@@ -33,18 +33,16 @@ import { Textarea } from "@/components/ui/textarea";
 
 // Validation Schemas
 const productRowSchema = z.object({
-  contractSub_type: z.string().min(1, "Item Type is required"),
   contractSub_item_name: z.string().min(1, "Item name is required"),
-  
-  contractSub_descriptionofGoods: z.string().min(1, "ASTA is required"),
-  contractSub_quality: z.string().min(1, "Quality is required"),
-  
-  contractSub_item_type: z.string().min(1, "Type is required"),
+  contractSub_descriptionofGoods: z.string().min(1, "Item Descriptions is required"),
+  contractSub_bagsize: z.number().min(1, "Gross Weight is required"),
   contractSub_packing: z.number().min(1, "Packing is required"),
-  contractSub_bagsize: z.number().min(1, "Bag is required"),
+  contractSub_quality: z.string().min(1, "Quality is required"),
+  contractSub_type: z.string().min(1, "Item Type is required"),
+  contractSub_item_type: z.string().min(1, "Type is required"),
   contractSub_qntyInMt: z.number().min(1, "Quoted price is required"),
   contractSub_rateMT: z.number().min(1, "Rate is required"),
-  contractSub_sbaga: z.string().min(1, "Bag type is required"),
+  contractSub_sbaga: z.string().min(1, "Bag Type is required"),
 });
 
 const enquiryFormSchema = z.object({
@@ -52,16 +50,25 @@ const enquiryFormSchema = z.object({
   contract_consignee: z.string().min(1, "Consignee Name is required"),
   contract_buyer_ec: z.string().min(1, "Buyer ECGC Name is required"),
   contract_consignee_ec: z.string().min(1, "Consignee ECGC Name is required"),
-  contract_date: z.string().min(1, "Enquiry date is required"),
-  contract_no: z.string().min(1, "Packing type is required"),
-  branch_short: z.string().min(1, "branch_short is required"),
-  contract_ship_date: z.string().min(1, "Contract date is required"),
-  contract_ref: z.string().min(1, "Contract date is required"),
-  contract_pono: z.string().min(1, "Contract date is required"),
-  contract_buyer_add: z.string().min(1, "Contract date is required"),
-  contract_buyer_ec_add: z.string().min(1, "Contract date is required"),
+  contract_buyer_add: z.string().min(1, "Buyer Address is required"),
+  contract_buyer_ec_add: z.string().min(1, "Buyer ECGC Address is required"),
   contract_consignee_add: z.string().min(1, "Consignee Address is required"),
-  enquiry_data: z
+  contract_consignee_ec_add: z.string().min(1, "Consignee ECGC Address is required"),
+  branch_short: z.string().min(1, "Company Sort is required"),
+  branch_name: z.string().min(1, "Company Name is required"),
+  branch_address: z.string().min(1, "Company Address is required"),
+  contract_no: z.string().min(1, "Contract No is required"),
+  contract_date: z.string().min(1, "Contract date is required"),
+  contract_ref: z.string().min(1, "Contract Ref is required"),
+  contract_pono: z.string().min(1, "Contract PONO is required"),
+  contract_loading: z.string().min(1, "Port of Loading is required"),
+  contract_destination_port: z.string().min(1, "Destination Port is required"),
+  contract_discharge: z.string().min(1, "Discharge is required"),
+  contract_cif: z.string().min(1, "CIF is required"),
+  contract_destination_country: z.string().min(1, "Dest. Country is required"),
+  contract_container_size: z.string().min(1, "Containers/Size is required"),
+
+  contract_data: z
     .array(productRowSchema)
     .min(1, "At least one product is required"),
 });
@@ -121,6 +128,222 @@ const fetchContractNos = async (company_sort) => {
   return response.json();
 };
 
+const fetchPortofLoadings = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No authentication token found");
+
+  const response = await fetch(
+    `${BASE_URL}/api/panel-fetch-portofLoading`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to fetch Port of Loading no data");
+  return response.json();
+};
+
+const fetchContainerSizes = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No authentication token found");
+
+  const response = await fetch(
+    `${BASE_URL}/api/panel-fetch-container-size`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to fetch Container Size no data");
+  return response.json();
+};
+
+const fetchPaymentTerms = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No authentication token found");
+
+  const response = await fetch(
+    `${BASE_URL}/api/panel-fetch-paymentTermsC`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to fetch Container Size no data");
+  return response.json();
+};
+
+const fetchPorts = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No authentication token found");
+
+  const response = await fetch(
+    `${BASE_URL}/api/panel-fetch-country-port`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to fetch Port no data");
+  return response.json();
+};
+
+const fetchCountrys = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No authentication token found");
+
+  const response = await fetch(
+    `${BASE_URL}/api/panel-fetch-country`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to fetch Port no data");
+  return response.json();
+};
+
+const fetchMarkings = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No authentication token found");
+
+  const response = await fetch(
+    `${BASE_URL}/api/panel-fetch-marking`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to fetch Marking no data");
+  return response.json();
+};
+
+const fetchItemNames = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No authentication token found");
+
+  const response = await fetch(
+    `${BASE_URL}/api/panel-fetch-itemname`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to fetch Item Name no data");
+  return response.json();
+};
+
+const fetchDescriptionofGoods = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No authentication token found");
+
+  const response = await fetch(
+    `${BASE_URL}/api/panel-fetch-descriptionofGoods`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to fetch Description of Goods no data");
+  return response.json();
+};
+
+const fetchBagsTypes = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No authentication token found");
+
+  const response = await fetch(
+    `${BASE_URL}/api/panel-fetch-bagType`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to fetch Bag Type no data");
+  return response.json();
+};
+
+const fetchCustomdescriptions = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No authentication token found");
+
+  const response = await fetch(
+    `${BASE_URL}/api/panel-fetch-customdescription`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to fetch Custom Description no data");
+  return response.json();
+};
+
+const fetchTypes = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No authentication token found");
+
+  const response = await fetch(
+    `${BASE_URL}/api/panel-fetch-type`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to fetch Types no data");
+  return response.json();
+};
+
+const fetchQualitys = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No authentication token found");
+
+  const response = await fetch(
+    `${BASE_URL}/api/panel-fetch-quality`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to fetch Quality no data");
+  return response.json();
+};
+
 const fetchProducts = async () => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
@@ -139,12 +362,12 @@ const fetchProducts = async () => {
   return response.json();
 };
 
-const createEnquiry = async (data) => {
+const createContract = async (data) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
 
   const response = await fetch(
-    "https://adityaspice.com/app/public/api/panel-create-enquiry",
+    `${BASE_URL}/api/panel-create-contract`,
     {
       method: "POST",
       headers: {
@@ -292,14 +515,74 @@ const ContractAdd = () => {
     queryKey: ["contractNo"],
     queryFn: fetchContractNos(formData.branch_short),
   });
+
+  const { data: portofLoadingData } = useQuery({
+    queryKey: ["portofLoadings"],
+    queryFn: fetchPortofLoadings,
+  });
+
+  const { data: containerSizeData } = useQuery({
+    queryKey: ["containersizes"],
+    queryFn: fetchContainerSizes,
+  });
+
+  const { data: paymentTermsData } = useQuery({
+    queryKey: ["paymentTerms"],
+    queryFn: fetchPaymentTerms,
+  });
+
+  const { data: countryData } = useQuery({
+    queryKey: ["country"],
+    queryFn: fetchCountrys,
+  });
+
+  const { data: markingData } = useQuery({
+    queryKey: ["markings"],
+    queryFn: fetchMarkings,
+  });
+
+  const { data: itemNameData } = useQuery({
+    queryKey: ["itemNames"],
+    queryFn: fetchItemNames,
+  });
+
+  const { data: descriptionofGoodseData } = useQuery({
+    queryKey: ["descriptionofGoodss"],
+    queryFn: fetchDescriptionofGoods,
+  });
+
+  const { data: bagTypeData } = useQuery({
+    queryKey: ["bagTypes"],
+    queryFn: fetchBagsTypes,
+  });
+
+  const { data: customdescriptionData } = useQuery({
+    queryKey: ["customdescriptions"],
+    queryFn: fetchCustomdescriptions,
+  });
+
+  const { data: typeData } = useQuery({
+    queryKey: ["types"],
+    queryFn: fetchTypes,
+  });
+
+  const { data: qualityData } = useQuery({
+    queryKey: ["qualitys"],
+    queryFn: fetchQualitys,
+  });
+  
+  const { data: portsData } = useQuery({
+    queryKey: ["ports"],
+    queryFn: fetchPorts,
+  });
   
   const { data: productData } = useQuery({
     queryKey: ["products"],
     queryFn: fetchProducts,
   });
 
-  const createEnquiryMutation = useMutation({
-    mutationFn: createEnquiry,
+  const createContractMutation = useMutation({
+    mutationFn: createContract,
     onSuccess: () => {
       toast({
         title: "Success",
@@ -316,7 +599,7 @@ const ContractAdd = () => {
     },
   });
 
-  const packingTypes = ["5 Kg", "10 Kg", "15 Kg", "20 Kg", "25 Kg"];
+  
 
   useEffect(() => {
     const calculateProgress = () => {
@@ -521,9 +804,9 @@ const ContractAdd = () => {
     try {
       const validatedData = enquiryFormSchema.parse({
         ...formData,
-        enquiry_data: contractData,
+        contract_data: contractData,
       });
-      createEnquiryMutation.mutate(validatedData);
+      createContractMutation.mutate(validatedData);
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {
@@ -841,12 +1124,12 @@ const ContractAdd = () => {
                       <SelectValue placeholder="Select Port of Loading" />
                     </SelectTrigger>
                     <SelectContent>
-                      {branchData?.branch?.map((branch) => (
+                      {portofLoadingData?.portofLoading?.map((portofLoading) => (
                         <SelectItem
-                          key={branch.branch_short}
-                          value={branch.branch_short.toString()}
+                          key={portofLoading.portofLoading}
+                          value={portofLoading.portofLoading.toString()}
                         >
-                          {branch.branch_short}
+                          {portofLoading.portofLoading}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -867,12 +1150,12 @@ const ContractAdd = () => {
                       <SelectValue placeholder="Select Destination Port" />
                     </SelectTrigger>
                     <SelectContent>
-                      {branchData?.branch?.map((branch) => (
+                      {portsData?.country?.map((country) => (
                         <SelectItem
-                          key={branch.branch_short}
-                          value={branch.branch_short.toString()}
+                          key={country.country_port}
+                          value={country.country_port.toString()}
                         >
-                          {branch.branch_short}
+                          {country.country_port}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -897,12 +1180,12 @@ const ContractAdd = () => {
                       <SelectValue placeholder="Select Discharge" />
                     </SelectTrigger>
                     <SelectContent>
-                      {branchData?.branch?.map((branch) => (
+                      {portsData?.country?.map((country) => (
                         <SelectItem
-                          key={branch.branch_short}
-                          value={branch.branch_short.toString()}
+                          key={country.country_port}
+                          value={country.country_port.toString()}
                         >
-                          {branch.branch_short}
+                          {country.country_port}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -923,12 +1206,12 @@ const ContractAdd = () => {
                       <SelectValue placeholder="Select CIF" />
                     </SelectTrigger>
                     <SelectContent>
-                      {branchData?.branch?.map((branch) => (
+                      {portsData?.country?.map((country) => (
                         <SelectItem
-                          key={branch.branch_short}
-                          value={branch.branch_short.toString()}
+                          key={country.country_port}
+                          value={country.country_port.toString()}
                         >
-                          {branch.branch_short}
+                          {country.country_port}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -949,12 +1232,12 @@ const ContractAdd = () => {
                       <SelectValue placeholder="Select Dest. Country" />
                     </SelectTrigger>
                     <SelectContent>
-                      {branchData?.branch?.map((branch) => (
+                      {countryData?.country?.map((country) => (
                         <SelectItem
-                          key={branch.branch_short}
-                          value={branch.branch_short.toString()}
+                          key={country.country_name}
+                          value={country.country_name.toString()}
                         >
-                          {branch.branch_short}
+                          {country.country_name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -975,12 +1258,12 @@ const ContractAdd = () => {
                       <SelectValue placeholder="Select Containers/Size" />
                     </SelectTrigger>
                     <SelectContent>
-                      {branchData?.branch?.map((branch) => (
+                      {containerSizeData?.containerSize?.map((containerSize) => (
                         <SelectItem
-                          key={branch.branch_short}
-                          value={branch.branch_short.toString()}
+                          key={containerSize.containerSize}
+                          value={containerSize.containerSize.toString()}
                         >
-                          {branch.branch_short}
+                          {containerSize.containerSize}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -989,7 +1272,7 @@ const ContractAdd = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Shipment Date <span className="text-red-500">*</span>
+                    Shipment Date
                   </label>
                   <Input
                     type="date"
@@ -999,7 +1282,7 @@ const ContractAdd = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Shipment <span className="text-red-500">*</span>
+                    Shipment 
                   </label>
                   <Input
                     type="date"
@@ -1053,12 +1336,12 @@ const ContractAdd = () => {
                       <SelectValue placeholder="Select Payment Terms" />
                     </SelectTrigger>
                     <SelectContent>
-                      {branchData?.branch?.map((branch) => (
+                      {paymentTermsData?.paymentTermsC?.map((paymentTermsC) => (
                         <SelectItem
-                          key={branch.branch_short}
-                          value={branch.branch_short.toString()}
+                          key={paymentTermsC.paymentTermsC}
+                          value={paymentTermsC.paymentTermsC.toString()}
                         >
-                          {branch.branch_short}
+                          {paymentTermsC.paymentTermsC}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -1226,127 +1509,19 @@ const ContractAdd = () => {
               </div>
             </div>
 
-            {/* Requirements Section */}
-            <div className="mb-8">
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    branch_short <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    type="text"
-                    placeholder="Enter branch_short details"
-                    value={formData.branch_short}
-                    onChange={(e) => handleInputChange(e, "branch_short")}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Packing Type <span className="text-red-500">*</span>
-                  </label>
-                  <Select
-                    value={formData.contract_no}
-                    onValueChange={(value) =>
-                      handleInputChange({ target: { value } }, "contract_no")
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select packing type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {packingTypes.map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <RadioOption
-                  label="Sample Required"
-                  value="contract_ref"
-                  onChange={handleInputChange}
-                  currentValue={formData.contract_ref}
-                  required={true}
-                />
-                <RadioOption
-                  label="Treatment Required"
-                  value="contract_pono"
-                  onChange={handleInputChange}
-                  currentValue={formData.contract_pono}
-                  required={true}
-                />
-
-                {/* Conditional Treatment Options */}
-                {formData.contract_pono === "Yes" && (
-                  <div className="col-span-2 space-y-4">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={formData.contract_buyer_add === "Yes"}
-                        onCheckedChange={(checked) =>
-                          handleInputChange(
-                            { target: { checked, type: "checkbox" } },
-                            "contract_buyer_add"
-                          )
-                        }
-                      />
-                      <label>contract_buyer_add</label>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={formData.contract_buyer_ec_add === "Yes"}
-                        onCheckedChange={(checked) =>
-                          handleInputChange(
-                            { target: { checked, type: "checkbox" } },
-                            "contract_buyer_ec_add"
-                          )
-                        }
-                      />
-                      <label>Gama Radiations</label>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={formData.contract_consignee_add === "Yes"}
-                        onCheckedChange={(checked) =>
-                          handleInputChange(
-                            { target: { checked, type: "checkbox" } },
-                            "contract_consignee_add"
-                          )
-                        }
-                      />
-                      <label>Steam Sterilization</label>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+            
           </CardContent>
         </Card>
 
-        {/* Submit Button */}
-        {/* <div className="flex justify-end">
-          <Button
-            type="submit"
-            className="bg-yellow-500 text-black hover:bg-yellow-400"
-            disabled={createEnquiryMutation.isPending}
-          >
-            {createEnquiryMutation.isPending
-              ? "Submitting..."
-              : "Submit Enquiry"}
-          </Button>
-        </div> */}
+        
         <div className="flex flex-col items-end">
-          {createEnquiryMutation.isPending && <ProgressBar progress={70} />}
+          {createContractMutation.isPending && <ProgressBar progress={70} />}
           <Button
             type="submit"
             className="bg-yellow-500 text-black hover:bg-yellow-400 flex items-center mt-2"
-            disabled={createEnquiryMutation.isPending}
+            disabled={createContractMutation.isPending}
           >
-            {createEnquiryMutation.isPending
+            {createContractMutation.isPending
               ? "Submitting..."
               : "Submit Enquiry"}
           </Button>
