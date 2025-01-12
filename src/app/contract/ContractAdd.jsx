@@ -30,6 +30,8 @@ import CreateCustomer from "../customer/CreateCustomer";
 import CreateProduct from "../product/CreateProduct";
 import BASE_URL from "@/config/BaseUrl";
 import { Textarea } from "@/components/ui/textarea";
+import { useCurrentYear } from "@/hooks/useCurrentYear";
+
 
 // Validation Schemas
 const productRowSchema = z.object({
@@ -38,14 +40,14 @@ const productRowSchema = z.object({
   contractSub_bagsize: z.number().min(1, "Gross Weight is required"),
   contractSub_packing: z.number().min(1, "Packing is required"),
   contractSub_quality: z.string().min(1, "Quality is required"),
-  contractSub_type: z.string().min(1, "Item Type is required"),
+  contractSub_item_bag: z.number().min(1, "Bag is required"),
   contractSub_item_type: z.string().min(1, "Type is required"),
   contractSub_qntyInMt: z.number().min(1, "Quoted price is required"),
   contractSub_rateMT: z.number().min(1, "Rate is required"),
   contractSub_sbaga: z.string().min(1, "Bag Type is required"),
 });
 
-const enquiryFormSchema = z.object({
+const contractFormSchema = z.object({
   contract_buyer: z.string().min(1, "Buyer Name is required"),
   contract_consignee: z.string().min(1, "Consignee Name is required"),
   contract_buyer_ec: z.string().min(1, "Buyer ECGC Name is required"),
@@ -344,24 +346,6 @@ const fetchQualitys = async () => {
   return response.json();
 };
 
-const fetchProducts = async () => {
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("No authentication token found");
-
-  const response = await fetch(
-    "https://adityaspice.com/app/public/api/panel-fetch-product",
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    }
-  );
-
-  if (!response.ok) throw new Error("Failed to fetch product data");
-  return response.json();
-};
-
 const createContract = async (data) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
@@ -425,39 +409,43 @@ const ContractAdd = () => {
   const [progress, setProgress] = useState(0);
 
   const [visibleColumns, setVisibleColumns] = useState([
-    "contractSub_type",
     "contractSub_marking",
+    "contractSub_item_name",
     "contractSub_descriptionofGoods",
-    "contractSub_quality",
-    "contractSub_item_type",
+    "contractSub_item_bag",
+    "contractSub_packing",
     "contractSub_bagsize",
     "contractSub_qntyInMt",
+    "contractSub_rateMT",
+    "contractSub_sbaga",
+    "contractSub_customdescription",
+    "contractSub_item_type",
+    "contractSub_quality",
   ]);
 
   const defaultTableHeaders = [
-    { key: "contractSub_type", label: "Product Name", required: true },
-    { key: "contractSub_marking", label: "SHU (in K)", required: true },
-    { key: "contractSub_descriptionofGoods", label: "ASTA", required: true },
-    { key: "contractSub_quality", label: "Quality Type", required: true },
-    { key: "contractSub_item_type", label: "Course Type", required: true },
-    { key: "contractSub_bagsize", label: "Quantity (in MT)", required: true },
-    { key: "contractSub_qntyInMt", label: "Quoted Price", required: true },
+    { key: "contractSub_marking", label: "Marking", required: false },
+    { key: "contractSub_item_name", label: "Item Name", required: true },
+    { key: "contractSub_descriptionofGoods", label: "Descriptions", required: true },
+    { key: "contractSub_item_bag", label: "Bags", required: true },
+    { key: "contractSub_packing", label: "Net", required: true },
+    { key: "contractSub_bagsize", label: "Gross", required: true },
+    { key: "contractSub_qntyInMt", label: "Qnty (MT)", required: true },
+    { key: "contractSub_rateMT", label: "Rate", required: true },
+    { key: "contractSub_sbaga", label: "Bag Type", required: true },
+    { key: "contractSub_customdescription", label: "Custom Description" , required: false },
+    { key: "contractSub_item_type", label: "Type", required: true },
+    { key: "contractSub_quality", label: "Quality", required: true },
   ];
 
-  const optionalHeaders = [
-    { key: "contractSub_item_name", label: "Product Code" },
-    { key: "contractSub_customdescription", label: "Stem Type" },
-    { key: "contractSub_packing", label: "Moisture Value" },
-    { key: "contractSub_rateMT", label: "Final Price" },
-    { key: "contractSub_sbaga", label: "P2B Blend" },
-  ];
+  
 
   const [contractData, setContractData] = useState([
     {
-      contractSub_type: "",
-      contractSub_item_name: "",
       contractSub_marking: "",
+      contractSub_item_name: "",
       contractSub_descriptionofGoods: "",
+      contractSub_item_bag: "",
       contractSub_quality: "",
       contractSub_customdescription: "",
       contractSub_item_type: "",
@@ -468,12 +456,20 @@ const ContractAdd = () => {
       contractSub_sbaga: "",
     },
   ]);
-
+  const { data: currentYear } = useCurrentYear();
+  useEffect(() => {
+    if (currentYear) {
+      setFormData((prev) => ({
+        ...prev,
+        contract_year: currentYear,
+      }));
+    }
+  }, [currentYear]);
   const [formData, setFormData] = useState({
     branch_short: "",
     branch_name: "",
     branch_address: "",
-    contract_year: "",
+    contract_year: currentYear,
     contract_date: getTodayDate(),
     contract_no: "",
     contract_ref: "",
@@ -505,7 +501,7 @@ const ContractAdd = () => {
     queryKey: ["buyer"],
     queryFn: fetchBuyers,
   });
-
+  
   const { data: branchData } = useQuery({
     queryKey: ["branch"],
     queryFn: fetchCompanys,
@@ -513,8 +509,12 @@ const ContractAdd = () => {
 
   const { data: contractNoData } = useQuery({
     queryKey: ["contractNo"],
-    queryFn: fetchContractNos(formData.branch_short),
+    queryFn: fetchContractNos(branchData?.branch_short),
+    enabled: !!formData?.branch_short, 
+    refetchOnWindowFocus: false,
   });
+
+  console.log("gg",contractNoData)
 
   const { data: portofLoadingData } = useQuery({
     queryKey: ["portofLoadings"],
@@ -576,11 +576,6 @@ const ContractAdd = () => {
     queryFn: fetchPorts,
   });
   
-  const { data: productData } = useQuery({
-    queryKey: ["products"],
-    queryFn: fetchProducts,
-  });
-
   const createContractMutation = useMutation({
     mutationFn: createContract,
     onSuccess: () => {
@@ -626,19 +621,13 @@ const ContractAdd = () => {
         "contract_ship_date",
         "contract_ref",
       ];
+
       requirementsFields.forEach((field) => {
         totalFields++;
         if (formData[field]) filledFields++;
       });
 
-      // Add treatment fields if treatment is required
-      if (formData.contract_pono === "Yes") {
-        const treatmentFields = ["contract_buyer_add", "contract_buyer_ec_add", "contract_consignee_add"];
-        treatmentFields.forEach((field) => {
-          totalFields++;
-          if (formData[field] === "Yes") filledFields++;
-        });
-      }
+      
 
       // Count all visible product fields for each row
       contractData.forEach((row) => {
@@ -659,23 +648,20 @@ const ContractAdd = () => {
 
   const handleInputChange = (e, field) => {
     let value;
-    if (e.target.type === "checkbox") {
-      value = e.target.checked ? "Yes" : "No";
-    } else {
-      value = e.target.value;
-    }
+    value = e.target.value;
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
+    
   };
 
   const handleRowDataChange = (rowIndex, field, value) => {
     const numericFields = [
       'contractSub_bagsize',
       'contractSub_qntyInMt',
-      
-      'contractSub_marking',
+      'contractSub_packing',
+      'contractSub_rateMT',
       'contractSub_descriptionofGoods'
     ];
     let processedValue = value;
@@ -718,7 +704,7 @@ const ContractAdd = () => {
     setContractData([
       ...contractData,
       {
-        contractSub_type: "",
+        contractSub_item_bag: "",
         contractSub_item_name: "",
         contractSub_marking: "",
         contractSub_descriptionofGoods: "",
@@ -740,69 +726,29 @@ const ContractAdd = () => {
     }
   };
 
-  const RadioOption = ({
-    label,
-    value,
-    onChange,
-    currentValue,
-    required = false,
-  }) => (
-    <div>
-      <label className="block text-sm font-medium mb-2">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
-      <RadioGroup
-        value={currentValue}
-        onValueChange={(newValue) =>
-          onChange({ target: { value: newValue } }, value)
-        }
-        className="flex gap-4"
-      >
-        <div className="flex items-center space-x-2 cursor-pointer">
-          <RadioGroupItem value="Yes" id={`${value}-yes`} />
-          <label htmlFor={`${value}-yes`} className="cursor-pointer">
-            Yes
-          </label>
-        </div>
-        <div className="flex items-center space-x-2 cursor-pointer">
-          <RadioGroupItem value="No" id={`${value}-no`} />
-          <label htmlFor={`${value}-no`} className="cursor-pointer">
-            No
-          </label>
-        </div>
-      </RadioGroup>
-    </div>
-  );
+  
   const fieldLabels = {
     contract_buyer: "Buyer",
     contract_consignee: "Consignee",
     contract_buyer_ec: "Buyer ECGC",
     contract_consignee_ec: "Consignee ECGC",
-    contract_date: "Enquiry Date",
-    contract_no: "Packing Type",
-    branch_short: "branch_short",
+    contract_date: "Contract Date",
+    contract_no: "Contract No",
+    
     contract_ship_date: "Shipment Date",
-    contract_ref: "Sample Required",
-    contract_pono: "Treatment Required",
-    contract_buyer_add: "contract_buyer_add",
-    contract_buyer_ec_add: "Gama Radiations",
-    contract_consignee_add: "Steam Sterilization",
-    contractSub_type: "Product Name",
-    contractSub_marking: "SHU",
-    contractSub_descriptionofGoods: "ASTA",
-    contractSub_quality: "Quality Type",
-    contractSub_item_type: "Course Type",
-    contractSub_bagsize: "Quantity",
-    contractSub_qntyInMt: "Quoted Price",
-    contractSub_rateMT: "Final Price",
-    contractSub_sbaga: "P2B Blend",
+    contract_ref: "Contract Ref",
+    contract_pono: "PONO Required",
+    contract_buyer_add: "Buyer Add",
+    contract_buyer_ec_add: "Buyer ECGC Add",
+    contract_consignee_add: "Cnsignee Add",
+   
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const validatedData = enquiryFormSchema.parse({
+      const validatedData = contractFormSchema.parse({
         ...formData,
         contract_data: contractData,
       });
@@ -1368,34 +1314,14 @@ const ContractAdd = () => {
                <h2 className="text-xl font-semibold">Products</h2>
                <CreateProduct/>
                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Settings2 className="h-4 w-4 mr-2" />
-                      Customize Columns
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    {optionalHeaders.map((header) => (
-                      <DropdownMenuItem
-                        key={header.key}
-                        onClick={() => toggleColumn(header.key)}
-                      >
-                        <span>{header.label}</span>
-                        {visibleColumns.includes(header.key) && (
-                          <span className="text-green-500">✓</span>
-                        )}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse">
                   <thead>
                     <tr className="bg-gray-50">
-                      {[...defaultTableHeaders, ...optionalHeaders]
+                      {[...defaultTableHeaders]
                         .filter((header) => visibleColumns.includes(header.key))
                         .map((header) => (
                           <th
@@ -1414,13 +1340,13 @@ const ContractAdd = () => {
                   <tbody>
                     {contractData.map((row, rowIndex) => (
                       <tr key={rowIndex} className="border-b hover:bg-gray-50">
-                        {[...defaultTableHeaders, ...optionalHeaders]
+                        {[...defaultTableHeaders]
                           .filter((header) =>
                             visibleColumns.includes(header.key)
                           )
                           .map((header) => (
                             <td key={header.key} className="p-2 border">
-                              {header.key === "contractSub_type" ? (
+                              {header.key === "contractSub_marking" ? (
                                 <Select
                                   value={row[header.key]}
                                   onValueChange={(value) =>
@@ -1432,15 +1358,15 @@ const ContractAdd = () => {
                                   }
                                 >
                                   <SelectTrigger>
-                                    <SelectValue placeholder="Select product" />
+                                    <SelectValue placeholder="Select Marking" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    {productData?.product?.map((product) => (
+                                    {markingData?.marking?.map((marking) => (
                                       <SelectItem
-                                        key={product.id}
-                                        value={product.product_name}
+                                        key={marking.marking}
+                                        value={marking.marking}
                                       >
-                                        {product.product_name}
+                                        {marking.marking}
                                       </SelectItem>
                                     ))}
                                   </SelectContent>
@@ -1456,23 +1382,52 @@ const ContractAdd = () => {
                                     )
                                   }
                                   type={
-                                    ['contractSub_bagsize', 'contractSub_qntyInMt', 
-                                      'contractSub_marking', 
-                                     'contractSub_descriptionofGoods'].includes(header.key) 
+                                    ['contractSub_item_name', 
+                                      'contractSub_descriptionofGoods', 
+                                      'contractSub_item_bag', 
+                                     'contractSub_packing',
+                                     'contractSub_bagsize',
+                                     'contractSub_qntyInMt',
+                                     'contractSub_rateMT',
+                                     'contractSub_sbaga',
+                                     'contractSub_customdescription',
+                                     'contractSub_item_type',
+                                     'contractSub_quality',
+                                    ].includes(header.key) 
                                       ? "number" 
                                       : "text"
                                   }
                                   step={
-                                    ['contractSub_bagsize', 'contractSub_qntyInMt', 
-                                      'contractSub_marking', 
-                                     'contractSub_descriptionofGoods'].includes(header.key) 
+                                    ['contractSub_item_name', 
+                                      'contractSub_descriptionofGoods', 
+                                      'contractSub_item_bag', 
+                                     'contractSub_packing',
+                                     'contractSub_bagsize',
+                                     'contractSub_qntyInMt',
+                                     'contractSub_rateMT',
+                                     'contractSub_sbaga',
+                                     'contractSub_customdescription',
+                                     'contractSub_item_type',
+                                     'contractSub_quality',
+                                    ]
+                                     .includes(header.key) 
                                       ? "any" 
                                       : undefined
                                   }
                                   min={
-                                    ['contractSub_bagsize', 'contractSub_qntyInMt', 
-                                      'contractSub_marking', 
-                                     'contractSub_descriptionofGoods'].includes(header.key) 
+                                    ['contractSub_item_name', 
+                                      'contractSub_descriptionofGoods', 
+                                      'contractSub_item_bag', 
+                                     'contractSub_packing',
+                                     'contractSub_bagsize',
+                                     'contractSub_qntyInMt',
+                                     'contractSub_rateMT',
+                                     'contractSub_sbaga',
+                                     'contractSub_customdescription',
+                                     'contractSub_item_type',
+                                     'contractSub_quality',
+                                    ]
+                                     .includes(header.key) 
                                       ? "0" 
                                       : undefined
                                   }
