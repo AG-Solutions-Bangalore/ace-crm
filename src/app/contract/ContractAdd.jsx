@@ -45,31 +45,40 @@ const productRowSchema = z.object({
   contractSub_qntyInMt: z.number().min(1, "Quoted price is required"),
   contractSub_rateMT: z.number().min(1, "Rate is required"),
   contractSub_sbaga: z.string().min(1, "Bag Type is required"),
+  contractSub_marking: z.string().optional(),
+  contractSub_customdescription: z.string().optional(),
 });
 
 const contractFormSchema = z.object({
-  contract_buyer: z.string().min(1, "Buyer Name is required"),
-  contract_consignee: z.string().min(1, "Consignee Name is required"),
-  contract_buyer_ec: z.string().min(1, "Buyer ECGC Name is required"),
-  contract_consignee_ec: z.string().min(1, "Consignee ECGC Name is required"),
-  contract_buyer_add: z.string().min(1, "Buyer Address is required"),
-  contract_buyer_ec_add: z.string().min(1, "Buyer ECGC Address is required"),
-  contract_consignee_add: z.string().min(1, "Consignee Address is required"),
-  contract_consignee_ec_add: z.string().min(1, "Consignee ECGC Address is required"),
   branch_short: z.string().min(1, "Company Sort is required"),
   branch_name: z.string().min(1, "Company Name is required"),
   branch_address: z.string().min(1, "Company Address is required"),
-  contract_no: z.string().min(1, "Contract No is required"),
+  contract_year: z.string().optional(),
   contract_date: z.string().min(1, "Contract date is required"),
+  contract_no: z.string().min(1, "Contract No is required"),
   contract_ref: z.string().min(1, "Contract Ref is required"),
   contract_pono: z.string().min(1, "Contract PONO is required"),
+  contract_buyer: z.string().min(1, "Buyer Name is required"),
+  contract_buyer_add: z.string().min(1, "Buyer Address is required"),
+  contract_buyer_ec: z.string().min(1, "Buyer ECGC Name is required"),
+  contract_buyer_ec_add: z.string().min(1, "Buyer ECGC Address is required"),
+  contract_consignee: z.string().min(1, "Consignee Name is required"),
+  contract_consignee_add: z.string().min(1, "Consignee Address is required"),
+  contract_consignee_ec: z.string().min(1, "Consignee ECGC Name is required"),
+  contract_consignee_ec_add: z.string().min(1, "Consignee ECGC Address is required"),
+  contract_container_size: z.string().min(1, "Containers/Size is required"),
   contract_loading: z.string().min(1, "Port of Loading is required"),
   contract_destination_port: z.string().min(1, "Destination Port is required"),
   contract_discharge: z.string().min(1, "Discharge is required"),
   contract_cif: z.string().min(1, "CIF is required"),
   contract_destination_country: z.string().min(1, "Dest. Country is required"),
-  contract_container_size: z.string().min(1, "Containers/Size is required"),
-
+  contract_shipment:z.string().optional(),
+  contract_ship_date:z.string().optional(),
+  contract_specification1:z.string().optional(),
+  contract_specification2:z.string().optional(),
+  contract_payment_terms:z.string().optional(),
+  contract_remarks:z.string().optional(),
+  
   contract_data: z
     .array(productRowSchema)
     .min(1, "At least one product is required"),
@@ -509,8 +518,8 @@ const ContractAdd = () => {
   });
 
   const { data: contractNoData } = useQuery({
-    queryKey: ["contractnos",formData.branch_short],
-    queryFn: fetchContractNos(formData.branch_short),
+    queryKey: ["contractnoss"],
+    queryFn: fetchContractNos,
   });
 
   const { data: portofLoadingData } = useQuery({
@@ -657,7 +666,8 @@ const ContractAdd = () => {
       'contractSub_bagsize',
       'contractSub_qntyInMt',
       'contractSub_packing',
-      'contractSub_rateMT'
+      'contractSub_rateMT',
+      'contractSub_item_bag'
     ];
     let processedValue = value;
        // If it's a numeric field, process it
@@ -814,16 +824,22 @@ const ContractAdd = () => {
                           "contract_buyer_add"
                         );
                       }
-                      const contractRef = `${formData.branch_short}/${selectedBuyer.buyer_sort}/${formData.contract_no}/${formData.contract_year}`;
-                      handleInputChange(
-                        { target: { value: contractRef} },
-                        "contract_ref"
+                      
+                      const selectedCompanySort = branchData?.branch?.find(
+                        (branch) => branch.branch_short === formData.branch_short
                       );
+                      if(selectedCompanySort){
+                        const contractRef = `${selectedCompanySort.branch_name_short}/${selectedBuyer.buyer_sort}/${formData.contract_no}/${formData.contract_year}`;
+                        handleInputChange(
+                          { target: { value: contractRef} },
+                          "contract_ref"
+                        );
 
-                      handleInputChange(
-                        { target: { value: contractRef} },
-                        "contract_pono"
-                      );
+                        handleInputChange(
+                          { target: { value: contractRef} },
+                          "contract_pono"
+                        );
+                      }
                     }}
                   >
                     <SelectTrigger>
@@ -985,6 +1001,7 @@ const ContractAdd = () => {
                     placeholder="Enter Buyer ECGC Address"
                     value={formData.contract_buyer_ec_add}
                     onChange={(e) => handleInputChange(e, "contract_buyer_ec_add")}
+                    
                   />
                 </div>
                 <div>
@@ -1029,7 +1046,7 @@ const ContractAdd = () => {
                         );
                         
                         if(selectedBuyer){
-                          const contractRef = `${selectedCompanySort.branch_short}/${selectedBuyer.buyer_sort}/${formData.contract_no}/${formData.contract_year}`;
+                          const contractRef = `${selectedCompanySort.branch_name_short}/${selectedBuyer.buyer_sort}/${formData.contract_no}/${formData.contract_year}`;
                           handleInputChange(
                             { target: { value: contractRef} },
                             "contract_ref"
@@ -1085,7 +1102,10 @@ const ContractAdd = () => {
                       const selectedBuyer = buyerData?.buyer?.find(
                         (buyer) => buyer.buyer_name === formData.contract_buyer
                       );
-                      const contractRef = `${formData.branch_short}/${selectedBuyer.buyer_sort}/${value}/${formData.contract_year}`;
+                      const selectedCompanySort = branchData?.branch?.find(
+                        (branch) => branch.branch_short === formData.branch_short
+                      );
+                      const contractRef = `${selectedCompanySort.branch_name_short}/${selectedBuyer.buyer_sort}/${value}/${formData.contract_year}`;
                       handleInputChange(
                         { target: { value: contractRef} },
                         "contract_ref"
@@ -1105,12 +1125,12 @@ const ContractAdd = () => {
                       <SelectValue placeholder="Select Contract No" />
                     </SelectTrigger>
                     <SelectContent>
-                      {contractNoData?.contractNo?.map((contractNo) => (
+                      {contractNoData?.contractNo?.map((contractNos) => (
                         <SelectItem
-                          key={contractNo}
-                          value={contractNo.toString()}
+                          key={contractNos}
+                          value={contractNos.toString()}
                         >
-                          {contractNo}
+                          {contractNos}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -1643,11 +1663,7 @@ const ContractAdd = () => {
                                   }
                                   step={
                                     [
-                                      'contractSub_item_bag', 
-                                     'contractSub_packing',
-                                     'contractSub_bagsize',
-                                     'contractSub_qntyInMt',
-                                     'contractSub_rateMT',
+                                      
                                      
                                     ]
                                      .includes(header.key) 

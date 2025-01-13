@@ -182,7 +182,7 @@ const ContractList = () => {
 
         return (
           <div className="flex flex-row">
-          <TooltipProvider>
+          {/* <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -195,9 +195,9 @@ const ContractList = () => {
               </TooltipTrigger>
               <TooltipContent>View Contract</TooltipContent>
             </Tooltip>
-          </TooltipProvider>
+          </TooltipProvider> */}
   
-          <TooltipProvider>
+          {/* <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -210,24 +210,8 @@ const ContractList = () => {
               </TooltipTrigger>
               <TooltipContent>Edit Contract</TooltipContent>
             </Tooltip>
-          </TooltipProvider>
-  
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => navigate(`/reply-edit-contract/${contractId}`)}
-                >
-                  <UserPen className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Reply Follow-Up</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-  
-          <TooltipProvider>
+          </TooltipProvider> */}
+          {/* <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -243,7 +227,7 @@ const ContractList = () => {
               </TooltipTrigger>
               <TooltipContent>Delete Contract</TooltipContent>
             </Tooltip>
-          </TooltipProvider>
+          </TooltipProvider> */}
         </div>
         );
       },
