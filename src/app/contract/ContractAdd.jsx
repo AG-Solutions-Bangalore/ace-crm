@@ -113,6 +113,7 @@ const fetchCompanys = async () => {
 };
 
 const fetchContractNos = async (company_sort) => {
+  
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
 
@@ -508,13 +509,9 @@ const ContractAdd = () => {
   });
 
   const { data: contractNoData } = useQuery({
-    queryKey: ["contractNo"],
-    queryFn: fetchContractNos(branchData?.branch_short),
-    enabled: !!formData?.branch_short, 
-    refetchOnWindowFocus: false,
+    queryKey: ["contractnos",formData.branch_short],
+    queryFn: fetchContractNos(formData.branch_short),
   });
-
-  console.log("gg",contractNoData)
 
   const { data: portofLoadingData } = useQuery({
     queryKey: ["portofLoadings"],
@@ -653,7 +650,6 @@ const ContractAdd = () => {
       ...prev,
       [field]: value,
     }));
-    
   };
 
   const handleRowDataChange = (rowIndex, field, value) => {
@@ -661,8 +657,7 @@ const ContractAdd = () => {
       'contractSub_bagsize',
       'contractSub_qntyInMt',
       'contractSub_packing',
-      'contractSub_rateMT',
-      'contractSub_descriptionofGoods'
+      'contractSub_rateMT'
     ];
     let processedValue = value;
        // If it's a numeric field, process it
@@ -690,14 +685,6 @@ const ContractAdd = () => {
       [field]: processedValue,
     };
     setContractData(newData);
-  };
-
-  const toggleColumn = (columnKey) => {
-    setVisibleColumns((prev) =>
-      prev.includes(columnKey)
-        ? prev.filter((key) => key !== columnKey)
-        : [...prev, columnKey]
-    );
   };
 
   const addRow = () => {
@@ -804,7 +791,7 @@ const ContractAdd = () => {
         <Card className="mb-6">
           <CardContent className="p-6">
             {/* Basic Details Section */}
-            <div className="mb-8">
+            <div className="mb-0">
               <div className="grid grid-cols-4 gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-2">
@@ -812,9 +799,32 @@ const ContractAdd = () => {
                   </label>
                   <Select
                     value={formData.contract_buyer}
-                    onValueChange={(value) =>
-                      handleInputChange({ target: { value } }, "contract_buyer")
-                    }
+                    onValueChange={(value) => {
+                      const selectedBuyer = buyerData?.buyer?.find(
+                        (buyer) => buyer.buyer_name === value
+                      );
+                      handleInputChange(
+                        { target: { value } },
+                        "contract_buyer"
+                      );
+
+                      if (selectedBuyer) {
+                        handleInputChange(
+                          { target: { value: selectedBuyer.buyer_address } },
+                          "contract_buyer_add"
+                        );
+                      }
+                      const contractRef = `${formData.branch_short}/${selectedBuyer.buyer_sort}/${formData.contract_no}/${formData.contract_year}`;
+                      handleInputChange(
+                        { target: { value: contractRef} },
+                        "contract_ref"
+                      );
+
+                      handleInputChange(
+                        { target: { value: contractRef} },
+                        "contract_pono"
+                      );
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select Buyer" />
@@ -838,9 +848,21 @@ const ContractAdd = () => {
                   </label>
                   <Select
                     value={formData.contract_consignee}
-                    onValueChange={(value) =>
-                      handleInputChange({ target: { value } }, "contract_consignee")
-                    }
+                    onValueChange={(value) => {
+                      const selectedBuyer = buyerData?.buyer?.find(
+                        (buyer) => buyer.buyer_name === value
+                      );
+                      handleInputChange(
+                        { target: { value } },
+                        "contract_consignee"
+                      );
+                      if (selectedBuyer) {
+                        handleInputChange(
+                          { target: { value: selectedBuyer.buyer_address } },
+                          "contract_consignee_add"
+                        );
+                      }
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select Consignee" />
@@ -864,9 +886,21 @@ const ContractAdd = () => {
                   </label>
                   <Select
                     value={formData.contract_buyer_ec}
-                    onValueChange={(value) =>
-                      handleInputChange({ target: { value } }, "contract_buyer_ec")
-                    }
+                    onValueChange={(value) => {
+                      const selectedBuyer = buyerData?.buyer?.find(
+                        (buyer) => buyer.buyer_name === value
+                      );
+                      handleInputChange(
+                        { target: { value } },
+                        "contract_buyer_ec"
+                      );
+                      if (selectedBuyer) {
+                        handleInputChange(
+                          { target: { value: selectedBuyer.buyer_address } },
+                          "contract_buyer_ec_add"
+                        );
+                      }
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select Buyer ECGC" />
@@ -890,9 +924,21 @@ const ContractAdd = () => {
                   </label>
                   <Select
                     value={formData.contract_consignee_ec}
-                    onValueChange={(value) =>
-                      handleInputChange({ target: { value } }, "contract_consignee_ec")
-                    }
+                    onValueChange={(value) => {
+                      const selectedBuyer = buyerData?.buyer?.find(
+                        (buyer) => buyer.buyer_name === value
+                      );
+                      handleInputChange(
+                        { target: { value } },
+                        "contract_consignee_ec"
+                      );
+                      if (selectedBuyer) {
+                        handleInputChange(
+                          { target: { value: selectedBuyer.buyer_address } },
+                          "contract_consignee_ec_add"
+                        );
+                      }
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select Consignee ECGC" />
@@ -960,9 +1006,44 @@ const ContractAdd = () => {
                   </label>
                   <Select
                     value={formData.branch_short}
-                    onValueChange={(value) =>
-                      handleInputChange({ target: { value } }, "branch_short")
-                    }
+                    onValueChange={(value) => {
+                      const selectedCompanySort = branchData?.branch?.find(
+                        (branch) => branch.branch_short === value
+                      );
+                      
+                      handleInputChange(
+                        { target: { value } },
+                        "branch_short"
+                      );
+                      if (selectedCompanySort) {
+                        handleInputChange(
+                          { target: { value: selectedCompanySort.branch_name } },
+                          "branch_name"
+                        );
+                        handleInputChange(
+                          { target: { value: selectedCompanySort.branch_address } },
+                          "branch_address"
+                        );
+                        const selectedBuyer = buyerData?.buyer?.find(
+                          (buyer) => buyer.buyer_name === formData.contract_buyer
+                        );
+                        
+                        if(selectedBuyer){
+                          const contractRef = `${selectedCompanySort.branch_short}/${selectedBuyer.buyer_sort}/${formData.contract_no}/${formData.contract_year}`;
+                          handleInputChange(
+                            { target: { value: contractRef} },
+                            "contract_ref"
+                          );
+  
+                          handleInputChange(
+                            { target: { value: contractRef} },
+                            "contract_pono"
+                          );
+                        }
+                        
+                      }
+                      fetchContractNos(value);
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select Company" />
@@ -1000,8 +1081,24 @@ const ContractAdd = () => {
                   </label>
                   <Select
                     value={formData.contract_no}
-                    onValueChange={(value) =>
-                      handleInputChange({ target: { value } }, "contract_no")
+                    onValueChange={(value) =>{
+                      const selectedBuyer = buyerData?.buyer?.find(
+                        (buyer) => buyer.buyer_name === formData.contract_buyer
+                      );
+                      const contractRef = `${formData.branch_short}/${selectedBuyer.buyer_sort}/${value}/${formData.contract_year}`;
+                      handleInputChange(
+                        { target: { value: contractRef} },
+                        "contract_ref"
+                      );
+
+                      handleInputChange(
+                        { target: { value: contractRef} },
+                        "contract_pono"
+                      );
+
+                      handleInputChange({ target: { value } }, "contract_no");
+                    }
+                      
                     }
                   >
                     <SelectTrigger>
@@ -1042,6 +1139,7 @@ const ContractAdd = () => {
                     type="text"
                     placeholder="Enter Contract Ref"
                     value={formData.contract_ref}
+                    disabled
                     onChange={(e) => handleInputChange(e, "contract_ref")}
                   />
                 </div>
@@ -1231,7 +1329,7 @@ const ContractAdd = () => {
                     Shipment 
                   </label>
                   <Input
-                    type="date"
+                    type="text"
                     value={formData.contract_shipment}
                     onChange={(e) => handleInputChange(e, "contract_shipment")}
                   />
@@ -1266,16 +1364,16 @@ const ContractAdd = () => {
                 
               </div>
               </div>
-<div className="mb-8">
+            <div className="mb-8">
               <div className="grid grid-cols-2 gap-6">
                 <div>
                 <label className="block text-sm font-medium mb-2">
                 Payment Terms
                   </label>
                   <Select
-                    value={formData.contract_container_size}
+                    value={formData.contract_payment_terms}
                     onValueChange={(value) =>
-                      handleInputChange({ target: { value } }, "contract_container_size")
+                      handleInputChange({ target: { value } }, "contract_payment_terms")
                     }
                   >
                     <SelectTrigger>
@@ -1371,7 +1469,157 @@ const ContractAdd = () => {
                                     ))}
                                   </SelectContent>
                                 </Select>
-                              ) : (
+                              ) : header.key === "contractSub_item_name" ? (
+                                <Select
+                                  value={row[header.key]}
+                                  onValueChange={(value) =>
+                                    handleRowDataChange(
+                                      rowIndex,
+                                      header.key,
+                                      value
+                                    )
+                                  }
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select Item Name" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {itemNameData?.itemname?.map((itemname) => (
+                                      <SelectItem
+                                        key={itemname.item_name}
+                                        value={itemname.item_name}
+                                      >
+                                        {itemname.item_name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ): header.key === "contractSub_descriptionofGoods" ? (
+                                <Select
+                                  value={row[header.key]}
+                                  onValueChange={(value) =>
+                                    handleRowDataChange(
+                                      rowIndex,
+                                      header.key,
+                                      value
+                                    )
+                                  }
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select Item Name" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {descriptionofGoodseData?.descriptionofGoods?.map((descriptionofGoods) => (
+                                      <SelectItem
+                                        key={descriptionofGoods.descriptionofGoods}
+                                        value={descriptionofGoods.descriptionofGoods}
+                                      >
+                                        {descriptionofGoods.descriptionofGoods}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ): header.key === "contractSub_sbaga" ? (
+                                <Select
+                                  value={row[header.key]}
+                                  onValueChange={(value) =>
+                                    handleRowDataChange(
+                                      rowIndex,
+                                      header.key,
+                                      value
+                                    )
+                                  }
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select Bag Type" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {bagTypeData?.bagType?.map((bagType) => (
+                                      <SelectItem
+                                        key={bagType.bagType}
+                                        value={bagType.bagType}
+                                      >
+                                        {bagType.bagType}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ):header.key === "contractSub_customdescription" ? (
+                                <Select
+                                  value={row[header.key]}
+                                  onValueChange={(value) =>
+                                    handleRowDataChange(
+                                      rowIndex,
+                                      header.key,
+                                      value
+                                    )
+                                  }
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select Custom Description" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {customdescriptionData?.customdescription?.map((customdescription) => (
+                                      <SelectItem
+                                        key={customdescription.customdescription}
+                                        value={customdescription.customdescription}
+                                      >
+                                        {customdescription.customdescription}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ):header.key === "contractSub_item_type" ? (
+                                <Select
+                                  value={row[header.key]}
+                                  onValueChange={(value) =>
+                                    handleRowDataChange(
+                                      rowIndex,
+                                      header.key,
+                                      value
+                                    )
+                                  }
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select Type" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {typeData?.type?.map((typess) => (
+                                      <SelectItem
+                                        key={typess.type}
+                                        value={typess.type}
+                                      >
+                                        {typess.type}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ):header.key === "contractSub_quality" ? (
+                                <Select
+                                  value={row[header.key]}
+                                  onValueChange={(value) =>
+                                    handleRowDataChange(
+                                      rowIndex,
+                                      header.key,
+                                      value
+                                    )
+                                  }
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select Quality" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {qualityData?.quality?.map((quality) => (
+                                      <SelectItem
+                                        key={quality.quality}
+                                        value={quality.quality}
+                                      >
+                                        {quality.quality}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ):(
                                 <Input
                                   value={row[header.key]}
                                   onChange={(e) =>
@@ -1382,50 +1630,38 @@ const ContractAdd = () => {
                                     )
                                   }
                                   type={
-                                    ['contractSub_item_name', 
-                                      'contractSub_descriptionofGoods', 
+                                    [
                                       'contractSub_item_bag', 
                                      'contractSub_packing',
                                      'contractSub_bagsize',
                                      'contractSub_qntyInMt',
                                      'contractSub_rateMT',
-                                     'contractSub_sbaga',
-                                     'contractSub_customdescription',
-                                     'contractSub_item_type',
-                                     'contractSub_quality',
+                                     
                                     ].includes(header.key) 
                                       ? "number" 
                                       : "text"
                                   }
                                   step={
-                                    ['contractSub_item_name', 
-                                      'contractSub_descriptionofGoods', 
+                                    [
                                       'contractSub_item_bag', 
                                      'contractSub_packing',
                                      'contractSub_bagsize',
                                      'contractSub_qntyInMt',
                                      'contractSub_rateMT',
-                                     'contractSub_sbaga',
-                                     'contractSub_customdescription',
-                                     'contractSub_item_type',
-                                     'contractSub_quality',
+                                     
                                     ]
                                      .includes(header.key) 
                                       ? "any" 
                                       : undefined
                                   }
                                   min={
-                                    ['contractSub_item_name', 
-                                      'contractSub_descriptionofGoods', 
+                                    [
                                       'contractSub_item_bag', 
                                      'contractSub_packing',
                                      'contractSub_bagsize',
                                      'contractSub_qntyInMt',
                                      'contractSub_rateMT',
-                                     'contractSub_sbaga',
-                                     'contractSub_customdescription',
-                                     'contractSub_item_type',
-                                     'contractSub_quality',
+                                     
                                     ]
                                      .includes(header.key) 
                                       ? "0" 
