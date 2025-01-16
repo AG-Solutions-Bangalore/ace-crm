@@ -39,14 +39,14 @@ const productRowSchema = z.object({
   contractSub_descriptionofGoods: z.string().min(1, "Item Descriptions is required"),
   contractSub_bagsize: z.number().min(1, "Gross Weight is required"),
   contractSub_packing: z.number().min(1, "Packing is required"),
-  contractSub_quality: z.string().min(1, "Quality is required"),
+ 
   contractSub_item_bag: z.number().min(1, "Bag is required"),
-  contractSub_item_type: z.string().min(1, "Type is required"),
+  
   contractSub_qntyInMt: z.number().min(1, "Quoted price is required"),
   contractSub_rateMT: z.number().min(1, "Rate is required"),
   contractSub_sbaga: z.string().min(1, "Bag Type is required"),
   contractSub_marking: z.string().optional(),
-  contractSub_customdescription: z.string().optional(),
+ 
 });
 
 const contractFormSchema = z.object({
@@ -60,12 +60,10 @@ const contractFormSchema = z.object({
   contract_pono: z.string().min(1, "Contract PONO is required"),
   contract_buyer: z.string().min(1, "Buyer Name is required"),
   contract_buyer_add: z.string().min(1, "Buyer Address is required"),
-  contract_buyer_ec: z.string().min(1, "Buyer ECGC Name is required"),
-  contract_buyer_ec_add: z.string().min(1, "Buyer ECGC Address is required"),
+  
   contract_consignee: z.string().min(1, "Consignee Name is required"),
   contract_consignee_add: z.string().min(1, "Consignee Address is required"),
-  contract_consignee_ec: z.string().min(1, "Consignee ECGC Name is required"),
-  contract_consignee_ec_add: z.string().min(1, "Consignee ECGC Address is required"),
+  
   contract_container_size: z.string().min(1, "Containers/Size is required"),
   contract_loading: z.string().min(1, "Port of Loading is required"),
   contract_destination_port: z.string().min(1, "Destination Port is required"),
@@ -302,60 +300,6 @@ const fetchBagsTypes = async () => {
   return response.json();
 };
 
-const fetchCustomdescriptions = async () => {
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("No authentication token found");
-
-  const response = await fetch(
-    `${BASE_URL}/api/panel-fetch-customdescription`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    }
-  );
-
-  if (!response.ok) throw new Error("Failed to fetch Custom Description no data");
-  return response.json();
-};
-
-const fetchTypes = async () => {
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("No authentication token found");
-
-  const response = await fetch(
-    `${BASE_URL}/api/panel-fetch-type`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    }
-  );
-
-  if (!response.ok) throw new Error("Failed to fetch Types no data");
-  return response.json();
-};
-
-const fetchQualitys = async () => {
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("No authentication token found");
-
-  const response = await fetch(
-    `${BASE_URL}/api/panel-fetch-quality`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    }
-  );
-
-  if (!response.ok) throw new Error("Failed to fetch Quality no data");
-  return response.json();
-};
-
 const createContract = async (data) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
@@ -428,9 +372,6 @@ const ContractAdd = () => {
     "contractSub_qntyInMt",
     "contractSub_rateMT",
     "contractSub_sbaga",
-    "contractSub_customdescription",
-    "contractSub_item_type",
-    "contractSub_quality",
   ]);
 
   const defaultTableHeaders = [
@@ -443,9 +384,7 @@ const ContractAdd = () => {
     { key: "contractSub_qntyInMt", label: "Qnty (MT)", required: true },
     { key: "contractSub_rateMT", label: "Rate", required: true },
     { key: "contractSub_sbaga", label: "Bag Type", required: true },
-    { key: "contractSub_customdescription", label: "Custom Description" , required: false },
-    { key: "contractSub_item_type", label: "Type", required: true },
-    { key: "contractSub_quality", label: "Quality", required: true },
+    
   ];
 
   
@@ -456,9 +395,6 @@ const ContractAdd = () => {
       contractSub_item_name: "",
       contractSub_descriptionofGoods: "",
       contractSub_item_bag: "",
-      contractSub_quality: "",
-      contractSub_customdescription: "",
-      contractSub_item_type: "",
       contractSub_packing: "",
       contractSub_bagsize: "",
       contractSub_qntyInMt: "",
@@ -488,10 +424,7 @@ const ContractAdd = () => {
     contract_buyer_add: "",
     contract_consignee:"",
     contract_consignee_add: "",
-    contract_buyer_ec:"",
-    contract_buyer_ec_add: "",
-    contract_consignee_ec:"",
-    contract_consignee_ec_add: "",
+   
     contract_container_size: "",
     contract_loading: "",
     contract_destination_port: "",
@@ -562,21 +495,6 @@ const ContractAdd = () => {
     queryFn: fetchBagsTypes,
   });
 
-  const { data: customdescriptionData } = useQuery({
-    queryKey: ["customdescriptions"],
-    queryFn: fetchCustomdescriptions,
-  });
-
-  const { data: typeData } = useQuery({
-    queryKey: ["types"],
-    queryFn: fetchTypes,
-  });
-
-  const { data: qualityData } = useQuery({
-    queryKey: ["qualitys"],
-    queryFn: fetchQualitys,
-  });
-  
   const { data: portsData } = useQuery({
     queryKey: ["ports"],
     queryFn: fetchPorts,
@@ -611,8 +529,8 @@ const ContractAdd = () => {
       const basicDetailsFields = [
         "contract_buyer",
         "contract_consignee",
-        "contract_buyer_ec",
-        "contract_consignee_ec",
+       
+        
         "contract_date",
         "contract_no",
       ];
@@ -705,9 +623,6 @@ const ContractAdd = () => {
         contractSub_item_name: "",
         contractSub_marking: "",
         contractSub_descriptionofGoods: "",
-        contractSub_quality: "",
-        contractSub_customdescription: "",
-        contractSub_item_type: "",
         contractSub_packing: "",
         contractSub_bagsize: "",
         contractSub_qntyInMt: "",
@@ -727,8 +642,8 @@ const ContractAdd = () => {
   const fieldLabels = {
     contract_buyer: "Buyer",
     contract_consignee: "Consignee",
-    contract_buyer_ec: "Buyer ECGC",
-    contract_consignee_ec: "Consignee ECGC",
+   
+  
     contract_date: "Contract Date",
     contract_no: "Contract No",
     
@@ -736,7 +651,7 @@ const ContractAdd = () => {
     contract_ref: "Contract Ref",
     contract_pono: "PONO Required",
     contract_buyer_add: "Buyer Add",
-    contract_buyer_ec_add: "Buyer ECGC Add",
+  
     contract_consignee_add: "Cnsignee Add",
    
   };
@@ -804,7 +719,7 @@ const ContractAdd = () => {
             <div className="mb-0">
               <div className="grid grid-cols-4 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-xs font-medium mb-2">
                     Buyer <span className="text-red-500">*</span>
                   </label>
                   <Select
@@ -822,6 +737,30 @@ const ContractAdd = () => {
                         handleInputChange(
                           { target: { value: selectedBuyer.buyer_address } },
                           "contract_buyer_add"
+                        );
+                        handleInputChange(
+                          { target: { value: selectedBuyer.buyer_name } },
+                          "contract_consignee"
+                        );
+                        handleInputChange(
+                          { target: { value: selectedBuyer.buyer_address } },
+                          "contract_consignee_add"
+                        );
+                        handleInputChange(
+                          { target: { value: selectedBuyer.buyer_port } },
+                          "contract_destination_port"
+                        );
+                        handleInputChange(
+                          { target: { value: selectedBuyer.buyer_port } },
+                          "contract_discharge"
+                        );
+                        handleInputChange(
+                          { target: { value: selectedBuyer.buyer_port } },
+                          "contract_cif"
+                        );
+                        handleInputChange(
+                          { target: { value: selectedBuyer.buyer_country } },
+                          "contract_destination_country"
                         );
                       }
                       
@@ -898,127 +837,6 @@ const ContractAdd = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Buyer ECGC <span className="text-red-500">*</span>
-                  </label>
-                  <Select
-                    value={formData.contract_buyer_ec}
-                    onValueChange={(value) => {
-                      const selectedBuyer = buyerData?.buyer?.find(
-                        (buyer) => buyer.buyer_name === value
-                      );
-                      handleInputChange(
-                        { target: { value } },
-                        "contract_buyer_ec"
-                      );
-                      if (selectedBuyer) {
-                        handleInputChange(
-                          { target: { value: selectedBuyer.buyer_address } },
-                          "contract_buyer_ec_add"
-                        );
-                      }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Buyer ECGC" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {buyerData?.buyer?.map((buyer) => (
-                        <SelectItem
-                          key={buyer.buyer_name}
-                          value={buyer.buyer_name.toString()}
-                        >
-                          {buyer.buyer_name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <CreateCustomer/>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                  Consignee ECGC<span className="text-red-500">*</span>
-                  </label>
-                  <Select
-                    value={formData.contract_consignee_ec}
-                    onValueChange={(value) => {
-                      const selectedBuyer = buyerData?.buyer?.find(
-                        (buyer) => buyer.buyer_name === value
-                      );
-                      handleInputChange(
-                        { target: { value } },
-                        "contract_consignee_ec"
-                      );
-                      if (selectedBuyer) {
-                        handleInputChange(
-                          { target: { value: selectedBuyer.buyer_address } },
-                          "contract_consignee_ec_add"
-                        );
-                      }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Consignee ECGC" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {buyerData?.buyer?.map((buyer) => (
-                        <SelectItem
-                          key={buyer.buyer_name}
-                          value={buyer.buyer_name.toString()}
-                        >
-                          {buyer.buyer_name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <CreateCustomer/>
-                </div>
-                </div>
-                </div>
-
-                <div className="mb-8">
-              <div className="grid grid-cols-4 gap-6">
-                <div>
-                <Textarea
-                    type="text"
-                    placeholder="Enter Buyer Address"
-                    value={formData.contract_buyer_add}
-                    onChange={(e) => handleInputChange(e, "contract_buyer_add")}
-                  />
-                  
-                  
-                </div>
-                <div>
-                <Textarea
-                    type="text"
-                    placeholder="Enter Consignee Address"
-                    value={formData.contract_consignee_add}
-                    onChange={(e) => handleInputChange(e, "contract_consignee_add")}
-                  />
-                </div>
-                <div>
-                <Textarea
-                    type="text"
-                    placeholder="Enter Buyer ECGC Address"
-                    value={formData.contract_buyer_ec_add}
-                    onChange={(e) => handleInputChange(e, "contract_buyer_ec_add")}
-                    
-                  />
-                </div>
-                <div>
-                  <Textarea
-                      type="text"
-                      placeholder="Enter Consignee ECGC Address"
-                      value={formData.contract_consignee_ec_add}
-                      onChange={(e) => handleInputChange(e, "contract_consignee_ec_add")}
-                    />
-                </div>
-                </div>
-                </div>
-
-                <div className="mb-8">
-                <div className="grid grid-cols-4 gap-6">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
                   Company <span className="text-red-500">*</span>
                   </label>
                   <Select
@@ -1040,6 +858,10 @@ const ContractAdd = () => {
                         handleInputChange(
                           { target: { value: selectedCompanySort.branch_address } },
                           "branch_address"
+                        );
+                        handleInputChange(
+                          { target: { value: selectedCompanySort.branch_port_of_loading} },
+                          "contract_loading"
                         );
                         const selectedBuyer = buyerData?.buyer?.find(
                           (buyer) => buyer.buyer_name === formData.contract_buyer
@@ -1077,20 +899,6 @@ const ContractAdd = () => {
                     </SelectContent>
                   </Select>
                   
-                </div>
-                <div>
-                <Input
-                    type="text"
-                    placeholder="Enter Company Name"
-                    value={formData.branch_name}
-                    onChange={(e) => handleInputChange(e, "branch_name")}
-                  />
-                <Textarea
-                    type="text"
-                    placeholder="Enter Company Address"
-                    value={formData.branch_address}
-                    onChange={(e) => handleInputChange(e, "branch_address")}
-                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">
@@ -1137,6 +945,34 @@ const ContractAdd = () => {
                   </Select>
                   
                 </div>
+                </div>
+                </div>
+
+                <div className="mb-8">
+              <div className="grid grid-cols-4 gap-6">
+                <div>
+                <Textarea
+                    type="text"
+                    placeholder="Enter Buyer Address"
+                    value={formData.contract_buyer_add}
+                    onChange={(e) => handleInputChange(e, "contract_buyer_add")}
+                  />
+                  
+                  
+                </div>
+                <div>
+                <Textarea
+                    type="text"
+                    placeholder="Enter Consignee Address"
+                    value={formData.contract_consignee_add}
+                    onChange={(e) => handleInputChange(e, "contract_consignee_add")}
+                  />
+                </div>
+                <div style={{textAlign:'center'}}>
+                  <span style={{fontSize:'12px'}}>{formData.branch_name}</span><br/>
+                  <span style={{fontSize:'9px',display:'block'}}>{formData.branch_address}</span>
+                  
+                </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Contract Date <span className="text-red-500">*</span>
@@ -1147,8 +983,10 @@ const ContractAdd = () => {
                     onChange={(e) => handleInputChange(e, "contract_date")}
                   />
                 </div>
-               </div>
-               </div>
+                
+                </div>
+                </div>
+
                <div className="mb-8">
                <div className="grid grid-cols-4 gap-6"> 
                 <div>
@@ -1560,81 +1398,6 @@ const ContractAdd = () => {
                                         value={bagType.bagType}
                                       >
                                         {bagType.bagType}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              ):header.key === "contractSub_customdescription" ? (
-                                <Select
-                                  value={row[header.key]}
-                                  onValueChange={(value) =>
-                                    handleRowDataChange(
-                                      rowIndex,
-                                      header.key,
-                                      value
-                                    )
-                                  }
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select Custom Description" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {customdescriptionData?.customdescription?.map((customdescription) => (
-                                      <SelectItem
-                                        key={customdescription.customdescription}
-                                        value={customdescription.customdescription}
-                                      >
-                                        {customdescription.customdescription}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              ):header.key === "contractSub_item_type" ? (
-                                <Select
-                                  value={row[header.key]}
-                                  onValueChange={(value) =>
-                                    handleRowDataChange(
-                                      rowIndex,
-                                      header.key,
-                                      value
-                                    )
-                                  }
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select Type" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {typeData?.type?.map((typess) => (
-                                      <SelectItem
-                                        key={typess.type}
-                                        value={typess.type}
-                                      >
-                                        {typess.type}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              ):header.key === "contractSub_quality" ? (
-                                <Select
-                                  value={row[header.key]}
-                                  onValueChange={(value) =>
-                                    handleRowDataChange(
-                                      rowIndex,
-                                      header.key,
-                                      value
-                                    )
-                                  }
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select Quality" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {qualityData?.quality?.map((quality) => (
-                                      <SelectItem
-                                        key={quality.quality}
-                                        value={quality.quality}
-                                      >
-                                        {quality.quality}
                                       </SelectItem>
                                     ))}
                                   </SelectContent>
