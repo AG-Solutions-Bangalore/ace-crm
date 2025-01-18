@@ -53,31 +53,38 @@ const contractFormSchema = z.object({
   branch_short: z.string().min(1, "Company Sort is required"),
   branch_name: z.string().min(1, "Company Name is required"),
   branch_address: z.string().min(1, "Company Address is required"),
-  contract_year: z.string().optional(),
+  invoice_year: z.string().optional(),
   contract_date: z.string().min(1, "Contract date is required"),
-  contract_no: z.string().min(1, "Contract No is required"),
-  contract_ref: z.string().min(1, "Contract Ref is required"),
-  contract_pono: z.string().min(1, "Contract PONO is required"),
+  invoice_date: z.string().min(1, "Invoice date is required"),
+  contract_no: z.string().min(1, "Invoice No is required"),
+  contract_ref: z.string().min(1, "Invoice Ref is required"),
+  contract_pono: z.string().min(1, "PONO is required"),
+  invoice_no: z.string().min(1, "Invoice NO is required"),
   contract_buyer: z.string().min(1, "Buyer Name is required"),
   contract_buyer_add: z.string().min(1, "Buyer Address is required"),
-  
+  contract_product: z.string().min(1, "Product is required"),
   contract_consignee: z.string().min(1, "Consignee Name is required"),
   contract_consignee_add: z.string().min(1, "Consignee Address is required"),
-  contract_product: z.string().min(1, "Product is required"),
+  
   contract_container_size: z.string().min(1, "Containers/Size is required"),
   contract_loading: z.string().min(1, "Port of Loading is required"),
   contract_destination_port: z.string().min(1, "Destination Port is required"),
   contract_discharge: z.string().min(1, "Discharge is required"),
   contract_cif: z.string().min(1, "CIF is required"),
   contract_destination_country: z.string().min(1, "Dest. Country is required"),
-  contract_shipment:z.string().optional(),
-  contract_ship_date:z.string().optional(),
+  
+  
   contract_specification1:z.string().optional(),
   contract_specification2:z.string().optional(),
   contract_payment_terms:z.string().optional(),
   contract_remarks:z.string().optional(),
-  
-  contract_data: z
+  invoice_consig_bank:z.string().optional(),
+  invoice_prereceipts:z.string().optional(),
+  invoice_precarriage: z.string().min(1, "Precarriage is required"),
+  invoice_product_cust_des: z.string().min(1, "Product Descriptions is required"),
+  invoice_gr_code: z.string().min(1, "GR Code is required"),
+  invoice_lut_code: z.string().min(1, "LUT Code is required"),
+  invoice_data: z
     .array(productRowSchema)
     .min(1, "At least one product is required"),
 });
@@ -119,41 +126,96 @@ const fetchCompanys = async () => {
   return response.json();
 };
 
-const fetchContractNos = async (company_sort) => {
-  
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("No authentication token found");
 
-  const response = await fetch(
-    `${BASE_URL}/api/panel-fetch-contract-no/${company_sort}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    }
-  );
-
-  if (!response.ok) throw new Error("Failed to fetch contract no data");
-  return response.json();
-};
 
 const fetchProduct = async () => {
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("No authentication token found");
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("No authentication token found");
+  
+    const response = await fetch(
+      `${BASE_URL}/api/panel-fetch-product`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  
+    if (!response.ok) throw new Error("Failed to fetch Product no data");
+    return response.json();
+};
 
-  const response = await fetch(
-    `${BASE_URL}/api/panel-fetch-product`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    }
-  );
+const fetchLUT = async (value) => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("No authentication token found");
+  
+    const response = await fetch(
+      `${BASE_URL}/api/panel-fetch-scheme-by-value/${value}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  
+    if (!response.ok) throw new Error("Failed to fetch LUT data");
+    return response.json();
+};
 
-  if (!response.ok) throw new Error("Failed to fetch Product no data");
-  return response.json();
+const fetchGRCode = async (value) => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("No authentication token found");
+  
+    const response = await fetch(
+      `${BASE_URL}/api/panel-fetch-grcode/${value}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  
+    if (!response.ok) throw new Error("Failed to fetch GR Code data");
+    return response.json();
+};
+
+const fetchPrereceipts = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("No authentication token found");
+  
+    const response = await fetch(
+      `${BASE_URL}/api/panel-fetch-prereceipts`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  
+    if (!response.ok) throw new Error("Failed to fetch Product no data");
+    return response.json();
+};
+
+const fetchContractRef = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("No authentication token found");
+  
+    const response = await fetch(
+      `${BASE_URL}/api/panel-fetch-contract-ref`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  
+    if (!response.ok) throw new Error("Failed to fetch Contract ref data");
+    return response.json();
 };
 
 const fetchPortofLoadings = async () => {
@@ -191,6 +253,24 @@ const fetchContainerSizes = async () => {
   if (!response.ok) throw new Error("Failed to fetch Container Size no data");
   return response.json();
 };
+
+const fetchProductCustomDescription = async (value) => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("No authentication token found");
+  
+    const response = await fetch(
+      `${BASE_URL}/api/panel-fetch-product-description/${value}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  
+    if (!response.ok) throw new Error("Failed to fetch Container Size no data");
+    return response.json();
+  };
 
 const fetchPaymentTerms = async () => {
   const token = localStorage.getItem("token");
@@ -318,7 +398,7 @@ const fetchBagsTypes = async () => {
   return response.json();
 };
 
-const createContract = async (data) => {
+const createInvoice = async (data) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
 
@@ -375,7 +455,7 @@ const EnquiryHeader = ({ progress }) => {
 };
 
 // Main Component
-const ContractAdd = () => {
+const InvoiceAdd = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [progress, setProgress] = useState(0);
@@ -407,7 +487,7 @@ const ContractAdd = () => {
 
   
 
-  const [contractData, setContractData] = useState([
+  const [invoiceData, setInvoiceData] = useState([
     {
       contractSub_marking: "",
       contractSub_item_name: "",
@@ -425,7 +505,7 @@ const ContractAdd = () => {
     if (currentYear) {
       setFormData((prev) => ({
         ...prev,
-        contract_year: currentYear,
+        invoice_year: currentYear,
       }));
     }
   }, [currentYear]);
@@ -433,11 +513,13 @@ const ContractAdd = () => {
     branch_short: "",
     branch_name: "",
     branch_address: "",
-    contract_year: currentYear,
-    contract_date: getTodayDate(),
+    invoice_year: currentYear,
+    contract_date: "",
+    invoice_date: "",
     contract_no: "",
     contract_ref: "",
     contract_pono: "",
+    invoice_no: "",
     contract_buyer: "",
     contract_buyer_add: "",
     contract_consignee:"",
@@ -449,13 +531,17 @@ const ContractAdd = () => {
     contract_discharge: "",
     contract_cif: "",
     contract_destination_country: "",
-    contract_shipment: "",
-    contract_ship_date: "",
     contract_specification1: "",
     contract_specification2: "",
     contract_payment_terms: "",
     contract_remarks: "",
-    
+    invoice_consig_bank: "",
+    invoice_consig_bank_address: "",
+    invoice_prereceipts: "",
+    invoice_precarriage: "",
+    invoice_product_cust_des: "",
+    invoice_gr_code: "",
+    invoice_lut_code: "",
   });
 
   const { data: buyerData } = useQuery({
@@ -468,10 +554,7 @@ const ContractAdd = () => {
     queryFn: fetchCompanys,
   });
 
-  const { data: contractNoData } = useQuery({
-    queryKey: ["contractnoss"],
-    queryFn: fetchContractNos,
-  });
+  
 
   const { data: portofLoadingData } = useQuery({
     queryKey: ["portofLoadings"],
@@ -479,13 +562,38 @@ const ContractAdd = () => {
   });
 
   const { data: productData } = useQuery({
-    queryKey: ["products"],
-    queryFn: fetchProduct,
-  });
-  
+      queryKey: ["products"],
+      queryFn: fetchProduct,
+    });
+
+    const { data: lutData } = useQuery({
+        queryKey: ["lut"],
+        queryFn: fetchLUT,
+      });
+
+      const { data: grcodeData } = useQuery({
+        queryKey: ["lut"],
+        queryFn: fetchGRCode,
+      });
+
+    const { data: prereceiptsData } = useQuery({
+        queryKey: ["prereceipts"],
+        queryFn: fetchPrereceipts,
+      });
+    
+    const { data: contractRefsData } = useQuery({
+        queryKey: ["contractRefs"],
+        queryFn: fetchContractRef,
+      });
+    
   const { data: containerSizeData } = useQuery({
     queryKey: ["containersizes"],
     queryFn: fetchContainerSizes,
+  });
+
+  const { data: productCustomDescriptionData } = useQuery({
+    queryKey: ["containersizes"],
+    queryFn: fetchProductCustomDescription,
   });
 
   const { data: paymentTermsData } = useQuery({
@@ -523,8 +631,8 @@ const ContractAdd = () => {
     queryFn: fetchPorts,
   });
   
-  const createContractMutation = useMutation({
-    mutationFn: createContract,
+  const createInvoiceMutation = useMutation({
+    mutationFn: createInvoice,
     onSuccess: () => {
       toast({
         title: "Success",
@@ -565,7 +673,7 @@ const ContractAdd = () => {
       // Count requirements fields
       const requirementsFields = [
         "branch_short",
-        "contract_ship_date",
+        
         "contract_ref",
       ];
 
@@ -577,7 +685,7 @@ const ContractAdd = () => {
       
 
       // Count all visible product fields for each row
-      contractData.forEach((row) => {
+      invoiceData.forEach((row) => {
         visibleColumns.forEach((columnKey) => {
           totalFields++;
           if (row[columnKey] && row[columnKey].toString().trim() !== "") {
@@ -591,7 +699,7 @@ const ContractAdd = () => {
     };
 
     calculateProgress();
-  }, [formData, contractData, visibleColumns]);
+  }, [formData, invoiceData, visibleColumns]);
 
   const handleInputChange = (e, field) => {
     let value;
@@ -630,17 +738,17 @@ const ContractAdd = () => {
           return; // Ignore invalid numbers
         }
       }
-    const newData = [...contractData];
+    const newData = [...invoiceData];
     newData[rowIndex] = {
       ...newData[rowIndex],
       [field]: processedValue,
     };
-    setContractData(newData);
+    setInvoiceData(newData);
   };
 
   const addRow = () => {
-    setContractData([
-      ...contractData,
+    setInvoiceData([
+      ...invoiceData,
       {
         contractSub_item_bag: "",
         contractSub_item_name: "",
@@ -656,8 +764,8 @@ const ContractAdd = () => {
   };
 
   const removeRow = (index) => {
-    if (contractData.length > 1) {
-      setContractData((prevData) => prevData.filter((_, i) => i !== index));
+    if (invoiceData.length > 1) {
+      setInvoiceData((prevData) => prevData.filter((_, i) => i !== index));
     }
   };
 
@@ -670,7 +778,7 @@ const ContractAdd = () => {
     contract_date: "Contract Date",
     contract_no: "Contract No",
     
-    contract_ship_date: "Shipment Date",
+   
     contract_ref: "Contract Ref",
     contract_pono: "PONO Required",
     contract_buyer_add: "Buyer Add",
@@ -685,9 +793,9 @@ const ContractAdd = () => {
     try {
       const validatedData = contractFormSchema.parse({
         ...formData,
-        contract_data: contractData,
+        invoice_data: invoiceData,
       });
-      createContractMutation.mutate(validatedData);
+      createInvoiceMutation.mutate(validatedData);
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {
@@ -739,10 +847,174 @@ const ContractAdd = () => {
         <Card className="mb-6">
           <CardContent className="p-6">
             {/* Basic Details Section */}
-            <div className="mb-0">
+            <div className="mb-8">
+               <div className="grid grid-cols-5 gap-6"> 
+                <div>
+                <label className="block text-sm font-medium mb-2">
+                  Contract Ref. <span className="text-red-500">*</span>
+                  </label>
+                    <Select
+                    value={formData.contract_ref}
+                    onValueChange={(value) =>
+                      handleInputChange({ target: { value } }, "contract_ref")
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Contract Ref." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {contractRefsData?.contractRef?.map((contractRef) => (
+                        <SelectItem
+                          key={contractRef.contract_ref}
+                          value={contractRef.contract_ref.toString()}
+                        >
+                          {contractRef.contract_ref}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                    <div>
+                    <label className="block text-sm font-medium mb-2">
+                    Company <span className="text-red-500">*</span>
+                    </label>
+                    <Select
+                    value={formData.branch_short}
+                    onValueChange={(value) => {
+                        const selectedCompanySort = branchData?.branch?.find(
+                        (branch) => branch.branch_short === value
+                        );
+                        
+                        handleInputChange(
+                        { target: { value } },
+                        "branch_short"
+                        );
+                        if (selectedCompanySort) {
+                        handleInputChange(
+                            { target: { value: selectedCompanySort.branch_name } },
+                            "branch_name"
+                        );
+                        handleInputChange(
+                            { target: { value: selectedCompanySort.branch_address } },
+                            "branch_address"
+                        );
+                        fetchLUT(selectedCompanySort.branch_scheme);
+                        
+                        
+                        
+                        }
+                        
+                    }}
+                    >
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select Company" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {branchData?.branch?.map((branch) => (
+                        <SelectItem
+                            key={branch.branch_short}
+                            value={branch.branch_short.toString()}
+                        >
+                            {branch.branch_short}
+                        </SelectItem>
+                        ))}
+                    </SelectContent>
+                    </Select>
+                    
+                </div>  
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                  Invoice No <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    type="text"
+                    placeholder="Enter Invoice No"
+                    value={formData.invoice_no}
+                    onChange={(e) => handleInputChange(e, "invoice_no")}
+                />
+                  
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                  Invoice Date <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    type="date"
+                    value={formData.invoice_date}
+                    onChange={(e) => handleInputChange(e, "invoice_date")}
+                  />
+                </div>  
+                <div style={{textAlign:'center'}}>
+                  <span style={{fontSize:'12px'}}>{formData.branch_name}</span><br/>
+                  <span style={{fontSize:'9px',display:'block'}}>{formData.branch_address}</span>
+                  
+                </div>
+
+
+                </div>
+                </div>
+
+                
+            <div className="mb-8">
               <div className="grid grid-cols-4 gap-6">
                 <div>
-                  <label className="block text-xs font-medium mb-2">
+                    <label className="block text-sm font-medium mb-2">
+                        Contract Ref. <span className="text-red-500">*</span>
+                        </label>
+                    <Input
+                        type="text"
+                        placeholder="Enter Contract Ref"
+                        value={formData.contract_ref}
+                        disabled
+                        onChange={(e) => handleInputChange(e, "contract_ref")}
+                        />
+                    </div>
+
+                    <div>
+                <label className="block text-sm font-medium mb-2">
+                  Contract PONO. <span className="text-red-500">*</span>
+                  </label>
+                <Input
+                    type="text"
+                    placeholder="Enter Contract PoNo"
+                    value={formData.contract_pono}
+                    disabled
+                    onChange={(e) => handleInputChange(e, "contract_pono")}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Contract Date <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    type="date"
+                    value={formData.contract_date}
+                    onChange={(e) => handleInputChange(e, "contract_date")}
+                  />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium mb-2">
+                        Invoice Ref. <span className="text-red-500">*</span>
+                        </label>
+                    <Input
+                        type="text"
+                        placeholder="Enter Invoice Ref"
+                        value={formData.invoice_ref}
+                        disabled
+                        onChange={(e) => handleInputChange(e, "invoice_ref")}
+                        />
+                    </div>
+                
+                
+                </div>
+                </div>
+
+                <div className="mb-0">
+              <div className="grid grid-cols-4 gap-6">
+              
+              <div>
+                  <label className="block text-sm font-medium mb-2">
                     Buyer <span className="text-red-500">*</span>
                   </label>
                   <Select
@@ -760,46 +1032,6 @@ const ContractAdd = () => {
                         handleInputChange(
                           { target: { value: selectedBuyer.buyer_address } },
                           "contract_buyer_add"
-                        );
-                        handleInputChange(
-                          { target: { value: selectedBuyer.buyer_name } },
-                          "contract_consignee"
-                        );
-                        handleInputChange(
-                          { target: { value: selectedBuyer.buyer_address } },
-                          "contract_consignee_add"
-                        );
-                        handleInputChange(
-                          { target: { value: selectedBuyer.buyer_port } },
-                          "contract_destination_port"
-                        );
-                        handleInputChange(
-                          { target: { value: selectedBuyer.buyer_port } },
-                          "contract_discharge"
-                        );
-                        handleInputChange(
-                          { target: { value: selectedBuyer.buyer_port } },
-                          "contract_cif"
-                        );
-                        handleInputChange(
-                          { target: { value: selectedBuyer.buyer_country } },
-                          "contract_destination_country"
-                        );
-                      }
-                      
-                      const selectedCompanySort = branchData?.branch?.find(
-                        (branch) => branch.branch_short === formData.branch_short
-                      );
-                      if(selectedCompanySort){
-                        const contractRef = `${selectedCompanySort.branch_name_short}/${selectedBuyer.buyer_sort}/${formData.contract_no}/${formData.contract_year}`;
-                        handleInputChange(
-                          { target: { value: contractRef} },
-                          "contract_ref"
-                        );
-
-                        handleInputChange(
-                          { target: { value: contractRef} },
-                          "contract_pono"
                         );
                       }
                     }}
@@ -859,120 +1091,72 @@ const ContractAdd = () => {
                   <CreateCustomer/>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                  Company <span className="text-red-500">*</span>
-                  </label>
-                  <Select
-                    value={formData.branch_short}
-                    onValueChange={(value) => {
-                      const selectedCompanySort = branchData?.branch?.find(
-                        (branch) => branch.branch_short === value
-                      );
-                      
-                      handleInputChange(
-                        { target: { value } },
-                        "branch_short"
-                      );
-                      if (selectedCompanySort) {
-                        handleInputChange(
-                          { target: { value: selectedCompanySort.branch_name } },
-                          "branch_name"
-                        );
-                        handleInputChange(
-                          { target: { value: selectedCompanySort.branch_address } },
-                          "branch_address"
-                        );
-                        handleInputChange(
-                          { target: { value: selectedCompanySort.branch_port_of_loading} },
-                          "contract_loading"
-                        );
-                        const selectedBuyer = buyerData?.buyer?.find(
-                          (buyer) => buyer.buyer_name === formData.contract_buyer
-                        );
-                        
-                        if(selectedBuyer){
-                          const contractRef = `${selectedCompanySort.branch_name_short}/${selectedBuyer.buyer_sort}/${formData.contract_no}/${formData.contract_year}`;
-                          handleInputChange(
-                            { target: { value: contractRef} },
-                            "contract_ref"
-                          );
-  
-                          handleInputChange(
-                            { target: { value: contractRef} },
-                            "contract_pono"
-                          );
-                        }
-                        
-                      }
-                      fetchContractNos(value);
-                    }}
-                  >
+                    <label className="block text-sm font-medium mb-2">
+                    Consig. Bank <span className="text-red-500">*</span>
+                    </label>
+                    <Select
+                    value={formData.invoice_consig_bank}
+                    onValueChange={(value) =>
+                        handleInputChange({ target: { value } }, "invoice_consig_bank")
+                    }
+                    >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select Company" />
+                        <SelectValue placeholder="Select Consig. Bank" />
                     </SelectTrigger>
                     <SelectContent>
-                      {branchData?.branch?.map((branch) => (
+                        {buyerData?.buyer?.map((buyer) => (
                         <SelectItem
-                          key={branch.branch_short}
-                          value={branch.branch_short.toString()}
+                            key={buyer.buyer_name}
+                            value={buyer.buyer_name.toString()}
                         >
-                          {branch.branch_short}
+                            {buyer.buyer_name}
                         </SelectItem>
-                      ))}
+                        ))}
                     </SelectContent>
-                  </Select>
-                  
+                    </Select>
+                    
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                  Contract No <span className="text-red-500">*</span>
-                  </label>
-                  <Select
-                    value={formData.contract_no}
+                    <label className="block text-sm font-medium mb-2">
+                    Product <span className="text-red-500">*</span>
+                    </label>
+                    <Select
+                    value={formData.contract_product}
                     onValueChange={(value) =>{
-                      const selectedBuyer = buyerData?.buyer?.find(
-                        (buyer) => buyer.buyer_name === formData.contract_buyer
-                      );
-                      const selectedCompanySort = branchData?.branch?.find(
-                        (branch) => branch.branch_short === formData.branch_short
-                      );
-                      const contractRef = `${selectedCompanySort.branch_name_short}/${selectedBuyer.buyer_sort}/${value}/${formData.contract_year}`;
-                      handleInputChange(
-                        { target: { value: contractRef} },
-                        "contract_ref"
-                      );
-
-                      handleInputChange(
-                        { target: { value: contractRef} },
-                        "contract_pono"
-                      );
-
-                      handleInputChange({ target: { value } }, "contract_no");
+                        handleInputChange({ target: { value } }, "contract_product")
+                        fetchProductCustomDescription(value);
+                        fetchGRCode(value);
                     }
-                      
+                        
                     }
-                  >
+                    
+                    >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select Contract No" />
+                        <SelectValue placeholder="Select Product" />
                     </SelectTrigger>
                     <SelectContent>
-                      {contractNoData?.contractNo?.map((contractNos) => (
+                        {productData?.product?.map((product) => (
                         <SelectItem
-                          key={contractNos}
-                          value={contractNos.toString()}
+                            key={product.product_name}
+                            value={product.product_name.toString()}
                         >
-                          {contractNos}
+                            {product.product_name}
                         </SelectItem>
-                      ))}
+                        ))}
                     </SelectContent>
-                  </Select>
-                  
+                    </Select>
+                    
                 </div>
+                
+                
+                
+                
+                
                 </div>
                 </div>
 
                 <div className="mb-8">
-              <div className="grid grid-cols-4 gap-6">
+                <div className="grid grid-cols-4 gap-6">
                 <div>
                 <Textarea
                     type="text"
@@ -991,77 +1175,48 @@ const ContractAdd = () => {
                     onChange={(e) => handleInputChange(e, "contract_consignee_add")}
                   />
                 </div>
-                <div style={{textAlign:'center'}}>
-                  <span style={{fontSize:'12px'}}>{formData.branch_name}</span><br/>
-                  <span style={{fontSize:'9px',display:'block'}}>{formData.branch_address}</span>
-                  
-                </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Contract Date <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    type="date"
-                    value={formData.contract_date}
-                    onChange={(e) => handleInputChange(e, "contract_date")}
+                <Textarea
+                    type="text"
+                    placeholder="Enter Consig. Bank Address"
+                    value={formData.invoice_consig_bank_address}
+                    onChange={(e) => handleInputChange(e, "invoice_consig_bank_address")}
                   />
                 </div>
-                
-                </div>
+                <div>
+                    <label className="block text-sm font-medium mb-2">
+                    Pre-Receipts <span className="text-red-500">*</span>
+                    </label>
+                    <Select
+                    value={formData.invoice_prereceipts}
+                    onValueChange={(value) =>
+                        handleInputChange({ target: { value } }, "invoice_prereceipts")
+                    }
+                    >
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select Consig. Bank" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {prereceiptsData?.prereceipts?.map((prereceipts) => (
+                        <SelectItem
+                            key={prereceipts.prereceipts_name}
+                            value={prereceipts.prereceipts_name.toString()}
+                        >
+                            {prereceipts.prereceipts_name}
+                        </SelectItem>
+                        ))}
+                    </SelectContent>
+                    </Select>
+                    
+                </div>        
+
+
+                    </div> 
                 </div>
 
                <div className="mb-8">
                <div className="grid grid-cols-5 gap-6"> 
-                <div>
-                <label className="block text-sm font-medium mb-2">
-                  Contract Ref. <span className="text-red-500">*</span>
-                  </label>
-                <Input
-                    type="text"
-                    placeholder="Enter Contract Ref"
-                    value={formData.contract_ref}
-                    disabled
-                    onChange={(e) => handleInputChange(e, "contract_ref")}
-                  />
-                </div>
-                <div>
-                <label className="block text-sm font-medium mb-2">
-                  Contract PONO. <span className="text-red-500">*</span>
-                  </label>
-                <Input
-                    type="text"
-                    placeholder="Enter Contract PoNo"
-                    value={formData.contract_pono}
-                    onChange={(e) => handleInputChange(e, "contract_pono")}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                  Product <span className="text-red-500">*</span>
-                  </label>
-                  <Select
-                    value={formData.contract_product}
-                    onValueChange={(value) =>
-                      handleInputChange({ target: { value } }, "contract_product")
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Product" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {productData?.product?.map((product) => (
-                        <SelectItem
-                          key={product.product_name}
-                          value={product.product_name.toString()}
-                        >
-                          {product.product_name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  
-                </div>
-                <div>
+               <div>
                   <label className="block text-sm font-medium mb-2">
                   Port of Loading <span className="text-red-500">*</span>
                   </label>
@@ -1113,10 +1268,6 @@ const ContractAdd = () => {
                   </Select>
                   
                 </div>
-                </div>
-                </div>
-                <div className="mb-8">
-                <div className="grid grid-cols-6 gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-2">
                   Discharge <span className="text-red-500">*</span>
@@ -1195,6 +1346,14 @@ const ContractAdd = () => {
                   </Select>
                   
                 </div>
+
+                </div>
+                </div>
+                <div className="mb-8">
+                <div className="grid grid-cols-2 gap-6">
+                
+                
+                
                 <div>
                   <label className="block text-sm font-medium mb-2">
                   Containers/Size <span className="text-red-500">*</span>
@@ -1221,58 +1380,90 @@ const ContractAdd = () => {
                   </Select>
                   
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Shipment Date
-                  </label>
-                  <Input
-                    type="date"
-                    value={formData.contract_ship_date}
-                    onChange={(e) => handleInputChange(e, "contract_ship_date")}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Shipment 
-                  </label>
-                  <Input
-                    type="text"
-                    value={formData.contract_shipment}
-                    onChange={(e) => handleInputChange(e, "contract_shipment")}
-                  />
-                </div>
-                </div>
-                </div>
-
-                <div className="mb-8">
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                <label className="block text-sm font-medium mb-2">
-                Specification1
-                  </label>
-                <Textarea
-                    type="text"
-                    placeholder="Enter Specification1"
-                    value={formData.contract_specification1}
-                    onChange={(e) => handleInputChange(e, "contract_specification1")}
-                  />
-                </div>
-                <div>
-                <label className="block text-sm font-medium mb-2">
-                Specification2
-                  </label>
-                <Textarea
-                    type="text"
-                    placeholder="Enter Specification2"
-                    value={formData.contract_specification2}
-                    onChange={(e) => handleInputChange(e, "contract_specification2")}
-                  />
-                </div>
                 
-              </div>
-              </div>
-            <div className="mb-8">
-              <div className="grid grid-cols-2 gap-6">
+
+                
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                  Custom Des <span className="text-red-500">*</span>
+                  </label>
+                  <Select
+                    value={formData.invoice_product_cust_des}
+                    onValueChange={(value) =>
+                      handleInputChange({ target: { value } }, "invoice_product_cust_des")
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Custom Des" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {productCustomDescriptionData?.productSub?.map((productSub) => (
+                        <SelectItem
+                          key={productSub.product_description}
+                          value={productSub.product_description.toString()}
+                        >
+                          {productSub.product_description}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                </div>
+                </div>
+                </div>
+                <div className="mb-8">
+              <div className="grid grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                LUT Code <span className="text-red-500">*</span>
+                  </label>
+                  <Select
+                    value={formData.invoice_lut_code}
+                    onValueChange={(value) =>
+                      handleInputChange({ target: { value } }, "invoice_lut_code")
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select LUT Code" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {lutData?.scheme?.map((scheme) => (
+                        <SelectItem
+                          key={scheme.scheme_description}
+                          value={scheme.scheme_description.toString()}
+                        >
+                          {scheme.scheme_description}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                <label className="block text-sm font-medium mb-2">
+                GR Code <span className="text-red-500">*</span>
+                  </label>
+                  <Select
+                    value={formData.invoice_gr_code}
+                    onValueChange={(value) =>
+                      handleInputChange({ target: { value } }, "invoice_gr_code")
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select GR Code" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {grcodeData?.grcode?.map((grcode) => (
+                        <SelectItem
+                          key={grcode.gr_code_des}
+                          value={grcode.gr_code_des.toString()}
+                        >
+                          {grcode.gr_code_des}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div>
                 <label className="block text-sm font-medium mb-2">
                 Payment Terms
@@ -1298,6 +1489,34 @@ const ContractAdd = () => {
                     </SelectContent>
                   </Select>
                 </div>
+                
+                
+              </div>
+              </div>
+                <div className="mb-8">
+              <div className="grid grid-cols-3 gap-6">
+                <div>
+                <label className="block text-sm font-medium mb-2">
+                Specification1
+                  </label>
+                <Textarea
+                    type="text"
+                    placeholder="Enter Specification1"
+                    value={formData.contract_specification1}
+                    onChange={(e) => handleInputChange(e, "contract_specification1")}
+                  />
+                </div>
+                <div>
+                <label className="block text-sm font-medium mb-2">
+                Specification2
+                  </label>
+                <Textarea
+                    type="text"
+                    placeholder="Enter Specification2"
+                    value={formData.contract_specification2}
+                    onChange={(e) => handleInputChange(e, "contract_specification2")}
+                  />
+                </div>
                 <div>
                 <label className="block text-sm font-medium mb-2">
                 Remarks
@@ -1309,9 +1528,9 @@ const ContractAdd = () => {
                     onChange={(e) => handleInputChange(e, "contract_remarks")}
                   />
                 </div>
-                
               </div>
               </div>
+            
             {/* Products Section */}
             <div className="mb-8">
               <div className="flex justify-between items-center mb-4">
@@ -1343,7 +1562,7 @@ const ContractAdd = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {contractData.map((row, rowIndex) => (
+                    {invoiceData.map((row, rowIndex) => (
                       <tr key={rowIndex} className="border-b hover:bg-gray-50">
                         {[...defaultTableHeaders]
                           .filter((header) =>
@@ -1504,7 +1723,7 @@ const ContractAdd = () => {
                           <Button
                             variant="ghost"
                             onClick={() => removeRow(rowIndex)}
-                            disabled={contractData.length === 1}
+                            disabled={invoiceData.length === 1}
                             className="text-red-500"
                             type="button"
                           >
@@ -1534,15 +1753,15 @@ const ContractAdd = () => {
 
         
         <div className="flex flex-col items-end">
-          {createContractMutation.isPending && <ProgressBar progress={70} />}
+          {createInvoiceMutation.isPending && <ProgressBar progress={70} />}
           <Button
             type="submit"
             className="bg-yellow-500 text-black hover:bg-yellow-400 flex items-center mt-2"
-            disabled={createContractMutation.isPending}
+            disabled={createInvoiceMutation.isPending}
           >
-            {createContractMutation.isPending
+            {createInvoiceMutation.isPending
               ? "Submitting..."
-              : "Submit Contract"}
+              : "Submit Invoice"}
           </Button>
         </div>
       </form>
@@ -1550,4 +1769,4 @@ const ContractAdd = () => {
   );
 };
 
-export default ContractAdd;
+export default InvoiceAdd;

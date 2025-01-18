@@ -6,6 +6,8 @@ import Home from "./app/home/Home";
 
 import ContractList from "./app/contract/ContractList";
 import ContractAdd from "./app/contract/ContractAdd";
+import InvoiceList from "./app/invoice/InvoiceList";
+import InvoiceAdd from "./app/invoice/InvoiceAdd";
 
 
 const queryClient = new QueryClient()
@@ -23,7 +25,8 @@ function App() {
         {/* Contract  */}
         <Route path="/contract" element={<ContractList />} />
         <Route path="/create-contract" element={<ContractAdd />} />
-        
+        <Route path="/invoice" element={<InvoiceList />} />
+        <Route path="/create-invoice" element={<InvoiceAdd />} />
       </Routes>
       </QueryClientProvider>
     </>

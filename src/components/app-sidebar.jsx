@@ -115,6 +115,11 @@ export function AppSidebar({ ...props }) {
         url: "/contract",
         icon: Map,
       },
+      {
+        name: "Invoice",
+        url: "/invoice",
+        icon: Map,
+      },
     ],
   };
   
