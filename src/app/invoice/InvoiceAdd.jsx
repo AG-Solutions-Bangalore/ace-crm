@@ -126,7 +126,23 @@ const fetchCompanys = async () => {
   return response.json();
 };
 
+const fetchDefaultSetting = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No authentication token found");
 
+  const response = await fetch(
+    `${BASE_URL}/api/panel-fetch-default-setting`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to fetch Product no data");
+  return response.json();
+};
 
 const fetchProduct = async () => {
     const token = localStorage.getItem("token");
@@ -566,6 +582,11 @@ const InvoiceAdd = () => {
       queryFn: fetchProduct,
     });
 
+    const { data: defaultSettingData } = useQuery({
+      queryKey: ["products"],
+      queryFn: fetchDefaultSetting,
+    });
+    
     const { data: lutData } = useQuery({
         queryKey: ["lut"],
         queryFn: fetchLUT,
