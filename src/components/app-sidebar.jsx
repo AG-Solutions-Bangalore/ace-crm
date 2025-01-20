@@ -104,6 +104,14 @@ export function AppSidebar({ ...props }) {
             url: "/customdescription",
           },
           {
+            title: "Type",
+            url: "/type",
+          },
+          {
+            title: "Quality",
+            url: "/quality",
+          },
+          {
           
             title: "Item",
             url: "/item",
