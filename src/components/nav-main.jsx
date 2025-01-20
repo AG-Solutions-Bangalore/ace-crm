@@ -30,7 +30,6 @@ const buttonVariants = {
 export function NavMain({
   items
 }) {
-
   if (!items || items.length === 0) {
     return null;
   }
@@ -40,7 +39,7 @@ export function NavMain({
   }
   return (
     (<SidebarGroup>
-      <SidebarGroupLabel>Business Offered</SidebarGroupLabel>
+      <SidebarGroupLabel>Home</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible
@@ -49,25 +48,20 @@ export function NavMain({
             defaultOpen={item.isActive}
             className="group/collapsible">
             <SidebarMenuItem>
-              {/* <CollapsibleTrigger asChild> */}
+              <CollapsibleTrigger asChild>
               <motion.div
                   variants={buttonVariants}
                   whileHover="hover" 
                 >
-                         <Link to={item.url}>
                 <SidebarMenuButton tooltip={item.title}>
-         
-                     
-                {item.icon && <item.icon />}
-                <span className="transition-colors duration-200 hover:text-blue-500">{item.title}</span>
-          
-                  
-          
+                  {item.icon && <item.icon />}
+                  <span className="transition-colors duration-200 hover:text-blue-500">{item.title}</span>
+                  <ChevronRight
+                    className="ml-auto  transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                 </SidebarMenuButton>
-                         </Link>
                 </motion.div>
-              {/* </CollapsibleTrigger> */}
-              {/* <CollapsibleContent 
+              </CollapsibleTrigger>
+              <CollapsibleContent 
                as={motion.div} 
                variants={itemVariants}
                initial="closed"
@@ -78,7 +72,7 @@ export function NavMain({
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild>
                         <Link to={subItem.url}>
-                     
+                          {/* <span className="transition-colors duration-200 hover:text-blue-500">{subItem.title}</span> */}
                           <motion.span
                             className="transition-colors duration-200 hover:text-blue-500"
                             whileHover={{ scale: 1.05 }} 
@@ -90,7 +84,7 @@ export function NavMain({
                     </SidebarMenuSubItem>
                   ))}
                 </SidebarMenuSub>
-              </CollapsibleContent> */}
+              </CollapsibleContent>
             </SidebarMenuItem>
           </Collapsible>
         ))}
@@ -98,3 +92,5 @@ export function NavMain({
     </SidebarGroup>)
   );
 }
+
+
