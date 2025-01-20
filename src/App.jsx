@@ -17,12 +17,13 @@ import SchemeList from "./app/master/scheme/SchemeList";
 import CountryList from "./app/master/country/CountryList";
 import ContainerSizeList from "./app/master/ContainerSize/ContainerSizeList";
 import PaymentTermCList from "./app/master/paymentTermC/PaymentTermCList";
-
 import ItemList from "./app/master/item/ItemList";
 import MarkingList from "./app/master/marking/MarkingList";
 import DescriptionGoodsList from "./app/master/descriptionGoods/DescriptionGoodsList";
 import CustomDescription from "./app/master/customDescription/CustomDescription";
 import BagTypeList from "./app/master/bagType/BagTypeList";
+import TypeList from "./app/master/type/TypeList";
+import QualityList from "./app/master/quality/QualityList";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +73,10 @@ function App() {
           <Route path="/item" element={<ItemList />} />
           {/* Master -marking */}
           <Route path="/marking" element={<MarkingList />} />
+          {/* Master -typelist */}
+          <Route path="/type" element={<TypeList />} />
+          {/* Master -Quality  */}
+          <Route path="/quality" element={<QualityList />} />
         </Routes>
       </QueryClientProvider>
     </>
