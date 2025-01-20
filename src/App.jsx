@@ -17,6 +17,8 @@ import SchemeList from "./app/master/scheme/SchemeList";
 import CountryList from "./app/master/country/CountryList";
 import ContainerSizeList from "./app/master/ContainerSize/ContainerSizeList";
 import PaymentTermCList from "./app/master/paymentTermC/PaymentTermCList";
+import ItemList from "./app/master/item/ItemList";
+import MarkingList from "./app/master/marking/MarkingList";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +58,10 @@ function App() {
           <Route path="/containersize" element={<ContainerSizeList />} />
           {/* Master -Payment Term C */}
           <Route path="/paymentTermC" element={<PaymentTermCList />} />
+          {/* Master -items */}
+          <Route path="/item" element={<ItemList />} />
+          {/* Master -marking */}
+          <Route path="/marking" element={<MarkingList />} />
         </Routes>
       </QueryClientProvider>
     </>
