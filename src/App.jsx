@@ -17,11 +17,12 @@ import SchemeList from "./app/master/scheme/SchemeList";
 import CountryList from "./app/master/country/CountryList";
 import ContainerSizeList from "./app/master/ContainerSize/ContainerSizeList";
 import PaymentTermCList from "./app/master/paymentTermC/PaymentTermCList";
-import DescriptionGoodsList from "./app/master/descriptionGoods/DescriptionGoodsList";
-import BagTypeList from "./app/master/bagType/BagTypeList";
-import CustomDescription from "./app/master/customDescription/CustomDescription";
+
 import ItemList from "./app/master/item/ItemList";
 import MarkingList from "./app/master/marking/MarkingList";
+import DescriptionGoodsList from "./app/master/descriptionGoods/DescriptionGoodsList";
+import CustomDescription from "./app/master/customDescription/CustomDescription";
+import BagTypeList from "./app/master/bagType/BagTypeList";
 
 const queryClient = new QueryClient();
 

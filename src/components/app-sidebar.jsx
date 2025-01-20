@@ -92,7 +92,6 @@ export function AppSidebar({ ...props }) {
             url: "/paymentTermC",
           },
           {
-<<<<<<< HEAD
             title: "Description of Goods",
             url: "/descriptionGoods",
           },
@@ -103,14 +102,15 @@ export function AppSidebar({ ...props }) {
           {
             title: "Custom Description",
             url: "/customdescription",
-=======
+          },
+          {
+          
             title: "Item",
             url: "/item",
           },
           {
             title: "Marking",
             url: "/marking",
->>>>>>> 5d751f4849e4300b507da3d68391822338cc92ac
           },
         ],
       },
