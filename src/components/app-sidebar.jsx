@@ -79,6 +79,18 @@ export function AppSidebar({ ...props }) {
             title: "Scheme",
             url: "/scheme",
           },
+          {
+            title: "Country",
+            url: "/country",
+          },
+          {
+            title: "Container Size",
+            url: "/containersize",
+          },
+          {
+            title: "Payment TermsC",
+            url: "/paymentTermC",
+          },
         ],
       },
      
