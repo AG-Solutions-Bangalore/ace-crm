@@ -57,8 +57,6 @@ const EditScheme = ({schemeId}) => {
       setFormData({
         scheme_description: schemeData.scheme_description,
         scheme_tax: schemeData.scheme_tax,
-        bank_acc_no: schemeData.bank_acc_no,
-        bank_branch: schemeData.bank_branch,
         scheme_status: schemeData.scheme_status,
       });
     } catch (error) {

@@ -91,6 +91,14 @@ export function AppSidebar({ ...props }) {
             title: "Payment TermsC",
             url: "/paymentTermC",
           },
+          {
+            title: "Item",
+            url: "/item",
+          },
+          {
+            title: "Marking",
+            url: "/marking",
+          },
         ],
       },
      
