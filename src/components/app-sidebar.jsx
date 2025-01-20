@@ -59,25 +59,29 @@ export function AppSidebar({ ...props }) {
     ],
     navMain: [
       {
-        title: "Payment Mediation",
-        url: "/amount",
+        title: "Master",
+        url: "#",
         icon: Settings2,
+        items: [
+          {
+            title: "Branch",
+            url: "/branch",
+          },
+          {
+            title: "State",
+            url: "/state",
+          },
+          {
+            title: "Bank",
+            url: "/bank",
+          },
+          {
+            title: "Scheme",
+            url: "/scheme",
+          },
+        ],
       },
-      {
-        title: "Business Expansion",
-        url: "/business-opp",
-        icon: BookOpen,
-      },
-      {
-        title: "Job Offered",
-        url: "/job-offered",
-        icon: SquareTerminal,
-      },
-      {
-        title: "Job Require",
-        url: "/job-require",
-        icon: SquareTerminal,
-      },
+     
     ],
     navMain1: [
       {
@@ -119,6 +123,8 @@ export function AppSidebar({ ...props }) {
         name: "Invoice",
         url: "/invoice",
         icon: Map,
+        
+        
       },
     ],
   };
@@ -130,6 +136,7 @@ export function AppSidebar({ ...props }) {
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
+          <NavMain items={data.navMain} />
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
