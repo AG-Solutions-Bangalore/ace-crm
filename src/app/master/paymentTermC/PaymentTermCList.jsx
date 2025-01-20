@@ -30,27 +30,27 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from 'react-router-dom';
 import BASE_URL from '@/config/BaseUrl';
-import CreateScheme from './CreateScheme';
-import EditScheme from './EditScheme';
+import CreatePaymentTermC from './CreatePaymentTermC';
+import EditPaymentTermC from './EditPaymentTermC';
 
 
-const SchemeList = () => {
+const PaymentTermCList = () => {
     const {
-        data: schemes,
+        data: paymenttermC,
         isLoading,
         isError,
         refetch,
       } = useQuery({
-        queryKey: ["schemes"],
+        queryKey: ["paymenttermC"],
         queryFn: async () => {
           const token = localStorage.getItem("token");
           const response = await axios.get(
-            `${BASE_URL}/api/panel-fetch-scheme-list`,
+            `${BASE_URL}/api/panel-fetch-paymentTermsC-list`,
             {
               headers: { Authorization: `Bearer ${token}` },
             }
           );
-          return response.data.scheme;
+          return response.data.paymentTermsC;
         },
       });
     
@@ -69,36 +69,25 @@ const SchemeList = () => {
           cell: ({ row }) => <div>{row.getValue("id")}</div>,
         },
         {
-          accessorKey: "scheme_short",
+          accessorKey: "paymentTermsC",
           header: ({ column }) => (
             <Button
               variant="ghost"
               onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
-              Scheme
+              Payment Term C
               <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
           ),
-          cell: ({ row }) => <div>{row.getValue("scheme_short")}</div>,
+          cell: ({ row }) => <div>{row.getValue("paymentTermsC")}</div>,
         },
-        {
-            accessorKey: "scheme_description",
-            header: "Description",
-            cell: ({ row }) => <div>{row.getValue("scheme_description")}</div>,
-          },
-        {
-          accessorKey: "scheme_tax",
-          header: "Tax ",
-          cell: ({ row }) => <div>{row.getValue("scheme_tax")}</div>,
-        },
-       
-       
+    
     
         {
-          accessorKey: "scheme_status",
+          accessorKey: "paymentTermsC_status",
           header: "Status",
           cell: ({ row }) => {
-            const status = row.getValue("scheme_status");
+            const status = row.getValue("paymentTermsC_status");
     
             return (
               <span
@@ -117,11 +106,11 @@ const SchemeList = () => {
           id: "actions",
           header: "Action",
           cell: ({ row }) => {
-            const schemeId = row.original.id;
+            const paymentId = row.original.id;
     
             return (
               <div className="flex flex-row">
-              <EditScheme schemeId={schemeId}/>
+              <EditPaymentTermC paymentId={paymentId}/>
               </div>
             );
           },
@@ -130,7 +119,7 @@ const SchemeList = () => {
     
       // Create the table instance
       const table = useReactTable({
-        data: schemes || [],
+        data: paymenttermC || [],
         columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
@@ -160,7 +149,7 @@ const SchemeList = () => {
             <div className="flex justify-center items-center h-full">
               <Button disabled>
                 <Loader2 className=" h-4 w-4 animate-spin" />
-                Loading Scheme
+                Loading Payment Term C
               </Button>
             </div>
           </Page>
@@ -174,7 +163,7 @@ const SchemeList = () => {
             <Card className="w-full max-w-md mx-auto mt-10">
               <CardHeader>
                 <CardTitle className="text-destructive">
-                  Error Fetching Scheme
+                  Error Fetching Payment Term C
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -186,11 +175,12 @@ const SchemeList = () => {
           </Page>
         );
       }
+    
   return (
   <Page>
-    <div className="w-full p-4">
+       <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
-          Scheme List
+        Payment Term C List
         </div>
 
         {/* searching and column filter  */}
@@ -206,7 +196,7 @@ const SchemeList = () => {
           <div className="relative w-72">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
             <Input
-              placeholder="Search scheme..."
+              placeholder="Search payment term c..."
               value={table.getState().globalFilter || ""}
               onChange={(event) => table.setGlobalFilter(event.target.value)}
               className="pl-8 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-gray-200"
@@ -240,7 +230,7 @@ const SchemeList = () => {
           </DropdownMenu>
    
      
-    <CreateScheme/>
+        <CreatePaymentTermC/>
         </div>
         {/* table  */}
         <div className="rounded-md border">
@@ -299,7 +289,7 @@ const SchemeList = () => {
         {/* row slection and pagintaion button  */}
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="flex-1 text-sm text-muted-foreground">
-            Total Scheme : &nbsp;
+            Total Payment Term C : &nbsp;
             {table.getFilteredRowModel().rows.length}
           </div>
           <div className="space-x-2">
@@ -326,4 +316,4 @@ const SchemeList = () => {
   )
 }
 
-export default SchemeList
+export default PaymentTermCList

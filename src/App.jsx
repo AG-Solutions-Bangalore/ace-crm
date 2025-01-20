@@ -14,6 +14,9 @@ import EditBranch from "./app/master/branch/EditBranch";
 import StateList from "./app/master/state/StateList";
 import BankList from "./app/master/bank/BankList";
 import SchemeList from "./app/master/scheme/SchemeList";
+import CountryList from "./app/master/country/CountryList";
+import ContainerSizeList from "./app/master/ContainerSize/ContainerSizeList";
+import PaymentTermCList from "./app/master/paymentTermC/PaymentTermCList";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +49,13 @@ function App() {
           <Route path="/bank" element={<BankList />} />
           {/* Master Scheme  */}
           <Route path="/scheme" element={<SchemeList />} />
+
+          {/* Master -Country */}
+          <Route path="/country" element={<CountryList />} />
+          {/* Master -ContainerSize */}
+          <Route path="/containersize" element={<ContainerSizeList />} />
+          {/* Master -Payment Term C */}
+          <Route path="/paymentTermC" element={<PaymentTermCList />} />
         </Routes>
       </QueryClientProvider>
     </>

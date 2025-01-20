@@ -59,7 +59,7 @@ const CreateBank = () => {
       setIsLoading(true);
       try {
         const token = localStorage.getItem("token");
-        await axios.post(`${BASE_URL}/api/anel-create-bank`, formData, {
+        await axios.post(`${BASE_URL}/api/panel-create-bank`, formData, {
           headers: { Authorization: `Bearer ${token}` },
         });
   
