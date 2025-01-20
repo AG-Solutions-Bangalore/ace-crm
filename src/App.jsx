@@ -20,6 +20,8 @@ import PaymentTermCList from "./app/master/paymentTermC/PaymentTermCList";
 import DescriptionGoodsList from "./app/master/descriptionGoods/DescriptionGoodsList";
 import BagTypeList from "./app/master/bagType/BagTypeList";
 import CustomDescription from "./app/master/customDescription/CustomDescription";
+import ItemList from "./app/master/item/ItemList";
+import MarkingList from "./app/master/marking/MarkingList";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +67,10 @@ function App() {
           <Route path="/bagType" element={<BagTypeList />} />
           {/* Master -customdescription */}
           <Route path="/customdescription" element={<CustomDescription />} />
+          {/* Master -items */}
+          <Route path="/item" element={<ItemList />} />
+          {/* Master -marking */}
+          <Route path="/marking" element={<MarkingList />} />
         </Routes>
       </QueryClientProvider>
     </>
