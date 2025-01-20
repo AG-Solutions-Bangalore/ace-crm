@@ -92,16 +92,28 @@ export function AppSidebar({ ...props }) {
             url: "/paymentTermC",
           },
           {
+<<<<<<< HEAD
+            title: "Description of Goods",
+            url: "/descriptionGoods",
+          },
+          {
+            title: "Bag Type",
+            url: "/bagType",
+          },
+          {
+            title: "Custom Description",
+            url: "/customdescription",
+=======
             title: "Item",
             url: "/item",
           },
           {
             title: "Marking",
             url: "/marking",
+>>>>>>> 5d751f4849e4300b507da3d68391822338cc92ac
           },
         ],
       },
-     
     ],
     navMain1: [
       {
@@ -143,12 +155,9 @@ export function AppSidebar({ ...props }) {
         name: "Invoice",
         url: "/invoice",
         icon: Map,
-        
-        
       },
     ],
   };
-  
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -156,7 +165,7 @@ export function AppSidebar({ ...props }) {
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-          <NavMain items={data.navMain} />
+        <NavMain items={data.navMain} />
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
