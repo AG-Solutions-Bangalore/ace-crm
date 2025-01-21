@@ -122,6 +122,22 @@ export function AppSidebar({ ...props }) {
           },
         ],
       },
+      {
+        title: "Reports",
+        url: "#",
+        icon: Settings2,
+        items: [
+          {
+            title: "Buyer",
+            url: "/buyer-report",
+          },
+          {
+            title: "Contract",
+            url: "/contract-report",
+          },
+         
+        ],
+      },
     ],
     navMain1: [
       {
