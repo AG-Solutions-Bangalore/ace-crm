@@ -56,9 +56,12 @@
     "react-router-dom": "^6.27.0",
     "react-select": "^5.9.0",
     "react-to-print": "^2.15.1",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.2",
     "react-window": "^1.8.11",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
+    "pdfmake": "^0.2.16",
     "zod": "^3.23.8"
   },
   "devDependencies": {

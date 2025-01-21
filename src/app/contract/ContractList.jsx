@@ -114,19 +114,19 @@ const ContractList = () => {
   // Define columns for the table
   const columns = [
     {
-        accessorKey: "contract_date",
-        header: "Date",
-        cell: ({ row }) => {
-          const date = row.getValue("contract_date");
-          return moment(date).format("DDD-MMM-YYYY");
-        },
+      accessorKey: "contract_date",
+      header: "Date",
+      cell: ({ row }) => {
+        const date = row.getValue("contract_date");
+        return moment(date).format("DDD-MMM-YYYY");
+      },
     },
     {
       accessorKey: "branch_short",
       header: "Company",
       cell: ({ row }) => <div>{row.getValue("branch_short")}</div>,
     },
-    
+
     {
       accessorKey: "contract_no",
       header: ({ column }) => (
@@ -155,13 +155,13 @@ const ContractList = () => {
       header: "Status",
       cell: ({ row }) => {
         const status = row.getValue("contract_status");
-    
+
         const statusColors = {
-          "PENDING": "bg-blue-100 text-blue-800",
-          "OPEN": "bg-green-100 text-green-800",
-          "CLOSE": "bg-red-100 text-red-800",
+          PENDING: "bg-blue-100 text-blue-800",
+          OPEN: "bg-green-100 text-green-800",
+          CLOSE: "bg-red-100 text-red-800",
         };
-    
+
         return (
           <span
             className={`px-2 py-1 rounded text-xs ${
@@ -173,7 +173,7 @@ const ContractList = () => {
         );
       },
     },
-    
+
     {
       id: "actions",
       header: "Action",
@@ -182,53 +182,53 @@ const ContractList = () => {
 
         return (
           <div className="flex flex-row">
-          {/* <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => navigate(`/view-contract/${contractId}`)}
-                >
-                  <Eye className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>View Contract</TooltipContent>
-            </Tooltip>
-          </TooltipProvider> */}
-  
-          {/* <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => navigate(`/edit-contract/${contractId}`)}
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Edit Contract</TooltipContent>
-            </Tooltip>
-          </TooltipProvider> */}
-          {/* <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => {
-                    setDeleteContractId(contractId);
-                    setDeleteConfirmOpen(true);
-                  }}
-                >
-                  <Trash className="h-4 w-4 text-red-500" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Delete Contract</TooltipContent>
-            </Tooltip>
-          </TooltipProvider> */}
-        </div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => navigate(`/view-contract/${contractId}`)}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>View Contract</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => navigate(`/edit-contract/${contractId}`)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Edit Contract</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      setDeleteContractId(contractId);
+                      setDeleteConfirmOpen(true);
+                    }}
+                  >
+                    <Trash className="h-4 w-4 text-red-500" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Delete Contract</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         );
       },
     },
@@ -300,18 +300,10 @@ const ContractList = () => {
         </div>
         {/* searching and column filter  */}
         <div className="flex items-center py-4">
-          {/* <Input
-          placeholder="Search..."
-          value={table.getState().globalFilter || ""}
-          onChange={(event) => {
-            table.setGlobalFilter(event.target.value);
-          }}
-          className="max-w-sm"
-        /> */}
           <div className="relative w-72">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
             <Input
-              placeholder="Search Products..."
+              placeholder="Search contract..."
               value={table.getState().globalFilter || ""}
               onChange={(event) => table.setGlobalFilter(event.target.value)}
               className="pl-8 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-gray-200"
