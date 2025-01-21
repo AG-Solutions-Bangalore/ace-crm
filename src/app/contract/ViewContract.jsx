@@ -1,24 +1,19 @@
 import React, { useEffect, useState } from "react";
 import Page from "../dashboard/page";
 import { useParams } from "react-router-dom";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+import html2pdf from "html2pdf.js"; // Import html2pdf
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import BASE_URL from "@/config/BaseUrl";
 import EmailDialog from "./EmailDialog";
 import logo from "../../../public/assets/logo_ace.png";
-import logoMaker from "../../../public/assets/logo_ace.png";
-import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
 
 const ViewContract = () => {
   const { id } = useParams();
   const [contractData, setContractData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchContractData = async () => {
@@ -48,10 +43,12 @@ const ViewContract = () => {
 
     fetchContractData();
   }, [id]);
-
   const handlePDF = async () => {
     try {
-      // Convert the image to a data URL
+      // Get the HTML element to convert to PDF
+      const element = document.getElementById("contract-details");
+  
+      // Convert the logo to a data URL
       const toDataURL = async (url) => {
         const response = await fetch(url);
         const blob = await response.blob();
@@ -63,594 +60,92 @@ const ViewContract = () => {
         });
       };
   
-      // Convert the logo to a data URL
-      const logoDataURL = await toDataURL(logoMaker);
+      const logoDataURL = await toDataURL(logo);
   
-      // Define the content for the PDF
-      const content = [
-        { text: "Contract Details", style: "header" },
-        { text: "\n" }, // Add some spacing
-  
-        // Add contract information
-        { text: "Contract Information", style: "subheader" },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `ID: ${contractData.contract.id}`, width: "50%" },
-            { text: `Company ID: ${contractData.contract.company_id}`, width: "50%" },
-          ],
-        },
-        {
-          columns: [
-            { text: `Branch Short: ${contractData.contract.branch_short}`, width: "50%" },
-            { text: `Branch Name: ${contractData.contract.branch_name}`, width: "50%" },
-          ],
-        },
-       
-        { text: "\nContract Sub Details", style: "subheader" },
-        {
-          table: {
-            headerRows: 1,
-            widths: ["auto", "auto", "auto", "auto", "auto", "auto", "auto", "auto", "auto", "auto"],
-            body: [
-              [
-                "ID",
-                "Item Name",
-                "Marking",
-                "Description of Goods",
-                "Item Bag",
-                "Packing",
-                "Bag Size",
-                "Quantity in MT",
-                "Rate MT",
-                "SBAGA",
-              ],
-              ...contractData.contractSub.map((sub) => [
-                sub.id,
-                sub.contractSub_item_name,
-                sub.contractSub_marking,
-                sub.contractSub_descriptionofGoods,
-                sub.contractSub_item_bag,
-                sub.contractSub_packing,
-                sub.contractSub_bagsize,
-                sub.contractSub_qntyInMt,
-                sub.contractSub_rateMT,
-                sub.contractSub_sbaga,
-              ]),
-            ],
-          },
-        },
-      ];
-  
-     
-      const docDefinition = {
-        header: {
-          image: "logo",
-          width: 200, 
-          alignment: "center",
-          margin: [0, 10, 0, 10],
-        },
-        content: content,
-        styles: {
-          header: {
-            fontSize: 18,
-            bold: true,
-            alignment: "center",
-            margin: [0, 0, 0, 10], // Add margin below the header
-          },
-          subheader: {
-            fontSize: 14,
-            bold: true,
-            margin: [0, 10, 0, 5], // Add margin below the subheader
-          },
-        },
-        images: {
-          logo: logoDataURL, // Use the data URL of the logo
-        },
+      // Options for the PDF
+      const options = {
+        margin: 10,
+        filename: `contract_${id}.pdf`,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 }, // Increase scale for better quality
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
       };
   
-      // Generate and download the PDF
-      pdfMake.createPdf(docDefinition).download(`contract_${id}.pdf`);
+      // Create a new PDF instance
+      const pdf = new html2pdf().set(options);
+  
+      // Split the content into pages
+      const pageHeight = 297; // A4 page height in mm
+      const margin = 10; // Margin in mm
+      const contentHeight = pageHeight - 2 * margin; // Available height for content
+  
+      // Create a temporary container for the content
+      const tempContainer = document.createElement("div");
+      tempContainer.style.visibility = "hidden";
+      tempContainer.style.position = "absolute";
+      tempContainer.style.top = "-9999px";
+      document.body.appendChild(tempContainer);
+  
+      // Clone the original content
+      const originalContent = element.cloneNode(true);
+      tempContainer.appendChild(originalContent);
+  
+      // Split the content into pages
+      let currentHeight = 0;
+      let pageContent = [];
+      let currentPage = [];
+  
+      Array.from(originalContent.children).forEach((child) => {
+        const childHeight = child.offsetHeight * (options.html2canvas.scale || 1);
+  
+        if (currentHeight + childHeight > contentHeight) {
+          // Add the current page to the PDF
+          pageContent.push(currentPage);
+          currentPage = [];
+          currentHeight = 0;
+        }
+  
+        currentPage.push(child);
+        currentHeight += childHeight;
+      });
+  
+      // Add the last page
+      if (currentPage.length > 0) {
+        pageContent.push(currentPage);
+      }
+  
+      // Remove the temporary container
+      document.body.removeChild(tempContainer);
+  
+      // Add the logo and content to each page
+      pageContent.forEach((page, index) => {
+        const pageElement = document.createElement("div");
+        pageElement.style.position = "relative";
+  
+        // Add the logo to the top of the page
+        const logoElement = document.createElement("img");
+        logoElement.src = logoDataURL;
+        logoElement.style.width = "100px";
+        logoElement.style.marginBottom = "10px";
+        pageElement.appendChild(logoElement);
+  
+        // Add the content to the page
+        page.forEach((child) => {
+          pageElement.appendChild(child.cloneNode(true));
+        });
+  
+        // Add the page to the PDF
+        if (index > 0) {
+          pdf.addPage();
+        }
+        pdf.from(pageElement).toPdf().get("pdf").then((pdfDoc) => {
+          pdfDoc.save(`contract_${id}.pdf`);
+        });
+      });
     } catch (error) {
       console.error("Error generating PDF:", error);
       alert("Failed to generate PDF. Please try again.");
     }
-  };
-  
-  const handleSendEmail = async (email) => {
-    const input = document.getElementById("contract-details");
-    html2canvas(input).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-
-      const pageWidth = 210;
-      const pageHeight = 297;
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      const pageCount = Math.ceil(imgHeight / pageHeight);
-
-      for (let i = 0; i < pageCount; i++) {
-        if (i > 0) {
-          pdf.addPage();
-        }
-
-        const srcY = i * (canvas.height / pageCount);
-        const destY = 0;
-
-        pdf.addImage(
-          imgData,
-          "PNG",
-          0,
-          destY - i * pageHeight,
-          imgWidth,
-          imgHeight
-        );
-      }
-
-      const pdfBlob = pdf.output("blob");
-      const formData = new FormData();
-      formData.append("file", pdfBlob, `contract_${id}.pdf`);
-
-      fetch(`${BASE_URL}/api/send-email`, {
-        method: "POST",
-        body: formData,
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.success) {
-            alert("Email sent successfully!");
-          } else {
-            alert("Failed to send email.");
-          }
-        })
-        .catch((error) => {
-          console.error("Error sending email:", error);
-          alert("Error sending email.");
-        });
-    });
   };
 
   if (loading) {
@@ -666,7 +161,6 @@ const ViewContract = () => {
     );
   }
 
-  // Render error state
   if (error) {
     return (
       <Page>
@@ -696,12 +190,6 @@ const ViewContract = () => {
             >
               Generate PDF
             </button>
-            <button
-              className="border border-gray-200 p-1 bg-green-100 rounded-lg hover:bg-green-500"
-              onClick={() => setEmailDialogOpen(true)}
-            >
-              Send to Mail
-            </button>
           </div>
         </div>
         {contractData && (
@@ -729,7 +217,6 @@ const ViewContract = () => {
                 <strong>Branch Name:</strong>{" "}
                 {contractData.contract.branch_name}
               </p>
-
               <p>
                 <strong>Branch Address:</strong>{" "}
                 {contractData.contract.branch_address}
@@ -746,7 +233,6 @@ const ViewContract = () => {
                 <strong>Contract No:</strong>{" "}
                 {contractData.contract.contract_no}
               </p>
-
               <p>
                 <strong>Contract Ref:</strong>{" "}
                 {contractData.contract.contract_ref}
@@ -763,7 +249,6 @@ const ViewContract = () => {
                 <strong>Contract Buyer Address:</strong>{" "}
                 {contractData.contract.contract_buyer_add}
               </p>
-
               <p>
                 <strong>Contract Consignee:</strong>{" "}
                 {contractData.contract.contract_consignee}
@@ -772,7 +257,6 @@ const ViewContract = () => {
                 <strong>Contract Consignee Address:</strong>{" "}
                 {contractData.contract.contract_consignee_add}
               </p>
-             
             </div>
 
             <h2>Contract Sub Details</h2>
@@ -783,7 +267,6 @@ const ViewContract = () => {
                   <th>Item Name</th>
                   <th>Marking</th>
                   <th>Description of Goods</th>
-
                   <th>Item Bag</th>
                   <th>Packing</th>
                   <th>Bag Size</th>
@@ -799,7 +282,38 @@ const ViewContract = () => {
                     <td>{sub.contractSub_item_name}</td>
                     <td>{sub.contractSub_marking}</td>
                     <td>{sub.contractSub_descriptionofGoods}</td>
-
+                    <td>{sub.contractSub_item_bag}</td>
+                    <td>{sub.contractSub_packing}</td>
+                    <td>{sub.contractSub_bagsize}</td>
+                    <td>{sub.contractSub_qntyInMt}</td>
+                    <td>{sub.contractSub_rateMT}</td>
+                    <td>{sub.contractSub_sbaga}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <table border="1" cellPadding="5" cellSpacing="0">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Item Name</th>
+                  <th>Marking</th>
+                  <th>Description of Goods</th>
+                  <th>Item Bag</th>
+                  <th>Packing</th>
+                  <th>Bag Size</th>
+                  <th>Quantity in MT</th>
+                  <th>Rate MT</th>
+                  <th>SBAGA</th>
+                </tr>
+              </thead>
+              <tbody>
+                {contractData.contractSub.map((sub) => (
+                  <tr key={sub.id}>
+                    <td>{sub.id}</td>
+                    <td>{sub.contractSub_item_name}</td>
+                    <td>{sub.contractSub_marking}</td>
+                    <td>{sub.contractSub_descriptionofGoods}</td>
                     <td>{sub.contractSub_item_bag}</td>
                     <td>{sub.contractSub_packing}</td>
                     <td>{sub.contractSub_bagsize}</td>
@@ -813,11 +327,6 @@ const ViewContract = () => {
           </>
         )}
       </div>
-      <EmailDialog
-        open={emailDialogOpen}
-        onClose={() => setEmailDialogOpen(false)}
-        onSend={handleSendEmail}
-      />
     </Page>
   );
 };
