@@ -133,7 +133,7 @@ export function AppSidebar({ ...props }) {
           },
           {
             title: "Contract",
-            url: "/contract-report",
+            url: "/contract-form",
           },
          
         ],

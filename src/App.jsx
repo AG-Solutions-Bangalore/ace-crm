@@ -26,6 +26,8 @@ import TypeList from "./app/master/type/TypeList";
 import QualityList from "./app/master/quality/QualityList";
 import ViewContract from "./app/contract/ViewContract";
 import EditContract from "./app/contract/EditContract";
+import Buyer from "./app/reports/buyer/Buyer";
+import ContractForm from "./app/reports/contract/ContractForm";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +83,11 @@ function App() {
           <Route path="/type" element={<TypeList />} />
           {/* Master -Quality  */}
           <Route path="/quality" element={<QualityList />} />
+
+          {/* //Reports */}
+          {/* Reports -Buyer  */}
+          <Route path="/buyer-report" element={<Buyer />} />
+          <Route path="/contract-form" element={<ContractForm />} />
         </Routes>
       </QueryClientProvider>
     </>
