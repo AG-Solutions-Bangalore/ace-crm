@@ -24,6 +24,8 @@ import CustomDescription from "./app/master/customDescription/CustomDescription"
 import BagTypeList from "./app/master/bagType/BagTypeList";
 import TypeList from "./app/master/type/TypeList";
 import QualityList from "./app/master/quality/QualityList";
+import ViewContract from "./app/contract/ViewContract";
+import EditContract from "./app/contract/EditContract";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +42,8 @@ function App() {
           {/* Contract  */}
           <Route path="/contract" element={<ContractList />} />
           <Route path="/create-contract" element={<ContractAdd />} />
+          <Route path="/view-contract/:id" element={<ViewContract />} />
+          <Route path="/edit-contract/:id" element={<EditContract />} />
           {/* Invoice  */}
           <Route path="/invoice" element={<InvoiceList />} />
           <Route path="/create-invoice" element={<InvoiceAdd />} />
