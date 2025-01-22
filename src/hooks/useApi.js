@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import BASE_URL from "@/config/BaseUrl";
 
-const STALE_TIME = 5 * 60 * 1000; 
-const CACHE_TIME = 30 * 60 * 1000; 
+const STALE_TIME = 5 * 60 * 1000;
+const CACHE_TIME = 30 * 60 * 1000;
 
 const fetchData = async (endpoint, token) => {
   if (!token) throw new Error("No authentication token found");
@@ -117,4 +117,71 @@ export const useFetchDescriptionofGoods = () => {
 
 export const useFetchBagsTypes = () => {
   return useQuery(createQueryConfig(["bagTypes"], "/api/panel-fetch-bagType"));
+};
+
+//invoice apis
+
+export const useContactRef = () => {
+  return useQuery(
+    createQueryConfig(["contractRefs"], "/api/panel-fetch-contract-ref")
+  );
+};
+export const usePrereceipts = () => {
+  return useQuery(
+    createQueryConfig(["prereceipts"], "/api/panel-fetch-prereceipts")
+  );
+};
+
+export const useProductCustomDescription = (contract_ref) => {
+  const queryClient = useQueryClient();
+
+  const query = useQuery(
+    createQueryConfig(
+      ["productdesc", contract_ref],
+      `/api/panel-fetch-product-description/${contract_ref}`,
+      {
+        enabled: Boolean(contract_ref),
+      }
+    )
+  );
+
+  const prefetchNextContractNos = async () => {
+    if (contract_ref) {
+      await queryClient.prefetchQuery(
+        createQueryConfig(
+          ["productdesc", contract_ref],
+          `/api/panel-fetch-product-description/${contract_ref}`
+        )
+      );
+    }
+  };
+
+  return { ...query, prefetchNextContractNos };
+};
+
+export const useGRCode = (gr_code) => {
+  const queryClient = useQueryClient();
+
+  const query = useQuery(
+    createQueryConfig(
+      ["grcode", gr_code],
+      `/api/panel-fetch-grcode/${gr_code}`,
+      {
+        enabled: Boolean(gr_code),
+      }
+    )
+  );
+
+  const prefetchNextContractNos = async () => {
+    if (gr_code) {
+      await queryClient.prefetchQuery(
+        createQueryConfig(
+          ["grcode", gr_code],
+          `/api/panel-fetch-grcode/${gr_code}`
+        )
+      );
+    }
+  };
+
+  return { ...query, prefetchNextContractNos };
 };

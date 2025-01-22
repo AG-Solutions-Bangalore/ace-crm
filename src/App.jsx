@@ -28,6 +28,8 @@ import ViewContract from "./app/contract/ViewContract";
 import EditContract from "./app/contract/EditContract";
 import Buyer from "./app/reports/buyer/Buyer";
 import ContractForm from "./app/reports/contract/ContractForm";
+import ContractReport from "./app/reports/contract/ContractReport";
+import InvoiceAddN from "./app/invoice/InvoiceAddN";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +51,7 @@ function App() {
           {/* Invoice  */}
           <Route path="/invoice" element={<InvoiceList />} />
           <Route path="/create-invoice" element={<InvoiceAdd />} />
+          <Route path="/create-invoiceN" element={<InvoiceAddN />} />
 
           {/* Master - Branch  */}
 
@@ -88,6 +91,7 @@ function App() {
           {/* Reports -Buyer  */}
           <Route path="/buyer-report" element={<Buyer />} />
           <Route path="/contract-form" element={<ContractForm />} />
+          <Route path="/contract-report" element={<ContractReport />} />
         </Routes>
       </QueryClientProvider>
     </>
