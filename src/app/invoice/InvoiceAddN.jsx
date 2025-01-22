@@ -415,7 +415,7 @@ const InvoiceAddN = () => {
     queryKey: ["contracts", formData.contract_ref],
     queryFn: () => fetchContractData(formData.contract_ref),
   });
-
+  console.log(formData, "formdat");
   const handleInputChange = useCallback((field, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -423,6 +423,9 @@ const InvoiceAddN = () => {
     }));
   }, []);
 
+  useEffect(() => {
+    console.log(ContractRefData, "effect");
+  }, [ContractRefData]);
   const handleSelectChange = useCallback(
     (field, value) => {
       setFormData((prev) => ({
@@ -444,12 +447,10 @@ const InvoiceAddN = () => {
       //     }));
       //   }
       // }
+
       if (field === "contract_ref") {
         const selectedContract = ContractRefData?.contract;
-
         if (selectedContract) {
-          console.log(selectedContract, "contract_ref");
-
           if (selectedContract.contract_ref === value) {
             console.log(selectedContract.branch_short);
 
@@ -467,19 +468,28 @@ const InvoiceAddN = () => {
         const selectedBranch = branchData?.branch?.find(
           (branch) => branch.branch_short === value
         );
-
-        handleInputChange({ target: { value } }, "branch_short");
-
+        console.log(selectedBranch, "selectbracnh");
+        handleInputChange("branch_short", value);
         if (selectedBranch) {
           const { branch_name, branch_address, branch_scheme } = selectedBranch;
 
-          handleInputChange({ target: { value: branch_name } }, "branch_name");
           handleInputChange(
-            { target: { value: branch_address } },
-            "branch_address"
+            // { target: { value: branch_name } },
+            "branch_name",
+            branch_name
+          );
+          handleInputChange(
+            // { target: { value: branch_address } },
+            "branch_address",
+            branch_address
+          );
+          handleInputChange(
+            // { target: { value: branch_address } },
+            "branch_scheme",
+            branch_scheme
           );
 
-          fetchLUT(branch_scheme);
+          // fetchLUT(branch_scheme);
         }
       }
 
@@ -571,10 +581,10 @@ const InvoiceAddN = () => {
     [
       ContractRefData?.contract,
       buyerData,
-      branchData,
-      formData.branch_short,
-      formData.contract_buyer,
-      formData.contract_no,
+      // branchData,
+      // formData.branch_short,
+      // formData.contract_buyer,
+      // formData.contract_no,
       // formData.contract_year,
     ]
   );
@@ -736,41 +746,34 @@ const InvoiceAddN = () => {
   };
   //NEW LOAD
 
-  const fetchLUT = async (value) => {
+  const fetchLUT = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
       throw new Error("No authentication token found");
     }
-
-    const response = await fetch(
-      `${BASE_URL}/api/panel-fetch-scheme-by-value/${value}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch LUT data");
-    }
-
-    const data = await response.json();
-    // console.log("API Response Data:", data);
-
-    const options = data.scheme
-      ? [
-          {
-            value: data.scheme.scheme_description,
-            label: data.scheme.scheme_description,
+    console.log(formData.branch_scheme);
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/panel-fetch-scheme-by-value/${formData.branch_scheme}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
-        ]
-      : [];
+        }
+      );
 
-    // console.log("Converted Options:", options);
+      if (!response.ok) {
+        throw new Error("Failed to fetch LUT data");
+      }
 
-    return options;
+      const data = await response.json();
+      console.log(data);
+
+      return data;
+    } catch (error) {
+      console.log(error, "error in catch");
+    }
   };
 
   const {
@@ -778,8 +781,9 @@ const InvoiceAddN = () => {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["lut"],
+    queryKey: ["lut", formData.branch_scheme],
     queryFn: fetchLUT,
+    // STALE_TIME: Infinity,
     onSuccess: (data) => {
       console.log("API Response Data in onSuccess:", data);
       if (!data.scheme) {
@@ -790,7 +794,7 @@ const InvoiceAddN = () => {
       console.log("API Request Error:", error);
     },
   });
-
+  console.log(lutDatas, "lutdata");
   return (
     <Page>
       <form
