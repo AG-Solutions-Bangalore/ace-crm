@@ -1,39 +1,47 @@
-
-
-
 import React from "react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import Page from "@/app/dashboard/page";
 import BASE_URL from "@/config/BaseUrl";
-import { Download, Loader2, Printer } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 
-const ContractList = () => {
+const ContractReport = () => {
   const { toast } = useToast();
-
+  var postData = {
+    from_date: localStorage.getItem("from_date") || "",
+    to_date: localStorage.getItem("to_date") || "",
+    branch_short: localStorage.getItem("branch_short") || "",
+    buyer: localStorage.getItem("buyer") || "",
+    consignee: localStorage.getItem("consignee") || "",
+    container_size: localStorage.getItem("container_size") || "",
+    product: localStorage.getItem("product") || "",
+    status: localStorage.getItem("status") || "",
+  };
   const fetchContractData = async () => {
     const token = localStorage.getItem("token");
+
     const response = await axios.post(
-      `${BASE_URL}/api/panel-fetch-buyer-details-report`,
-      {},
+      `${BASE_URL}/api/panel-fetch-contract-report`,
+      postData,
       {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       }
     );
-    return response.data.buyer;
+    return response.data.contract;
   };
 
   const {
-    data: ContractData,
+    data: contractData,
     isLoading,
     isError,
+    refetch, // Add refetch here
   } = useQuery({
-    queryKey: ["ContractData"],
+    queryKey: ["contractData"],
     queryFn: fetchContractData,
     staleTime: Infinity,
   });
@@ -43,8 +51,8 @@ const ContractList = () => {
       <Page>
         <div className="flex justify-center items-center h-full">
           <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading Contract
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading Contract 
           </Button>
         </div>
       </Page>
@@ -70,19 +78,19 @@ const ContractList = () => {
     );
   }
 
-  //excel download
+  // excel download
   const onSubmit = (e) => {
     e.preventDefault();
 
     axios({
-      url: BASE_URL + "/api/panel-download-buyer-details-report",
+      url: BASE_URL + "/api/panel-download-contract-report",
       method: "POST",
+      data: postData,
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     })
       .then((res) => {
-        console.log("data : ", res.data);
         const url = window.URL.createObjectURL(new Blob([res.data]));
         const link = document.createElement("a");
         link.href = url;
@@ -91,7 +99,7 @@ const ContractList = () => {
         link.click();
         toast({
           title: "Success",
-          description: "Contract created successfully",
+          description: "Contract download successfully",
         });
       })
       .catch((error) => {
@@ -102,6 +110,39 @@ const ContractList = () => {
         });
       });
   };
+  //details DOwnload
+  // const onSubmitDetails = (e) => {
+  //   e.preventDefault();
+
+  //   axios({
+  //     url: BASE_URL + "/api/panel-download-contract-details-report",
+  //     method: "POST",
+  //     data: postData,
+  //     headers: {
+  //       Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //     },
+  //   })
+  //     .then((res) => {
+  //       const url = window.URL.createObjectURL(new Blob([res.data]));
+  //       const link = document.createElement("a");
+  //       link.href = url;
+  //       link.setAttribute("download", "contractdetails.csv");
+  //       document.body.appendChild(link);
+  //       link.click();
+  //       toast({
+  //         title: "Success",
+  //         description: "Contract Details download successfully",
+  //       });
+  //     })
+  //     .catch((error) => {
+  //       toast({
+  //         title: "Error",
+  //         description: error.message,
+  //         variant: "destructive",
+  //       });
+  //     });
+  // };
+
   return (
     <Page>
       <div className="p-4">
@@ -115,58 +156,89 @@ const ContractList = () => {
             >
               <Download className="h-4 w-4" /> Download
             </Button>
+            {/* <Button
+              variant="default"
+              className="ml-2 bg-yellow-500 text-black hover:bg-yellow-100"
+              onClick={onSubmitDetails}
+            >
+              <Download className="h-4 w-4" /> Details Download
+            </Button> */}
           </div>
-        </div>{" "}
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-gray-300">
             <thead className="bg-gray-100">
               <tr>
                 <th className="border border-gray-300 px-4 py-2 text-left">
-                Contract Sort
+                  Branch Short
                 </th>
                 <th className="border border-gray-300 px-4 py-2 text-left">
-                Contract Group
+                  Contract Date
                 </th>
                 <th className="border border-gray-300 px-4 py-2 text-left">
-                Contract Name
+                  Contract No
                 </th>
                 <th className="border border-gray-300 px-4 py-2 text-left">
-                Contract Address
+                  Contract Buyer
                 </th>
                 <th className="border border-gray-300 px-4 py-2 text-left">
-                Contract Port
+                  Contract Consignee
                 </th>
                 <th className="border border-gray-300 px-4 py-2 text-left">
-                Contract Country
+                  Container Size
                 </th>
                 <th className="border border-gray-300 px-4 py-2 text-left">
-                Contract Status
+                  Product
+                </th>
+                <th className="border border-gray-300 px-4 py-2 text-left">
+                  Loading Port
+                </th>
+                <th className="border border-gray-300 px-4 py-2 text-left">
+                  Destination Port
+                </th>
+                <th className="border border-gray-300 px-4 py-2 text-left">
+                  Status
+                </th>
+                <th className="border border-gray-300 px-4 py-2 text-left">
+                  Quantity (MT)
                 </th>
               </tr>
             </thead>
             <tbody>
-              {buyerData.map((buyer, index) => (
+              {contractData.map((contract, index) => (
                 <tr key={index} className="hover:bg-gray-50">
                   <td className="border border-gray-300 px-4 py-2 text-sm">
-                    {buyer.buyer_sort}
+                    {contract.branch_short}
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-sm">
-                    {buyer.buyer_group}
+                    {contract.contract_date}
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-sm">
-                    {buyer.buyer_name}
+                    {contract.contract_no}
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-sm">
-                    {buyer.buyer_address}
+                    {contract.contract_buyer}
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-sm">
-                    {buyer.buyer_port}
+                    {contract.contract_consignee}
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-sm">
-                    {buyer.buyer_country}
+                    {contract.contract_container_size}
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-sm">
-                    {buyer.buyer_status}
+                    {contract.contract_product}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-sm">
+                    {contract.contract_loading}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-sm">
+                    {contract.contract_destination_port}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-sm">
+                    {contract.contract_status}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-sm">
+                    {contract.total_qntyInMt}
                   </td>
                 </tr>
               ))}
@@ -178,4 +250,4 @@ const ContractList = () => {
   );
 };
 
-export default ContractList;
+export default ContractReport;

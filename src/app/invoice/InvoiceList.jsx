@@ -114,19 +114,19 @@ const InvoiceList = () => {
   // Define columns for the table
   const columns = [
     {
-        accessorKey: "invoice_date",
-        header: "Date",
-        cell: ({ row }) => {
-          const date = row.getValue("invoice_date");
-          return moment(date).format("DDD-MMM-YYYY");
-        },
+      accessorKey: "invoice_date",
+      header: "Date",
+      cell: ({ row }) => {
+        const date = row.getValue("invoice_date");
+        return moment(date).format("DDD-MMM-YYYY");
+      },
     },
     {
       accessorKey: "branch_short",
       header: "Company",
       cell: ({ row }) => <div>{row.getValue("branch_short")}</div>,
     },
-    
+
     {
       accessorKey: "invoice_no",
       header: ({ column }) => (
@@ -155,13 +155,13 @@ const InvoiceList = () => {
       header: "Status",
       cell: ({ row }) => {
         const status = row.getValue("invoice_status");
-    
+
         const statusColors = {
-          "PENDING": "bg-blue-100 text-blue-800",
-          "OPEN": "bg-green-100 text-green-800",
-          "CLOSE": "bg-red-100 text-red-800",
+          PENDING: "bg-blue-100 text-blue-800",
+          OPEN: "bg-green-100 text-green-800",
+          CLOSE: "bg-red-100 text-red-800",
         };
-    
+
         return (
           <span
             className={`px-2 py-1 rounded text-xs ${
@@ -173,7 +173,7 @@ const InvoiceList = () => {
         );
       },
     },
-    
+
     {
       id: "actions",
       header: "Action",
@@ -182,7 +182,7 @@ const InvoiceList = () => {
 
         return (
           <div className="flex flex-row">
-          {/* <TooltipProvider>
+            {/* <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -196,8 +196,8 @@ const InvoiceList = () => {
               <TooltipContent>View Invoice</TooltipContent>
             </Tooltip>
           </TooltipProvider> */}
-  
-          {/* <TooltipProvider>
+
+            {/* <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -211,7 +211,7 @@ const InvoiceList = () => {
               <TooltipContent>Edit Invoice</TooltipContent>
             </Tooltip>
           </TooltipProvider> */}
-          {/* <TooltipProvider>
+            {/* <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -228,7 +228,7 @@ const InvoiceList = () => {
               <TooltipContent>Delete Invoice</TooltipContent>
             </Tooltip>
           </TooltipProvider> */}
-        </div>
+          </div>
         );
       },
     },
@@ -296,7 +296,7 @@ const InvoiceList = () => {
     <Page>
       <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
-        Invoice List
+          Invoice List
         </div>
         {/* searching and column filter  */}
         <div className="flex items-center py-4">
@@ -349,6 +349,13 @@ const InvoiceList = () => {
             onClick={() => navigate("/create-invoice")}
           >
             <SquarePlus className="h-4 w-4" /> Invoice
+          </Button>
+          <Button
+            variant="default"
+            className="ml-2 bg-yellow-500 text-black hover:bg-yellow-100"
+            onClick={() => navigate("/create-invoiceN")}
+          >
+            <SquarePlus className="h-4 w-4" /> Invoice New
           </Button>
         </div>
         {/* table  */}
