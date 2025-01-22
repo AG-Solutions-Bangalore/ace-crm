@@ -1227,7 +1227,7 @@ const ContractAdd = () => {
       ? `${(
           parseFloat(row.contractSub_item_bag) *
           parseFloat(row.contractSub_packing)
-        ).toFixed(2)}`
+        ).toFixed(2)/1000}`
       : <span className="text-[11px]"> Bags X Net</span>}
   </p>
                         </TableCell>

@@ -74,7 +74,7 @@ const Home = () => {
     queryFn: async () => {
       const token = localStorage.getItem('token');
       const response = await fetch(
-        'https://adityaspice.com/app/public/api/panel-fetch-dashboard',
+        'https://exportbiz.in/public/api/panel-fetch-dashboard',
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -117,16 +117,16 @@ const Home = () => {
       <div className="p-6">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <StatCard
-            title="New Enquiries"
-            value={data.new_enquiry_count}
+            title="Contract"
+            value={data.contract_count}
             icon={FileText}
           />
           <StatCard
-            title="Quotations"
-            value={data.quotation_count}
+            title="Invoice"
+            value={data.invoice_count}
             icon={ClipboardCheck}
           />
-          <StatCard
+          {/* <StatCard
             title="Confirmed"
             value={data.confirmed_count}
             icon={CheckCircle}
@@ -135,10 +135,10 @@ const Home = () => {
             title="Closed"
             value={data.closed_count}
             icon={XCircle}
-          />
+          /> */}
         </div>
 
-        <EnquiryTable enquiries={data.enquiry} />
+        {/* <EnquiryTable enquiries={data.enquiry} /> */}
       </div>
     </Page>
   );
