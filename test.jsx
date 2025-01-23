@@ -1,301 +1,235 @@
-import Page from "@/app/dashboard/page";
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+ branch_short  // 1
+ branch_name  // 4
+ branch_address // 5
+//  invoice_year   dont show but send on sumbit
+ invoice_date // 3
+ invoice_no // 2
+ invoice_ref  // 9
+ contract_date // 8
+ contract_ref  // 6
+ contract_pono // 7
+ invoice_buyer  // 10
+ invoice_buyer_add // 14
+ invoice_consignee // 11
+ invoice_consignee_add // 15
+ invoice_container_size // 23 
+ invoice_loading // 18
+ invoice_destination_port // 19
+ invoice_discharge // 20 
+ invoice_cif // 21
+ invoice_destination_country // 22 
+ invoice_payment_terms // 27
+ invoice_remarks // 29
+ invoice_product // 13
+ invoice_consig_bank // 12
+ invoice_prereceipts // 17
+ invoice_precarriage // 28
+ invoice_product_cust_des // 24
+ invoice_gr_code // 26
+ invoice_lut_code // 25 
+ invoice_consig_bank_address // 16
 
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ChevronDown } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
-import { z } from "zod";
+ <MemoizedSelect
+                    value={formData.contract_ref}
+                    onChange={(value) => handleSelectChange("contract_ref", value)}
+                    options={
+                      contractRefsData?.contractRef?.map((contractRef) => ({
+                        value: contractRef.contract_ref,
+                        label: contractRef.contract_ref,
+                      })) || []
+                    }
+                    placeholder="Select Contract Ref."
+                  />
 
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
-import BASE_URL from "@/config/BaseUrl";
-import {
-  useFetchBuyers,
-  useFetchCompanys,
-  useFetchContractNos,
-  useFetchPortofLoadings,
-  useFetchContainerSizes,
-  useFetchPaymentTerms,
-  useFetchCountrys,
-  useFetchMarkings,
-  useFetchItemNames,
-  useFetchDescriptionofGoods,
-  useFetchBagsTypes,
-  useFetchPorts,
-  useFetchProduct,
-} from "@/hooks/useApi";
-const contractFormSchema = z.object({
-  from_date: z.string().min(1, "From date is required"),
+/*
+ <div>
+                    <label className="block text-sm font-medium mb-2">
+                    Company <span className="text-red-500">*</span>
+                    </label>
+                    <ShadcnSelect
+                    value={formData.branch_short}
+                    onValueChange={(value) => {
+                        const selectedCompanySort = branchData?.branch?.find(
+                        (branch) => branch.branch_short === value
+                        );
+                        
+                        handleInputChange(
+                        { target: { value } },
+                        "branch_short"
+                        );
+                        if (selectedCompanySort) {
+                        handleInputChange(
+                            { target: { value: selectedCompanySort.branch_name } },
+                            "branch_name"
+                        );
+                        handleInputChange(
+                            { target: { value: selectedCompanySort.branch_address } },
+                            "branch_address"
+                        );
+                        fetchLUT(selectedCompanySort.branch_scheme);
+                        
+                        
+                        
+                        }
+                        
+                    }}
 
-  to_date: z.number().min(1, "To Date is required"),
-  branch_short: z.string().optional(),
-  buyer: z.string().optional(),
-  consignee: z.string().optional(),
-  container_size: z.string().optional(),
-  product: z.string().optional(),
-  status: z.string().optional(),
-});
 
-const createContract = async (data) => {
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("No authentication token found");
+                      <label className="block text-sm font-medium mb-2">
+                  Consignee <span className="text-red-500">*</span>
+                  </label>
+                  <ShadcnSelect
+                    value={formData.invoice_consignee}
+                    onValueChange={(value) => {
+                      const selectedBuyer = buyerData?.buyer?.find(
+                        (buyer) => buyer.buyer_name === value
+                      );
+                      handleInputChange(
+                        { target: { value } },
+                        "invoice_consignee"
+                      );
+                      if (selectedBuyer) {
+                        handleInputChange(
+                          { target: { value: selectedBuyer.buyer_address } },
+                          "invoice_consignee_add"
+                        );
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Consignee" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {buyerData?.buyer?.map((buyer) => (
+                        <SelectItem
+                          key={buyer.buyer_name}
+                          value={buyer.buyer_name.toString()}
+                        >
+                          {buyer.buyer_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </ShadcnSelect>
+               
+                    >
 
-  const response = await fetch(
-    `${BASE_URL}/api/panel-download-contract-details-report`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    }
-  );
 
-  if (!response.ok) throw new Error("Failed to create enquiry");
-  return response.json();
-};
-const MemoizedSelect = React.memo(
-  ({ value, onChange, options, placeholder }) => {
-    const selectOptions = options.map((option) => ({
-      value: option.value,
-      label: option.label,
-    }));
 
-    const selectedOption = selectOptions.find(
-      (option) => option.value === value
-    );
 
-    const customStyles = {
-      control: (provided, state) => ({
-        ...provided,
-        minHeight: "36px",
-        borderRadius: "6px",
-        borderColor: state.isFocused ? "black" : "#e5e7eb",
-        boxShadow: state.isFocused ? "black" : "none",
-        "&:hover": {
-          borderColor: "none",
-          cursor: "text",
-        },
-      }),
-      option: (provided, state) => ({
-        ...provided,
-        fontSize: "14px",
-        backgroundColor: state.isSelected
-          ? "#A5D6A7"
-          : state.isFocused
-          ? "#f3f4f6"
-          : "white",
-        color: state.isSelected ? "black" : "#1f2937",
-        "&:hover": {
-          backgroundColor: "#EEEEEE",
-          color: "black",
-        },
-      }),
 
-      menu: (provided) => ({
-        ...provided,
-        borderRadius: "6px",
-        border: "1px solid #e5e7eb",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-      }),
-      placeholder: (provided) => ({
-        ...provided,
-        color: "#616161",
-        fontSize: "14px",
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "start",
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-      }),
-      singleValue: (provided) => ({
-        ...provided,
-        color: "black",
-        fontSize: "14px",
-      }),
-    };
 
-    const DropdownIndicator = (props) => {
-      return (
-        <div {...props.innerProps}>
-          <ChevronDown className="h-4 w-4 mr-3 text-gray-500" />
-        </div>
-      );
-    };
 
-    return (
-      <Select
-        value={selectedOption}
-        onChange={(selected) => onChange(selected ? selected.value : "")}
-        options={selectOptions}
-        placeholder={placeholder}
-        styles={customStyles}
-        components={{
-          IndicatorSeparator: () => null,
-          DropdownIndicator,
-        }}
-        // menuPortalTarget={document.body}
-        //   menuPosition="fixed"
-      />
-    );
-  }
-);
 
-const ContractForm = () => {
-  const { toast } = useToast();
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    from_date: "",
-    to_date: "",
-    branch_short: "",
-    buyer: "",
-    consignee: "",
-    container_size: "",
-    product: "",
-    status: "",
-  });
-  const { data: buyerData } = useFetchBuyers();
 
-  const createContractMutation = useMutation({
-    mutationFn: createContract,
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "Contract created successfully",
-      });
-      navigate("/contract");
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
 
-  const handleInputChange = useCallback((field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  }, []);
 
-  const fieldLabels = {
-    from_date: "From Date",
-    to_date: "To Date",
-    branch_short: " Branch Sort",
-    buyer: "Buyer",
-    consignee: "Consignee",
-    container_size: "Container size",
-    product: "Product",
-    status: "Status",
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const validatedData = contractFormSchema.parse({
-        ...formData,
-      });
-      createContractMutation.mutate(validatedData);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const groupedErrors = error.errors.reduce((acc, err) => {
-          const field = err.path.join(".");
-          if (!acc[field]) acc[field] = [];
-          acc[field].push(err.message);
-          return acc;
-        }, {});
 
-        const errorMessages = Object.entries(groupedErrors).map(
-          ([field, messages]) => {
-            const fieldKey = field.split(".").pop();
-            const label = fieldLabels[fieldKey] || field;
-            return `${label}: ${messages.join(", ")}`;
-          }
-        );
 
-        toast({
-          title: "Validation Error",
-          description: (
-            <div>
-              <ul className="list-disc pl-5">
-                {errorMessages.map((message, index) => (
-                  <li key={index}>{message}</li>
-                ))}
-              </ul>
-            </div>
-          ),
-          variant: "destructive",
-        });
-        return;
-      }
 
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
-    }
-  };
-  return (
-    <Page>
-      <div className="w-full p-4">
-        <div className="flex text-left text-2xl text-gray-800 font-[400]">
-          Type List
-        </div>
 
-        <div className="grid grid-cols-4 gap-6">
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Enter From Date <span className="text-red-500">*</span>
-            </label>
-            <Input type="date" placeholder="Enter From Date" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Enter To Date <span className="text-red-500">*</span>
-            </label>
-            <Input type="date" placeholder="Enter To Date" />
-          </div>
-          <div>
-            <label className="block text-xs mb-[2px] font-medium ">
-              Buyer <span className="text-red-500">*</span>
-            </label>
-            <MemoizedSelect
-              value={formData.branch_short}
-              onChange={(value) => handleSelectChange("branch_short", value)}
-              options={
-                buyerData?.buyer?.map((buyer) => ({
-                  value: buyer.buyer_name,
-                  label: buyer.buyer_name,
-                })) || []
-              }
-              placeholder="Select Buyer"
-            />
-          </div>
-        </div>
-      </div>
-    </Page>
-  );
-};
 
-export default ContractForm;
+
+                     <label className="block text-sm font-medium mb-2">
+                    Consig. Bank <span className="text-red-500">*</span>
+                    </label>
+                    
+                    <ShadcnSelect
+                    value={formData.invoice_consig_bank}
+                    onValueChange={(value) =>
+                        handleInputChange({ target: { value } }, "invoice_consig_bank")
+                    }
+                    >
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select Consig. Bank" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {buyerData?.buyer?.map((buyer) => (
+                        <SelectItem
+                            key={buyer.buyer_name}
+                            value={buyer.buyer_name.toString()}
+                        >
+                            {buyer.buyer_name}
+                        </SelectItem>
+                        ))}
+                    </SelectContent>
+                    </ShadcnSelect>
+                    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ <label className="block text-sm font-medium mb-2">
+                    Product <span className="text-red-500">*</span>
+                    </label>
+                    <ShadcnSelect
+                    value={formData.contract_product}
+                    onValueChange={(value) =>{
+                        handleInputChange({ target: { value } }, "contract_product")
+                        fetchProductCustomDescription(value);
+                        fetchGRCode(value);
+                    }
+                        
+                    }
+                    
+                    >
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select Product" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {productData?.product?.map((product) => (
+                        <SelectItem
+                            key={product.product_name}
+                            value={product.product_name.toString()}
+                        >
+                            {product.product_name}
+                        </SelectItem>
+                        ))}
+                    </SelectContent>
+                    </ShadcnSelect>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    
+
+
+
+
+*/
