@@ -29,7 +29,8 @@ import EditContract from "./app/contract/EditContract";
 import Buyer from "./app/reports/buyer/Buyer";
 import ContractForm from "./app/reports/contract/ContractForm";
 import ContractReport from "./app/reports/contract/ContractReport";
-// import InvoiceAddN from "./app/invoice/InvoiceAddN";
+import PreshipmentDetails from "./app/invoice/PreshipmentDetails";
+import InvoiceView from "./app/invoice/InvoiceView";
 
 const queryClient = new QueryClient();
 
@@ -51,7 +52,7 @@ function App() {
           {/* Invoice  */}
           <Route path="/invoice" element={<InvoiceList />} />
           <Route path="/create-invoice" element={<InvoiceAdd />} />
-          {/* <Route path="/create-invoiceN" element={<InvoiceAddN />} /> */}
+          <Route path="/view-invoice/:id" element={<InvoiceView />} />
 
           {/* Master - Branch  */}
 
