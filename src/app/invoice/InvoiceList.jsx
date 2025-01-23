@@ -182,20 +182,20 @@ const InvoiceList = () => {
 
         return (
           <div className="flex flex-row">
-            {/* <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => navigate(`/view-invoice/${invoiceId}`)}
-                >
-                  <Eye className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>View Invoice</TooltipContent>
-            </Tooltip>
-          </TooltipProvider> */}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => navigate(`/view-invoice/${invoiceId}`)}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>View Invoice</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
 
             {/* <TooltipProvider>
             <Tooltip>
