@@ -795,6 +795,8 @@ const InvoiceAddN = () => {
     },
   });
   console.log(lutDatas, "lutdata");
+  console.log("Container Size Data:", containerSizeData);
+  console.log("Container Size Array:", containerSizeData.containerSize);
   return (
     <Page>
       <form
