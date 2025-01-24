@@ -9,6 +9,7 @@ import BASE_URL from "@/config/BaseUrl";
 import { useParams } from "react-router-dom";
 import { getTodayDate } from "@/utils/currentDate";
 import ReactToPrint from "react-to-print";
+import { ButtonConfig } from "@/config/ButtonConfig";
 const ViewContract = () => {
   const containerRef = useRef();
   const { id } = useParams();
@@ -253,7 +254,7 @@ const ViewContract = () => {
     <Page>
       <button
         onClick={handleSaveAsPdf}
-        className="fixed bottom-10 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
+        className={`fixed bottom-10 right-10 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} px-4 py-2 rounded-lg shadow-lg `}
       >
         Save as PDF
       </button>
@@ -262,7 +263,7 @@ const ViewContract = () => {
               <Button
                 variant="outline"
                 size="icon"
-                className="fixed bottom-20 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
+                className={`fixed bottom-20 right-10 px-4 py-2 rounded-lg shadow-lg ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
               >
                 <Printer className="h-4 w-4" />
               </Button>

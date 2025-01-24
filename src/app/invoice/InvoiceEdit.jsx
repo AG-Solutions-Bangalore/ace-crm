@@ -1,17 +1,11 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { z } from "zod";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { gsap } from "gsap";
+
 import {
   Table,
   TableHeader,
@@ -27,10 +21,27 @@ import {
   Settings2,
   Trash2,
   ChevronDown,
+  Loader2,
+  FileText,
+  Package,
+  TestTubes,
+  Truck,
+  ChevronUp,
+  Clock,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import Page from "../dashboard/page";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ProgressBar } from "@/components/spinner/ProgressBar";
 import BASE_URL from "@/config/BaseUrl";
 import { Textarea } from "@/components/ui/textarea";
@@ -48,66 +59,9 @@ import {
   useFetchPortofLoadings,
   useFetchPorts,
   useFetchProduct,
+  useFetchStatus,
 } from "@/hooks/useApi";
-import axios from "axios";
 import { ButtonConfig } from "@/config/ButtonConfig";
-
-// Validation Schemas
-const productRowSchema = z.object({
-  invoiceSub_item_name: z.string().min(1, "Item name is required"),
-  invoiceSub_descriptionofGoods: z
-    .string()
-    .min(1, "Item Descriptions is required"),
-  invoiceSub_bagsize: z.number().min(1, "Gross Weight is required"),
-  invoiceSub_packing: z.number().min(1, "Packing is required"),
-
-  invoiceSub_item_bag: z.number().min(1, "Bag is required"),
-
-  invoiceSub_qntyInMt: z.number().min(1, "Quoted price is required"),
-  invoiceSub_rateMT: z.number().min(1, "Rate is required"),
-  invoiceSub_sbaga: z.string().min(1, "Bag Type is required"),
-  invoiceSub_marking: z.string().optional(),
-});
-
-const contractFormSchema = z.object({
-  branch_short: z.string().min(1, "Company Sort is required"),
-  branch_name: z.string().min(1, "Company Name is required"),
-  branch_address: z.string().min(1, "Company Address is required"),
-  invoice_year: z.string().optional(),
-  invoice_date: z.string().min(1, "Invoice date is required"),
-  invoice_no: z.string().min(1, "Invoice No is required"),
-  invoice_ref: z.string().min(1, "Invoice Ref is required"),
-  contract_date: z.string().min(1, "Contract Date is required"),
-  contract_ref: z.string().min(1, "Contract Ref is required"),
-  contract_pono: z.string().min(1, "PONO is required"),
-  invoice_buyer: z.string().min(1, "Buyer Name is required"),
-  invoice_buyer_add: z.string().min(1, "Buyer Address is required"),
-  invoice_product: z.string().min(1, "Product is required"),
-  invoice_consignee: z.string().min(1, "Consignee Name is required"),
-  invoice_consignee_add: z.string().min(1, "Consignee Address is required"),
-
-  invoice_container_size: z.string().min(1, "Containers/Size is required"),
-  invoice_loading: z.string().min(1, "Port of Loading is required"),
-  invoice_destination_port: z.string().min(1, "Destination Port is required"),
-  invoice_discharge: z.string().min(1, "Discharge is required"),
-  invoice_cif: z.string().min(1, "CIF is required"),
-  invoice_destination_country: z.string().min(1, "Dest. Country is required"),
-
-  invoice_payment_terms: z.string().optional(),
-  invoice_remarks: z.string().optional(),
-  invoice_consig_bank: z.string().optional(),
-  invoice_consig_bank_address: z.string().optional(),
-  invoice_prereceipts: z.string().optional(),
-  invoice_precarriage: z.string().optional(),
-  invoice_product_cust_des: z
-    .string()
-    .min(1, "Product Descriptions is required"),
-  invoice_gr_code: z.string().min(1, "GR Code is required"),
-  invoice_lut_code: z.string().min(1, "LUT Code is required"),
-  invoice_data: z
-    .array(productRowSchema)
-    .min(1, "At least one product is required"),
-});
 
 // API functions
 
@@ -233,12 +187,12 @@ const fetchProductCustomDescription = async (value) => {
   return response.json();
 };
 
-const createInvoice = async (data) => {
+const updateInvoice = async ({ id, data }) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
 
-  const response = await fetch(`${BASE_URL}/api/panel-create-invoice`, {
-    method: "POST",
+  const response = await fetch(`${BASE_URL}/api/panel-update-invoice/${id}`, {
+    method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -246,7 +200,7 @@ const createInvoice = async (data) => {
     body: JSON.stringify(data),
   });
 
-  if (!response.ok) throw new Error("Failed to create enquiry");
+  if (!response.ok) throw new Error("Failed to update contract");
   return response.json();
 };
 
@@ -425,41 +379,18 @@ const MemoizedProductSelect = React.memo(
     );
   }
 );
-
-// Main Component
-const InvoiceAdd = () => {
+const InvoiceEdit = () => {
+  const { id } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [dialogMessage, setDialogMessage] = useState("");
-  const [invoiceData, setInvoiceData] = useState([
-    {
-      invoiceSub_item_bag: "",
-      invoiceSub_item_name: "",
-      invoiceSub_marking: "",
-      invoiceSub_descriptionofGoods: "",
-      invoiceSub_packing: "",
-      invoiceSub_bagsize: "",
-      invoiceSub_qntyInMt: "",
-      invoiceSub_rateMT: "",
-      invoiceSub_sbaga: "",
-    },
-  ]);
-
-  const { data: currentYear } = useCurrentYear();
-  useEffect(() => {
-    if (currentYear) {
-      setFormData((prev) => ({
-        ...prev,
-        invoice_year: currentYear,
-      }));
-    }
-  }, [currentYear]);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleteItemId, setDeleteItemId] = useState(null);
+  const [showDischargeAndCIF, setShowDischargeAndCIF] = useState(false);
   const [formData, setFormData] = useState({
     branch_short: "",
     branch_name: "",
     branch_address: "",
-    invoice_year: currentYear,
+    invoice_year: "",
     invoice_date: "",
     invoice_no: "",
     invoice_ref: "",
@@ -485,57 +416,75 @@ const InvoiceAdd = () => {
     invoice_product_cust_des: "",
     invoice_gr_code: "",
     invoice_lut_code: "",
+    invoice_status: "Order in Hand",
     invoice_consig_bank_address: "",
   });
+  const [invoiceData, setInvoiceData] = useState([]);
 
-  const checkInvoiceRef = async (invoiceRef) => {
-    try {
+  const {
+    data: invoiceDatas,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["invoicess", id],
+    queryFn: async () => {
       const token = localStorage.getItem("token");
-      if (!token) throw new Error("No authentication token found");
-
       const response = await fetch(
-        "https://exportbiz.in/public/api/panel-check-invoice-ref",
+        `${BASE_URL}/api/panel-fetch-invoice-by-id/${id}`,
         {
-          method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
           },
-          body: JSON.stringify({ invoice_ref: invoiceRef }),
         }
       );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (data.code == 400) {
-        setDialogMessage(
-          data.msg || "This reference number is already created."
-        );
-        setIsDialogOpen(true);
-      }
-
-      return data;
-    } catch (error) {
-      console.error("Error checking invoice reference:", error);
-      throw error;
-    }
-  };
+      if (!response.ok) throw new Error("Failed to fetch invoice");
+      return response.json();
+    },
+  });
 
   useEffect(() => {
-    if (formData.invoice_ref) {
-      checkInvoiceRef(formData.invoice_ref)
-        .then((data) => {
-          console.log("Invoice reference is valid:", data);
-        })
-        .catch((error) => {
-          console.error("Error checking invoice reference:", error);
-        });
+    if (invoiceDatas) {
+      setFormData({
+        branch_short: invoiceDatas.invoice.branch_short,
+        branch_name: invoiceDatas.invoice.branch_name,
+        branch_address: invoiceDatas.invoice.branch_address,
+        invoice_year: invoiceDatas.invoice.invoice_year,
+        contract_date: invoiceDatas.invoice.contract_date,
+        invoice_date: invoiceDatas.invoice.invoice_date,
+        invoice_no: invoiceDatas.invoice.invoice_no,
+        contract_ref: invoiceDatas.invoice.contract_ref,
+        invoice_ref: invoiceDatas.invoice.invoice_ref,
+        contract_pono: invoiceDatas.invoice.contract_pono,
+        invoice_buyer: invoiceDatas.invoice.invoice_buyer,
+        invoice_buyer_add: invoiceDatas.invoice.invoice_buyer_add,
+        invoice_consignee: invoiceDatas.invoice.invoice_consignee,
+        invoice_consignee_add: invoiceDatas.invoice.invoice_consignee_add,
+        invoice_consig_bank: invoiceDatas.invoice.invoice_consig_bank,
+        invoice_consig_bank_address:
+          invoiceDatas.invoice.invoice_consig_bank_address,
+        invoice_product: invoiceDatas.invoice.invoice_product,
+        invoice_container_size: invoiceDatas.invoice.invoice_container_size,
+        invoice_loading: invoiceDatas.invoice.invoice_loading,
+        invoice_destination_port: invoiceDatas.invoice.invoice_destination_port,
+        invoice_discharge: invoiceDatas.invoice.invoice_discharge,
+        invoice_cif: invoiceDatas.invoice.invoice_cif,
+        invoice_destination_country:
+          invoiceDatas.invoice.invoice_destination_country,
+
+        invoice_payment_terms: invoiceDatas.invoice.invoice_payment_terms,
+        invoice_remarks: invoiceDatas.invoice.invoice_remarks,
+        invoice_status: invoiceDatas.invoice.invoice_status,
+        invoice_prereceipts: invoiceDatas.invoice.invoice_prereceipts,
+        invoice_precarriage: invoiceDatas.invoice.invoice_precarriage,
+        invoice_product_cust_des: invoiceDatas.invoice.invoice_product_cust_des,
+        invoice_gr_code: invoiceDatas.invoice.invoice_gr_code,
+        invoice_lut_code: invoiceDatas.invoice.invoice_lut_code,
+        contract_data: invoiceDatas.invoiceSub,
+      });
+      setInvoiceData(invoiceDatas.invoiceSub);
     }
-  }, [formData.invoice_ref]);
+  }, [invoiceDatas]);
 
   // const { data: defaultSettingData } = useQuery({
   //   queryKey: ["defaultCustomProduct",formData.contract_ref],
@@ -591,13 +540,14 @@ const InvoiceAdd = () => {
   const { data: portsData } = useFetchPorts();
   const { data: productData } = useFetchProduct();
   const { data: containerSizeData } = useFetchContainerSizes();
+  const { data: statusData } = useFetchStatus();
 
-  const createInvoiceMutation = useMutation({
-    mutationFn: createInvoice,
+  const updateInvoiceMutation = useMutation({
+    mutationFn: updateInvoice,
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Invoice created successfully",
+        description: "Invoice updated successfully",
       });
       navigate("/invoice");
     },
@@ -613,25 +563,10 @@ const InvoiceAdd = () => {
   const handleInputChange = (e, field) => {
     let value;
     value = e.target.value;
-    setFormData((prev) => {
-      const updatedFormData = { ...prev, [field]: value };
-      if (field === "invoice_no" || field === "branch_short") {
-        const selectedCompanySort = branchData?.branch?.find(
-          (branch) => branch.branch_short === updatedFormData.branch_short
-        );
-
-        if (
-          selectedCompanySort &&
-          updatedFormData.invoice_no &&
-          updatedFormData.invoice_year
-        ) {
-          const invoiceRef = `${selectedCompanySort.branch_name_short}${updatedFormData.invoice_no}${updatedFormData.invoice_year}`;
-          updatedFormData.invoice_ref = invoiceRef;
-        }
-      }
-
-      return updatedFormData;
-    });
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
   const handleSelectChange = useCallback(
     (field, value) => {
@@ -821,6 +756,7 @@ const InvoiceAdd = () => {
     },
     [invoiceData.length]
   );
+
   const fieldLabels = {
     branch_short: "Company Short",
     branch_name: "Company Name",
@@ -863,6 +799,53 @@ const InvoiceAdd = () => {
     invoiceSub_sbaga: "Bag Type",
     invoiceSub_marking: "Marking",
   };
+  const deleteProductMutation = useMutation({
+    mutationFn: async (productId) => {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `https://exportbiz.in/public/api/panel-delete-invoice-sub/${productId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to delete contract Table");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Invoice Table deleted successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteRow = (productId) => {
+    setDeleteItemId(productId);
+    setDeleteConfirmOpen(true);
+  };
+  const confirmDelete = async () => {
+    try {
+      await deleteProductMutation.mutateAsync(deleteItemId);
+      setInvoiceData((prevData) =>
+        prevData.filter((row) => row.id !== deleteItemId)
+      );
+    } catch (error) {
+      console.error("Failed to delete product:", error);
+    } finally {
+      setDeleteConfirmOpen(false);
+      setDeleteItemId(null);
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -876,11 +859,11 @@ const InvoiceAdd = () => {
         invoiceSub_bagsize: parseFloat(row.invoiceSub_bagsize),
       }));
 
-      const validatedData = contractFormSchema.parse({
+      const updateData = {
         ...formData,
         invoice_data: processedContractData,
-      });
-      createInvoiceMutation.mutate(validatedData);
+      };
+      updateInvoiceMutation.mutate({ id, data: updateData });
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {
@@ -924,152 +907,232 @@ const InvoiceAdd = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <Page>
+        <div className="flex justify-center items-center h-full">
+          <Button disabled>
+            <Loader2 className=" h-4 w-4 animate-spin" />
+            Loading invoice Data
+          </Button>
+        </div>
+      </Page>
+    );
+  }
+
+  //   Render error state
+  if (isError) {
+    return (
+      <Page>
+        <Card className="w-full max-w-md mx-auto mt-10">
+          <CardHeader>
+            <CardTitle className="text-destructive">
+              Error Fetching invoice Data
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => refetch()} variant="outline">
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </Page>
+    );
+  }
+  const CompactViewSection = ({ invoiceDatas }) => {
+    const [isExpanded, setIsExpanded] = useState(true);
+    const containerRef = useRef(null);
+    const contentRef = useRef(null);
+    const InfoItem = ({ icon: Icon, label, value }) => (
+      <div className="flex items-center gap-2">
+        <Icon className="h-4 w-4 text-yellow-600 shrink-0" />
+        <span className="text-sm text-gray-600">{label}:</span>
+        <span className="text-sm font-medium">{value || "N/A"}</span>
+      </div>
+    );
+
+    const toggleView = () => {
+      const content = contentRef.current;
+
+      if (isExpanded) {
+        // Folding animation
+        gsap.to(content, {
+          height: 0,
+          opacity: 0,
+          duration: 0.5,
+          ease: "power2.inOut",
+          transformOrigin: "top",
+          transformStyle: "preserve-3d",
+          rotateX: -90,
+          onComplete: () => setIsExpanded(false),
+        });
+      } else {
+        // Unfolding animation
+        setIsExpanded(true);
+        gsap.fromTo(
+          content,
+          {
+            height: 0,
+            opacity: 0,
+            rotateX: -90,
+          },
+          {
+            height: "auto",
+            opacity: 1,
+            duration: 0.5,
+            ease: "power2.inOut",
+            transformOrigin: "top",
+            transformStyle: "preserve-3d",
+            rotateX: 0,
+          }
+        );
+      }
+    };
+
+    const TreatmentInfo = () =>
+      invoiceDatas?.invoice?.branch_short && (
+        <div className="mt-2 p-2 bg-blue-50 rounded-lg">
+          <div className="grid grid-cols-3 gap-4 text-sm">
+            <InfoItem
+              icon={Clock}
+              label="Invoice Date"
+              value={
+                <Input
+                  type="date"
+                  value={formData.invoice_date}
+                  className="bg-white"
+                  onChange={(e) => handleInputChange(e, "invoice_date")}
+                />
+              }
+            />
+            <div className=" col-span-2">
+              <InfoItem
+                icon={TestTubes}
+                label="Branch Add"
+                value={invoiceDatas.invoice.branch_address}
+              />
+            </div>
+          </div>
+        </div>
+      );
+
+    return (
+      <Card className="mb-2 " ref={containerRef}>
+        <div className="p-4 bg-blue-200 flex items-center justify-between">
+          <h2 className="text-lg font-semibold  flex items-center gap-2">
+            <p className="flex gap-1 relative items-center">
+              {" "}
+              <FileText className="h-5 w-5" />
+              {invoiceDatas?.invoice?.invoice_ref} -
+              <span className="text-sm uppercase">
+                {invoiceDatas?.invoice?.branch_short}
+              </span>
+              <span className=" absolute top-4 left-6 text-[9px]  bg-inherit ">
+                {invoiceDatas.invoice.branch_name}
+              </span>
+            </p>
+          </h2>
+         
+                  
+          <div className="flex items-center gap-2">
+            <span className=" flex items-center gap-2    text-xs font-medium  text-yellow-800 ">
+              {/* {invoiceDatas?.invoice?.invoice_status} */}
+              <MemoizedSelect
+                    value={formData.invoice_product}
+                    onChange={(value) =>
+                      handleSelectChange("invoice_product", value)
+                    }
+                    options={
+                      productData?.product?.map((product) => ({
+                        value: product.product_name,
+                        label: product.product_name,
+                      })) || []
+                    }
+                    placeholder="Select Product"
+                  />
+              <MemoizedSelect
+                    value={formData.invoice_status}
+                    onChange={(value) =>
+                      handleSelectChange("invoice_status", value)
+                    }
+                    options={
+                      statusData?.invoiceStatus?.map((status) => ({
+                        value: status.invoice_status,
+                        label: status.invoice_status,
+                      })) || []
+                    }
+                    placeholder="Select Status"
+                  />
+            </span>
+
+            {isExpanded ? (
+              <ChevronUp
+                onClick={toggleView}
+                className="h-5 w-5 cursor-pointer  text-yellow-600"
+              />
+            ) : (
+              <ChevronDown
+                onClick={toggleView}
+                className="h-5 w-5 cursor-pointer  text-yellow-600"
+              />
+            )}
+          </div>
+        </div>
+        <div
+          ref={contentRef}
+          className="transform-gpu"
+          style={{ transformStyle: "preserve-3d" }}
+        >
+          <CardContent className="p-4">
+            {/* Basic Info */}
+
+            <div className="space-y-2 flex items-center justify-between">
+              <InfoItem
+                icon={FileText}
+                label="Contract Ref"
+                value={invoiceDatas?.invoice?.contract_ref}
+              />
+              <InfoItem
+                icon={Package}
+                label="Invoice No"
+                value={invoiceDatas?.invoice?.invoice_no}
+              />
+
+              <InfoItem
+                icon={TestTubes}
+                label="Contract Date"
+                value={invoiceDatas?.invoice?.contract_date}
+              />
+              <InfoItem
+                icon={Truck}
+                label="Contract PONO"
+                value={invoiceDatas?.invoice?.contract_pono}
+              />
+            </div>
+
+            <TreatmentInfo />
+
+            {/* Products Table */}
+          </CardContent>
+        </div>
+      </Card>
+    );
+  };
   return (
     <Page>
       <form
         onSubmit={handleSubmit}
-        className="w-full p-4 bg-blue-50/30 rounded-lg"
+        className="w-full p-4 bg-blue-50/30"
       >
         {/* <EnquiryHeader progress={progress} /> */}
-
-        <Card className="mb-6 bg-blue-200">
+        <CompactViewSection invoiceDatas={invoiceDatas} />
+        
+        <Card className="    bg-blue-200">
           <CardContent className="p-6">
-            {/* Basic Details Section */}
-            <div className="mb-8">
-              <div className="grid grid-cols-5 gap-6">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Contract Ref. <span className="text-red-500">*</span>
-                  </label>
-                  {/* this is just for show  no field required here  */}
-                  <MemoizedSelect
-                    value={formData.contract_ref}
-                    onChange={(value) =>
-                      handleSelectChange("contract_ref", value)
-                    }
-                    options={
-                      contractRefsData?.contractRef?.map((contractRef) => ({
-                        value: contractRef.contract_ref,
-                        label: contractRef.contract_ref,
-                      })) || []
-                    }
-                    placeholder="Select Contract Ref."
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Company <span className="text-red-500">*</span>
-                  </label>
-                  <MemoizedSelect
-                    value={formData.branch_short}
-                    onChange={(value) =>
-                      handleSelectChange("branch_short", value)
-                    }
-                    options={
-                      branchData?.branch?.map((branch) => ({
-                        value: branch.branch_short,
-                        label: branch.branch_short,
-                      })) || []
-                    }
-                    placeholder="Select Company"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Invoice No <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    type="text"
-                    placeholder="Enter Invoice No"
-                    className="bg-white"
-                    value={formData.invoice_no}
-                    onChange={(e) => handleInputChange(e, "invoice_no")}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Invoice Date <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    type="date"
-                    value={formData.invoice_date}
-                    className="bg-white"
-                    onChange={(e) => handleInputChange(e, "invoice_date")}
-                  />
-                </div>
-                <div
-                  style={{ textAlign: "center" }}
-                  className="bg-white rounded-md"
-                >
-                  <span style={{ fontSize: "12px" }}>
-                    {formData.branch_name}
-                  </span>
-                  <br />
-                  <span style={{ fontSize: "9px", display: "block" }}>
-                    {formData.branch_address}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mb-8">
-              <div className="grid grid-cols-4 gap-6">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Contract Ref. <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    type="text"
-                    className="bg-white"
-                    placeholder="Enter Contract Ref"
-                    value={formData.contract_ref}
-                    disabled
-                    onChange={(e) => handleInputChange(e, "contract_ref")}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Contract PONO. <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    type="text"
-                    className="bg-white"
-                    placeholder="Enter Contract PoNo"
-                    value={formData.contract_pono}
-                    onChange={(e) => handleInputChange(e, "contract_pono")}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Contract Date <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    type="date"
-                    className="bg-white"
-                    value={formData.contract_date}
-                    onChange={(e) => handleInputChange(e, "contract_date")}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Invoice Ref. <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    type="text"
-                    placeholder="Enter Invoice Ref"
-                    className="bg-white"
-                    value={formData.invoice_ref}
-                    disabled
-                    onChange={(e) => handleInputChange(e, "invoice_ref")}
-                  />
-                </div>
-              </div>
-            </div>
+           
 
             <div className="mb-0">
-              <div className="grid grid-cols-4 gap-6">
+              <div className="grid grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Buyer <span className="text-red-500">*</span>
@@ -1125,29 +1188,12 @@ const InvoiceAdd = () => {
                     placeholder="Select Consig. Bank"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Product <span className="text-red-500">*</span>
-                  </label>
-                  <MemoizedSelect
-                    value={formData.invoice_product}
-                    onChange={(value) =>
-                      handleSelectChange("invoice_product", value)
-                    }
-                    options={
-                      productData?.product?.map((product) => ({
-                        value: product.product_name,
-                        label: product.product_name,
-                      })) || []
-                    }
-                    placeholder="Select Product"
-                  />
-                </div>
+                
               </div>
             </div>
 
-            <div className="mb-8">
-              <div className="grid grid-cols-4 gap-6">
+            <div className="mb-3">
+              <div className="grid grid-cols-3 gap-6">
                 <div>
                   <Textarea
                     type="text"
@@ -1179,7 +1225,13 @@ const InvoiceAdd = () => {
                     }
                   />
                 </div>
-                <div>
+                
+              </div>
+            </div>
+
+            <div className="mb-3">
+              <div className="grid grid-cols-6 gap-6">
+              <div>
                   <label className="block text-sm font-medium mb-2">
                     Pre-Receipts <span className="text-red-500">*</span>
                   </label>
@@ -1197,11 +1249,6 @@ const InvoiceAdd = () => {
                     placeholder="Select Pre Receipts"
                   />
                 </div>
-              </div>
-            </div>
-
-            <div className="mb-8">
-              <div className="grid grid-cols-5 gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Port of Loading <span className="text-red-500">*</span>
@@ -1223,8 +1270,15 @@ const InvoiceAdd = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Destination Port <span className="text-red-500">*</span>
+                  <label className=" text-sm flex flex-row items-center justify-between font-medium mb-2">
+                   <span> Dest. Port <span className="text-red-500">*</span></span>
+                    <p
+                    type="button"
+                    onClick={() => setShowDischargeAndCIF(!showDischargeAndCIF)}
+                    className=" underline text-xs text-black hover:text-red-700 cursor-pointer"
+                  >
+                    Change D/C
+                  </p>
                   </label>
                   <MemoizedSelect
                     value={formData.invoice_destination_port}
@@ -1239,43 +1293,48 @@ const InvoiceAdd = () => {
                     }
                     placeholder="Select Destination Port"
                   />
+                 
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Discharge <span className="text-red-500">*</span>
-                  </label>
-                  <MemoizedSelect
-                    value={formData.invoice_discharge}
-                    onChange={(value) =>
-                      handleSelectChange("invoice_discharge", value)
-                    }
-                    options={
-                      portsData?.country?.map((country) => ({
-                        value: country.country_port,
-                        label: country.country_port,
-                      })) || []
-                    }
-                    placeholder="Select Discharge "
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    CIF <span className="text-red-500">*</span>
-                  </label>
-                  <MemoizedSelect
-                    value={formData.invoice_cif}
-                    onChange={(value) =>
-                      handleSelectChange("invoice_cif", value)
-                    }
-                    options={
-                      portsData?.country?.map((country) => ({
-                        value: country.country_port,
-                        label: country.country_port,
-                      })) || []
-                    }
-                    placeholder="Select CIF "
-                  />
-                </div>
+                {showDischargeAndCIF && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">
+                        Discharge <span className="text-red-500">*</span>
+                      </label>
+                      <MemoizedSelect
+                        value={formData.invoice_discharge}
+                        onChange={(value) =>
+                          handleSelectChange("invoice_discharge", value)
+                        }
+                        options={
+                          portsData?.country?.map((country) => ({
+                            value: country.country_port,
+                            label: country.country_port,
+                          })) || []
+                        }
+                        placeholder="Select Discharge "
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">
+                        CIF <span className="text-red-500">*</span>
+                      </label>
+                      <MemoizedSelect
+                        value={formData.invoice_cif}
+                        onChange={(value) =>
+                          handleSelectChange("invoice_cif", value)
+                        }
+                        options={
+                          portsData?.country?.map((country) => ({
+                            value: country.country_port,
+                            label: country.country_port,
+                          })) || []
+                        }
+                        placeholder="Select CIF "
+                      />
+                    </div>
+                  </>
+                )}
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Dest. Country <span className="text-red-500">*</span>
@@ -1294,10 +1353,6 @@ const InvoiceAdd = () => {
                     placeholder="Select Dest. Country "
                   />
                 </div>
-              </div>
-            </div>
-            <div className="mb-8">
-              <div className="grid grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Containers/Size <span className="text-red-500">*</span>
@@ -1318,7 +1373,6 @@ const InvoiceAdd = () => {
                     placeholder="Select Containers/Size"
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Custom Des <span className="text-red-500">*</span>
@@ -1339,7 +1393,11 @@ const InvoiceAdd = () => {
                     placeholder="Select Custom Des"
                   />
                 </div>
-                <div>
+              </div>
+            </div>
+            <div className="mb-3">
+              <div className="grid grid-cols-4 gap-6">
+                {/* <div>
                   <label className="block text-sm font-medium mb-2">
                     Precarriage
                   </label>
@@ -1352,11 +1410,25 @@ const InvoiceAdd = () => {
                       handleInputChange(e, "invoice_precarriage")
                     }
                   />
+                </div> */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Payment Terms
+                  </label>
+                  <MemoizedSelect
+                    value={formData.invoice_payment_terms}
+                    onChange={(value) =>
+                      handleSelectChange("invoice_payment_terms", value)
+                    }
+                    options={
+                      paymentTermsData?.paymentTermsC?.map((paymentTermsC) => ({
+                        value: paymentTermsC.paymentTermsC,
+                        label: paymentTermsC.paymentTermsC,
+                      })) || []
+                    }
+                    placeholder="Select Payment Terms"
+                  />
                 </div>
-              </div>
-            </div>
-            <div className="mb-8">
-              <div className="grid grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     LUT Code <span className="text-red-500">*</span>
@@ -1399,28 +1471,6 @@ const InvoiceAdd = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Payment Terms
-                  </label>
-                  <MemoizedSelect
-                    value={formData.invoice_payment_terms}
-                    onChange={(value) =>
-                      handleSelectChange("invoice_payment_terms", value)
-                    }
-                    options={
-                      paymentTermsData?.paymentTermsC?.map((paymentTermsC) => ({
-                        value: paymentTermsC.paymentTermsC,
-                        label: paymentTermsC.paymentTermsC,
-                      })) || []
-                    }
-                    placeholder="Select Payment Terms"
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="mb-8">
-              <div className="grid grid-cols-1 gap-6">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
                     Remarks
                   </label>
                   <Textarea
@@ -1433,9 +1483,11 @@ const InvoiceAdd = () => {
                 </div>
               </div>
             </div>
+          
+          
 
             {/* Products Section */}
-            <div className="mb-2">
+            <div >
               <div className="flex justify-between items-center mb-4">
                 <div className="flex flex-row items-center">
                   <h2 className="text-xl font-semibold">Products</h2>
@@ -1476,7 +1528,7 @@ const InvoiceAdd = () => {
                   </TableHeader>
                   <TableBody>
                     {invoiceData.map((row, rowIndex) => (
-                      <TableRow key={rowIndex} className="hover:bg-gray-50">
+                      <TableRow key={rowIndex} className="hover:bg-blue-500 hover:cursor-pointer">
                         <TableCell className="p-2 border">
                           <MemoizedProductSelect
                             value={row.invoiceSub_marking}
@@ -1537,8 +1589,8 @@ const InvoiceAdd = () => {
                           </div>
                         </TableCell>
 
-                        <TableCell className="p-2 border">
-                          <div className="flex flex-col gap-2">
+                        <TableCell className="p-2 border w-32">
+                          <div className="flex flex-col gap-2"> 
                             <Input
                               value={row.invoiceSub_item_bag}
                               onChange={(e) =>
@@ -1647,15 +1699,26 @@ const InvoiceAdd = () => {
                         </TableCell>
 
                         <TableCell className="p-2 border">
-                          <Button
-                            variant="ghost"
-                            onClick={() => removeRow(rowIndex)}
-                            disabled={invoiceData.length === 1}
-                            className="text-red-500 "
-                            type="button"
-                          >
-                            <MinusCircle className="h-4 w-4" />
-                          </Button>
+                          {row.id ? (
+                            <Button
+                              variant="ghost"
+                              onClick={() => handleDeleteRow(row.id)}
+                              className="text-red-500"
+                              type="button"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              onClick={() => removeRow(rowIndex)}
+                              disabled={invoiceData.length === 1}
+                              className="text-red-500 "
+                              type="button"
+                            >
+                              <MinusCircle className="h-4 w-4" />
+                            </Button>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -1678,36 +1741,38 @@ const InvoiceAdd = () => {
         </Card>
 
         <div className="flex flex-col items-end">
-          {createInvoiceMutation.isPending && <ProgressBar progress={70} />}
+          {updateInvoiceMutation.isPending && <ProgressBar progress={70} />}
           <Button
             type="submit"
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
-            disabled={createInvoiceMutation.isPending}
+            disabled={updateInvoiceMutation.isPending}
           >
-            {createInvoiceMutation.isPending
-              ? "Submitting..."
-              : "Submit Invoice"}
+            {updateInvoiceMutation.isPending ? "Updating..." : "Update Invoice"}
           </Button>
         </div>
       </form>
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Duplicate Entry</DialogTitle>
-            <DialogDescription>{dialogMessage}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              invoice product from this enquiry.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
               className="bg-yellow-500 text-black hover:bg-red-600"
-              onClick={() => setIsDialogOpen(false)}
             >
-              Close
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Page>
   );
 };
 
-export default InvoiceAdd;
+export default InvoiceEdit;

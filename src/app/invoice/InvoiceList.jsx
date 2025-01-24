@@ -59,6 +59,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import { useToast } from "@/hooks/use-toast";
+import { ButtonConfig } from "@/config/ButtonConfig";
 const InvoiceList = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteInoice, setDeleteInoiceid] = useState(null);
@@ -197,7 +198,7 @@ const InvoiceList = () => {
               </Tooltip>
             </TooltipProvider>
 
-            {/* <TooltipProvider>
+            <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -210,8 +211,8 @@ const InvoiceList = () => {
               </TooltipTrigger>
               <TooltipContent>Edit Invoice</TooltipContent>
             </Tooltip>
-          </TooltipProvider> */}
-            {/* <TooltipProvider>
+          </TooltipProvider>
+            <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -227,7 +228,7 @@ const InvoiceList = () => {
               </TooltipTrigger>
               <TooltipContent>Delete Invoice</TooltipContent>
             </Tooltip>
-          </TooltipProvider> */}
+          </TooltipProvider>
           </div>
         );
       },
@@ -345,18 +346,12 @@ const InvoiceList = () => {
           </DropdownMenu>
           <Button
             variant="default"
-            className="ml-2 bg-yellow-500 text-black hover:bg-yellow-100"
+            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             onClick={() => navigate("/create-invoice")}
           >
             <SquarePlus className="h-4 w-4" /> Invoice
           </Button>
-          <Button
-            variant="default"
-            className="ml-2 bg-yellow-500 text-black hover:bg-yellow-100"
-            onClick={() => navigate("/create-invoiceN")}
-          >
-            <SquarePlus className="h-4 w-4" /> Invoice New
-          </Button>
+          
         </div>
         {/* table  */}
         <div className="rounded-md border">
@@ -451,7 +446,7 @@ const InvoiceList = () => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
-              className="bg-yellow-500 text-black hover:bg-red-600"
+              className={`${ButtonConfig.backgroundColor}  ${ButtonConfig.textColor} hover:bg-red-600`}
             >
               Delete
             </AlertDialogAction>

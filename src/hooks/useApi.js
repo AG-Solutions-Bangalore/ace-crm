@@ -120,3 +120,8 @@ export const useFetchBagsTypes = () => {
 };
 
 //invoice apis
+
+
+export const useFetchStatus = () => {
+  return useQuery(createQueryConfig(["status"], "/api/panel-fetch-invoice-status"));
+};

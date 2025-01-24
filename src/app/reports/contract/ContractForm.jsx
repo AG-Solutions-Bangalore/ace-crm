@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Download } from "lucide-react";
 import axios from "axios";
+import { ButtonConfig } from "@/config/ButtonConfig";
 
 const contractFormSchema = z.object({
   from_date: z.string().min(1, "From date is required"),
@@ -450,14 +451,13 @@ const ContractForm = () => {
 
                 <Button
                   variant="default"
-                  className="ml-2 bg-yellow-500 text-black hover:bg-yellow-100"
-                  onClick={onSubmit}
+                  className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}                  onClick={onSubmit}
                 >
                   <Download className="h-4 w-4" /> Download
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-yellow-500 ml-2 text-black hover:bg-yellow-400 flex items-center mt-2"
+                  className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} ml-2 flex items-center mt-2`}
                   disabled={createContractMutation.isPending}
                 >
                   {createContractMutation.isPending

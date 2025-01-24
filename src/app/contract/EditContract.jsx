@@ -60,6 +60,7 @@ import {
   useFetchProduct,
 } from "@/hooks/useApi";
 import Page from "../dashboard/page";
+import { ButtonConfig } from "@/config/ButtonConfig";
 
 // Validation Schemas
 
@@ -1408,7 +1409,7 @@ const EditContract = () => {
                 <Button
                   type="button"
                   onClick={addRow}
-                  className="bg-yellow-500 text-black hover:bg-yellow-400"
+                  className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
                 >
                   <PlusCircle className="h-4 w-4 mr-2" />
                   Add Product
@@ -1422,7 +1423,7 @@ const EditContract = () => {
           {updateContractMutation.isPending && <ProgressBar progress={70} />}
           <Button
             type="submit"
-            className="bg-yellow-500 text-black hover:bg-yellow-400 flex items-center mt-2"
+            className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
             disabled={updateContractMutation.isPending}
           >
             {updateContractMutation.isPending
@@ -1444,7 +1445,7 @@ const EditContract = () => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
-              className="bg-yellow-500 text-black hover:bg-red-600"
+              className={`${ButtonConfig.backgroundColor}  ${ButtonConfig.textColor} text-black hover:bg-red-600`}
             >
               Delete
             </AlertDialogAction>

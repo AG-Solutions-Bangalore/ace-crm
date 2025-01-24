@@ -37,6 +37,7 @@ import {
   useFetchPorts,
   useFetchProduct,
 } from "@/hooks/useApi";
+import { ButtonConfig } from "@/config/ButtonConfig";
 
 // Validation Schemas
 const productRowSchema = z.object({
@@ -1269,7 +1270,7 @@ const ContractAdd = () => {
                 <Button
                   type="button"
                   onClick={addRow}
-                  className="bg-yellow-500 text-black hover:bg-yellow-400"
+                  className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
                 >
                   <PlusCircle className="h-4 w-4 mr-2" />
                   Add Product
@@ -1283,7 +1284,7 @@ const ContractAdd = () => {
           {createContractMutation.isPending && <ProgressBar progress={70} />}
           <Button
             type="submit"
-            className="bg-yellow-500 text-black hover:bg-yellow-400 flex items-center mt-2"
+            className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
             disabled={createContractMutation.isPending}
           >
             {createContractMutation.isPending
