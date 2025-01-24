@@ -28,6 +28,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ButtonConfig } from '@/config/ButtonConfig';
 const EditContainerSize = ({containerId}) => {
     const [open, setOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -226,7 +227,7 @@ const EditContainerSize = ({containerId}) => {
                  <Button
                    onClick={handleSubmit}
                    disabled={isLoading || !hasChanges}
-                   className={`mt-2 relative overflow-hidden ${hasChanges ? 'bg-yellow-500 text-black hover:bg-yellow-100' : ''}`}
+                   className={`mt-2 relative overflow-hidden ${hasChanges ? `${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}` : ''}`}
                  >
                    {isLoading ? (
                      <>

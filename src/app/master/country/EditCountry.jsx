@@ -29,6 +29,7 @@ import axios from "axios";
 import BASE_URL from "@/config/BaseUrl";
 import { Edit, Loader2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { ButtonConfig } from "@/config/ButtonConfig";
 
 const EditCountry = ({ countryId }) => {
   const [open, setOpen] = useState(false);
@@ -242,7 +243,7 @@ const EditCountry = ({ countryId }) => {
           <Button
             onClick={handleSubmit}
             disabled={isLoading || isFetching}
-            className="bg-yellow-500 text-black hover:bg-yellow-100"
+            className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
           >
             {isLoading ? (
               <>

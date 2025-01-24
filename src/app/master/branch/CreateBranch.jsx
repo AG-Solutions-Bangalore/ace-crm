@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { ProgressBar } from '@/components/spinner/ProgressBar';
+import { ButtonConfig } from '@/config/ButtonConfig';
 
 
 // Validation Schema
@@ -195,7 +196,7 @@ const CreateBranch = () => {
                  
        
                    {/* Branch Details Section */}
-                   <div className="grid grid-cols-2 gap-6">
+                   <div className="grid grid-cols-4 gap-6">
                      <div>
                        <label className="block text-sm font-medium mb-2">
                          Branch Short Name <span className="text-red-500">*</span>
@@ -228,18 +229,6 @@ const CreateBranch = () => {
                          placeholder="Enter branch short name"
                        />
                      </div>
-       
-                     <div>
-                       <label className="block text-sm font-medium mb-2">
-                         Branch Address <span className="text-red-500">*</span>
-                       </label>
-                       <Input
-                         value={formData.branch_address}
-                         onChange={(e) => handleInputChange(e, "branch_address")}
-                         placeholder="Enter branch address"
-                       />
-                     </div>
-       
                      <div>
                        <label className="block text-sm font-medium mb-2">
                          Spice Board Details <span className="text-red-500">*</span>
@@ -250,6 +239,18 @@ const CreateBranch = () => {
                          placeholder="Enter spice board details"
                        />
                      </div>
+                     <div className='col-span-4'>
+                       <label className="block text-sm font-medium mb-2">
+                         Branch Address <span className="text-red-500">*</span>
+                       </label>
+                       <Input
+                         value={formData.branch_address}
+                         onChange={(e) => handleInputChange(e, "branch_address")}
+                         placeholder="Enter branch address"
+                       />
+                     </div>
+       
+                    
        
                      <div>
                        <label className="block text-sm font-medium mb-2">
@@ -402,7 +403,7 @@ const CreateBranch = () => {
                  {createBranchMutation.isPending && <ProgressBar progress={70} />}
                  <Button
                    type="submit"
-                   className="bg-yellow-500 text-black hover:bg-yellow-400 flex items-center mt-2"
+                   className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
                    disabled={createBranchMutation.isPending}
                  >
                    {createBranchMutation.isPending

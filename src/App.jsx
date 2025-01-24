@@ -30,6 +30,8 @@ import Buyer from "./app/reports/buyer/Buyer";
 import ContractForm from "./app/reports/contract/ContractForm";
 import ContractReport from "./app/reports/contract/ContractReport";
 import PreshipmentDetails from "./app/invoice/PreshipmentDetails";
+import InvoiceView from "./app/invoice/InvoiceView";
+import InvoiceEdit from "./app/invoice/InvoiceEdit";
 import InvoiceTabs from "./app/invoice/InvoiceTabs";
 import PortOfLoadingList from "./app/master/portofLoading/PortofLoadingList";
 import GrCodeList from "./app/master/grcode/GrCodeList";
@@ -54,6 +56,8 @@ function App() {
           {/* Invoice  */}
           <Route path="/invoice" element={<InvoiceList />} />
           <Route path="/create-invoice" element={<InvoiceAdd />} />
+          <Route path="/view-invoice/:id" element={<InvoiceView />} />
+          <Route path="/edit-invoice/:id" element={<InvoiceEdit />} />
           <Route path="/view-invoice/:id" element={<InvoiceTabs />} />
 
           {/* Master - Branch  */}

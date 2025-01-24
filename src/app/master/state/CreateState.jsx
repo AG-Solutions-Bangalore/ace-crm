@@ -13,6 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useLocation } from "react-router-dom";
+import { ButtonConfig } from "@/config/ButtonConfig";
 
 const CreateState = () => {
   const [open, setOpen] = useState(false);
@@ -73,13 +74,13 @@ const CreateState = () => {
         {pathname === "/state" ? (
           <Button
             variant="default"
-            className="ml-2 bg-yellow-500 text-black hover:bg-yellow-100"
+            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
           >
             <SquarePlus className="h-4 w-4 mr-2" /> State
           </Button>
         ) : pathname === "/create-contract" ? (
           <p className="text-xs text-yellow-700 ml-2 mt-1 w-32 hover:text-red-800 cursor-pointer">
-            Create State
+             State
           </p>
         ) : null}
       </PopoverTrigger>
@@ -111,7 +112,7 @@ const CreateState = () => {
             <Button
               onClick={handleSubmit}
               disabled={isLoading}
-              className="mt-2 bg-yellow-500 text-black hover:bg-yellow-200"
+              className={`mt-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
           
             >
               {isLoading ? (

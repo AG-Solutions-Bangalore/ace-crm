@@ -59,6 +59,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import { useToast } from "@/hooks/use-toast";
+import { ButtonConfig } from "@/config/ButtonConfig";
 const ContractList = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteContractId, setDeleteContractId] = useState(null);
@@ -337,7 +338,7 @@ const ContractList = () => {
           </DropdownMenu>
           <Button
             variant="default"
-            className="ml-2 bg-yellow-500 text-black hover:bg-yellow-100"
+            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             onClick={() => navigate("/create-contract")}
           >
             <SquarePlus className="h-4 w-4" /> Contract
@@ -436,7 +437,7 @@ const ContractList = () => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
-              className="bg-yellow-500 text-black hover:bg-red-600"
+              className={`${ButtonConfig.backgroundColor}  ${ButtonConfig.textColor} text-black hover:bg-red-600`}
             >
               Delete
             </AlertDialogAction>

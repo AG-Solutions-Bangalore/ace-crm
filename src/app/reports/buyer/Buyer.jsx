@@ -7,6 +7,7 @@ import { Download, Loader2, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { ButtonConfig } from "@/config/ButtonConfig";
 
 const Buyer = () => {
   const { toast } = useToast();
@@ -107,7 +108,7 @@ const Buyer = () => {
           <div className="flex gap-2">
             <Button
               variant="default"
-              className="ml-2 bg-yellow-500 text-black hover:bg-yellow-100"
+              className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
               onClick={onSubmit}
             >
               <Download className="h-4 w-4" /> Download

@@ -16,6 +16,7 @@ import { ProgressBar } from "@/components/spinner/ProgressBar";
 
 import { Loader2 } from "lucide-react";
 import Page from "@/app/dashboard/page";
+import { ButtonConfig } from "@/config/ButtonConfig";
 
 // Header Component
 const BranchHeader = ({ branchDetails }) => {
@@ -23,25 +24,25 @@ const BranchHeader = ({ branchDetails }) => {
     <div className="flex sticky top-0 z-10 border border-gray-200 rounded-lg justify-between items-start gap-8 mb-2 bg-white p-4 shadow-sm">
       <div className="flex-1">
         <div className="flex items-center gap-2">
-          <h1 className="text-3xl font-bold text-gray-800">Edit Branch</h1>
+          <h1 className="text-2xl font-bold text-gray-800">{branchDetails?.branch?.branch_name}</h1>
           <span className="bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded">
             {branchDetails?.branch?.branch_status || "N/A"}
           </span>
         </div>
         <div className="flex items-center gap-4">
-          <p className="text-gray-600 mt-2">Update branch details</p>
+          <p className="text-gray-600 mt-2">Update branch/company details</p>
         </div>
       </div>
 
       <div className="flex-1 flex flex-col gap-3">
         <div className="flex items-center justify-end gap-2 text-sm">
           <span className="font-medium">
-            Branch ID: {branchDetails?.branch?.id || "N/A"}
+            Branch Short Name: {branchDetails?.branch?.branch_short || "N/A"}
           </span>
         </div>
         <div className="flex items-center justify-end gap-2 text-sm">
           <span className="font-medium">
-            Created At: {branchDetails?.branch?.created_at || "N/A"}
+            Branch Id: {branchDetails?.branch?.id || "N/A"}
           </span>
         </div>
       </div>
@@ -219,28 +220,8 @@ const EditBranch = () => {
         <Card className="mb-6">
           <CardContent className="p-6">
             {/* Branch Details Section */}
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Branch Short Name <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  value={formData?.branch_short}
-                  onChange={(e) => handleInputChange(e, "branch_short")}
-                  placeholder="Enter branch short name"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Branch Name <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  value={formData.branch_name}
-                  onChange={(e) => handleInputChange(e, "branch_name")}
-                  placeholder="Enter branch name"
-                />
-              </div>
+            <div className="grid grid-cols-4 gap-6">
+              
 
               <div>
                 <label className="block text-sm font-medium mb-2">
@@ -253,16 +234,7 @@ const EditBranch = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Branch Address <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  value={formData.branch_address}
-                  onChange={(e) => handleInputChange(e, "branch_address")}
-                  placeholder="Enter branch address"
-                />
-              </div>
+              
 
               <div>
                 <label className="block text-sm font-medium mb-2">
@@ -294,6 +266,16 @@ const EditBranch = () => {
                   value={formData.branch_apeda}
                   onChange={(e) => handleInputChange(e, "branch_apeda")}
                   placeholder="Enter APEDA details"
+                />
+              </div>
+              <div className="col-span-4">
+                <label className="block text-sm font-medium mb-2">
+                  Branch Address <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  value={formData.branch_address}
+                  onChange={(e) => handleInputChange(e, "branch_address")}
+                  placeholder="Enter branch address"
                 />
               </div>
 
@@ -448,7 +430,7 @@ const EditBranch = () => {
           {updateBranchMutation.isPending && <ProgressBar progress={70} />}
           <Button
             type="submit"
-            className="bg-yellow-500 text-black hover:bg-yellow-400 flex items-center mt-2"
+            className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
             disabled={updateBranchMutation.isPending}
           >
             {updateBranchMutation.isPending ? "Updating..." : "Update Branch"}

@@ -32,6 +32,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import BASE_URL from "@/config/BaseUrl";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { ButtonConfig } from "@/config/ButtonConfig";
 const BranchList = () => {
   const {
     data: customers,
@@ -251,7 +252,7 @@ const BranchList = () => {
    
           <Button
             variant="default"
-            className="ml-2 bg-yellow-500 text-black hover:bg-yellow-100"
+            className= {`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`} 
             onClick={() => navigate("/create-branch")}
           >
             <SquarePlus className="h-4 w-4" /> Branch

@@ -17,6 +17,7 @@ import BASE_URL from "@/config/BaseUrl";
 import { Loader2, SquarePlus } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
+import { ButtonConfig } from "@/config/ButtonConfig";
 
 const CreateBank = () => {
     const [open, setOpen] = useState(false);
@@ -100,7 +101,7 @@ const CreateBank = () => {
             {pathname === "/bank" ? (
               <Button
                 variant="default"
-                className="ml-2 bg-yellow-500 text-black hover:bg-yellow-100"
+                className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
               >
                 <SquarePlus className="h-4 w-4" /> Bank
               </Button>
@@ -175,7 +176,7 @@ const CreateBank = () => {
               <Button
                 onClick={handleSubmit}
                 disabled={isLoading}
-                className="bg-yellow-500 text-black hover:bg-yellow-100"
+                className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
               >
                 {isLoading ? (
                   <>
