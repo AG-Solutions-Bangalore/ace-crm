@@ -16,7 +16,6 @@ const InvoicePacking = () => {
   const [branchData, setBranchData] = useState({});
   const [invoiceSubData, setInvoiceSubData] = useState([]);
   const [sumbag, setSumBag] = useState(0);
-  const [total, setTotal] = useState(0);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -27,15 +26,8 @@ const InvoicePacking = () => {
       }, 0);
       setSumBag(totalBags);
     }
-    // if (invoiceSubData.length > 0) {
-    //   const totalBags = invoiceSubData.reduce((sum, item) => {
-    //     return sum + (item.invoiceSub_item_bag || 0);
-    //   }, 0);
-    //   setSumBag(totalBags);
-    // }
   }, [invoiceSubData]);
 
-  //   console.log(total);
   useEffect(() => {
     const fetchContractData = async () => {
       try {
@@ -191,7 +183,7 @@ const InvoicePacking = () => {
       <div className="flex justify-center items-center h-full">
         <Button disabled>
           <Loader2 className=" h-4 w-4 animate-spin" />
-          Loading Invoice Data
+          Loading Invoice Packing Data
         </Button>
       </div>
     );
@@ -267,7 +259,7 @@ const InvoicePacking = () => {
               <div className=" border border-black max-w-screen-lg mx-auto text-sm">
                 <div>
                   <div className="border-b border-black px-8 py-2  text-center text-sm font-bold  ">
-                    INVOICE
+                    PACKING LIST
                   </div>
                 </div>
 
@@ -424,10 +416,13 @@ const InvoicePacking = () => {
                   </div>
 
                   <div className="col-span-7 px-4">
-                    <p className="font-bold  pb-1">
+                    {/* <p className="font-bold  pb-1">
                       Terms of Delivery and Payment:
                     </p>
-                    <p className="text-center"> </p>
+                    <p>
+                      CIF USD {invoicePackingData.invoice_cif} PORT{" "}
+                      {invoicePackingData.invoice_destination_country}
+                    </p> */}
                   </div>
                 </div>
                 <div className="grid grid-cols-12 border-b border-black text-[12px]  h-full">
@@ -447,13 +442,10 @@ const InvoicePacking = () => {
                   </div>
 
                   <div className="col-span-7 px-4">
-                    {/* <p className="font-bold  ">
-                      CIF USD TANJUNG PRIOK PORT, INDONESIA
-                    </p>
-                    <p className="font-bold  ">
+                    <p className="flex items-center justify-center h-full w-full">
                       Insurance Terms - Exporter Warehouse to Consignee/Buyer
                       Warehouse
-                    </p> */}
+                    </p>
                   </div>
                 </div>
                 <div className="grid grid-cols-12 border-b border-black text-[12px]  h-full">
@@ -477,10 +469,10 @@ const InvoicePacking = () => {
                   </div>
 
                   <div className="col-span-7 px-4">
-                    <p className=" pb-1 text-[10px]">
+                    {/* <p className=" pb-1 text-[10px]">
                       <span className="font-bold"> PAYMENT BY -</span>{" "}
                       {invoicePackingData.invoice_payment_terms}
-                    </p>
+                    </p> */}
                   </div>
                 </div>
 
@@ -512,17 +504,17 @@ const InvoicePacking = () => {
                         >
                           QUANTITY IN MT
                         </th>
-                        <th
+                        {/* <th
                           className="border-r border-black p-2 text-center text-[11px]"
                           style={{ width: "10%" }}
                         >
                           RATE PER MT IN USD
-                        </th>
+                        </th> */}
                         <th
                           className="p-2 text-center text-[11px]"
                           style={{ width: "15%" }}
                         >
-                          AMOUNT (USD)
+                          REMARKS
                         </th>
                       </tr>
                     </thead>
@@ -562,9 +554,9 @@ const InvoicePacking = () => {
                             <td className="border-r border-black p-2 text-center">
                               {item.invoiceSub_qntyInMt}
                             </td>
-                            <td className="border-r border-black p-2 text-center">
+                            {/* <td className="border-r border-black p-2 text-center">
                               {item.invoiceSub_rateMT}
-                            </td>
+                            </td> */}
                             <td className="p-2 text-right">
                               ${" "}
                               {(
@@ -590,9 +582,9 @@ const InvoicePacking = () => {
                         <td className="border-r border-black p-2"></td>
                         <td className="border-r border-black p-2"></td>
                         <td className="border-r border-black p-2"></td>
-                        <td className="border-r border-black p-2"></td>
-                        <td className="border-t border-black p-2 text-right">
-                          $
+                        {/* <td className="border-r border-black p-2"></td> */}
+                        <td className=" p-2 text-right font-bold">
+                          {/* $
                           {invoiceSubData
                             .reduce((total, item) => {
                               return (
@@ -601,33 +593,34 @@ const InvoicePacking = () => {
                                   item.invoiceSub_rateMT || 0)
                               );
                             }, 0)
-                            .toFixed(2)}
+                            .toFixed(2)} */}
                         </td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
 
-                <div>
-                  <p className="block p-2">AMOUNT CHARGEABLE IN WORDS</p>
-                  <p className="block font-semibold ml-4">{totalInWords}</p>
+                <div className="text-[10px] ">
+                  <p className="flex p-2">
+                    {/* AMOUNT CHARGEABLE IN WORDS -
+                    <p className=" font-semibold ml-4">{totalInWords}</p> */}
+                  </p>
+
                   <p className="block font-semibold ml-4">
-                    SUPPLY MEANT FOR EXPORT ON PAYMENT OF IGST 5%
+                    {invoicePackingData.invoice_lut_code}
                   </p>
                   <p className="block font-semibold ml-4 ">
-                    SHIPMENT UNDER DUTY DRAWBACK TARRIF ITEM S.NO.0904,
-                    CHAPTER-9, COLUMN A @ 1% - SPICES.
+                    {invoicePackingData.invoice_gr_code}
                   </p>
                 </div>
-                <div className="grid grid-cols-2  text-[12px] mt-3">
+                <div className="grid grid-cols-2  text-[10px] mt-3">
                   <div className="col-span-1">
                     <div className=" px-2 leading-none">
                       <p className="font-bold">
                         {" "}
-                        WE INTEND TO CLAIM RoDTEP SCHEME-RoDTEP Entry No.683 @
-                        1%
+                        {invoicePackingData.invoice_default_statement}
                       </p>
-                      <p className="font-bold text-center mt-1">
+                      {/* <p className="font-bold  mt-1">
                         ** Thence Buyer Warehouse/Consignee Warehouse
                       </p>
                       <p className="font-bold mt-1">DECLARATION</p>
@@ -635,7 +628,7 @@ const InvoicePacking = () => {
                         WE DECLARE THAT THIS INVOICE SHOWS THE ACTUAL PRICE OF
                         THE GOODS DESCRIBED AND THAT ALL PARTICULARS ARE TRUE
                         AND CORRECT.
-                      </p>
+                      </p> */}
                     </div>
                   </div>
 
@@ -644,7 +637,11 @@ const InvoicePacking = () => {
                       <p className="font-bold leading-none">
                         SIGNATURE & DATE :
                       </p>
-                      <p className="mt-2 leading-none">17-10-2024</p>
+                      <p className="mt-2 leading-none"></p>
+                      <p className="mt-6 leading-none">
+                        {" "}
+                        {moment().format("DD-MM-YYYY")}
+                      </p>
                     </div>
                   </div>
                 </div>

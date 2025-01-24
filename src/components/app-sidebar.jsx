@@ -112,13 +112,40 @@ export function AppSidebar({ ...props }) {
             url: "/quality",
           },
           {
-          
             title: "Item",
             url: "/item",
           },
           {
             title: "Marking",
             url: "/marking",
+          },
+          {
+            title: "Port of Loading *",
+            url: "/portofloading",
+          },
+          {
+            title: "GR Code *",
+            url: "/grcode",
+          },
+          {
+            title: "Product *",
+            url: "/product",
+          },
+          {
+            title: "Product Descriptiono *",
+            url: "/productdescription",
+          },
+          {
+            title: "Shipper *",
+            url: "/shipper",
+          },
+          {
+            title: "Vessel *",
+            url: "/vessel",
+          },
+          {
+            title: "Pre Recepits *",
+            url: "/prerecepits",
           },
         ],
       },
@@ -135,7 +162,6 @@ export function AppSidebar({ ...props }) {
             title: "Contract",
             url: "/contract-form",
           },
-         
         ],
       },
     ],
@@ -189,7 +215,6 @@ export function AppSidebar({ ...props }) {
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-      
         <NavProjects projects={data.projects} />
         <NavMain items={data.navMain} />
       </SidebarContent>
