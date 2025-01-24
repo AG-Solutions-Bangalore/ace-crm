@@ -124,7 +124,7 @@ export function AppSidebar({ ...props }) {
             url: "/portofloading",
           },
           {
-            title: "GR Code *",
+            title: "GR Code ",
             url: "/grcode",
           },
           {

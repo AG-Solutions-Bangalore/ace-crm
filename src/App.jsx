@@ -56,7 +56,6 @@ function App() {
           {/* Invoice  */}
           <Route path="/invoice" element={<InvoiceList />} />
           <Route path="/create-invoice" element={<InvoiceAdd />} />
-          <Route path="/view-invoice/:id" element={<InvoiceView />} />
           <Route path="/edit-invoice/:id" element={<InvoiceEdit />} />
           <Route path="/view-invoice/:id" element={<InvoiceTabs />} />
 
