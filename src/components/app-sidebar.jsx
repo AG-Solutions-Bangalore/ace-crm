@@ -120,7 +120,7 @@ export function AppSidebar({ ...props }) {
             url: "/marking",
           },
           {
-            title: "Port of Loading *",
+            title: "Port of Loading ",
             url: "/portofloading",
           },
           {

@@ -31,6 +31,8 @@ import ContractForm from "./app/reports/contract/ContractForm";
 import ContractReport from "./app/reports/contract/ContractReport";
 import PreshipmentDetails from "./app/invoice/PreshipmentDetails";
 import InvoiceTabs from "./app/invoice/InvoiceTabs";
+import PortOfLoadingList from "./app/master/portofLoading/PortofLoadingList";
+import GrCodeList from "./app/master/grcode/GrCodeList";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +89,10 @@ function App() {
           <Route path="/type" element={<TypeList />} />
           {/* Master -Quality  */}
           <Route path="/quality" element={<QualityList />} />
+          {/* Master -port of  loading   */}
+          <Route path="/portofloading" element={<PortOfLoadingList />} />
+          {/* Master -gr code */}
+          <Route path="/grcode" element={<GrCodeList />} />
 
           {/* //Reports */}
           {/* Reports -Buyer  */}
