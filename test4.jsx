@@ -412,4 +412,3 @@ const EnquiryCreate = () => {
 export default EnquiryCreate;
 
 
-//sajid  without tabs in single page 

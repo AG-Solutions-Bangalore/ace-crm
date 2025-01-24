@@ -32,6 +32,9 @@ import ContractReport from "./app/reports/contract/ContractReport";
 import PreshipmentDetails from "./app/invoice/PreshipmentDetails";
 import InvoiceView from "./app/invoice/InvoiceView";
 import InvoiceEdit from "./app/invoice/InvoiceEdit";
+import InvoiceTabs from "./app/invoice/InvoiceTabs";
+import PortOfLoadingList from "./app/master/portofLoading/PortofLoadingList";
+import GrCodeList from "./app/master/grcode/GrCodeList";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +58,7 @@ function App() {
           <Route path="/create-invoice" element={<InvoiceAdd />} />
           <Route path="/view-invoice/:id" element={<InvoiceView />} />
           <Route path="/edit-invoice/:id" element={<InvoiceEdit />} />
+          <Route path="/view-invoice/:id" element={<InvoiceTabs />} />
 
           {/* Master - Branch  */}
 
@@ -89,6 +93,10 @@ function App() {
           <Route path="/type" element={<TypeList />} />
           {/* Master -Quality  */}
           <Route path="/quality" element={<QualityList />} />
+          {/* Master -port of  loading   */}
+          <Route path="/portofloading" element={<PortOfLoadingList />} />
+          {/* Master -gr code */}
+          <Route path="/grcode" element={<GrCodeList />} />
 
           {/* //Reports */}
           {/* Reports -Buyer  */}

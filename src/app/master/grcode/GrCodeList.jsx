@@ -1,5 +1,5 @@
+import Page from "@/app/dashboard/page";
 import React, { useState } from "react";
-import Page from "../dashboard/page";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import {
@@ -10,7 +10,14 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, Loader2, Edit, Search } from "lucide-react";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  Loader2,
+  Edit,
+  Search,
+  SquarePlus,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -28,28 +35,27 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import BASE_URL from "@/config/BaseUrl";
 import { useNavigate } from "react-router-dom";
-import CreateCustomer from "./CreateCustomer";
-import EditCustomer from "./EditCustomer";
-
-const CustomerList = () => {
+import BASE_URL from "@/config/BaseUrl";
+import CreateGrCode from "./CreateGrCode";
+import EditGrCode from "./EditGrCode";
+const GrCodeList = () => {
   const {
-    data: customers,
+    data: grCode,
     isLoading,
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["customers"],
+    queryKey: ["grcodeList"],
     queryFn: async () => {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `${BASE_URL}/api/panel-fetch-customer-list`,
+        `${BASE_URL}/api/panel-fetch-grcode-list`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      return response.data.customer;
+      return response.data.grcode;
     },
   });
 
@@ -58,7 +64,6 @@ const CustomerList = () => {
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
-  const navigate = useNavigate();
 
   // Define columns for the table
   const columns = [
@@ -68,34 +73,24 @@ const CustomerList = () => {
       cell: ({ row }) => <div>{row.getValue("id")}</div>,
     },
     {
-      accessorKey: "customer_name",
+      accessorKey: "gr_code_des",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Customer Name
+          Gr Code Desc
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: ({ row }) => <div>{row.getValue("customer_name")}</div>,
-    },
-    {
-      accessorKey: "customer_short",
-      header: "Short Name",
-      cell: ({ row }) => <div>{row.getValue("customer_short")}</div>,
-    },
-    {
-      accessorKey: "customer_country",
-      header: "Country",
-      cell: ({ row }) => <div>{row.getValue("customer_country")}</div>,
+      cell: ({ row }) => <div>{row.getValue("gr_code_des")}</div>,
     },
 
     {
-      accessorKey: "customer_status",
+      accessorKey: "gr_code_status",
       header: "Status",
       cell: ({ row }) => {
-        const status = row.getValue("customer_status");
+        const status = row.getValue("gr_code_status");
 
         return (
           <span
@@ -114,11 +109,11 @@ const CustomerList = () => {
       id: "actions",
       header: "Action",
       cell: ({ row }) => {
-        const customerId = row.original.id;
+        const grcodeId = row.original.id;
 
         return (
           <div className="flex flex-row">
-           <EditCustomer customerId={customerId} />
+            <EditGrCode grcodeId={grcodeId} />
           </div>
         );
       },
@@ -127,7 +122,7 @@ const CustomerList = () => {
 
   // Create the table instance
   const table = useReactTable({
-    data: customers || [],
+    data: grCode || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -157,7 +152,7 @@ const CustomerList = () => {
         <div className="flex justify-center items-center h-full">
           <Button disabled>
             <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading Customer
+            Loading grcode Data
           </Button>
         </div>
       </Page>
@@ -171,7 +166,7 @@ const CustomerList = () => {
         <Card className="w-full max-w-md mx-auto mt-10">
           <CardHeader>
             <CardTitle className="text-destructive">
-              Error Fetching Customer
+              Error Fetching grcode
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -183,33 +178,32 @@ const CustomerList = () => {
       </Page>
     );
   }
-
   return (
     <Page>
       <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
-          Customer List
+          Gr Code List
         </div>
-        
+
         {/* searching and column filter  */}
         <div className="flex items-center py-4">
           {/* <Input
-            placeholder="Search..."
-            value={table.getState().globalFilter || ""}
-            onChange={(event) => {
-              table.setGlobalFilter(event.target.value);
-            }}
-            className="max-w-sm"
-          /> */}
+          placeholder="Search..."
+          value={table.getState().globalFilter || ""}
+          onChange={(event) => {
+            table.setGlobalFilter(event.target.value);
+          }}
+          className="max-w-sm"
+        /> */}
           <div className="relative w-72">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-                <Input
-                  placeholder="Search customers..."
-                  value={table.getState().globalFilter || ""}
-                  onChange={(event) => table.setGlobalFilter(event.target.value)}
-                  className="pl-8 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-gray-200"
-                />
-              </div>
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              placeholder="Search grcode..."
+              value={table.getState().globalFilter || ""}
+              onChange={(event) => table.setGlobalFilter(event.target.value)}
+              className="pl-8 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-gray-200"
+            />
+          </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto ">
@@ -236,18 +230,20 @@ const CustomerList = () => {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <CreateCustomer/>
+
+          <CreateGrCode />
         </div>
         {/* table  */}
         <div className="rounded-md border">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} >
+                <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
                     return (
-                      <TableHead key={header.id}
-                      className="text-black bg-yellow-500"
+                      <TableHead
+                        key={header.id}
+                        className="text-black bg-yellow-500"
                       >
                         {header.isPlaceholder
                           ? null
@@ -294,8 +290,8 @@ const CustomerList = () => {
         {/* row slection and pagintaion button  */}
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="flex-1 text-sm text-muted-foreground">
-            Total Customer : &nbsp;
-            {table.getFilteredRowModel().rows.length} 
+            Total Gr Code : &nbsp;
+            {table.getFilteredRowModel().rows.length}
           </div>
           <div className="space-x-2">
             <Button
@@ -316,11 +312,9 @@ const CustomerList = () => {
             </Button>
           </div>
         </div>
-        </div>
-    
+      </div>
     </Page>
   );
 };
 
-export default CustomerList;
-
+export default GrCodeList;
