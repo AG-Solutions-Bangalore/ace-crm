@@ -32,6 +32,7 @@ import { useNavigate } from 'react-router-dom';
 import BASE_URL from '@/config/BaseUrl';
 import CreateScheme from './CreateScheme';
 import EditScheme from './EditScheme';
+import { ButtonConfig } from '@/config/ButtonConfig';
 
 
 const SchemeList = () => {
@@ -252,7 +253,7 @@ const SchemeList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                        className="text-black bg-yellow-500"
+                              className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null

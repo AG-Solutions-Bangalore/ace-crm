@@ -17,11 +17,12 @@ import { ProgressBar } from "@/components/spinner/ProgressBar";
 import { Loader2 } from "lucide-react";
 import Page from "@/app/dashboard/page";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { Textarea } from "@/components/ui/textarea";
 
 // Header Component
 const BranchHeader = ({ branchDetails }) => {
   return (
-    <div className="flex sticky top-0 z-10 border border-gray-200 rounded-lg justify-between items-start gap-8 mb-2 bg-white p-4 shadow-sm">
+    <div className={`flex sticky top-0 z-10 border border-gray-200 rounded-lg justify-between items-start gap-8 mb-2 ${ButtonConfig.cardheaderColor} p-4 shadow-sm`}>
       <div className="flex-1">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold text-gray-800">{branchDetails?.branch?.branch_name}</h1>
@@ -217,17 +218,29 @@ const EditBranch = () => {
       <form onSubmit={handleSubmit} className="w-full p-4">
         <BranchHeader branchDetails={branchDetails} />
 
-        <Card className="mb-6">
+        <Card className={`mb-6 ${ButtonConfig.cardColor}`}>
           <CardContent className="p-6">
             {/* Branch Details Section */}
             <div className="grid grid-cols-4 gap-6">
-              
+            <div className="col-span-1 row-span-2">
+                   <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
+                  Branch Address <span className="text-red-500">*</span>
+                </label>
+                <Textarea
+                   className="bg-white"
+                   rows={5}
+                  value={formData.branch_address}
+                  onChange={(e) => handleInputChange(e, "branch_address")}
+                  placeholder="Enter branch address"
+                />
+              </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                   <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                   Branch Short Name <span className="text-red-500">*</span>
                 </label>
                 <Input
+                   className="bg-white"
                   value={formData.branch_name_short}
                   onChange={(e) => handleInputChange(e, "branch_name_short")}
                   placeholder="Enter branch short name"
@@ -237,10 +250,11 @@ const EditBranch = () => {
               
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                   <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                   Spice Board Details <span className="text-red-500">*</span>
                 </label>
                 <Input
+                   className="bg-white"
                   value={formData.branch_spice_board}
                   onChange={(e) => handleInputChange(e, "branch_spice_board")}
                   placeholder="Enter spice board details"
@@ -248,10 +262,11 @@ const EditBranch = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                   <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                   IEC Code <span className="text-red-500">*</span>
                 </label>
                 <Input
+                   className="bg-white"
                   value={formData.branch_iec}
                   onChange={(e) => handleInputChange(e, "branch_iec")}
                   placeholder="Enter IEC code"
@@ -259,31 +274,24 @@ const EditBranch = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                   <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                   APEDA Details <span className="text-red-500">*</span>
                 </label>
                 <Input
+                   className="bg-white"
                   value={formData.branch_apeda}
                   onChange={(e) => handleInputChange(e, "branch_apeda")}
                   placeholder="Enter APEDA details"
                 />
               </div>
-              <div className="col-span-4">
-                <label className="block text-sm font-medium mb-2">
-                  Branch Address <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  value={formData.branch_address}
-                  onChange={(e) => handleInputChange(e, "branch_address")}
-                  placeholder="Enter branch address"
-                />
-              </div>
+             
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                   <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                   GST Number <span className="text-red-500">*</span>
                 </label>
                 <Input
+                   className="bg-white"
                   value={formData.branch_gst}
                   onChange={(e) => handleInputChange(e, "branch_gst")}
                   placeholder="Enter GST number"
@@ -291,10 +299,11 @@ const EditBranch = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                   <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                   State <span className="text-red-500">*</span>
                 </label>
                 <Input
+                   className="bg-white"
                   value={formData.branch_state}
                   onChange={(e) => handleInputChange(e, "branch_state")}
                   placeholder="Enter state"
@@ -302,10 +311,11 @@ const EditBranch = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                   <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                   State Number <span className="text-red-500">*</span>
                 </label>
                 <Input
+                   className="bg-white"
                   value={formData.branch_state_no}
                   onChange={(e) => handleInputChange(e, "branch_state_no")}
                   placeholder="Enter state number"
@@ -313,10 +323,11 @@ const EditBranch = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                   <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                   Scheme Details <span className="text-red-500">*</span>
                 </label>
                 <Input
+                   className="bg-white"
                   value={formData.branch_scheme}
                   onChange={(e) => handleInputChange(e, "branch_scheme")}
                   placeholder="Enter scheme details"
@@ -324,10 +335,11 @@ const EditBranch = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                   <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                   PAN Number <span className="text-red-500">*</span>
                 </label>
                 <Input
+                   className="bg-white"
                   value={formData.branch_pan_no}
                   onChange={(e) => handleInputChange(e, "branch_pan_no")}
                   placeholder="Enter PAN number"
@@ -335,10 +347,11 @@ const EditBranch = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                   <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                   ECGC/NCB Details <span className="text-red-500">*</span>
                 </label>
                 <Input
+                   className="bg-white"
                   value={formData.branch_ecgcncb}
                   onChange={(e) => handleInputChange(e, "branch_ecgcncb")}
                   placeholder="Enter ECGC/NCB details"
@@ -346,10 +359,11 @@ const EditBranch = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                   <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                   ECGC Policy Details <span className="text-red-500">*</span>
                 </label>
                 <Input
+                   className="bg-white"
                   value={formData.branch_ecgc_policy}
                   onChange={(e) => handleInputChange(e, "branch_ecgc_policy")}
                   placeholder="Enter ECGC policy details"
@@ -357,10 +371,11 @@ const EditBranch = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                   <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                   Registration Number <span className="text-red-500">*</span>
                 </label>
                 <Input
+                   className="bg-white"
                   value={formData.branch_reg_no}
                   onChange={(e) => handleInputChange(e, "branch_reg_no")}
                   placeholder="Enter registration number"
@@ -368,10 +383,11 @@ const EditBranch = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                   <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                   Port of Loading <span className="text-red-500">*</span>
                 </label>
                 <Input
+                   className="bg-white"
                   value={formData.branch_port_of_loading}
                   onChange={(e) =>
                     handleInputChange(e, "branch_port_of_loading")
@@ -381,10 +397,11 @@ const EditBranch = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                   <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                   Signatory Name <span className="text-red-500">*</span>
                 </label>
                 <Input
+                   className="bg-white"
                   value={formData.branch_sign_name}
                   onChange={(e) => handleInputChange(e, "branch_sign_name")}
                   placeholder="Enter signatory name"
@@ -392,10 +409,11 @@ const EditBranch = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                   <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                   Signatory Number <span className="text-red-500">*</span>
                 </label>
                 <Input
+                   className="bg-white"
                   value={formData.branch_sign_no}
                   onChange={(e) => handleInputChange(e, "branch_sign_no")}
                   placeholder="Enter signatory number"
@@ -403,19 +421,20 @@ const EditBranch = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                   <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                   Branch Status <span className="text-red-500">*</span>
                 </label>
                 <Select
+                
                   value={formData.branch_status}
                   onValueChange={(value) =>
                     handleInputChange({ target: { value } }, "branch_status")
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger    className="bg-white">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent    className="bg-white">
                     <SelectItem value="Active">Active</SelectItem>
                     <SelectItem value="Inactive">Inactive</SelectItem>
                   </SelectContent>

@@ -39,6 +39,7 @@ import { useNavigate } from "react-router-dom";
 import BASE_URL from "@/config/BaseUrl";
 import CreateItem from "./CreateItem";
 import EditItem from "./EditItem";
+import { ButtonConfig } from "@/config/ButtonConfig";
 const ItemList = () => {
     const {
         data: items,
@@ -252,7 +253,7 @@ const ItemList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                        className="text-black bg-yellow-500"
+                              className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null

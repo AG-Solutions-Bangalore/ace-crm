@@ -13,6 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useLocation } from "react-router-dom";
+import { ButtonConfig } from "@/config/ButtonConfig";
 const CreateMarking = () => {
     const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +71,7 @@ const CreateMarking = () => {
       {pathname === "/marking" ? (
         <Button
           variant="default"
-          className="ml-2 bg-yellow-500 text-black hover:bg-yellow-100"
+          className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
         >
           <SquarePlus className="h-4 w-4 " /> Marking
         </Button>
@@ -106,7 +107,7 @@ const CreateMarking = () => {
           <Button
             onClick={handleSubmit}
             disabled={isLoading}
-            className="mt-2 bg-yellow-500 text-black hover:bg-yellow-200"
+            className={`mt-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
           >
             {isLoading ? (
               <>

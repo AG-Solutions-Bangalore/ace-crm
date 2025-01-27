@@ -25,6 +25,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ButtonConfig } from "@/config/ButtonConfig";
 const EditDescriptionGoods = ({ descriptionId }) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -242,7 +243,7 @@ const EditDescriptionGoods = ({ descriptionId }) => {
                 disabled={isLoading || !hasChanges}
                 className={`mt-2 relative overflow-hidden ${
                   hasChanges
-                    ? "bg-yellow-500 text-black hover:bg-yellow-100"
+                    ? `${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `
                     : ""
                 }`}
               >

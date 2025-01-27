@@ -39,6 +39,7 @@ import { useNavigate } from "react-router-dom";
 import BASE_URL from "@/config/BaseUrl";
 import CreateDescriptionGoods from "./CreateDescriptionGoods";
 import EditDescriptionGoods from "./EditDescriptionGoods";
+import { ButtonConfig } from "@/config/ButtonConfig";
 
 const DescriptionGoodsList = () => {
   const {
@@ -245,7 +246,7 @@ const DescriptionGoodsList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                        className="text-black bg-yellow-500"
+                             className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null

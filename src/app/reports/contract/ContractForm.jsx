@@ -213,7 +213,7 @@ const ContractForm = () => {
 
   const BranchHeader = ({ progress }) => {
     return (
-      <div className="flex sticky top-0 z-10 border border-gray-200 rounded-lg justify-between items-start gap-8 mb-2 bg-white p-4 shadow-sm">
+      <div className={`flex sticky top-0 z-10 border border-gray-200 rounded-lg justify-between ${ButtonConfig.cardheaderColor} items-start gap-8 mb-2  p-4 shadow-sm`}>
         <div className="flex-1">
           <h1 className="text-3xl font-bold text-gray-800">Contract List</h1>
           <p className="text-gray-600 mt-2">Add a Contract to Vist Repost</p>
@@ -256,18 +256,19 @@ const ContractForm = () => {
     <Page>
       <BranchHeader />
 
-      <Card className="mb-6">
+      <Card className={`mb-6 ${ButtonConfig.cardColor}`}>
         <CardContent className="p-4">
           <div className="w-full p-4">
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                     Enter From Date <span className="text-red-500">*</span>
                   </label>
                   <Input
                     type="date"
                     value={formData.from_date}
+                    className="bg-white"
                     onChange={(e) =>
                       handleInputChange("from_date", e.target.value)
                     }
@@ -276,11 +277,12 @@ const ContractForm = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                     Enter To Date <span className="text-red-500">*</span>
                   </label>
                   <Input
                     type="date"
+                    className="bg-white"
                     value={formData.to_date}
                     onChange={(e) =>
                       handleInputChange("to_date", e.target.value)
@@ -290,7 +292,7 @@ const ContractForm = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                     Branch <span className="text-red-500"></span>
                   </label>
                   <Select
@@ -299,10 +301,10 @@ const ContractForm = () => {
                       handleInputChange({ target: { value } }, "branch_short")
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Select Branch" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white">
                       <SelectContent>
                         {branchData?.branch?.map((branch) => (
                           <SelectItem
@@ -320,7 +322,7 @@ const ContractForm = () => {
                 </div>
                 {/* //buyer */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                     Buyer <span className="text-red-500"></span>
                   </label>
                   <Select
@@ -329,10 +331,10 @@ const ContractForm = () => {
                       handleInputChange({ target: { value } }, "buyer")
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Select buyer" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white">
                       {buyerData?.buyer?.map((buyer) => (
                         <SelectItem
                           key={buyer.buyer_name}
@@ -347,7 +349,7 @@ const ContractForm = () => {
                 {/* Consignee */}
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                     Consignee <span className="text-red-500"></span>
                   </label>
                   <Select
@@ -356,10 +358,10 @@ const ContractForm = () => {
                       handleInputChange({ target: { value } }, "consignee")
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Select Consignee" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white">
                       {buyerData?.buyer?.map((buyer) => (
                         <SelectItem
                           key={buyer.buyer_name}
@@ -373,7 +375,7 @@ const ContractForm = () => {
                 </div>
                 {/* Containers/Size  */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                     Containers/Size <span className="text-red-500"></span>
                   </label>
                   <Select
@@ -382,10 +384,10 @@ const ContractForm = () => {
                       handleInputChange({ target: { value } }, "container_size")
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Select Containers" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white">
                       {containerSizeData?.containerSize?.map(
                         (containerSize) => (
                           <SelectItem
@@ -401,7 +403,7 @@ const ContractForm = () => {
                 </div>
                 {/* Product */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                     Product <span className="text-red-500"></span>
                   </label>
                   <Select
@@ -410,10 +412,10 @@ const ContractForm = () => {
                       handleInputChange({ target: { value } }, "product")
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Select Product" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white">
                       {productData?.product?.map((product) => (
                         <SelectItem
                           key={product.product_name}
@@ -427,7 +429,7 @@ const ContractForm = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                     Status <span className="text-red-500"></span>
                   </label>
                   <Select
@@ -436,10 +438,10 @@ const ContractForm = () => {
                       handleInputChange({ target: { value } }, "status")
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Select Status" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white">
                       <SelectItem value="Active">Active</SelectItem>
                       <SelectItem value="Inactive">Inactive</SelectItem>
                     </SelectContent>

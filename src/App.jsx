@@ -35,6 +35,11 @@ import InvoiceEdit from "./app/invoice/InvoiceEdit";
 import InvoiceTabs from "./app/invoice/InvoiceTabs";
 import PortOfLoadingList from "./app/master/portofLoading/PortofLoadingList";
 import GrCodeList from "./app/master/grcode/GrCodeList";
+import ProductList from "./app/master/product/ProductList";
+import ProductionDescriptionList from "./app/master/productDescription/ProductionDescriptionList";
+import ShipperList from "./app/master/shipper/ShipperList";
+import VesselList from "./app/master/vessel/VesselList";
+import PreReceiptList from "./app/master/preReceipt/PreReceiptList";
 
 const queryClient = new QueryClient();
 
@@ -96,6 +101,16 @@ function App() {
           <Route path="/portofloading" element={<PortOfLoadingList />} />
           {/* Master -gr code */}
           <Route path="/grcode" element={<GrCodeList />} />
+          {/* Master - Product */}
+          <Route path="/master-product" element={<ProductList />} />
+          {/* Master - productdescription */}
+          <Route path="/master-productdescription" element={<ProductionDescriptionList />} />
+          {/* Master - shipper */}
+          <Route path="/master-shipper" element={<ShipperList />} />
+          {/* Master - vessel */}
+          <Route path="/master-vessel" element={<VesselList />} />
+          {/* Master - prerecepits*/}
+          <Route path="/master-prerecepits" element={<PreReceiptList />} />
 
           {/* //Reports */}
           {/* Reports -Buyer  */}

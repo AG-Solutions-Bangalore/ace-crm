@@ -61,6 +61,7 @@ export function AppSidebar({ ...props }) {
       {
         title: "Master",
         url: "#",
+        isActive: true,
         icon: Settings2,
         items: [
           {
@@ -128,24 +129,24 @@ export function AppSidebar({ ...props }) {
             url: "/grcode",
           },
           {
-            title: "Product *",
-            url: "/product",
+            title: "Product",
+            url: "/master-product",
           },
           {
-            title: "Product Descriptiono *",
-            url: "/productdescription",
+            title: "Product Description ",
+            url: "/master-productdescription",
           },
           {
-            title: "Shipper *",
-            url: "/shipper",
+            title: "Shipper",
+            url: "/master-shipper",
           },
           {
-            title: "Vessel *",
-            url: "/vessel",
+            title: "Vessel",
+            url: "/master-vessel",
           },
           {
-            title: "Pre Recepits *",
-            url: "/prerecepits",
+            title: "Pre Recepits",
+            url: "/master-prerecepits",
           },
         ],
       },
@@ -153,6 +154,7 @@ export function AppSidebar({ ...props }) {
         title: "Reports",
         url: "#",
         icon: Settings2,
+        isActive: true,
         items: [
           {
             title: "Buyer",
@@ -165,31 +167,7 @@ export function AppSidebar({ ...props }) {
         ],
       },
     ],
-    navMain1: [
-      {
-        title: "Directory",
-        url: "/directory",
-        icon: Bot,
-      },
-
-      {
-        title: "Latest News",
-        url: "/latest-news",
-        icon: SquareTerminal,
-      },
-    ],
-    navReport: [
-      {
-        title: "Participant Summary",
-        url: "/participant-summary",
-        icon: Bot,
-      },
-      {
-        title: "User Management",
-        url: "/user-management",
-        icon: Bot,
-      },
-    ],
+   
     projects: [
       {
         name: "Dashboard",

@@ -39,6 +39,7 @@ import { useNavigate } from "react-router-dom";
 import BASE_URL from "@/config/BaseUrl";
 import CreateMarking from "./CreateMarking";
 import EditMarking from "./EditMarking";
+import { ButtonConfig } from "@/config/ButtonConfig";
 
 const MarkingList = () => {
     const {
@@ -244,7 +245,7 @@ const MarkingList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                        className="text-black bg-yellow-500"
+                         className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null

@@ -39,6 +39,7 @@ import { useNavigate } from "react-router-dom";
 import BASE_URL from "@/config/BaseUrl";
 import CreateBagType from "./CreateBagType";
 import EditBagType from "./EditBagType";
+import { ButtonConfig } from "@/config/ButtonConfig";
 
 const BagTypeList = () => {
   const {
@@ -245,7 +246,7 @@ const BagTypeList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                        className="text-black bg-yellow-500"
+                              className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null

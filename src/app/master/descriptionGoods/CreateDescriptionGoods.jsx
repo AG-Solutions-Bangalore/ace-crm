@@ -13,6 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useLocation } from "react-router-dom";
+import { ButtonConfig } from "@/config/ButtonConfig";
 
 const CreateDescriptionGoods = () => {
   const [open, setOpen] = useState(false);
@@ -71,7 +72,7 @@ const CreateDescriptionGoods = () => {
         {pathname === "/descriptionGoods" ? (
           <Button
             variant="default"
-            className="ml-2 bg-yellow-500 text-black hover:bg-yellow-100"
+            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
           >
             <SquarePlus className="h-4 w-4 " /> Description Goods
           </Button>
@@ -107,7 +108,7 @@ const CreateDescriptionGoods = () => {
             <Button
               onClick={handleSubmit}
               disabled={isLoading}
-              className="mt-2 bg-yellow-500 text-black hover:bg-yellow-200"
+              className={`mt-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
             >
               {isLoading ? (
                 <>

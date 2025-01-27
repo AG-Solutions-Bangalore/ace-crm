@@ -1018,7 +1018,7 @@ const InvoiceEdit = () => {
 
     return (
       <Card className="mb-2 " ref={containerRef}>
-        <div className="p-4 bg-blue-200 flex items-center justify-between">
+        <div className={ `p-4 ${ButtonConfig.cardColor} flex items-center justify-between`}>
           <h2 className="text-lg font-semibold  flex items-center gap-2">
             <p className="flex gap-1 relative items-center">
               {" "}
@@ -1127,14 +1127,14 @@ const InvoiceEdit = () => {
         {/* <EnquiryHeader progress={progress} /> */}
         <CompactViewSection invoiceDatas={invoiceDatas} />
         
-        <Card className="    bg-blue-200">
+        <Card className={`    ${ButtonConfig.cardColor}`}>
           <CardContent className="p-6">
            
 
             <div className="mb-0">
               <div className="grid grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Buyer <span className="text-red-500">*</span>
                   </label>
 
@@ -1153,7 +1153,7 @@ const InvoiceEdit = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Consignee <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1171,7 +1171,7 @@ const InvoiceEdit = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Consig. Bank 
                   </label>
                   <MemoizedSelect
@@ -1232,7 +1232,7 @@ const InvoiceEdit = () => {
             <div className="mb-3">
               <div className="grid grid-cols-6 gap-6">
               <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Pre-Receipts <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1250,7 +1250,7 @@ const InvoiceEdit = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Port of Loading <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1298,7 +1298,7 @@ const InvoiceEdit = () => {
                 {showDischargeAndCIF && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium mb-2">
+                         <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                         Discharge <span className="text-red-500">*</span>
                       </label>
                       <MemoizedSelect
@@ -1316,7 +1316,7 @@ const InvoiceEdit = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">
+                         <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                         CIF <span className="text-red-500">*</span>
                       </label>
                       <MemoizedSelect
@@ -1336,7 +1336,7 @@ const InvoiceEdit = () => {
                   </>
                 )}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Dest. Country <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1354,7 +1354,7 @@ const InvoiceEdit = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Containers/Size <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1374,7 +1374,7 @@ const InvoiceEdit = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Custom Des <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1398,7 +1398,7 @@ const InvoiceEdit = () => {
             <div className="mb-3">
               <div className="grid grid-cols-4 gap-6">
                 {/* <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Precarriage
                   </label>
                   <Input
@@ -1412,7 +1412,7 @@ const InvoiceEdit = () => {
                   />
                 </div> */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Payment Terms
                   </label>
                   <MemoizedSelect
@@ -1430,7 +1430,7 @@ const InvoiceEdit = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     LUT Code <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1452,7 +1452,7 @@ const InvoiceEdit = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     GR Code <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1470,7 +1470,7 @@ const InvoiceEdit = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Remarks
                   </label>
                   <Textarea
@@ -1528,7 +1528,7 @@ const InvoiceEdit = () => {
                   </TableHeader>
                   <TableBody>
                     {invoiceData.map((row, rowIndex) => (
-                      <TableRow key={rowIndex} className="hover:bg-blue-500 hover:cursor-pointer">
+                      <TableRow key={rowIndex} className="hover:bg-blue-200 hover:cursor-pointer">
                         <TableCell className="p-2 border">
                           <MemoizedProductSelect
                             value={row.invoiceSub_marking}

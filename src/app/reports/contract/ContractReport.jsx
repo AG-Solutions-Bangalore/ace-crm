@@ -146,7 +146,7 @@ const ContractReport = () => {
 
   return (
     <Page>
-      <div className="p-4">
+      <div className="p-4 ">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-semibold">Contract Details</h1>
           <div className="flex gap-2">
