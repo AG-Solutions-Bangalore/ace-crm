@@ -1,304 +1,4 @@
-its open the share without header " const whatsappPdf = async () => {
-    try {
-      const element = containerRef.current;
-      
-      if (!logoBase64) {
-        console.error("Logo not yet loaded");
-        return;
-      }
-  
-      const options = {
-        margin: [55, 0, 15, 0],
-        filename: "Sales_Contract.pdf",
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          windowHeight: element.scrollHeight,
-        },
-        jsPDF: {
-          unit: "mm",
-          format: "a4",
-          orientation: "portrait",
-        },
-        pagebreak: { mode: "avoid-all" },
-      };
-  
-      // Generate and save PDF
-      const pdf = await html2pdf().from(element).set(options).output('blob');
-      
-      // Create file
-      const file = new File([pdf], "Sales_Contract.pdf", { type: "application/pdf" });
-  
-      // Create message text
-      const message = `Contract details for ${contractData?.contract?.contract_ref || ""}\n\nContract Date: ${contractData?.contract?.contract_date || ""}\nBuyer: ${contractData?.contract?.contract_buyer || ""}\n\nPlease find the attached contract document.`;
-  
-      // Check if the Web Share API is supported and includes files
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({
-            files: [file],
-            text: message,
-          });
-        } catch (error) {
-          // Fallback to WhatsApp URL if share fails or is cancelled
-          const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-          window.open(whatsappUrl, '_blank');
-        }
-      } else {
-        // Fallback for browsers that don't support Web Share API
-        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-        window.open(whatsappUrl, '_blank');
-      }
-  
-    } catch (error) {
-      console.error("Error in whatsappPdf:", error);
-      // Show error message to user
-      alert("There was an error generating the PDF. Please try again.");
-    }
-  };"
-
-  -------------------------------------------------------------------------
-  its open the share without header :
-  const whatsappPdf = async () => {
-      try {
-        const element = containerRef.current;
-  
-        if (!logoBase64) {
-          console.error("Logo not yet loaded");
-          return;
-        }
-  
-        const options = {
-          margin: [55, 0, 15, 0],
-          filename: "Sales_Contract.pdf",
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            windowHeight: element.scrollHeight,
-          },
-          jsPDF: {
-            unit: "mm",
-            format: "a4",
-            orientation: "portrait",
-          },
-          pagebreak: { mode: "avoid-all" },
-        };
-  
-        const pdf = await html2pdf().from(element).set(options).output("blob");
-        const file = new File([pdf], "Sales_Contract.pdf", {
-          type: "application/pdf",
-        });
-  
-        const message = `Contract details for ${
-          contractData?.contract?.contract_ref || ""
-        }\n\nContract Date: ${
-          contractData?.contract?.contract_date || ""
-        }\nBuyer: ${
-          contractData?.contract?.contract_buyer || ""
-        }\n\nPlease find the attached contract document.`;
-  
-        try {
-          if (
-            navigator.share &&
-            navigator.canShare &&
-            navigator.canShare({ files: [file] })
-          ) {
-            await navigator.share({
-              files: [file],
-              text: message,
-            });
-            return;
-          }
-        } catch (shareError) {
-          console.log("Web Share API failed:", shareError);
-        }
-  
-        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-          const fileUrl = URL.createObjectURL(file);
-  
-          if (navigator.share) {
-            try {
-              await navigator.share({
-                text: message,
-                url: fileUrl,
-              });
-              URL.revokeObjectURL(fileUrl);
-              return;
-            } catch (mobileShareError) {
-              console.log("Mobile share failed:", mobileShareError);
-            }
-          }
-  
-          const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(
-            message
-          )}`;
-          window.location.href = whatsappUrl;
-  
-          setTimeout(() => {
-            const webWhatsappUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(
-              message
-            )}`;
-            window.open(webWhatsappUrl, "_blank");
-          }, 1000);
-  
-          URL.revokeObjectURL(fileUrl);
-          return;
-        }
-  
-        const webWhatsappUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(
-          message
-        )}`;
-        window.open(webWhatsappUrl, "_blank");
-      } catch (error) {
-        console.error("Error in whatsappPdf:", error);
-        alert("There was an error sharing the PDF. Please try again.");
-      }
-    };
-
-
-    ------------------------------------------------------------------------
-    share with header "const whatsappPdf = async () => {
-    try {
-      const element = containerRef.current;
-  
-      if (!logoBase64) {
-        console.error("Logo not yet loaded");
-        return;
-      }
-  
-      const options = {
-        margin: [55, 0, 15, 0],
-        filename: "Sales_Contract.pdf",
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          windowHeight: element.scrollHeight,
-        },
-        jsPDF: {
-          unit: "mm",
-          format: "a4",
-          orientation: "portrait",
-        },
-        pagebreak: { mode: "avoid-all" },
-      };
-  
-      const pdfOutput = await html2pdf()
-        .from(element)
-        .set(options)
-        .toPdf()
-        .get("pdf")
-        .then((pdf) => {
-          const totalPages = pdf.internal.getNumberOfPages();
-          const pageWidth = pdf.internal.pageSize.getWidth();
-          const pageHeight = pdf.internal.pageSize.getHeight();
-          
-          for (let i = 1; i <= totalPages; i++) {
-            pdf.setPage(i);
-  
-            // Add logo to each page
-            const imgData = logoBase64.split(",")[1];
-            pdf.addImage(imgData, "JPEG", 0, 10, pageWidth, 30);
-  
-            // Add contract title
-            pdf.setFontSize(12);
-            pdf.setFont(undefined, "normal");
-            const title = "SALES CONTRACT";
-            const titleWidth = (pdf.getStringUnitWidth(title) * 16) / pdf.internal.scaleFactor;
-            pdf.text(title, (pageWidth - titleWidth) / 2, 45);
-  
-            // Add contract details
-            pdf.setFontSize(9);
-            pdf.text(`Cont No.: ${contractData?.contract?.contract_ref || ""}`, 4, 55);
-            pdf.text(`DATE: ${contractData?.contract?.contract_date || ""}`, pageWidth - 31, 55);
-  
-            // Add page numbers
-            pdf.setFontSize(10);
-            pdf.setTextColor(0, 0, 0);
-            const text = `Page ${i} of ${totalPages}`;
-            const textWidth = (pdf.getStringUnitWidth(text) * 10) / pdf.internal.scaleFactor;
-            const x = pageWidth - textWidth - 10;
-            const y = pageHeight - 10;
-            pdf.text(text, x, y);
-          }
-          return pdf;
-        });
-  
-      const pdfBlob = pdfOutput.output('blob');
-      const file = new File([pdfBlob], "Sales_Contract.pdf", {
-        type: "application/pdf",
-      });
-  
-      const message = `Contract details for ${
-        contractData?.contract?.contract_ref || ""
-      }\n\nContract Date: ${
-        contractData?.contract?.contract_date || ""
-      }\nBuyer: ${
-        contractData?.contract?.contract_buyer || ""
-      }\n\nPlease find the attached contract document.`;
-  
-      try {
-        if (
-          navigator.share &&
-          navigator.canShare &&
-          navigator.canShare({ files: [file] })
-        ) {
-          await navigator.share({
-            files: [file],
-            text: message,
-          });
-          return;
-        }
-      } catch (shareError) {
-        console.log("Web Share API failed:", shareError);
-      }
-  
-      if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-        const fileUrl = URL.createObjectURL(file);
-  
-        if (navigator.share) {
-          try {
-            await navigator.share({
-              text: message,
-              url: fileUrl,
-            });
-            URL.revokeObjectURL(fileUrl);
-            return;
-          } catch (mobileShareError) {
-            console.log("Mobile share failed:", mobileShareError);
-          }
-        }
-   
-        const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(message)}`;
-        window.location.href = whatsappUrl;
-  
-        setTimeout(() => {
-          const webWhatsappUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(
-            message
-          )}`;
-          window.open(webWhatsappUrl, "_blank");
-        }, 1000);
-  
-        URL.revokeObjectURL(fileUrl);
-        return;
-      }
-  
-      const webWhatsappUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(
-        message
-      )}`;
-      window.open(webWhatsappUrl, "_blank");
-    } catch (error) {
-      console.error("Error in whatsappPdf:", error);
-      alert("There was an error sharing the PDF. Please try again.");
-    }
-  };"
-
-  ---------------------------------------------------------------------------
-  print  without header --
-  "
-  import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Page from "../dashboard/page";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -366,6 +66,17 @@ const TestViewPrint = () => {
         .print-hide {
           display: none;
         }
+          .header-print {
+        position: fixed;
+        top: 0;
+        left: 0;
+         border: 2px solid #000;
+        right: 0;
+        height: 200px;
+
+        background-color: white;
+        z-index: 100;
+      }
           div.content {
         
        
@@ -386,6 +97,29 @@ const TestViewPrint = () => {
       }
       `,
   });
+
+  const PrintHeader = () => (
+    <div className="fixed   top-0 h-[200px] w-full bg-white hidden print:block">
+      <img
+        src="/api/public/assets/images/letterHead/AceB.png"
+        alt="logo"
+        className="w-full max-h-[120px] object-contain"
+      />
+      <h1 className="text-center text-[15px] underline font-bold mt-4">
+        SALES CONTRACT
+      </h1>
+      <div className="p-4 flex items-center justify-between">
+        <p>
+          <span className="font-semibold text-[12px]">Cont No.:</span>
+          {contractData?.contract?.contract_ref}
+        </p>
+        <p>
+          <span className="font-semibold text-[12px]">DATE:</span>
+          {contractData?.contract?.contract_date}
+        </p>
+      </div>
+    </div>
+  );
   if (loading) {
     return (
       <Page>
@@ -420,7 +154,7 @@ const TestViewPrint = () => {
     <Page>
       <div className=" flex w-full p-4 gap-2 relative ">
         <div className="w-[75%]">
-          <div className="      ">
+          <div className="   header-print   ">
             <img
               src="/api/public/assets/images/letterHead/AceB.png"
               alt="logo"
@@ -440,6 +174,7 @@ const TestViewPrint = () => {
               </p>
             </div>
           </div>
+        
           <div
             ref={containerRef}
             className=" content page-break  min-h-screen font-normal "
@@ -712,5 +447,3 @@ const TestViewPrint = () => {
 };
 
 export default TestViewPrint;
-
-  "

@@ -125,3 +125,9 @@ export const useFetchBagsTypes = () => {
 export const useFetchStatus = () => {
   return useQuery(createQueryConfig(["status"], "/api/panel-fetch-invoice-status"));
 };
+export const useFetchVessel = () => {
+  return useQuery(createQueryConfig(["vessels"], "/api/panel-fetch-vessel"));
+};
+export const useFetchShipper = () => {
+  return useQuery(createQueryConfig(["shippers"], "/api/panel-fetch-shipper"));
+};

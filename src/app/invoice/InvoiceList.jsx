@@ -15,6 +15,7 @@ import {
   ChevronDown,
   Edit,
   Eye,
+  FilePlus2,
   Loader2,
   Search,
   SquarePlus,
@@ -210,6 +211,20 @@ const InvoiceList = () => {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Edit Invoice</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+            <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => navigate(`/document-edit-invoice/${invoiceId}`)}
+                >
+                  <FilePlus2  className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Invoice Document</TooltipContent>
             </Tooltip>
           </TooltipProvider>
             <TooltipProvider>
