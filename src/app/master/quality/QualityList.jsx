@@ -39,6 +39,7 @@ import { useNavigate } from "react-router-dom";
 import BASE_URL from "@/config/BaseUrl";
 import CreateQuality from "./CreateQuality";
 import EditQuality from "./EditQuality";
+import { ButtonConfig } from "@/config/ButtonConfig";
 const QualityList = () => {
   const {
     data: qualityList,
@@ -244,7 +245,7 @@ const QualityList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                        className="text-black bg-yellow-500"
+                              className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null

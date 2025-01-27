@@ -32,6 +32,7 @@ import { useNavigate } from 'react-router-dom';
 import BASE_URL from '@/config/BaseUrl';
 import CreatePaymentTermC from './CreatePaymentTermC';
 import EditPaymentTermC from './EditPaymentTermC';
+import { ButtonConfig } from '@/config/ButtonConfig';
 
 
 const PaymentTermCList = () => {
@@ -242,7 +243,7 @@ const PaymentTermCList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                        className="text-black bg-yellow-500"
+                        className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null

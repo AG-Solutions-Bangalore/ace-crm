@@ -932,13 +932,13 @@ const InvoiceAdd = () => {
       >
         {/* <EnquiryHeader progress={progress} /> */}
 
-        <Card className="mb-6 bg-blue-200">
+        <Card className={`mb-6 ${ButtonConfig.cardColor}`}>
           <CardContent className="p-6">
             {/* Basic Details Section */}
             <div className="mb-8">
               <div className="grid grid-cols-5 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Contract Ref. <span className="text-red-500">*</span>
                   </label>
                   {/* this is just for show  no field required here  */}
@@ -957,7 +957,7 @@ const InvoiceAdd = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Company <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -976,7 +976,7 @@ const InvoiceAdd = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Invoice No <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -988,7 +988,7 @@ const InvoiceAdd = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Invoice Date <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -1016,7 +1016,7 @@ const InvoiceAdd = () => {
             <div className="mb-8">
               <div className="grid grid-cols-4 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Contract Ref. <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -1030,7 +1030,7 @@ const InvoiceAdd = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Contract PONO. <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -1042,7 +1042,7 @@ const InvoiceAdd = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Contract Date <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -1053,7 +1053,7 @@ const InvoiceAdd = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Invoice Ref. <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -1071,7 +1071,7 @@ const InvoiceAdd = () => {
             <div className="mb-0">
               <div className="grid grid-cols-4 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Buyer <span className="text-red-500">*</span>
                   </label>
 
@@ -1090,7 +1090,7 @@ const InvoiceAdd = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Consignee <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1108,7 +1108,7 @@ const InvoiceAdd = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Consig. Bank 
                   </label>
                   <MemoizedSelect
@@ -1126,7 +1126,7 @@ const InvoiceAdd = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Product <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1180,7 +1180,7 @@ const InvoiceAdd = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Pre-Receipts <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1203,7 +1203,7 @@ const InvoiceAdd = () => {
             <div className="mb-8">
               <div className="grid grid-cols-5 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Port of Loading <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1223,7 +1223,7 @@ const InvoiceAdd = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Destination Port <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1241,7 +1241,7 @@ const InvoiceAdd = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Discharge <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1259,7 +1259,7 @@ const InvoiceAdd = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     CIF <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1277,7 +1277,7 @@ const InvoiceAdd = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Dest. Country <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1299,7 +1299,7 @@ const InvoiceAdd = () => {
             <div className="mb-8">
               <div className="grid grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Containers/Size <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1320,7 +1320,7 @@ const InvoiceAdd = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Custom Des <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1340,7 +1340,7 @@ const InvoiceAdd = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Precarriage
                   </label>
                   <Input
@@ -1358,7 +1358,7 @@ const InvoiceAdd = () => {
             <div className="mb-8">
               <div className="grid grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     LUT Code <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1380,7 +1380,7 @@ const InvoiceAdd = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     GR Code <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1398,7 +1398,7 @@ const InvoiceAdd = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Payment Terms
                   </label>
                   <MemoizedSelect
@@ -1420,7 +1420,7 @@ const InvoiceAdd = () => {
             <div className="mb-8">
               <div className="grid grid-cols-1 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
                     Remarks
                   </label>
                   <Textarea

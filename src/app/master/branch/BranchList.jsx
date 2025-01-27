@@ -268,7 +268,7 @@ const BranchList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                        className="text-black bg-yellow-500"
+                          className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null

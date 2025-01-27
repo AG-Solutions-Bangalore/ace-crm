@@ -39,6 +39,7 @@ import { useNavigate } from "react-router-dom";
 import BASE_URL from "@/config/BaseUrl";
 import CreateGrCode from "./CreateGrCode";
 import EditGrCode from "./EditGrCode";
+import { ButtonConfig } from "@/config/ButtonConfig";
 const GrCodeList = () => {
   const {
     data: grCode,
@@ -243,7 +244,7 @@ const GrCodeList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                        className="text-black bg-yellow-500"
+                             className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null

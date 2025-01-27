@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ButtonConfig } from "@/config/ButtonConfig";
 
 const CreateGrCode = () => {
   const [open, setOpen] = useState(false);
@@ -103,7 +104,7 @@ const CreateGrCode = () => {
         {pathname === "/grcode" ? (
           <Button
             variant="default"
-            className="ml-2 bg-yellow-500 text-black hover:bg-yellow-100"
+            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
           >
             <SquarePlus className="h-4 w-4 mr-2" /> GR Code
           </Button>
@@ -159,7 +160,7 @@ const CreateGrCode = () => {
             <Button
               onClick={handleSubmit}
               disabled={isLoading}
-              className="mt-2 bg-yellow-500 text-black hover:bg-yellow-200"
+              className={`mt-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             >
               {isLoading ? (
                 <>

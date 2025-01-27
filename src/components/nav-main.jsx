@@ -15,7 +15,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 
 const itemVariants = {
@@ -30,6 +30,7 @@ const buttonVariants = {
 export function NavMain({
   items
 }) {
+  const location = useLocation();
   if (!items || items.length === 0) {
     return null;
   }
@@ -41,7 +42,11 @@ export function NavMain({
     (<SidebarGroup>
       <SidebarGroupLabel>Home</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => (
+        {items.map((item) => {
+          const isParentActive = item.items?.some(
+            (subItem) => subItem.url === location.pathname
+          );
+          return (
           <Collapsible
             key={item.title}
             asChild
@@ -55,7 +60,13 @@ export function NavMain({
                 >
                 <SidebarMenuButton tooltip={item.title}>
                   {item.icon && <item.icon />}
-                  <span className="transition-colors duration-200 hover:text-blue-500">{item.title}</span>
+                  <span
+                        className={`transition-colors duration-200 ${
+                          isParentActive ? "text-blue-500" : "hover:text-blue-500"
+                        }`}
+                      >
+                        {item.title}
+                      </span>
                   <ChevronRight
                     className="ml-auto  transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                 </SidebarMenuButton>
@@ -68,13 +79,19 @@ export function NavMain({
                animate={item.isActive ? "open" : "closed"}
               >
                 <SidebarMenuSub>
-                  {item.items?.map((subItem) => (
+                  {item.items?.map((subItem) => {
+const isSubItemActive = location.pathname === subItem.url;
+                    return (
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild>
                         <Link to={subItem.url}>
                           {/* <span className="transition-colors duration-200 hover:text-blue-500">{subItem.title}</span> */}
                           <motion.span
-                            className="transition-colors duration-200 hover:text-blue-500"
+                             className={`transition-colors duration-200 ${
+                              isSubItemActive
+                                ? "text-blue-500"
+                                : "hover:text-blue-500"
+                            }`}
                             whileHover={{ scale: 1.05 }} 
                           >
                             {subItem.title}
@@ -82,15 +99,16 @@ export function NavMain({
                         </Link>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
-                  ))}
+                  )})}
                 </SidebarMenuSub>
               </CollapsibleContent>
             </SidebarMenuItem>
           </Collapsible>
-        ))}
+        )})}
       </SidebarMenu>
     </SidebarGroup>)
   );
 }
 
 
+// sajid 

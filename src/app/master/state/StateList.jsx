@@ -33,6 +33,7 @@ import BASE_URL from '@/config/BaseUrl';
 
 import CreateState from './CreateState';
 import EditState from './EditState';
+import { ButtonConfig } from '@/config/ButtonConfig';
 
 const StateList = () => {
     const {
@@ -247,7 +248,7 @@ const StateList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                        className="text-black bg-yellow-500"
+                             className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null

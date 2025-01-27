@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { ProgressBar } from '@/components/spinner/ProgressBar';
 import { ButtonConfig } from '@/config/ButtonConfig';
+import { Textarea } from '@/components/ui/textarea';
 
 
 // Validation Schema
@@ -35,7 +36,7 @@ const branchFormSchema = z.object({
 
 const BranchHeader = ({ progress }) => {
     return (
-      <div className="flex sticky top-0 z-10 border border-gray-200 rounded-lg justify-between items-start gap-8 mb-2 bg-white p-4 shadow-sm">
+      <div className={`flex sticky top-0 z-10 border border-gray-200 rounded-lg justify-between items-start gap-8 mb-2 ${ButtonConfig.cardheaderColor} p-4 shadow-sm`}>
         <div className="flex-1">
           <h1 className="text-3xl font-bold text-gray-800">Create Branch</h1>
           <p className="text-gray-600 mt-2">Add a new branch to your organization</p>
@@ -191,17 +192,30 @@ const CreateBranch = () => {
     <Page>
        <form onSubmit={handleSubmit} className="w-full p-4">
        <BranchHeader progress={progress} />
-               <Card className="mb-6">
+               <Card className={`mb-6 ${ButtonConfig.cardColor}`}>
                  <CardContent className="p-6">
                  
        
                    {/* Branch Details Section */}
                    <div className="grid grid-cols-4 gap-6">
+                   <div className='col-span-1  row-span-2'>
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
+                         Branch Address <span className="text-red-500">*</span>
+                       </label>
+                       <Textarea
+                              className="bg-white"
+                         value={formData.branch_address}
+                         onChange={(e) => handleInputChange(e, "branch_address")}
+                         placeholder="Enter branch address"
+                         rows={5}
+                       />
+                     </div>
                      <div>
-                       <label className="block text-sm font-medium mb-2">
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                          Branch Short Name <span className="text-red-500">*</span>
                        </label>
                        <Input
+                              className="bg-white"
                          value={formData.branch_short}
                          onChange={(e) => handleInputChange(e, "branch_short")}
                          placeholder="Enter branch short name"
@@ -209,10 +223,11 @@ const CreateBranch = () => {
                      </div>
        
                      <div>
-                       <label className="block text-sm font-medium mb-2">
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                          Branch Name <span className="text-red-500">*</span>
                        </label>
                        <Input
+                              className="bg-white"
                          value={formData.branch_name}
                          onChange={(e) => handleInputChange(e, "branch_name")}
                          placeholder="Enter branch name"
@@ -220,43 +235,37 @@ const CreateBranch = () => {
                      </div>
        
                      <div>
-                       <label className="block text-sm font-medium mb-2">
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                          Branch Short Name <span className="text-red-500">*</span>
                        </label>
                        <Input
+                              className="bg-white"
                          value={formData.branch_name_short}
                          onChange={(e) => handleInputChange(e, "branch_name_short")}
                          placeholder="Enter branch short name"
                        />
                      </div>
                      <div>
-                       <label className="block text-sm font-medium mb-2">
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                          Spice Board Details <span className="text-red-500">*</span>
                        </label>
                        <Input
+                              className="bg-white"
                          value={formData.branch_spice_board}
                          onChange={(e) => handleInputChange(e, "branch_spice_board")}
                          placeholder="Enter spice board details"
                        />
                      </div>
-                     <div className='col-span-4'>
-                       <label className="block text-sm font-medium mb-2">
-                         Branch Address <span className="text-red-500">*</span>
-                       </label>
-                       <Input
-                         value={formData.branch_address}
-                         onChange={(e) => handleInputChange(e, "branch_address")}
-                         placeholder="Enter branch address"
-                       />
-                     </div>
+                     
        
                     
        
                      <div>
-                       <label className="block text-sm font-medium mb-2">
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                          IEC Code <span className="text-red-500">*</span>
                        </label>
                        <Input
+                              className="bg-white"
                          value={formData.branch_iec}
                          onChange={(e) => handleInputChange(e, "branch_iec")}
                          placeholder="Enter IEC code"
@@ -264,10 +273,11 @@ const CreateBranch = () => {
                      </div>
        
                      <div>
-                       <label className="block text-sm font-medium mb-2">
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                          APEDA Details <span className="text-red-500">*</span>
                        </label>
                        <Input
+                              className="bg-white"
                          value={formData.branch_apeda}
                          onChange={(e) => handleInputChange(e, "branch_apeda")}
                          placeholder="Enter APEDA details"
@@ -275,10 +285,11 @@ const CreateBranch = () => {
                      </div>
        
                      <div>
-                       <label className="block text-sm font-medium mb-2">
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                          GST Number <span className="text-red-500">*</span>
                        </label>
                        <Input
+                              className="bg-white"
                          value={formData.branch_gst}
                          onChange={(e) => handleInputChange(e, "branch_gst")}
                          placeholder="Enter GST number"
@@ -286,10 +297,11 @@ const CreateBranch = () => {
                      </div>
        
                      <div>
-                       <label className="block text-sm font-medium mb-2">
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                          State <span className="text-red-500">*</span>
                        </label>
                        <Input
+                              className="bg-white"
                          value={formData.branch_state}
                          onChange={(e) => handleInputChange(e, "branch_state")}
                          placeholder="Enter state"
@@ -297,10 +309,11 @@ const CreateBranch = () => {
                      </div>
        
                      <div>
-                       <label className="block text-sm font-medium mb-2">
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                          State Number <span className="text-red-500">*</span>
                        </label>
                        <Input
+                              className="bg-white"
                          value={formData.branch_state_no}
                          onChange={(e) => handleInputChange(e, "branch_state_no")}
                          placeholder="Enter state number"
@@ -308,10 +321,11 @@ const CreateBranch = () => {
                      </div>
        
                      <div>
-                       <label className="block text-sm font-medium mb-2">
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                          Scheme Details <span className="text-red-500">*</span>
                        </label>
                        <Input
+                              className="bg-white"
                          value={formData.branch_scheme}
                          onChange={(e) => handleInputChange(e, "branch_scheme")}
                          placeholder="Enter scheme details"
@@ -319,10 +333,11 @@ const CreateBranch = () => {
                      </div>
        
                      <div>
-                       <label className="block text-sm font-medium mb-2">
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                          PAN Number <span className="text-red-500">*</span>
                        </label>
                        <Input
+                              className="bg-white"
                          value={formData.branch_pan_no}
                          onChange={(e) => handleInputChange(e, "branch_pan_no")}
                          placeholder="Enter PAN number"
@@ -330,10 +345,11 @@ const CreateBranch = () => {
                      </div>
        
                      <div>
-                       <label className="block text-sm font-medium mb-2">
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                          ECGC/NCB Details <span className="text-red-500">*</span>
                        </label>
                        <Input
+                              className="bg-white"
                          value={formData.branch_ecgcncb}
                          onChange={(e) => handleInputChange(e, "branch_ecgcncb")}
                          placeholder="Enter ECGC/NCB details"
@@ -341,10 +357,11 @@ const CreateBranch = () => {
                      </div>
        
                      <div>
-                       <label className="block text-sm font-medium mb-2">
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                          ECGC Policy Details <span className="text-red-500">*</span>
                        </label>
                        <Input
+                              className="bg-white"
                          value={formData.branch_ecgc_policy}
                          onChange={(e) => handleInputChange(e, "branch_ecgc_policy")}
                          placeholder="Enter ECGC policy details"
@@ -352,10 +369,11 @@ const CreateBranch = () => {
                      </div>
        
                      <div>
-                       <label className="block text-sm font-medium mb-2">
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                          Registration Number <span className="text-red-500">*</span>
                        </label>
                        <Input
+                              className="bg-white"
                          value={formData.branch_reg_no}
                          onChange={(e) => handleInputChange(e, "branch_reg_no")}
                          placeholder="Enter registration number"
@@ -363,10 +381,11 @@ const CreateBranch = () => {
                      </div>
        
                      <div>
-                       <label className="block text-sm font-medium mb-2">
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                          Port of Loading <span className="text-red-500">*</span>
                        </label>
                        <Input
+                              className="bg-white"
                          value={formData.branch_port_of_loading}
                          onChange={(e) => handleInputChange(e, "branch_port_of_loading")}
                          placeholder="Enter port of loading"
@@ -374,10 +393,11 @@ const CreateBranch = () => {
                      </div>
        
                      <div>
-                       <label className="block text-sm font-medium mb-2">
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                          Signatory Name <span className="text-red-500">*</span>
                        </label>
                        <Input
+                              className="bg-white"
                          value={formData.branch_sign_name}
                          onChange={(e) => handleInputChange(e, "branch_sign_name")}
                          placeholder="Enter signatory name"
@@ -385,10 +405,11 @@ const CreateBranch = () => {
                      </div>
        
                      <div>
-                       <label className="block text-sm font-medium mb-2">
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                          Signatory Number <span className="text-red-500">*</span>
                        </label>
                        <Input
+                              className="bg-white"
                          value={formData.branch_sign_no}
                          onChange={(e) => handleInputChange(e, "branch_sign_no")}
                          placeholder="Enter signatory number"

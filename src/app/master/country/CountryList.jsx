@@ -32,6 +32,7 @@ import { useNavigate } from 'react-router-dom';
 import BASE_URL from '@/config/BaseUrl';
 import CreateCountry from './CreateCountry';
 import EditCountry from './EditCountry';
+import { ButtonConfig } from '@/config/ButtonConfig';
 
 const CountryList = () => {
     const {
@@ -242,7 +243,7 @@ const CountryList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                        className="text-black bg-yellow-500"
+                              className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null
