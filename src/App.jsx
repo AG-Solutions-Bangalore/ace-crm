@@ -40,6 +40,8 @@ import ProductionDescriptionList from "./app/master/productDescription/Productio
 import ShipperList from "./app/master/shipper/ShipperList";
 import VesselList from "./app/master/vessel/VesselList";
 import PreReceiptList from "./app/master/preReceipt/PreReceiptList";
+import TestViewPrint from "./app/contract/TestViewPrint";
+import InvoiceDocumentEdit from "./app/invoice/InvoiceDocumentEdit";
 
 const queryClient = new QueryClient();
 
@@ -57,11 +59,13 @@ function App() {
           <Route path="/contract" element={<ContractList />} />
           <Route path="/create-contract" element={<ContractAdd />} />
           <Route path="/view-contract/:id" element={<ViewContract />} />
+          <Route path="/tesview-contract/:id" element={<TestViewPrint />} />
           <Route path="/edit-contract/:id" element={<EditContract />} />
           {/* Invoice  */}
           <Route path="/invoice" element={<InvoiceList />} />
           <Route path="/create-invoice" element={<InvoiceAdd />} />
           <Route path="/edit-invoice/:id" element={<InvoiceEdit />} />
+          <Route path="/document-edit-invoice/:id" element={<InvoiceDocumentEdit />} />
           <Route path="/view-invoice/:id" element={<InvoiceTabs />} />
 
           {/* Master - Branch  */}
