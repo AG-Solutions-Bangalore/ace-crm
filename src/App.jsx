@@ -42,6 +42,12 @@ import VesselList from "./app/master/vessel/VesselList";
 import PreReceiptList from "./app/master/preReceipt/PreReceiptList";
 import TestViewPrint from "./app/contract/TestViewPrint";
 import InvoiceDocumentEdit from "./app/invoice/InvoiceDocumentEdit";
+import UserPage from "./app/userManagement/UserPage";
+import ManagementDashboard from "./app/userManagement/ManagementDashboard";
+import CreatePage from "./app/userManagement/CreatePage";
+import CreateButton from "./app/userManagement/CreateButton";
+import UserTypeList from "./app/UserType/UserTypeList";
+import EditUserType from "./app/UserType/EditUserType";
 
 const queryClient = new QueryClient();
 
@@ -65,62 +71,86 @@ function App() {
           <Route path="/invoice" element={<InvoiceList />} />
           <Route path="/create-invoice" element={<InvoiceAdd />} />
           <Route path="/edit-invoice/:id" element={<InvoiceEdit />} />
-          <Route path="/document-edit-invoice/:id" element={<InvoiceDocumentEdit />} />
+          <Route
+            path="/document-edit-invoice/:id"
+            element={<InvoiceDocumentEdit />}
+          />
           <Route path="/view-invoice/:id" element={<InvoiceTabs />} />
 
           {/* Master - Branch  */}
 
-          <Route path="/branch" element={<BranchList />} />
+          <Route path="/master/branch" element={<BranchList />} />
           <Route path="/create-branch" element={<CreateBranch />} />
           <Route path="/edit-branch/:id" element={<EditBranch />} />
 
           {/* Master -State  */}
-          <Route path="/state" element={<StateList />} />
+          <Route path="/master/state" element={<StateList />} />
           {/* Master -  Bank */}
-          <Route path="/bank" element={<BankList />} />
+          <Route path="/master/bank" element={<BankList />} />
           {/* Master Scheme  */}
-          <Route path="/scheme" element={<SchemeList />} />
+          <Route path="/master/scheme" element={<SchemeList />} />
 
           {/* Master -Country */}
-          <Route path="/country" element={<CountryList />} />
+          <Route path="/master/country" element={<CountryList />} />
           {/* Master -ContainerSize */}
-          <Route path="/containersize" element={<ContainerSizeList />} />
+          <Route path="/master/containersize" element={<ContainerSizeList />} />
           {/* Master -Payment Term C */}
-          <Route path="/paymentTermC" element={<PaymentTermCList />} />
+          <Route path="/master/paymentTermC" element={<PaymentTermCList />} />
           {/* Master -Description of Goods */}
-          <Route path="/descriptionGoods" element={<DescriptionGoodsList />} />
+          <Route
+            path="/master/descriptionGoods"
+            element={<DescriptionGoodsList />}
+          />
           {/* Master -Bag List */}
-          <Route path="/bagType" element={<BagTypeList />} />
+          <Route path="/master/bagType" element={<BagTypeList />} />
           {/* Master -customdescription */}
-          <Route path="/customdescription" element={<CustomDescription />} />
+          <Route
+            path="/master/customdescription"
+            element={<CustomDescription />}
+          />
           {/* Master -items */}
-          <Route path="/item" element={<ItemList />} />
+          <Route path="/master/item" element={<ItemList />} />
           {/* Master -marking */}
-          <Route path="/marking" element={<MarkingList />} />
+          <Route path="/master/marking" element={<MarkingList />} />
           {/* Master -typelist */}
-          <Route path="/type" element={<TypeList />} />
+          <Route path="/master/type" element={<TypeList />} />
           {/* Master -Quality  */}
-          <Route path="/quality" element={<QualityList />} />
+          <Route path="/master/quality" element={<QualityList />} />
           {/* Master -port of  loading   */}
-          <Route path="/portofloading" element={<PortOfLoadingList />} />
+          <Route path="/master/portofloading" element={<PortOfLoadingList />} />
           {/* Master -gr code */}
-          <Route path="/grcode" element={<GrCodeList />} />
+          <Route path="/master/grcode" element={<GrCodeList />} />
           {/* Master - Product */}
-          <Route path="/master-product" element={<ProductList />} />
+          <Route path="/master/product" element={<ProductList />} />
           {/* Master - productdescription */}
-          <Route path="/master-productdescription" element={<ProductionDescriptionList />} />
+          <Route
+            path="/master/productdescription"
+            element={<ProductionDescriptionList />}
+          />
           {/* Master - shipper */}
-          <Route path="/master-shipper" element={<ShipperList />} />
+          <Route path="/master/shipper" element={<ShipperList />} />
           {/* Master - vessel */}
-          <Route path="/master-vessel" element={<VesselList />} />
+          <Route path="/master/vessel" element={<VesselList />} />
           {/* Master - prerecepits*/}
-          <Route path="/master-prerecepits" element={<PreReceiptList />} />
+          <Route path="/master/prerecepits" element={<PreReceiptList />} />
 
           {/* //Reports */}
           {/* Reports -Buyer  */}
-          <Route path="/buyer-report" element={<Buyer />} />
-          <Route path="/contract-form" element={<ContractForm />} />
-          <Route path="/contract-report" element={<ContractReport />} />
+          <Route path="/report/buyer-report" element={<Buyer />} />
+          <Route path="/report/contract-form" element={<ContractForm />} />
+          <Route path="/report/contract-report" element={<ContractReport />} />
+
+          {/* //management */}
+          <Route path="/userManagement" element={<UserPage />} />
+          <Route
+            path="/management-dashboard/:id"
+            element={<ManagementDashboard />}
+          />
+          <Route path="/page-management" element={<CreatePage />} />
+          <Route path="/button-management" element={<CreateButton />} />
+          {/* //usertype */}
+          <Route path="/user-type" element={<UserTypeList />} />
+          <Route path="/edit-user-type/:id" element={<EditUserType />} />
         </Routes>
       </QueryClientProvider>
     </>

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/popover";
 import { useLocation } from "react-router-dom";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { StateCreate } from "@/components/buttonIndex/ButtonComponents";
 
 const CreateState = () => {
   const [open, setOpen] = useState(false);
@@ -38,13 +39,9 @@ const CreateState = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        `${BASE_URL}/api/panel-create-state`,
-        formData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await axios.post(`${BASE_URL}/api/panel-create-state`, formData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       toast({
         title: "Success",
@@ -71,16 +68,21 @@ const CreateState = () => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        {pathname === "/state" ? (
-          <Button
-            variant="default"
-            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-          >
-            <SquarePlus className="h-4 w-4 mr-2" /> State
-          </Button>
+        {pathname === "/master/state" ? (
+          // <Button
+          //   variant="default"
+          //   className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+          // >
+          //   <SquarePlus className="h-4 w-4 mr-2" /> State
+          // </Button>
+          <div>
+            <StateCreate
+              className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+            ></StateCreate>
+          </div>
         ) : pathname === "/create-contract" ? (
           <p className="text-xs text-yellow-700 ml-2 mt-1 w-32 hover:text-red-800 cursor-pointer">
-             State
+            State
           </p>
         ) : null}
       </PopoverTrigger>
@@ -113,7 +115,6 @@ const CreateState = () => {
               onClick={handleSubmit}
               disabled={isLoading}
               className={`mt-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-          
             >
               {isLoading ? (
                 <>

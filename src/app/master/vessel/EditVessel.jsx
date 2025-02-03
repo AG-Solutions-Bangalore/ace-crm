@@ -26,8 +26,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { VesselEdit } from "@/components/buttonIndex/ButtonComponents";
 
-const EditVessel = ({vesselId}) => {
+const EditVessel = ({ vesselId }) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -52,11 +53,9 @@ const EditVessel = ({vesselId}) => {
       );
       const vesselData = response?.data?.vessel;
       setFormData({
-  
         vessel_status: vesselData.vessel_status || "Active",
       });
       setOriginalData({
-  
         vessel_status: vesselData.vessel_status || "Active",
       });
     } catch (error) {
@@ -109,8 +108,7 @@ const EditVessel = ({vesselId}) => {
     } catch (error) {
       toast({
         title: "Error",
-        description:
-          error.response?.data?.message || "Failed to update Vessel",
+        description: error.response?.data?.message || "Failed to update Vessel",
         variant: "destructive",
       });
     } finally {
@@ -122,12 +120,12 @@ const EditVessel = ({vesselId}) => {
   const hasChanges =
     originalData && formData.vessel_status !== originalData.vessel_status;
   return (
- <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen}>
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
             <PopoverTrigger asChild>
-              <Button
+              {/* <Button
                 variant="ghost"
                 size="icon"
                 className={`transition-all duration-200 ${
@@ -141,7 +139,16 @@ const EditVessel = ({vesselId}) => {
                     isHovered ? "text-blue-500" : ""
                   }`}
                 />
-              </Button>
+              </Button> */}
+              <div>
+                <VesselEdit
+                  className={`transition-all duration-200 ${
+                    isHovered ? "bg-blue-50" : ""
+                  }`}
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
+                ></VesselEdit>
+              </div>
             </PopoverTrigger>
           </TooltipTrigger>
           <TooltipContent>
@@ -163,7 +170,6 @@ const EditVessel = ({vesselId}) => {
               </p>
             </div>
             <div className="grid gap-2">
-           
               <div className="grid gap-1">
                 <label htmlFor="vessel_status" className="text-sm font-medium">
                   Status
@@ -234,7 +240,7 @@ const EditVessel = ({vesselId}) => {
         )}
       </PopoverContent>
     </Popover>
-  )
-}
+  );
+};
 
-export default EditVessel
+export default EditVessel;

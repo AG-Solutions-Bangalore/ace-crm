@@ -60,6 +60,12 @@ import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import { useToast } from "@/hooks/use-toast";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import {
+  ContractCreate,
+  ContractDelete,
+  ContractEdit,
+  ContractView,
+} from "@/components/buttonIndex/ButtonComponents";
 const ContractList = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteContractId, setDeleteContractId] = useState(null);
@@ -183,7 +189,7 @@ const ContractList = () => {
 
         return (
           <div className="flex flex-row">
-            {/* <TooltipProvider>
+            <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
@@ -196,17 +202,20 @@ const ContractList = () => {
                 </TooltipTrigger>
                 <TooltipContent>Test View Contract</TooltipContent>
               </Tooltip>
-            </TooltipProvider> */}
+            </TooltipProvider>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
+                  {/* <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => navigate(`/view-contract/${contractId}`)}
                   >
                     <Eye className="h-4 w-4" />
-                  </Button>
+                  </Button> */}
+                  <ContractView
+                    onClick={() => navigate(`/view-contract/${contractId}`)}
+                  ></ContractView>
                 </TooltipTrigger>
                 <TooltipContent>View Contract</TooltipContent>
               </Tooltip>
@@ -215,13 +224,16 @@ const ContractList = () => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
+                  {/* <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => navigate(`/edit-contract/${contractId}`)}
                   >
                     <Edit className="h-4 w-4" />
-                  </Button>
+                  </Button> */}
+                  <ContractEdit
+                    onClick={() => navigate(`/edit-contract/${contractId}`)}
+                  ></ContractEdit>
                 </TooltipTrigger>
                 <TooltipContent>Edit Contract</TooltipContent>
               </Tooltip>
@@ -229,16 +241,12 @@ const ContractList = () => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
+                  <ContractDelete
                     onClick={() => {
                       setDeleteContractId(contractId);
                       setDeleteConfirmOpen(true);
                     }}
-                  >
-                    <Trash className="h-4 w-4 text-red-500" />
-                  </Button>
+                  ></ContractDelete>
                 </TooltipTrigger>
                 <TooltipContent>Delete Contract</TooltipContent>
               </Tooltip>
@@ -350,13 +358,17 @@ const ContractList = () => {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
+          {/* <Button
             variant="default"
             className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             onClick={() => navigate("/create-contract")}
           >
             <SquarePlus className="h-4 w-4" /> Contract
-          </Button>
+          </Button> */}
+          <ContractCreate
+            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+            onClick={() => navigate("/create-contract")}
+          ></ContractCreate>
         </div>
         {/* table  */}
         <div className="rounded-md border">

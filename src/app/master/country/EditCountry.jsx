@@ -30,6 +30,7 @@ import BASE_URL from "@/config/BaseUrl";
 import { Edit, Loader2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { CountryEdit } from "@/components/buttonIndex/ButtonComponents";
 
 const EditCountry = ({ countryId }) => {
   const [open, setOpen] = useState(false);
@@ -151,7 +152,7 @@ const EditCountry = ({ countryId }) => {
         <Tooltip>
           <TooltipTrigger asChild>
             <DialogTrigger asChild>
-              <Button
+              {/* <Button
                 variant="ghost"
                 size="icon"
                 className={`transition-all duration-200 ${
@@ -165,7 +166,11 @@ const EditCountry = ({ countryId }) => {
                     isHovered ? "text-blue-500" : ""
                   }`}
                 />
-              </Button>
+              </Button> */}
+              <CountryEdit
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              ></CountryEdit>
             </DialogTrigger>
           </TooltipTrigger>
           <TooltipContent>

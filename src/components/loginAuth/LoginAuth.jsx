@@ -24,6 +24,8 @@ export default function LoginAuth() {
   const [loadingMessage, setLoadingMessage] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { fetchPagePermission, fetchPermissions } = useContext(ContextPanel);
+
   const loadingMessages = [
     "Setting things up for you...",
     "Checking your credentials...",
@@ -53,64 +55,60 @@ export default function LoginAuth() {
     setIsLoading(true);
 
     const formData = new FormData();
-    formData.append("username", email);
+    formData.append("username", email); // Ensure API expects "username"
     formData.append("password", password);
 
     try {
+      console.log("Submitting login request...");
+
       const res = await axios.post(`${BASE_URL}/api/panel-login`, formData);
 
-      if (res.status == 200) {
-        const token = res.data.UserInfo?.token;
+      console.log("Full API Response:", res); // Debugging: See full API response
+      console.log("Response Data:", res.data); // Debugging: See response content
 
-        if (token) {
-          // Store user information in localStorage
-          localStorage.setItem("token", token);
-          localStorage.setItem("id", res.data.UserInfo.user.id);
-          localStorage.setItem("companyID", res.data.UserInfo.user.company_id);
-          localStorage.setItem("branchId", res.data.UserInfo.user.branch_id);
-          localStorage.setItem("name", res.data.UserInfo.user.name);
-          localStorage.setItem("username", res.data.UserInfo.user.name);
-          localStorage.setItem("email", res.data.UserInfo.user.email);
-          localStorage.setItem("userType", res.data.UserInfo.user.user_type);
+      if (res.status === 200) {
+        console.log("Login Success ✅ Checking UserInfo...");
 
-          // Show success toast
-          toast({
-            title: "Login Successful",
-            description: "Welcome back to your dashboard.",
-          });
-
-          // Direct navigation based on user type
-          const userType = res.data.UserInfo.user.user_type;
-          switch (userType) {
-            case 1:
-              navigate("/home");
-              break;
-            case 2:
-              navigate("/home");
-              break;
-            case 3:
-              navigate("/home");
-              break;
-            case 4:
-              navigate("/home");
-              break;
-            default:
-              navigate("/home");
-          }
-        } else {
-          throw new Error("No token received");
+        if (!res.data.UserInfo || !res.data.UserInfo.token) {
+          console.warn("⚠️ Login failed: Token missing in response");
+          toast.error("Login Failed: No token received.");
+          setIsLoading(false);
+          return;
         }
+
+        const { UserInfo, userN } = res.data;
+
+        console.log("Saving user details to local storage...");
+        localStorage.setItem("token", UserInfo.token);
+        localStorage.setItem("allUsers", JSON.stringify(userN));
+        localStorage.setItem("id", UserInfo.user.id);
+        localStorage.setItem("name", UserInfo.user.name);
+        localStorage.setItem("username", UserInfo.user.full_name);
+        localStorage.setItem("userType", UserInfo.user.user_type);
+        localStorage.setItem("companyID", UserInfo.user.company_id);
+
+        localStorage.setItem("branchId", UserInfo.user.branch_id);
+        localStorage.setItem("email", UserInfo.user.email);
+
+        await fetchPermissions();
+        await fetchPagePermission();
+
+        console.log("✅ Login successful! Redirecting to /home...");
+        navigate("/home");
       } else {
-        throw new Error("Login failed");
+        console.warn("⚠️ Unexpected API response:", res);
+        toast.error("Login Failed: Unexpected response.");
       }
     } catch (error) {
-      // Handle login errors
+      console.error("❌ Login Error:", error.response?.data || error.message);
+
       toast({
         variant: "destructive",
         title: "Login Failed",
         description:
           error.response?.data?.message || "Please check your credentials.",
       });
+
       setIsLoading(false);
     }
   };
@@ -123,31 +121,25 @@ export default function LoginAuth() {
       transition={{ duration: 0.3 }}
     >
       <motion.div
-        initial={{
-          opacity: 1,
-          x: 0,
-        }}
+        initial={{ opacity: 1, x: 0 }}
         exit={{
           opacity: 0,
           x: -window.innerWidth,
-          transition: {
-            duration: 0.3,
-            ease: "easeInOut",
-          },
+          transition: { duration: 0.3, ease: "easeInOut" },
         }}
       >
         <Card className="w-80 max-w-md">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-center">Login</CardTitle>
             <CardDescription className="text-center">
-              Enter your UserName and password to access your account
+              Enter your username and password to access your account
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit}>
               <div className="grid gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="email">UserName</Label>
+                  <Label htmlFor="email">Username</Label>
                   <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -156,7 +148,7 @@ export default function LoginAuth() {
                     <Input
                       id="email"
                       type="text"
-                      placeholder="username"
+                      placeholder="Enter your username"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -175,8 +167,8 @@ export default function LoginAuth() {
                     <Input
                       id="password"
                       type="password"
-                      value={password}
                       placeholder="*******"
+                      value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />

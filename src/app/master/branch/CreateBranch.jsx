@@ -120,7 +120,7 @@ const CreateBranch = () => {
         title: "Success",
         description: "Branch created successfully",
       });
-      navigate("/branch");
+      navigate("/master/branch");
     },
     onError: (error) => {
       toast({

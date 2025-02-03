@@ -26,6 +26,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { DescriptionofGoodsEdit } from "@/components/buttonIndex/ButtonComponents";
 const EditDescriptionGoods = ({ descriptionId }) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -53,11 +54,13 @@ const EditDescriptionGoods = ({ descriptionId }) => {
       const descriptionofGoodsData = response?.data?.descriptionofGoods;
       setFormData({
         descriptionofGoods: descriptionofGoodsData.descriptionofGoods || "",
-        descriptionofGoods_status: descriptionofGoodsData.descriptionofGoods_status || "Active",
+        descriptionofGoods_status:
+          descriptionofGoodsData.descriptionofGoods_status || "Active",
       });
       setOriginalData({
         descriptionofGoods: descriptionofGoodsData.descriptionofGoods || "",
-        descriptionofGoods_status: descriptionofGoodsData.descriptionofGoods_status || "Active",
+        descriptionofGoods_status:
+          descriptionofGoodsData.descriptionofGoods_status || "Active",
       });
     } catch (error) {
       toast({
@@ -109,7 +112,9 @@ const EditDescriptionGoods = ({ descriptionId }) => {
     } catch (error) {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to update description of goods",
+        description:
+          error.response?.data?.message ||
+          "Failed to update description of goods",
         variant: "destructive",
       });
     } finally {
@@ -121,14 +126,15 @@ const EditDescriptionGoods = ({ descriptionId }) => {
   const hasChanges =
     originalData &&
     (formData.descriptionofGoods !== originalData.descriptionofGoods ||
-      formData.descriptionofGoods_status !== originalData.descriptionofGoods_status);
+      formData.descriptionofGoods_status !==
+        originalData.descriptionofGoods_status);
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
             <PopoverTrigger asChild>
-              <Button
+              {/* <Button
                 variant="ghost"
                 size="icon"
                 className={`transition-all duration-200 ${
@@ -142,7 +148,16 @@ const EditDescriptionGoods = ({ descriptionId }) => {
                     isHovered ? "text-blue-500" : ""
                   }`}
                 />
-              </Button>
+              </Button> */}
+              <div>
+                <DescriptionofGoodsEdit
+                  className={`transition-all duration-200 ${
+                    isHovered ? "bg-blue-50" : ""
+                  }`}
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
+                ></DescriptionofGoodsEdit>
+              </div>
             </PopoverTrigger>
           </TooltipTrigger>
           <TooltipContent>
@@ -158,15 +173,20 @@ const EditDescriptionGoods = ({ descriptionId }) => {
         ) : (
           <div className="grid gap-4">
             <div className="space-y-2">
-              <h4 className="font-medium leading-none">Edit description of goods</h4>
+              <h4 className="font-medium leading-none">
+                Edit description of goods
+              </h4>
               <p className="text-sm text-muted-foreground">
                 Update description of goods details
               </p>
             </div>
             <div className="grid gap-2">
               <div className="grid gap-1">
-                <label htmlFor="descriptionofGoods" className="text-sm font-medium">
-                Description of Goods
+                <label
+                  htmlFor="descriptionofGoods"
+                  className="text-sm font-medium"
+                >
+                  Description of Goods
                 </label>
                 <div className="relative">
                   <Input
@@ -182,14 +202,16 @@ const EditDescriptionGoods = ({ descriptionId }) => {
                     className={hasChanges ? "pr-8 border-blue-200" : ""}
                   />
                   {hasChanges &&
-                    formData.descriptionofGoods !== originalData.descriptionofGoods && (
+                    formData.descriptionofGoods !==
+                      originalData.descriptionofGoods && (
                       <div className="absolute right-2 top-1/2 -translate-y-1/2">
                         <RefreshCcw
                           className="h-4 w-4 text-blue-500 cursor-pointer hover:rotate-180 transition-all duration-300"
                           onClick={() =>
                             setFormData((prev) => ({
                               ...prev,
-                              descriptionofGoods: originalData.descriptionofGoods,
+                              descriptionofGoods:
+                                originalData.descriptionofGoods,
                             }))
                           }
                         />
@@ -198,13 +220,19 @@ const EditDescriptionGoods = ({ descriptionId }) => {
                 </div>
               </div>
               <div className="grid gap-1">
-                <label htmlFor="descriptionofGoods_status" className="text-sm font-medium">
+                <label
+                  htmlFor="descriptionofGoods_status"
+                  className="text-sm font-medium"
+                >
                   Status
                 </label>
                 <Select
                   value={formData.descriptionofGoods_status}
                   onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, descriptionofGoods_status: value }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      descriptionofGoods_status: value,
+                    }))
                   }
                 >
                   <SelectTrigger

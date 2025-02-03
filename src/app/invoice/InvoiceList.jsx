@@ -61,6 +61,13 @@ import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import { useToast } from "@/hooks/use-toast";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import {
+  InvoiceCreate,
+  InvoiceDelete,
+  InvoiceDocument,
+  InvoiceEdit,
+  InvoiceView,
+} from "@/components/buttonIndex/ButtonComponents";
 const InvoiceList = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteInoice, setDeleteInoiceid] = useState(null);
@@ -187,63 +194,61 @@ const InvoiceList = () => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
+                  {/* <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => navigate(`/view-invoice/${invoiceId}`)}
                   >
                     <Eye className="h-4 w-4" />
-                  </Button>
+                  </Button> */}
+
+                  <InvoiceView
+                    onClick={() => navigate(`/view-invoice/${invoiceId}`)}
+                  ></InvoiceView>
                 </TooltipTrigger>
                 <TooltipContent>View Invoice</TooltipContent>
               </Tooltip>
             </TooltipProvider>
 
             <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => navigate(`/edit-invoice/${invoiceId}`)}
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Edit Invoice</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <InvoiceEdit
+                    onClick={() => navigate(`/edit-invoice/${invoiceId}`)}
+                  ></InvoiceEdit>
+                </TooltipTrigger>
+                <TooltipContent>Edit Invoice</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => navigate(`/document-edit-invoice/${invoiceId}`)}
-                >
-                  <FilePlus2  className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Invoice Document</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <InvoiceDocument
+                    onClick={() =>
+                      navigate(`/document-edit-invoice/${invoiceId}`)
+                    }
+                  >
+                    <FilePlus2 className="h-4 w-4" />
+                  </InvoiceDocument>
+                </TooltipTrigger>
+                <TooltipContent>Invoice Document</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => {
-                    setDeleteInoiceid(invoiceId);
-                    setDeleteConfirmOpen(true);
-                  }}
-                >
-                  <Trash className="h-4 w-4 text-red-500" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Delete Invoice</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <InvoiceDelete
+                    onClick={() => {
+                      setDeleteInoiceid(invoiceId);
+                      setDeleteConfirmOpen(true);
+                    }}
+                  >
+                    <Trash className="h-4 w-4 text-red-500" />
+                  </InvoiceDelete>
+                </TooltipTrigger>
+                <TooltipContent>Delete Invoice</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         );
       },
@@ -359,14 +364,19 @@ const InvoiceList = () => {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
+          {/* <Button
             variant="default"
             className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             onClick={() => navigate("/create-invoice")}
           >
             <SquarePlus className="h-4 w-4" /> Invoice
-          </Button>
-          
+          </Button> */}
+          <div>
+            <InvoiceCreate
+              className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+              onClick={() => navigate("/create-invoice")}
+            ></InvoiceCreate>
+          </div>
         </div>
         {/* table  */}
         <div className="rounded-md border">
@@ -378,7 +388,7 @@ const InvoiceList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                              className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                        className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null

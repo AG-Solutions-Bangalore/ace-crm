@@ -30,9 +30,10 @@ import BASE_URL from "@/config/BaseUrl";
 import { Edit, Loader2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { SchemeEdit } from "@/components/buttonIndex/ButtonComponents";
 
-const EditScheme = ({schemeId}) => {
-    const [open, setOpen] = useState(false);
+const EditScheme = ({ schemeId }) => {
+  const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -109,9 +110,13 @@ const EditScheme = ({schemeId}) => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`${BASE_URL}/api/panel-update-scheme/${schemeId}`, formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.put(
+        `${BASE_URL}/api/panel-update-scheme/${schemeId}`,
+        formData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       toast({
         title: "Success",
@@ -131,17 +136,17 @@ const EditScheme = ({schemeId}) => {
     }
   };
   return (
-   <Dialog open={open} onOpenChange={setOpen}>
-        {/* <DialogTrigger asChild>
+    <Dialog open={open} onOpenChange={setOpen}>
+      {/* <DialogTrigger asChild>
              <Button variant="ghost" size="icon">
                <Edit className="h-4 w-4" />
              </Button>
            </DialogTrigger> */}
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DialogTrigger asChild>
-                <Button
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DialogTrigger asChild>
+              {/* <Button
                   variant="ghost"
                   size="icon"
                   className={`transition-all duration-200 ${
@@ -155,87 +160,93 @@ const EditScheme = ({schemeId}) => {
                       isHovered ? "text-blue-500" : ""
                     }`}
                   />
-                </Button>
-              </DialogTrigger>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Edit Scheme</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-  
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Edit Scheme</DialogTitle>
-          </DialogHeader>
-  
-          {isFetching ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin" />
-            </div>
-          ) : (
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="scheme_description">Scheme Description</Label>
-                <textarea
-                  id="scheme_description"
-                  name="scheme_description"
-                  value={formData.scheme_description}
-                  onChange={handleInputChange}
-                  placeholder="Enter Scheme Description"
-                   className="w-full p-1 border border-gray-300 rounded-sm "
-                />
-              </div>
-  
-              <div className="grid gap-2">
-                <Label htmlFor="scheme_tax">Scheme Tax</Label>
-                <Input
-                  id="scheme_tax"
-                  name="scheme_tax"
-                  value={formData.scheme_tax}
-                  onChange={handleInputChange}
-                  placeholder="Enter Scheme Tax "
-                />
-              </div>
-         
-  
-              <div className="grid gap-2">
-                <Label htmlFor="scheme_status">Status</Label>
-                <Select
-                  value={formData.scheme_status}
-                  onValueChange={handleStatusChange}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Active">Active</SelectItem>
-                    <SelectItem value="Inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          )}
-  
-          <DialogFooter>
-            <Button
-              onClick={handleSubmit}
-              disabled={isLoading || isFetching}
-              className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Updating...
-                </>
-              ) : (
-                "Update Scheme"
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-  )
-}
+                </Button> */}
+              <SchemeEdit
+                className={`transition-all duration-200 ${
+                  isHovered ? "bg-blue-50" : ""
+                }`}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              ></SchemeEdit>
+            </DialogTrigger>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Edit Scheme</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
 
-export default EditScheme
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Edit Scheme</DialogTitle>
+        </DialogHeader>
+
+        {isFetching ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin" />
+          </div>
+        ) : (
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="scheme_description">Scheme Description</Label>
+              <textarea
+                id="scheme_description"
+                name="scheme_description"
+                value={formData.scheme_description}
+                onChange={handleInputChange}
+                placeholder="Enter Scheme Description"
+                className="w-full p-1 border border-gray-300 rounded-sm "
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="scheme_tax">Scheme Tax</Label>
+              <Input
+                id="scheme_tax"
+                name="scheme_tax"
+                value={formData.scheme_tax}
+                onChange={handleInputChange}
+                placeholder="Enter Scheme Tax "
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="scheme_status">Status</Label>
+              <Select
+                value={formData.scheme_status}
+                onValueChange={handleStatusChange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="Inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )}
+
+        <DialogFooter>
+          <Button
+            onClick={handleSubmit}
+            disabled={isLoading || isFetching}
+            className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Updating...
+              </>
+            ) : (
+              "Update Scheme"
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default EditScheme;

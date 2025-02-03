@@ -1,4 +1,4 @@
-import Page from '@/app/dashboard/page'
+import Page from "@/app/dashboard/page";
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -10,7 +10,14 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, Loader2, Edit, Search, SquarePlus } from "lucide-react";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  Loader2,
+  Edit,
+  Search,
+  SquarePlus,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -28,163 +35,162 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useNavigate } from 'react-router-dom';
-import BASE_URL from '@/config/BaseUrl';
+import { useNavigate } from "react-router-dom";
+import BASE_URL from "@/config/BaseUrl";
 
-import CreateState from './CreateState';
-import EditState from './EditState';
-import { ButtonConfig } from '@/config/ButtonConfig';
+import CreateState from "./CreateState";
+import EditState from "./EditState";
+import { ButtonConfig } from "@/config/ButtonConfig";
 
 const StateList = () => {
-    const {
-        data: customers,
-        isLoading,
-        isError,
-        refetch,
-      } = useQuery({
-        queryKey: ["customers"],
-        queryFn: async () => {
-          const token = localStorage.getItem("token");
-          const response = await axios.get(
-            `${BASE_URL}/api/panel-fetch-state-list`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          return response.data.state;
-        },
-      });
-    
-      // State for table management
-      const [sorting, setSorting] = useState([]);
-      const [columnFilters, setColumnFilters] = useState([]);
-      const [columnVisibility, setColumnVisibility] = useState({});
-      const [rowSelection, setRowSelection] = useState({});
-      const navigate = useNavigate();
-    
-      // Define columns for the table
-      const columns = [
+  const {
+    data: customers,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["customers"],
+    queryFn: async () => {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `${BASE_URL}/api/panel-fetch-state-list`,
         {
-          accessorKey: "id",
-          header: "ID",
-          cell: ({ row }) => <div>{row.getValue("id")}</div>,
-        },
-        {
-          accessorKey: "state_name",
-          header: ({ column }) => (
-            <Button
-              variant="ghost"
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            >
-              State
-              <ArrowUpDown className="ml-2 h-4 w-4" />
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data.state;
+    },
+  });
+
+  // State for table management
+  const [sorting, setSorting] = useState([]);
+  const [columnFilters, setColumnFilters] = useState([]);
+  const [columnVisibility, setColumnVisibility] = useState({});
+  const [rowSelection, setRowSelection] = useState({});
+  const navigate = useNavigate();
+
+  // Define columns for the table
+  const columns = [
+    {
+      accessorKey: "id",
+      header: "ID",
+      cell: ({ row }) => <div>{row.getValue("id")}</div>,
+    },
+    {
+      accessorKey: "state_name",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          State
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <div>{row.getValue("state_name")}</div>,
+    },
+    {
+      accessorKey: "state_no",
+      header: "State No",
+      cell: ({ row }) => <div>{row.getValue("state_no")}</div>,
+    },
+
+    {
+      accessorKey: "state_status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.getValue("state_status");
+
+        return (
+          <span
+            className={`px-2 py-1 rounded text-xs ${
+              status == "Active"
+                ? "bg-green-100 text-green-800"
+                : "bg-gray-100 text-gray-800"
+            }`}
+          >
+            {status}
+          </span>
+        );
+      },
+    },
+    {
+      id: "actions",
+      header: "Action",
+      cell: ({ row }) => {
+        const stateId = row.original.id;
+
+        return (
+          <div className="flex flex-row">
+            <EditState stateId={stateId} />
+          </div>
+        );
+      },
+    },
+  ];
+
+  // Create the table instance
+  const table = useReactTable({
+    data: customers || [],
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+    initialState: {
+      pagination: {
+        pageSize: 7,
+      },
+    },
+  });
+
+  // Render loading state
+  if (isLoading) {
+    return (
+      <Page>
+        <div className="flex justify-center items-center h-full">
+          <Button disabled>
+            <Loader2 className=" h-4 w-4 animate-spin" />
+            Loading State
+          </Button>
+        </div>
+      </Page>
+    );
+  }
+
+  // Render error state
+  if (isError) {
+    return (
+      <Page>
+        <Card className="w-full max-w-md mx-auto mt-10">
+          <CardHeader>
+            <CardTitle className="text-destructive">
+              Error Fetching State
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => refetch()} variant="outline">
+              Try Again
             </Button>
-          ),
-          cell: ({ row }) => <div>{row.getValue("state_name")}</div>,
-        },
-        {
-          accessorKey: "state_no",
-          header: "State No",
-          cell: ({ row }) => <div>{row.getValue("state_no")}</div>,
-        },
-       
-    
-        {
-          accessorKey: "state_status",
-          header: "Status",
-          cell: ({ row }) => {
-            const status = row.getValue("state_status");
-    
-            return (
-              <span
-                className={`px-2 py-1 rounded text-xs ${
-                  status == "Active"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-gray-100 text-gray-800"
-                }`}
-              >
-                {status}
-              </span>
-            );
-          },
-        },
-        {
-          id: "actions",
-          header: "Action",
-          cell: ({ row }) => {
-            const stateId = row.original.id;
-    
-            return (
-              <div className="flex flex-row">
-              <EditState stateId={stateId}/>
-              </div>
-            );
-          },
-        },
-      ];
-    
-      // Create the table instance
-      const table = useReactTable({
-        data: customers || [],
-        columns,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
-        state: {
-          sorting,
-          columnFilters,
-          columnVisibility,
-          rowSelection,
-        },
-        initialState: {
-          pagination: {
-            pageSize: 7,
-          },
-        },
-      });
-    
-      // Render loading state
-      if (isLoading) {
-        return (
-          <Page>
-            <div className="flex justify-center items-center h-full">
-              <Button disabled>
-                <Loader2 className=" h-4 w-4 animate-spin" />
-                Loading State
-              </Button>
-            </div>
-          </Page>
-        );
-      }
-    
-      // Render error state
-      if (isError) {
-        return (
-          <Page>
-            <Card className="w-full max-w-md mx-auto mt-10">
-              <CardHeader>
-                <CardTitle className="text-destructive">
-                  Error Fetching State
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Button onClick={() => refetch()} variant="outline">
-                  Try Again
-                </Button>
-              </CardContent>
-            </Card>
-          </Page>
-        );
-      }
-    
+          </CardContent>
+        </Card>
+      </Page>
+    );
+  }
+
   return (
-   <Page>
-    <div className="w-full p-4">
+    <Page>
+      <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
           State List
         </div>
@@ -234,9 +240,8 @@ const StateList = () => {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-   
-     
-          <CreateState/>
+
+            <CreateState />
         </div>
         {/* table  */}
         <div className="rounded-md border">
@@ -248,7 +253,7 @@ const StateList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                             className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                        className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null
@@ -318,8 +323,8 @@ const StateList = () => {
           </div>
         </div>
       </div>
-   </Page>
-  )
-}
+    </Page>
+  );
+};
 
-export default StateList
+export default StateList;

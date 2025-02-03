@@ -26,6 +26,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { CustomDescriptionEdit } from "@/components/buttonIndex/ButtonComponents";
 
 const EditCustomDescription = ({ customdescriptionId }) => {
   const [open, setOpen] = useState(false);
@@ -135,7 +136,7 @@ const EditCustomDescription = ({ customdescriptionId }) => {
         <Tooltip>
           <TooltipTrigger asChild>
             <PopoverTrigger asChild>
-              <Button
+              {/* <Button
                 variant="ghost"
                 size="icon"
                 className={`transition-all duration-200 ${
@@ -149,7 +150,16 @@ const EditCustomDescription = ({ customdescriptionId }) => {
                     isHovered ? "text-blue-500" : ""
                   }`}
                 />
-              </Button>
+              </Button> */}
+              <div>
+                <CustomDescriptionEdit
+                  className={`transition-all duration-200 ${
+                    isHovered ? "bg-blue-50" : ""
+                  }`}
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
+                ></CustomDescriptionEdit>
+              </div>
             </PopoverTrigger>
           </TooltipTrigger>
           <TooltipContent>
@@ -202,8 +212,7 @@ const EditCustomDescription = ({ customdescriptionId }) => {
                           onClick={() =>
                             setFormData((prev) => ({
                               ...prev,
-                              customdescription:
-                                originalData.customdescription,
+                              customdescription: originalData.customdescription,
                             }))
                           }
                         />
