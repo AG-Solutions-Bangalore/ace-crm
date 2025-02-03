@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { GRCodeCreate } from "@/components/buttonIndex/ButtonComponents";
 
 const CreateGrCode = () => {
   const [open, setOpen] = useState(false);
@@ -101,13 +102,18 @@ const CreateGrCode = () => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        {pathname === "/grcode" ? (
-          <Button
-            variant="default"
-            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-          >
-            <SquarePlus className="h-4 w-4 mr-2" /> GR Code
-          </Button>
+        {pathname === "/master/grcode" ? (
+          // <Button
+          //   variant="default"
+          //   className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+          // >
+          //   <SquarePlus className="h-4 w-4 mr-2" /> GR Code
+          // </Button>
+          <div>
+            <GRCodeCreate
+              className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+            ></GRCodeCreate>
+          </div>
         ) : pathname === "/create-contract" ? (
           <p className="text-xs text-yellow-700 ml-2 mt-1 w-32 hover:text-red-800 cursor-pointer">
             Create GR Code

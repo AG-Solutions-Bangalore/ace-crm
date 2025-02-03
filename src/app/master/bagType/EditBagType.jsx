@@ -26,6 +26,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { BagTypeEdit } from "@/components/buttonIndex/ButtonComponents";
 const EditBagType = ({ bagTypeId }) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -51,11 +52,9 @@ const EditBagType = ({ bagTypeId }) => {
       );
       const bagTypeData = response?.data?.bagType;
       setFormData({
-  
         bagType_status: bagTypeData.bagType_status || "Active",
       });
       setOriginalData({
-  
         bagType_status: bagTypeData.bagType_status || "Active",
       });
     } catch (error) {
@@ -126,7 +125,7 @@ const EditBagType = ({ bagTypeId }) => {
         <Tooltip>
           <TooltipTrigger asChild>
             <PopoverTrigger asChild>
-              <Button
+              {/* <Button
                 variant="ghost"
                 size="icon"
                 className={`transition-all duration-200 ${
@@ -140,7 +139,16 @@ const EditBagType = ({ bagTypeId }) => {
                     isHovered ? "text-blue-500" : ""
                   }`}
                 />
-              </Button>
+              </Button> */}
+              <div>
+                <BagTypeEdit
+                  className={`transition-all duration-200 ${
+                    isHovered ? "bg-blue-50" : ""
+                  }`}
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
+                ></BagTypeEdit>
+              </div>
             </PopoverTrigger>
           </TooltipTrigger>
           <TooltipContent>
@@ -162,7 +170,6 @@ const EditBagType = ({ bagTypeId }) => {
               </p>
             </div>
             <div className="grid gap-2">
-           
               <div className="grid gap-1">
                 <label htmlFor="bagType_status" className="text-sm font-medium">
                   Status

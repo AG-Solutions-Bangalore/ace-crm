@@ -10,7 +10,14 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, Loader2, Edit, Search, SquarePlus } from "lucide-react";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  Loader2,
+  Edit,
+  Search,
+  SquarePlus,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -31,8 +38,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { useNavigate } from "react-router-dom";
 import BASE_URL from "@/config/BaseUrl";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import {
+  BranchCreate,
+  BranchEdit,
+} from "@/components/buttonIndex/ButtonComponents";
 const BranchList = () => {
   const {
     data: customers,
@@ -118,20 +134,23 @@ const BranchList = () => {
 
         return (
           <div className="flex flex-row">
-           <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => navigate(`/edit-branch/${branchId}`)}
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Edit Branch</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  {/* <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => navigate(`/edit-branch/${branchId}`)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button> */}
+                  <BranchEdit
+                    onClick={() => navigate(`/edit-branch/${branchId}`)}
+                  ></BranchEdit>
+                </TooltipTrigger>
+                <TooltipContent>Edit Branch</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         );
       },
@@ -249,14 +268,20 @@ const BranchList = () => {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-   
+          {/*    
           <Button
             variant="default"
             className= {`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`} 
             onClick={() => navigate("/create-branch")}
           >
             <SquarePlus className="h-4 w-4" /> Branch
-          </Button>
+          </Button> */}
+          <div>
+            <BranchCreate
+              className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+              onClick={() => navigate("/create-branch")}
+            ></BranchCreate>
+          </div>
         </div>
         {/* table  */}
         <div className="rounded-md border">
@@ -268,7 +293,7 @@ const BranchList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                          className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                        className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null

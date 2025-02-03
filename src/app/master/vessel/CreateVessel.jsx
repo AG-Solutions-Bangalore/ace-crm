@@ -14,12 +14,13 @@ import {
 } from "@/components/ui/popover";
 import { useLocation } from "react-router-dom";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { VesselCreate } from "@/components/buttonIndex/ButtonComponents";
 
 const CreateVessel = () => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-      vessel_name: "",
+    vessel_name: "",
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -37,13 +38,9 @@ const CreateVessel = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        `${BASE_URL}/api/panel-create-vessel`,
-        formData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await axios.post(`${BASE_URL}/api/panel-create-vessel`, formData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       toast({
         title: "Success",
@@ -51,15 +48,14 @@ const CreateVessel = () => {
       });
 
       setFormData({
-          vessel_name: "",
+        vessel_name: "",
       });
       await queryClient.invalidateQueries(["vessels"]);
       setOpen(false);
     } catch (error) {
       toast({
         title: "Error",
-        description:
-          error.response?.data?.message || "Failed to create Vessel",
+        description: error.response?.data?.message || "Failed to create Vessel",
         variant: "destructive",
       });
     } finally {
@@ -67,15 +63,20 @@ const CreateVessel = () => {
     }
   };
   return (
- <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        {pathname === "/master-vessel" ? (
-          <Button
-            variant="default"
-            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
-          >
-            <SquarePlus className="h-4 w-4 " /> Vessel
-          </Button>
+        {pathname === "/master/vessel" ? (
+          // <Button
+          //   variant="default"
+          //   className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
+          // >
+          //   <SquarePlus className="h-4 w-4 " /> Vessel
+          // </Button>
+          <div>
+            <VesselCreate
+              className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
+            ></VesselCreate>
+          </div>
         ) : pathname === "/create-contract" ? (
           <p className="text-xs text-yellow-700 ml-2 mt-1 w-32 hover:text-red-800 cursor-pointer">
             Create Vessel
@@ -85,9 +86,7 @@ const CreateVessel = () => {
       <PopoverContent className="w-80">
         <div className="grid gap-4">
           <div className="space-y-2">
-            <h4 className="font-medium leading-none">
-              Create New Vessel
-            </h4>
+            <h4 className="font-medium leading-none">Create New Vessel</h4>
             <p className="text-sm text-muted-foreground">
               Enter the details for the new vessel
             </p>
@@ -123,7 +122,7 @@ const CreateVessel = () => {
         </div>
       </PopoverContent>
     </Popover>
-  )
-}
+  );
+};
 
-export default CreateVessel
+export default CreateVessel;

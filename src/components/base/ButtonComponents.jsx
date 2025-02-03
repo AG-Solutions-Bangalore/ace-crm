@@ -152,7 +152,6 @@ export const ParticipationCrMessage = ({ onClick, className }) => {
 ParticipationCrMessage.page = "Participant";
 
 
-//payment mediation 
 
 export const PaymentEdit = ({ onClick, className }) => (
     <ButtonWrapper

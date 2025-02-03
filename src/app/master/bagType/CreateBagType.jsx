@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/popover";
 import { useLocation } from "react-router-dom";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { BagTypeCreate } from "@/components/buttonIndex/ButtonComponents";
 const CreateBagType = () => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -36,13 +37,9 @@ const CreateBagType = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        `${BASE_URL}/api/panel-create-bagType`,
-        formData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await axios.post(`${BASE_URL}/api/panel-create-bagType`, formData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       toast({
         title: "Success",
@@ -68,27 +65,30 @@ const CreateBagType = () => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        {pathname === "/bagType" ? (
-          <Button
-            variant="default"
-            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
-          >
-            <SquarePlus className="h-4 w-4 " /> Bag Type
-          </Button>
+        {pathname === "/master/bagType" ? (
+          // <Button
+          //   variant="default"
+          //   className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
+          // >
+          //   <SquarePlus className="h-4 w-4 " /> Bag Type
+          // </Button>
+          <div>
+            <BagTypeCreate
+              className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
+            ></BagTypeCreate>
+          </div>
         ) : pathname === "/create-contract" ? (
           <p className="text-xs text-yellow-700 ml-2 mt-1 w-32 hover:text-red-800 cursor-pointer">
-            Create  Bag Type
+            Create Bag Type
           </p>
         ) : null}
       </PopoverTrigger>
       <PopoverContent className="w-80">
         <div className="grid gap-4">
           <div className="space-y-2">
-            <h4 className="font-medium leading-none">
-              Create New  Bag Type
-            </h4>
+            <h4 className="font-medium leading-none">Create New Bag Type</h4>
             <p className="text-sm text-muted-foreground">
-              Enter the details for the  bag type
+              Enter the details for the bag type
             </p>
           </div>
           <div className="grid gap-2">

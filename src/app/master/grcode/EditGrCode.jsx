@@ -26,6 +26,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { GRCodeEdit } from "@/components/buttonIndex/ButtonComponents";
 const EditGrCode = ({ grcodeId }) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -124,7 +125,7 @@ const EditGrCode = ({ grcodeId }) => {
         <Tooltip>
           <TooltipTrigger asChild>
             <PopoverTrigger asChild>
-              <Button
+              {/* <Button
                 variant="ghost"
                 size="icon"
                 className={`transition-all duration-200 ${
@@ -138,7 +139,16 @@ const EditGrCode = ({ grcodeId }) => {
                     isHovered ? "text-blue-500" : ""
                   }`}
                 />
-              </Button>
+              </Button> */}
+              <div>
+                <GRCodeEdit
+                  className={`transition-all duration-200 ${
+                    isHovered ? "bg-blue-50" : ""
+                  }`}
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
+                ></GRCodeEdit>
+              </div>
             </PopoverTrigger>
           </TooltipTrigger>
           <TooltipContent>

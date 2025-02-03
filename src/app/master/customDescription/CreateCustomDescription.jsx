@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/popover";
 import { useLocation } from "react-router-dom";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { CustomDescriptionCreate } from "@/components/buttonIndex/ButtonComponents";
 
 const CreateCustomDescription = () => {
   const [open, setOpen] = useState(false);
@@ -70,13 +71,20 @@ const CreateCustomDescription = () => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        {pathname === "/customdescription" ? (
-          <Button
-            variant="default"
-            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
-          >
-            <SquarePlus className="h-4 w-4 " /> Custom Description
-          </Button>
+        {pathname === "/master/customdescription" ? (
+          // <Button
+          //   variant="default"
+          //   className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
+          // >
+          //   <SquarePlus className="h-4 w-4 " /> Custom Description
+          // </Button>
+          <div>
+            <CustomDescriptionCreate
+              className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
+            >
+              <SquarePlus className="h-4 w-4 " /> Custom Description
+            </CustomDescriptionCreate>
+          </div>
         ) : pathname === "/create-contract" ? (
           <p className="text-xs text-yellow-700 ml-2 mt-1 w-32 hover:text-red-800 cursor-pointer">
             Create Custom Description

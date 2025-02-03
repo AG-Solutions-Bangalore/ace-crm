@@ -14,11 +14,12 @@ import {
 } from "@/components/ui/popover";
 import { useLocation } from "react-router-dom";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { ShipperCreate } from "@/components/buttonIndex/ButtonComponents";
 const CreateShipper = () => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-      shipper_name: "",
+    shipper_name: "",
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -36,13 +37,9 @@ const CreateShipper = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        `${BASE_URL}/api/panel-create-shipper`,
-        formData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await axios.post(`${BASE_URL}/api/panel-create-shipper`, formData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       toast({
         title: "Success",
@@ -50,7 +47,7 @@ const CreateShipper = () => {
       });
 
       setFormData({
-          shipper_name: "",
+        shipper_name: "",
       });
       await queryClient.invalidateQueries(["shippers"]);
       setOpen(false);
@@ -67,62 +64,65 @@ const CreateShipper = () => {
   };
   return (
     <Popover open={open} onOpenChange={setOpen}>
-         <PopoverTrigger asChild>
-           {pathname === "/master-shipper" ? (
-             <Button
-               variant="default"
-               className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
-             >
-               <SquarePlus className="h-4 w-4 " /> Shipper
-             </Button>
-           ) : pathname === "/create-contract" ? (
-             <p className="text-xs text-yellow-700 ml-2 mt-1 w-32 hover:text-red-800 cursor-pointer">
-               Create Shipper
-             </p>
-           ) : null}
-         </PopoverTrigger>
-         <PopoverContent className="w-80">
-           <div className="grid gap-4">
-             <div className="space-y-2">
-               <h4 className="font-medium leading-none">
-                 Create New Shipper
-               </h4>
-               <p className="text-sm text-muted-foreground">
-                 Enter the details for the new shipper
-               </p>
-             </div>
-             <div className="grid gap-2">
-               <Input
-                 id="shipper"
-                 placeholder="Enter Shipper "
-                 value={formData.shipper_name}
-                 onChange={(e) =>
-                   setFormData((prev) => ({
-                     ...prev,
-                     shipper_name: e.target.value,
-                   }))
-                 }
-               />
-   
-               <Button
-                 onClick={handleSubmit}
-                 disabled={isLoading}
-                 className={`mt-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
-               >
-                 {isLoading ? (
-                   <>
-                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                     Creating...
-                   </>
-                 ) : (
-                   "Create Shipper"
-                 )}
-               </Button>
-             </div>
-           </div>
-         </PopoverContent>
-       </Popover>
-  )
-}
+      <PopoverTrigger asChild>
+        {pathname === "/master/shipper" ? (
+          //  <Button
+          //    variant="default"
+          //    className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
+          //  >
+          //    <SquarePlus className="h-4 w-4 " /> Shipper
+          //  </Button>
+          <div>
+            <ShipperCreate
+              className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
+            ></ShipperCreate>
+          </div>
+        ) : pathname === "/create-contract" ? (
+          <p className="text-xs text-yellow-700 ml-2 mt-1 w-32 hover:text-red-800 cursor-pointer">
+            Create Shipper
+          </p>
+        ) : null}
+      </PopoverTrigger>
+      <PopoverContent className="w-80">
+        <div className="grid gap-4">
+          <div className="space-y-2">
+            <h4 className="font-medium leading-none">Create New Shipper</h4>
+            <p className="text-sm text-muted-foreground">
+              Enter the details for the new shipper
+            </p>
+          </div>
+          <div className="grid gap-2">
+            <Input
+              id="shipper"
+              placeholder="Enter Shipper "
+              value={formData.shipper_name}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  shipper_name: e.target.value,
+                }))
+              }
+            />
 
-export default CreateShipper
+            <Button
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className={`mt-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create Shipper"
+              )}
+            </Button>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+export default CreateShipper;

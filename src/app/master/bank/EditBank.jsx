@@ -30,6 +30,7 @@ import BASE_URL from "@/config/BaseUrl";
 import { Edit, Loader2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { BankEdit } from "@/components/buttonIndex/ButtonComponents";
 
 const EditBank = ({ bankId }) => {
   const [open, setOpen] = useState(false);
@@ -147,7 +148,7 @@ const EditBank = ({ bankId }) => {
         <Tooltip>
           <TooltipTrigger asChild>
             <DialogTrigger asChild>
-              <Button
+              {/* <Button
                 variant="ghost"
                 size="icon"
                 className={`transition-all duration-200 ${
@@ -161,7 +162,11 @@ const EditBank = ({ bankId }) => {
                     isHovered ? "text-blue-500" : ""
                   }`}
                 />
-              </Button>
+              </Button> */}
+              <BankEdit
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              ></BankEdit>
             </DialogTrigger>
           </TooltipTrigger>
           <TooltipContent>

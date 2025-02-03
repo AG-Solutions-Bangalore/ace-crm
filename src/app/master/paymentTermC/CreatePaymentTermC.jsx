@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/popover";
 import { useLocation } from "react-router-dom";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { PaymentTermsCCreate } from "@/components/buttonIndex/ButtonComponents";
 const CreatePaymentTermC = () => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -64,13 +65,18 @@ const CreatePaymentTermC = () => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        {pathname === "/paymentTermC" ? (
-          <Button
-            variant="default"
-            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
-          >
-            <SquarePlus className="h-4 w-4 " /> Payment TermC
-          </Button>
+        {pathname === "/master/paymentTermC" ? (
+          // <Button
+          //   variant="default"
+          //   className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
+          // >
+          //   <SquarePlus className="h-4 w-4 " /> Payment TermC
+          // </Button>
+          <div>
+            <PaymentTermsCCreate
+              className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} `}
+            ></PaymentTermsCCreate>
+          </div>
         ) : pathname === "/create-contract" ? (
           <p className="text-xs text-yellow-700 ml-2 mt-1 w-32 hover:text-red-800 cursor-pointer">
             Create Payment TermC

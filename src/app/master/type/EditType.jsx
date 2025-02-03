@@ -26,6 +26,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { TypeEdit } from "@/components/buttonIndex/ButtonComponents";
 const EditType = ({ typeId }) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -119,7 +120,7 @@ const EditType = ({ typeId }) => {
         <Tooltip>
           <TooltipTrigger asChild>
             <PopoverTrigger asChild>
-              <Button
+              {/* <Button
                 variant="ghost"
                 size="icon"
                 className={`transition-all duration-200 ${
@@ -133,7 +134,16 @@ const EditType = ({ typeId }) => {
                     isHovered ? "text-blue-500" : ""
                   }`}
                 />
-              </Button>
+              </Button> */}
+              <div>
+                <TypeEdit
+                  className={`transition-all duration-200 ${
+                    isHovered ? "bg-blue-50" : ""
+                  }`}
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
+                ></TypeEdit>
+              </div>
             </PopoverTrigger>
           </TooltipTrigger>
           <TooltipContent>

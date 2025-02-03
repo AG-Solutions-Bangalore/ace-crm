@@ -8,6 +8,7 @@ import {
   GalleryVerticalEnd,
   Map,
   PieChart,
+  Settings,
   Settings2,
   SquareTerminal,
 } from "lucide-react";
@@ -64,89 +65,93 @@ export function AppSidebar({ ...props }) {
         isActive: true,
         icon: Settings2,
         items: [
+          // {
+          //   title: "Branch",
+          //   url: "/branch",
+          // },
           {
             title: "Branch",
-            url: "/branch",
+            url: "/master/branch",
           },
           {
             title: "State",
-            url: "/state",
+            url: "/master/state",
           },
           {
             title: "Bank",
-            url: "/bank",
+            url: "/master/bank",
           },
           {
             title: "Scheme",
-            url: "/scheme",
+            url: "/master/scheme",
           },
           {
             title: "Country",
-            url: "/country",
+            url: "/master/country",
           },
           {
             title: "Container Size",
-            url: "/containersize",
+            url: "/master/containersize",
           },
           {
             title: "Payment TermsC",
-            url: "/paymentTermC",
+            url: "/master/paymentTermC",
           },
           {
             title: "Description of Goods",
-            url: "/descriptionGoods",
+            url: "/master/descriptionGoods",
           },
           {
             title: "Bag Type",
-            url: "/bagType",
+            url: "/master/bagType",
           },
           {
             title: "Custom Description",
-            url: "/customdescription",
+            url: "/master/customdescription",
           },
           {
             title: "Type",
-            url: "/type",
+            url: "/master/type",
           },
           {
             title: "Quality",
-            url: "/quality",
+            url: "/master/quality",
           },
           {
             title: "Item",
-            url: "/item",
+            url: "/master/item",
           },
           {
             title: "Marking",
-            url: "/marking",
+            url: "/master/marking",
           },
           {
-            title: "Port of Loading ",
-            url: "/portofloading",
+            title: "Port of Loading",
+            url: "/master/portofloading",
           },
           {
-            title: "GR Code ",
-            url: "/grcode",
+            title: "GR Code",
+            url: "/master/grcode",
           },
           {
             title: "Product",
-            url: "/master-product",
+            url: "/master/product",
           },
           {
-            title: "Product Description ",
-            url: "/master-productdescription",
+            title: "Product Description",
+            url: "/master/productdescription",
           },
           {
             title: "Shipper",
-            url: "/master-shipper",
+            url: "/master/shipper",
           },
           {
             title: "Vessel",
-            url: "/master-vessel",
+            url: "/master/vessel",
           },
           {
             title: "Pre Recepits",
-            url: "/master-prerecepits",
+            url: "/master/prerecepits",
           },
         ],
       },
@@ -157,22 +162,32 @@ export function AppSidebar({ ...props }) {
         isActive: true,
         items: [
           {
-            title: "Buyer",
-            url: "/buyer-report",
+            title: "BuyerR",
+            url: "/report/buyer-report",
           },
           {
-            title: "Contract",
-            url: "/contract-form",
+            title: "ContractR",
+            url: "/report/contract-form",
           },
         ],
       },
     ],
-   
+
     projects: [
       {
         name: "Dashboard",
         url: "/home",
         icon: Frame,
+      },
+      {
+        name: "UserPage",
+        url: "/userManagement",
+        icon: Frame,
+      },
+      {
+        name: "UserType",
+        url: "/user-type",
+        icon: Settings,
       },
       {
         name: "Contract",

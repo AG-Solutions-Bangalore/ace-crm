@@ -1,124 +1,89 @@
-import { ChevronRight } from "lucide-react";
-import { motion } from "framer-motion";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-} from "@/components/ui/sidebar";
-import { Link, useLocation } from "react-router-dom";
-import { useEffect, useRef } from "react"; 
 
-const itemVariants = {
-  open: { opacity: 1, height: "auto", transition: { duration: 0.3 } },
-  closed: { opacity: 0, height: 0, transition: { duration: 0.3 } },
+
+const handlePrintPdf = () => {
+  const printContent = containerRef.current;
+  const printWindow = window.open("", "", "height=500,width=800");
+
+  // Create the header content (same as PrintHeader component)
+  const printHeader = `
+    <div class="print-header" style="position: fixed; top: 0; left: 0; right: 0; background-color: white; z-index: 1000; height: 200px;">
+      <img src="/api/public/assets/images/letterHead/AceB.png" alt="logo" style="width: 100%; max-height: 120px; object-contain;" />
+      <h1 style="text-align: center; font-size: 15px; text-decoration: underline; font-weight: bold; margin-top: 16px;">
+        SALES CONTRACT
+      </h1>
+      <div style="padding: 16px; display: flex; justify-content: space-between;">
+        <p><span style="font-weight: bold; font-size: 12px;">Cont No.:</span> ${contractData?.contract?.contract_ref}</p>
+        <p><span style="font-weight: bold; font-size: 12px;">DATE:</span> ${moment(contractData?.contract?.contract_date).format("DD-MMM-YYYY")}</p>
+      </div>
+    </div>
+  `;
+
+  // Open print window and write content
+  printWindow.document.write("<html><head><title>Print Receipt</title>");
+
+  // Add CSS styles to the print window
+  const styles = Array.from(document.styleSheets)
+    .map((styleSheet) => {
+      try {
+        return Array.from(styleSheet.cssRules)
+          .map((rule) => rule.cssText)
+          .join("");
+      } catch (e) {
+        console.log("Accessing cross-origin styles is not allowed, skipping.");
+        return "";
+      }
+    })
+    .join("");
+
+  printWindow.document.write(`
+    <style>
+      ${styles}
+
+      @media print {
+        body {
+          margin: 0mm;
+          padding: 50mm 5mm 1mm 1mm;
+          min-height: 100vh;
+        }
+        .print-header {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          background-color: white;
+          z-index: 1000;
+          height: 200px;
+        }
+        .print-container {
+          page-break-inside: avoid;
+        }
+        .print-container p, .print-container div {
+          page-break-inside: avoid;
+          page-break-after: auto;
+        }
+        /* Adjust the margin for the first page */
+        @page :first {
+          margin-bottom: 100px; /* Keep some space for the header on the first page */
+        }
+
+        /* For subsequent pages, ensure content starts below the header */
+        @page :not(:first) {
+          margin-top: 100px; /* Apply margin-top to subsequent pages only */
+        }
+
+        /* Adjust content position from the second page onward */
+        .print-container {
+          margin-top: 100px; /* Set this margin for pages after the first */
+        }
+      }
+    </style>
+  `);
+
+  printWindow.document.write("</head><body>");
+  // Write the header and content to the print window
+  printWindow.document.write(printHeader); // Insert the header
+  printWindow.document.write(printContent.innerHTML); // Insert the main content
+  printWindow.document.write("</body></html>");
+  printWindow.document.close();
+  printWindow.print();
 };
-
-const buttonVariants = {
-  hover: { scale: 1.05 },
-};
-
-export function NavMain({ items }) {
-  const location = useLocation();
-  const activeSubItemRef = useRef(null); 
-
-  // Scroll the active sub-item into view when the location changes
-  useEffect(() => {
-    if (activeSubItemRef.current) {
-      activeSubItemRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }
-  }, [location.pathname]); 
-
-  if (!items || items.length === 0) {
-    return null;
-  }
-
-  const hasActiveItems = items.length > 0;
-  if (!hasActiveItems) {
-    return null;
-  }
-
-  return (
-    <SidebarGroup>
-      <SidebarGroupLabel>Home</SidebarGroupLabel>
-      <SidebarMenu>
-        {items.map((item) => {
-          const isParentActive = item.items?.some(
-            (subItem) => subItem.url === location.pathname
-          );
-          return (
-            <Collapsible
-              key={item.title}
-              asChild
-              defaultOpen={item.isActive}
-              className="group/collapsible"
-            >
-              <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
-                  <motion.div variants={buttonVariants} whileHover="hover">
-                    <SidebarMenuButton tooltip={item.title}>
-                      {item.icon && <item.icon />}
-                      <span
-                        className={`transition-colors duration-200 ${
-                          isParentActive ? "text-blue-500" : "hover:text-blue-500"
-                        }`}
-                      >
-                        {item.title}
-                      </span>
-                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                    </SidebarMenuButton>
-                  </motion.div>
-                </CollapsibleTrigger>
-                <CollapsibleContent
-                  as={motion.div}
-                  variants={itemVariants}
-                  initial="closed"
-                  animate={item.isActive ? "open" : "closed"}
-                >
-                  <SidebarMenuSub>
-                    {item.items?.map((subItem) => {
-                      const isSubItemActive = location.pathname === subItem.url;
-                      return (
-                        <SidebarMenuSubItem
-                          key={subItem.title}
-                          ref={isSubItemActive ? activeSubItemRef : null} 
-                        >
-                          <SidebarMenuSubButton asChild>
-                            <Link to={subItem.url}>
-                              <motion.span
-                                className={`transition-colors duration-200 ${
-                                  isSubItemActive
-                                    ? "text-blue-500"
-                                    : "hover:text-blue-500"
-                                }`}
-                                whileHover={{ scale: 1.05 }}
-                              >
-                                {subItem.title}
-                              </motion.span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      );
-                    })}
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              </SidebarMenuItem>
-            </Collapsible>
-          );
-        })}
-      </SidebarMenu>
-    </SidebarGroup>
-  );
-}

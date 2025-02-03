@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { BuyerRDownload } from "@/components/buttonIndex/ButtonComponents";
 
 const Buyer = () => {
   const { toast } = useToast();
@@ -106,13 +107,19 @@ const Buyer = () => {
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-semibold">Buyer Details</h1>
           <div className="flex gap-2">
-            <Button
+            {/* <Button
               variant="default"
               className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
               onClick={onSubmit}
             >
               <Download className="h-4 w-4" /> Download
-            </Button>
+            </Button> */}
+            <div>
+              <BuyerRDownload
+                className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+                onClick={onSubmit}
+              ></BuyerRDownload>
+            </div>
           </div>
         </div>{" "}
         <div className="overflow-x-auto">
