@@ -196,35 +196,34 @@ const PreshipmentDetails = () => {
       .save();
   };
 
-  if (loading) {
-    return (
-      <Page>
+
+   if (loading) {
+      return (
         <div className="flex justify-center items-center h-full">
           <Button disabled>
             <Loader2 className=" h-4 w-4 animate-spin" />
             Loading Invoice Data
           </Button>
         </div>
-      </Page>
-    );
-  }
-
-  if (error) {
-    return (
-      <Page>
+      );
+    }
+  
+    if (error) {
+      return (
         <Card className="w-full max-w-md mx-auto mt-10">
           <CardHeader>
             <CardTitle className="text-destructive">
-              Error Fetching invoice Data
+              Error Fetching invoice Packing Data
             </CardTitle>
           </CardHeader>
           <CardContent>
             <Button variant="outline">Try Again</Button>
           </CardContent>
         </Card>
-      </Page>
-    );
-  }
+      );
+    }
+
+  
 
   const PrintHeader = () => (
     <div className="print-header">
