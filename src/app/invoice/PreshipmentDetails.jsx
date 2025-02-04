@@ -7,6 +7,8 @@ import BASE_URL from "@/config/BaseUrl";
 import { useParams } from "react-router-dom";
 import ReactToPrint from "react-to-print";
 import moment from "moment";
+import { toWords } from "number-to-words";
+
 const PreshipmentDetails = () => {
   const containerRef = useRef();
   const { id } = useParams();
@@ -16,6 +18,8 @@ const PreshipmentDetails = () => {
   const [prouducthsn, setProuductHsn] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [sumbag, setSumBag] = useState(0);
+
   const logoUrl = "/api/public/assets/images/letterHead/AceB.png";
   useEffect(() => {
     const fetchContractData = async () => {
@@ -48,7 +52,14 @@ const PreshipmentDetails = () => {
 
     fetchContractData();
   }, [id]);
-
+  useEffect(() => {
+    if (invoiceSubData.length > 0) {
+      const totalBags = invoiceSubData.reduce((sum, item) => {
+        return sum + (item.invoiceSub_item_bag || 0);
+      }, 0);
+      setSumBag(totalBags);
+    }
+  }, [invoiceSubData]);
   const handleSaveAsPdf = () => {
     const element = containerRef.current;
     generatePdf(element);
@@ -118,7 +129,15 @@ const PreshipmentDetails = () => {
       </div>
     );
   }
+  const totalAmount = invoiceSubData.reduce((total, item) => {
+    return total + (item.invoiceSub_qntyInMt * item.invoiceSub_rateMT || 0);
+  }, 0);
 
+  const dollars = Math.floor(totalAmount);
+  const cents = Math.round((totalAmount - dollars) * 100);
+  const totalInWords = `${toWords(dollars).toUpperCase()} DOLLARS AND ${
+    cents > 0 ? toWords(cents).toUpperCase() + " CENTS" : "NO CENTS"
+  }`;
   return (
     <div>
       <button
@@ -245,14 +264,12 @@ const PreshipmentDetails = () => {
                     </h2>
                     <div className="grid grid-cols-2 leading-tight">
                       <div className="p-1 border-r border-black flex items-center justify-center h-full">
-                        <h2 className="text-center">EC</h2>
+                        <h2 className="text-center">Buyer</h2>
                       </div>
 
-                      <div className="p-1 text-center">
-                        <p>KUO YEONG PTE LTD</p>
-                        <p>BLK 16 PASIR PANJANG</p>
-                        <p>WHOLESALE CENTRE #01-092</p>
-                        <p>SINGAPORE - 110016</p>
+                      <div className="p-1 text-center text-[12px]">
+                        {invoicePackingData.invoice_buyer}
+                        {invoicePackingData.invoice_buyer_add}
                       </div>
                     </div>
                   </div>
@@ -266,10 +283,8 @@ const PreshipmentDetails = () => {
                           Consignee
                         </h2>
                         <div className="p-1 text-center leading-tight">
-                          <p>KUO YEONG PTE LTD</p>
-                          <p>BLK 16 PASIR PANJANG</p>
-                          <p>WHOLESALE CENTRE #01-092</p>
-                          <p>SINGAPORE - 110016</p>
+                          {invoicePackingData.invoice_consignee}
+                          {invoicePackingData.invoice_consignee_add}
                         </div>
                       </div>
 
@@ -279,10 +294,8 @@ const PreshipmentDetails = () => {
                           Consignee Bank
                         </h2>
                         <div className="p-1 text-center leading-tight">
-                          <p>KUO YEONG PTE LTD</p>
-                          <p>BLK 16 PASIR PANJANG</p>
-                          <p>WHOLESALE CENTRE #01-092</p>
-                          <p>SINGAPORE - 110016</p>
+                          {invoicePackingData.invoice_consig_bank}
+                          {invoicePackingData.invoice_consig_bank_address}
                         </div>
                       </div>
                     </div>
@@ -292,42 +305,57 @@ const PreshipmentDetails = () => {
                 <div className="grid grid-cols-12 border-b border-black">
                   <div className="col-span-5 border-r border-black text-[12px]">
                     <h2 className="p-1 py-4">
-                      INDIAN GROUNDNUTS KERNEL HPS 80/90
+                      {invoicePackingData.invoice_product_cust_des}
                     </h2>
                   </div>
                 </div>
                 <div className="grid grid-cols-5 border-b border-black text-[12px]">
                   <div className="border-r border-black h-full p-1 text-center ">
-                    <p className="font-bold">Pre-carriage by:</p>
+                    <p className="font-bold">Pre-carriage by: </p>
                   </div>
                   <div className="px-2 p-1 h-full text-center border-r border-black ">
-                    <p className="font-bold">Pre-receipt at:</p>
+                    <p className="font-bold">Port of Loading:</p>
                   </div>
                   <div className="px-2 h-full border-r border-black p-1 text-center">
-                    <p className="font-bold">Pre-receipt at:</p>
+                    <p className="font-bold">Port of Discharge:</p>
                   </div>
                   <div className="px-2 h-full border-r border-black p-1 text-center">
-                    <p className="font-bold">Pre-receipt at:</p>
+                    <p className="font-bold">Final Destination:</p>
                   </div>
                   <div className="px-2 h-full  p-1 text-center">
-                    <p className="font-bold">Pre-receipt at:</p>
+                    <p className="font-bold">Country Destination:</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-5 border-b border-black text-[12px]">
                   <div className="border-r border-black px-2 h-full p-1 text-center">
-                    <p className="text-center font-bold"> BANGALORE</p>
+                    <p className="text-center font-bold">
+                      {" "}
+                      {invoicePackingData.invoice_precarriage}
+                    </p>
                   </div>
                   <div className="border-r border-black px-2 h-full p-1 text-center">
-                    <p className="text-center font-bold"> CHENNAI, INDIA</p>
+                    <p className="text-center font-bold">
+                      {" "}
+                      {invoicePackingData.invoice_loading},INDIA
+                    </p>
                   </div>
                   <div className="border-r border-black px-2 h-full p-1 text-center">
-                    <p className="text-center font-bold"> SINGAPORE</p>
+                    <p className="text-center font-bold">
+                      {" "}
+                      {invoicePackingData.invoice_discharge}
+                    </p>
                   </div>
                   <div className="border-r border-black px-2 h-full p-1 text-center">
-                    <p className="text-center font-bold"> SINGAPORE</p>
+                    <p className="text-center font-bold">
+                      {" "}
+                      {invoicePackingData.invoice_destination_port}
+                    </p>
                   </div>
                   <div className=" px-2 h-full p-1 text-center">
-                    <p className="text-center font-bold"> SINGAPORE</p>
+                    <p className="text-center font-bold">
+                      {" "}
+                      {invoicePackingData.invoice_destination_country}
+                    </p>
                   </div>
                 </div>
 
@@ -336,10 +364,10 @@ const PreshipmentDetails = () => {
                     <p>CIF USD</p>
                   </div>
                   <div className="px-2 p-1 h-full border-r border-black ">
-                    <p>SINGAPORE</p>
+                    <p> {invoicePackingData.invoice_cif}</p>
                   </div>
                   <div className="px-2 h-full p-1 col-span-3">
-                    <p>SINGAPORE</p>
+                    <p> {invoicePackingData.invoice_destination_country}</p>
                   </div>
                 </div>
 
@@ -363,7 +391,8 @@ const PreshipmentDetails = () => {
                           className="border-r border-black p-2 text-center text-[11px]"
                           style={{ width: "30%" }}
                         >
-                          DESCRIPTION OF EXPORT GOODS
+                          <p> DESCRIPTION OF EXPORT GOODS</p>{" "}
+                          {prouducthsn.product_hs}
                         </th>
                         <th
                           className="border-r border-black p-2 px-3 text-center text-[11px]"
@@ -387,26 +416,24 @@ const PreshipmentDetails = () => {
                     </thead>
 
                     <tbody>
-                      {/* {invoiceSubData.map((item, index) => ( */}
-                      <>
-                        <tr>
-                          <td className="border-r border-black p-2">
-                            {/* {item.invoiceSub_marking} <br /> */}
-                            INDIAN GROUNDNUTS 80/90 25 KGS
-                          </td>
-                          <td className="border-r border-black p-2">
-                            {/* <p className="text-center">
+                      {invoiceSubData.map((item, index) => (
+                        <>
+                          <tr>
+                            <td className="border-r border-black p-2">
+                              {item.invoiceSub_marking} <br />
+                            </td>
+                            <td className="border-r border-black p-2">
+                              <p className="text-center">
                                 {" "}
                                 {item.invoiceSub_item_bag}
                               </p>{" "}
                               <p className="text-center">
                                 {" "}
                                 {item.invoiceSub_sbaga}
-                              </p>{" "} */}
-                            800 JUTE $ 1,400.00 $ 28,000.00 BAGS
-                          </td>
-                          <td className="border-r border-black p-2">
-                            {/* {item.InvoiceSubs.item_hsn && (
+                              </p>{" "}
+                            </td>
+                            <td className="border-r border-black p-2">
+                              {item.InvoiceSubs.item_hsn && (
                                 <p>HSN : {item.InvoiceSubs.item_hsn}</p>
                               )}
                               {item.invoiceSub_item_name && (
@@ -422,40 +449,34 @@ const PreshipmentDetails = () => {
                                   PACKED {item.invoiceSub_packing} KGS NET IN
                                   EACH {item.invoiceSub_sbaga}
                                 </p>
-                              )} */}
-                            <p> INDIAN GROUNDNUTS 80/90</p>{" "}
-                            <p> (SOUTH NEW CROP JAVA GRADE)</p>{" "}
-                            <p> PACKED 25 KGS NET IN EACH JUTE BAGS</p>{" "}
-                          </td>
-                          <td className="border-r border-black p-2 text-center">
-                            {/* {item.invoiceSub_qntyInMt} */}
-                            20.000 MT
-                          </td>
-                          <td className="border-r border-black p-2 text-center">
-                            {/* {item.invoiceSub_rateMT} */}$ 1,400.00
-                          </td>
-                          <td className="p-2 text-right">
-                            $ 28,000.00
-                            {/* {(
+                              )}
+                            </td>
+                            <td className="border-r border-black p-2 text-center">
+                              {item.invoiceSub_qntyInMt}
+                            </td>
+                            <td className="border-r border-black p-2 text-center">
+                              {item.invoiceSub_rateMT}
+                            </td>
+                            <td className="p-2 text-right">
+                              $
+                              {(
                                 item.invoiceSub_qntyInMt *
                                 item.invoiceSub_rateMT
-                              ).toFixed(2)} */}
-                          </td>
-                        </tr>
-                      </>
-                      {/* ))} */}
+                              ).toFixed(2)}
+                            </td>
+                          </tr>
+                        </>
+                      ))}
 
                       <tr>
                         <td className="border-r border-black p-2">
                           <br />
                           <span className="font-bold block text-[11px]">
-                            {/* (IN {invoicePackingData.invoice_container_size}) */}
-                            (IN 1 x 20FT FCL)
+                            (IN {invoicePackingData.invoice_container_size})
                           </span>
                           <span className="font-bold text-[10px]">
-                            {/* ( {sumbag} BAGS IN{" "}
-                            {invoicePackingData.invoice_container_size}) */}
-                            (800 BAGS IN 1 x 20FT FCL)
+                            ( {sumbag} BAGS IN{" "}
+                            {invoicePackingData.invoice_container_size})
                           </span>
                         </td>
                         <td className="border-r border-black p-2"></td>
@@ -463,8 +484,8 @@ const PreshipmentDetails = () => {
                         <td className="border-r border-black p-2"></td>
                         <td className="border-r border-black p-2"></td>
                         <td className="border-t border-black p-2 text-right font-bold">
-                          $ 28,000.00
-                          {/* {invoiceSubData
+                          28,000.00
+                          {invoiceSubData
                             .reduce((total, item) => {
                               return (
                                 total +
@@ -472,7 +493,7 @@ const PreshipmentDetails = () => {
                                   item.invoiceSub_rateMT || 0)
                               );
                             }, 0)
-                            .toFixed(2)} */}
+                            .toFixed(2)}
                         </td>
                       </tr>
                     </tbody>
@@ -482,18 +503,15 @@ const PreshipmentDetails = () => {
                 <div className="text-[10px] ">
                   <p className="flex px-2">
                     AMOUNT CHARGEABLE IN WORDS -
-                    {/* <p className=" font-semibold ml-4">{totalInWords}</p> */}
-                  </p>
-                  <p className=" font-semibold ml-4">
-                    TWENTY EIGHT THOUSAND US DOLLARS AND NO CENTS.
+                    <p className=" font-semibold ml-4">{totalInWords}</p>
                   </p>
 
-                  {/* <p className="block font-semibold ml-4">
+                  <p className="block font-semibold ml-4">
                     {invoicePackingData.invoice_lut_code}
                   </p>
                   <p className="block font-semibold ml-4 ">
                     {invoicePackingData.invoice_gr_code}
-                  </p> */}
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-12 text-[12px]">

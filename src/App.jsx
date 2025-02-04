@@ -142,6 +142,7 @@ function App() {
           <Route path="/report/buyer-report" element={<Buyer />} />
           <Route path="/report/contract-form" element={<ContractForm />} />
           <Route path="/report/contract-report" element={<ContractReport />} />
+          
           {/* //payment */}
           <Route path="/payment-list" element={<PaymentList />} />
           <Route path="/payment-view" element={<PaymentView />} />
