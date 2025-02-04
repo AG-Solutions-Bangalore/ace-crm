@@ -154,7 +154,7 @@ const InvoiceSpiceBoard = () => {
       <div className="flex justify-center items-center h-full">
         <Button disabled>
           <Loader2 className=" h-4 w-4 animate-spin" />
-          Loading Invoice Data
+          Loading Spice Data
         </Button>
       </div>
     );
@@ -165,7 +165,7 @@ const InvoiceSpiceBoard = () => {
       <Card className="w-full max-w-md mx-auto mt-10">
         <CardHeader>
           <CardTitle className="text-destructive">
-            Error Fetching invoice Packing Data
+            Error Fetching Spice Data
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -388,7 +388,7 @@ const InvoiceSpiceBoard = () => {
               <td className="p-2 border-b border-r border-black text-left">
                 Name of the Vessel
               </td>
-              <td className="p-2 border-b border-black"></td>
+              <td className="p-2 border-b border-black">{spiceBoard?.invoice_vessel}</td>
             </tr>
             <tr>
               <td className="p-2 border-r border-b border-black text-center">
@@ -397,7 +397,7 @@ const InvoiceSpiceBoard = () => {
               <td className="p-2 border-b border-r border-black text-left">
                 Container No.
               </td>
-              <td className="p-2 border-b border-black"></td>
+              <td className="p-2 border-b border-black">{spiceBoard?.invoice_container}</td>
             </tr>
 
             <tr>
@@ -420,7 +420,7 @@ const InvoiceSpiceBoard = () => {
         <div className="mt-2 flex flex-row items-center justify-around">
           <div>
             <p className="text-sm">
-              PLACE : <strong>CHENNAI</strong>
+              PLACE : <strong>{spiceBoard?.invoice_loading}</strong>
             </p>
             <p className="text-sm">
               DATE :{" "}
