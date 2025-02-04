@@ -178,7 +178,7 @@ const InvoiceGst = () => {
           </div>
         </div>
         {/* table  */}
-        <div className="border-t text-[11px] border-black ">
+        <div className="border text-[11px] border-black h-[10rem]">
           <div className="">
             <div
               className="grid bg-white"
@@ -376,7 +376,7 @@ const InvoiceGst = () => {
           
           <div className=" w-[40%] grid grid-rows-2 ">
             <div className=" flex flex-col  gap-1">
-            <p className=" text-[13px] flex items-center justify-end gap-2">
+            <p className=" text-[13px] flex items-center justify-end gap-2 mt-1">
               <span >Total Invoice Amount before Tax</span>
               <span>:</span>
               <span className="w-14 text-end pr-1" >0.00</span>
