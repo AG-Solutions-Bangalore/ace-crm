@@ -976,7 +976,7 @@ const InvoiceView = () => {
                           <td className="border-r border-black p-2 text-center">
                             {item.invoiceSub_qntyInMt}
                           </td>
-                          {index === invoiceSubData.length - 2 && (
+                          {/* {index === invoiceSubData.length - 2 && (
                             <td className="p-2 text-left" colSpan={5}>
                               <p> TOTAL NET WEIGHT:</p>{" "}
                               <p className="ml-8">
@@ -1003,6 +1003,37 @@ const InvoiceView = () => {
                                 KGS
                               </p>
                             </td>
+                          )} */}
+                          {index === invoiceSubData.length - 1 && (
+                            <>
+                              <tr>
+                                <td className="p-2 text-left" colSpan={5}>
+                                  <p> TOTAL NET WEIGHT:</p>
+                                  <p className="ml-8">
+                                    {invoiceSubData.reduce(
+                                      (total, item) =>
+                                        total +
+                                        (item.invoiceSub_qntyInMt * 1000 || 0),
+                                      0
+                                    )}{" "}
+                                    KGS
+                                  </p>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td className="p-2 text-left" colSpan={5}>
+                                  <p> TOTAL GROSS WEIGHT:</p>
+                                  <p className="ml-8">
+                                    {invoiceSubData.reduce(
+                                      (total, item) =>
+                                        total + (item.invoiceSub_item_bag || 0),
+                                      0
+                                    )}{" "}
+                                    KGS
+                                  </p>
+                                </td>
+                              </tr>
+                            </>
                           )}
                         </tr>
                       ))}
