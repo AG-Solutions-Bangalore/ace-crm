@@ -1,13 +1,5 @@
 import React, { useContext, useEffect, useCallback, useState } from "react";
 import { ExternalLink, Search, Filter } from "lucide-react";
-
-import {
-  Input,
-  Menu,
-  MenuHandler,
-  MenuList,
-  MenuItem,
-} from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
 import { ContextPanel } from "@/lib/ContextPanel";
 import Page from "../dashboard/page";
@@ -21,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { ButtonConfig } from "@/config/ButtonConfig";
 
 const UserPage = () => {
+
   const { getStaticUsers } = useContext(ContextPanel);
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
@@ -159,7 +152,7 @@ const UserPage = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            {/* <Button
+            <Button
               onClick={() => navigate("/page-management")}
               className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             >
@@ -170,7 +163,7 @@ const UserPage = () => {
               className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             >
               + Button
-            </Button> */}
+            </Button>
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full">

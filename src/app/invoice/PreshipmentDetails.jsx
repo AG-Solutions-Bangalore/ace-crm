@@ -1,27 +1,28 @@
 import React, { useEffect, useRef, useState } from "react";
-import Page from "../dashboard/page";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Printer } from "lucide-react";
 import html2pdf from "html2pdf.js";
 import BASE_URL from "@/config/BaseUrl";
 import { useParams } from "react-router-dom";
-import { getTodayDate } from "@/utils/currentDate";
 import ReactToPrint from "react-to-print";
+import moment from "moment";
 const PreshipmentDetails = () => {
   const containerRef = useRef();
   const { id } = useParams();
-  const [contractData, setContractData] = useState(null);
+  const [invoicePackingData, setInvoicePackingData] = useState(null);
+  const [branchData, setBranchData] = useState({});
+  const [invoiceSubData, setInvoiceSubData] = useState([]);
+  const [prouducthsn, setProuductHsn] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [logoBase64, setLogoBase64] = useState("");
   const logoUrl = "/api/public/assets/images/letterHead/AceB.png";
   useEffect(() => {
     const fetchContractData = async () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${BASE_URL}/api/panel-fetch-contract-by-id/${id}`,
+          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -30,11 +31,14 @@ const PreshipmentDetails = () => {
         );
 
         if (!response.ok) {
-          throw new Error("Failed to fetch contract data");
+          throw new Error("Failed to fetch preshipmentData ");
         }
 
         const data = await response.json();
-        setContractData(data);
+        setInvoicePackingData(data.invoice);
+        setBranchData(data.branch);
+        setInvoiceSubData(data.invoiceSub);
+        setProuductHsn(data.producthsn);
         setLoading(false);
       } catch (error) {
         setError(error.message);
@@ -44,105 +48,29 @@ const PreshipmentDetails = () => {
 
     fetchContractData();
   }, [id]);
-  useEffect(() => {
-    const fetchAndConvertImage = async () => {
-      try {
-        const response = await fetch(logoUrl);
-        const blob = await response.blob();
-
-        // Create a FileReader to convert blob to base64  - because some packge dont take it with base64
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setLogoBase64(reader.result);
-        };
-        reader.readAsDataURL(blob);
-      } catch (error) {
-        console.error("Error fetching and converting image:", error);
-      }
-    };
-
-    fetchAndConvertImage();
-  }, []);
 
   const handleSaveAsPdf = () => {
-    if (!logoBase64) {
-      console.error("Logo not yet loaded");
-      return;
-    }
     const element = containerRef.current;
-
-    const images = element.getElementsByTagName("img");
-    let loadedImages = 0;
-
-    if (images.length === 0) {
-      generatePdf(element);
-      return;
-    }
-
-    Array.from(images).forEach((img) => {
-      if (img.complete) {
-        loadedImages++;
-        if (loadedImages === images.length) {
-          generatePdf(element);
-        }
-      } else {
-        img.onload = () => {
-          loadedImages++;
-          if (loadedImages === images.length) {
-            generatePdf(element);
-          }
-        };
-      }
-    });
+    generatePdf(element);
   };
 
   const generatePdf = (element) => {
-    if (!logoBase64) {
-      console.error("Logo not yet converted to base64");
-      return;
-    }
-
     const options = {
-      margin: [55, 0, 15, 0], // top , left , bottom , right
-      filename: "Sales_Contract.pdf",
+      margin: [5, 5, 5, 5],
+      filename: "Pre_Shipment.pdf",
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: {
         scale: 2,
         useCORS: true,
         windowHeight: element.scrollHeight,
+        scrollY: 0,
       },
       jsPDF: {
         unit: "mm",
         format: "a4",
         orientation: "portrait",
       },
-      pagebreak: { mode: "avoid-all" },
-      // its no use
-      header: {
-        height: "90mm",
-        contents: {
-          default: `
-             <div style="text-align: center; width: 100%; >
-               <img src="${logoBase64}" alt="logo" style="max-width: 100%; height: auto; margin: 0 auto;" />
-                <h1 style="text-align: center; font-size: 16px; text-decoration: underline; font-weight: bold; margin: 15px 0;">
-                PRESHIPMENT CHECKING
-
-              </h1>
-              <div style="display: flex; justify-content: space-between; margin: 10px 40px;">
-                <p>
-                  <span style="font-weight: 600; font-size: 15px;">Cont No.:</span>
-                  ${contractData?.contract?.contract_ref || ""}
-                </p>
-                <p>
-                  <span style="font-weight: 600; font-size: 15px;">DATE:</span>
-                  ${contractData?.contract?.contract_date || ""}
-                </p>
-              </div>
-             </div>
-          
-           `,
-        },
-      },
+      pagebreak: { mode: "avoid" },
     };
 
     html2pdf()
@@ -154,100 +82,42 @@ const PreshipmentDetails = () => {
         const totalPages = pdf.internal.getNumberOfPages();
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
-        for (let i = 1; i <= totalPages; i++) {
-          pdf.setPage(i);
 
-          // for logo
-          const imgData = logoBase64.split(",")[1];
-          pdf.addImage(imgData, "JPEG", 0, 10, pageWidth, 30);
-
-          // Add contract title
-          pdf.setFontSize(12);
-          pdf.setFont(undefined, "normal");
-          const title = "PRESHIPMENT CHECKING";
-          const titleWidth =
-            (pdf.getStringUnitWidth(title) * 16) / pdf.internal.scaleFactor;
-          pdf.text(title, (pageWidth - titleWidth) / 2, 45);
-
-          // Add contract details
-          pdf.setFontSize(9);
-          pdf.text(
-            `Cont No.: ${contractData?.contract?.contract_ref || ""}`,
-            4,
-            55
-          );
-          pdf.text(
-            `DATE: ${contractData?.contract?.contract_date || ""}`,
-            pageWidth - 31,
-            55
-          );
-          // Add page no at the Bottom
-
-          pdf.setFontSize(10);
-          pdf.setTextColor(0, 0, 0);
-          const text = `Page ${i} of ${totalPages}`;
-          const textWidth =
-            (pdf.getStringUnitWidth(text) * 10) / pdf.internal.scaleFactor;
-          const x = pageWidth - textWidth - 10;
-          const y = pageHeight - 10;
-          pdf.text(text, x, y);
-        }
+        console.log(`Element Height: ${element.scrollHeight}`);
+        console.log(`Page Width: ${pageWidth}, Page Height: ${pageHeight}`);
       })
       .save();
   };
 
   if (loading) {
     return (
-      <Page>
+      <div>
         <div className="flex justify-center items-center h-full">
           <Button disabled>
             <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading Invoice Data
+            Loading Pre_Shipment Data
           </Button>
         </div>
-      </Page>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Page>
+      <div>
         <Card className="w-full max-w-md mx-auto mt-10">
           <CardHeader>
             <CardTitle className="text-destructive">
-              Error Fetching invoice Data
+              Error Fetching Pre_Shipment Data
             </CardTitle>
           </CardHeader>
           <CardContent>
             <Button variant="outline">Try Again</Button>
           </CardContent>
         </Card>
-      </Page>
+      </div>
     );
   }
-
-  const PrintHeader = () => (
-    <div className="print-header">
-      <img
-        src="/api/public/assets/images/letterHead/AceB.png"
-        alt="logo"
-        className="w-full max-h-[120px] object-contain"
-      />
-      <h1 className="text-center text-[15px] underline font-bold mt-4">
-        PRESHIPMENT CHECKING
-      </h1>
-      <div className="p-4 flex items-center justify-between">
-        <p>
-          <span className="font-semibold text-[12px]">Cont No.:</span>
-          {contractData?.contract?.contract_ref}
-        </p>
-        <p>
-          <span className="font-semibold text-[12px]">DATE:</span>
-          {contractData?.contract?.contract_date}
-        </p>
-      </div>
-    </div>
-  );
 
   return (
     <div>
@@ -268,316 +138,397 @@ const PreshipmentDetails = () => {
           </Button>
         )}
         content={() => containerRef.current}
-        documentTitle={`contract-view`}
+        documentTitle={`Preshiment-view`}
         pageStyle={`
-                            @page {
-                                size: auto;
-                                margin: 0mm;
-                            }
-                            @media print {
-                                body {
-                                 border: 1px solid #000;
-                                    margin: 1mm;
-                                     padding: 1mm;
-                                     min-height:100vh
-                                }
-                                .print-hide {
-                                    display: none;
-                                }
-                            }
-                        `}
+          @page {
+              size: auto;
+              margin: 0mm;
+          }
+          @media print {
+              body {
+              //  border: 1px solid #000;
+                  margin: 2mm;
+                   padding: 2mm;
+                
+                   min-height:100vh
+              }
+               .page-break {
+            page-break-before: always;
+        }
+          
+          }
+      `}
       />
 
-      <div className="max-w-4xl mt-4 mx-auto    ">
-        <h1 className="text-center text-[15px] underline font-bold ">
-          PRESHIPMENT CHECKING
-        </h1>
-      </div>
       <div ref={containerRef} className="   min-h-screen font-normal ">
-        {contractData && (
+        <div className="max-w-4xl my-4 mx-auto">
+          <h1 className="text-center text-[15px]  font-bold ">
+            PRESHIPMENT CHECKING
+          </h1>
+        </div>
+        {invoicePackingData && (
           <>
-            <div className="max-w-4xl mx-auto    p-4">
-              <div className="my-3">
-                <div className="border border-black">
-                  <div className="grid grid-cols-2 border-b border-black">
-                    <div className="p-2 border-r border-black">
-                      <h1 className="font-bold text-lg">TRUSPICE EXIM</h1>
-                      <p>43/773, PENTHOUSE, PALARIVATTAM THAMMANAM ROAD,</p>
-                      <p>Kochi, Ernakulam, Kerala, 682025 INDIA</p>
-                    </div>
-                    <div className="p-2">
-                      <div className="flex justify-between">
-                        <span>Inv. No. &amp; dt. :</span>
-                        <span>TSE2024251049</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Date:</span>
-                        <span>17-10-2024</span>
-                      </div>
-                    </div>
+            <div className="max-w-4xl mx-auto text-[12px]">
+              <div className="border border-black max-w-4xl mx-auto text-sm">
+                <div className="grid grid-cols-12 border-b border-black text-[12px]">
+                  <div className="col-span-5 border-r border-black p-1 font-bold">
+                    <p>ACE EXPORTS</p>
                   </div>
-                  <div className="grid grid-cols-4 border-b border-black">
-                    <div className="p-2 border-r border-black">
-                      <p>ORDER TYPE:</p>
-                      <p>TSE/PDEI/2024-25/1049 Dt.: 17-10-2024</p>
+                  <div className="col-span-7 grid grid-cols-4">
+                    <div className="col-span-1 border-r border-black p-1 flex items-center">
+                      Inv. No. & Dt:
                     </div>
-                    <div className="p-2 border-r border-black">
-                      <p>State Code</p>
-                      <p>32</p>
+                    <div className="col-span-2  border-r border-black p-1 flex items-center font-bold">
+                      {invoicePackingData.invoice_ref}
                     </div>
-                    <div className="p-2 border-r border-black">
-                      <p>IEC Code</p>
-                      <p>AAUFT1081E</p>
-                    </div>
-                    <div className="p-2">
-                      <p>GSTIN</p>
-                      <p>32AAUFT1081E1Z7</p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-3 border-b border-black">
-                    <div className="p-2 border-r border-black">
-                      <p className="font-bold">Buyer</p>
-                      <p>PT. DHANUSH EXPORT INTERNATIONAL</p>
-                      <p>JL. BUKIT GADING RAYA KOMP, BUKIT GADING</p>
-                      <p>INDAH BLOK I/15, KEL. KELAPA GADING</p>
-                      <p>BARAT,KEC. KELAPA GADING KOTA JAKARTA</p>
-                      <p>UTARA INDONESIA NPWP: 001.870.101.1-059.000</p>
-                    </div>
-                    <div className="p-2 border-r border-black">
-                      <p className="font-bold">Consignee</p>
-                      <p>PT. DHANUSH EXPORT INTERNATIONAL</p>
-                      <p>JL. BUKIT GADING RAYA KOMP, BUKIT GADING</p>
-                      <p>INDAH BLOK I/15, KEL. KELAPA GADING</p>
-                      <p>BARAT,KEC. KELAPA GADING KOTA JAKARTA</p>
-                      <p>UTARA INDONESIA NPWP: 001.870.101.1-059.000</p>
-                    </div>
-                    <div className="p-2">
-                      <p className="font-bold">Consignee Bank</p>
-                      <p>PT. DHANUSH EXPORT INTERNATIONAL</p>
-                      <p>JL. BUKIT GADING RAYA KOMP, BUKIT GADING</p>
-                      <p>INDAH BLOK I/15, KEL. KELAPA GADING</p>
-                      <p>BARAT,KEC. KELAPA GADING KOTA JAKARTA</p>
-                      <p>UTARA INDONESIA NPWP: 001.870.101.1-059.000</p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 border-b border-black">
-                    <div className="p-2 border-r border-black">
-                      <p>CHILLI POWDER</p>
-                    </div>
-                    <div className="p-2">
-                      <p>Notify Party</p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-5">
-                    <div className="p-2 border-r border-black">
-                      <p>Pre-receipt at</p>
-                      <p>GUNTUR</p>
-                    </div>
-                    <div className="p-2 border-r border-black">
-                      <p>Port of Loading</p>
-                      <p>CHENNAI, INDIA</p>
-                    </div>
-                    <div className="p-2 border-r border-black">
-                      <p>Port of Discharge</p>
-                      <p>TANJUNG PRIOK</p>
-                    </div>
-                    <div className="p-2 border-r border-black">
-                      <p>Final Destination</p>
-                      <p>TANJUNG PRIOK</p>
-                    </div>
-                    <div className="p-2">
-                      <p>Country Destination</p>
-                      <p>INDONESIA</p>
+
+                    <div className="col-span-1 p-1 flex items-center">
+                      {moment(invoicePackingData.invoice_date).format(
+                        "DD-MM-YYY"
+                      )}
                     </div>
                   </div>
                 </div>
-              </div>
+                <div className="grid grid-cols-12 border-b border-black text-[12px]">
+                  <div className="col-span-5 border-r border-black p-2 leading-tight">
+                    {invoicePackingData.branch_address}
+                  </div>
+                  <div className="col-span-7 text-[12px]">
+                    <div className="grid grid-cols-4   border-b border-black">
+                      <div className="col-span-1 border-r  border-black p-1">
+                        ORDER TYPE:
+                      </div>
+                      <div className="col-span-3 p-1 border-black flex items-center font-bold">
+                        {invoicePackingData.contract_ref} Dt:
+                        <span className="ml-2">
+                          {" "}
+                          {moment(invoicePackingData.contract_date).format(
+                            "DD-MM-YYY"
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-5 gap-2 border-b border-black">
+                      <div className=" border-r  border-black p-1 text-center">
+                        State Code
+                      </div>
+                      <div className="border-r border-black p-1 text-center">
+                        IEC Code
+                      </div>
+                      <div className="border-r border-black p-1 col-span-2 text-center">
+                        GSTIN
+                      </div>
+                      <div className=" p-1 text-center">HSN Code</div>
+                    </div>
+                    <div className="grid grid-cols-5 gap-2">
+                      <div className="border-r border-black p-1 text-center">
+                        {branchData.branch_state_no}
+                      </div>
+                      <div className="border-r border-black p-1 text-center">
+                        {branchData.branch_iec}
+                      </div>
+                      <div className="border-r border-black p-1 col-span-2 text-center">
+                        {branchData.branch_gst}
+                      </div>
+                      <div className=" p-1 text-center">
+                        {prouducthsn.product_hsn}
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full bg-white border border-gray-300 text-[12px] table-fixed">
-                  <tbody className="divide-y divide-gray-200">
-                    {contractData.contractSub.map((sub) => (
-                      <tr key={sub.id}>
-                        <td className="border w-[30%] text-[12px] border-black p-2 text-sm text-gray-900 break-words">
-                          {sub.contractSub_marking}
+                <div className="grid grid-cols-12 border-b border-black">
+                  {/* Buyer Section */}
+                  <div className="col-span-5 border-r border-black text-[12px]">
+                    <h2 className="font-bold text-center border-b border-black p-1">
+                      Buyer
+                    </h2>
+                    <div className="grid grid-cols-2 leading-tight">
+                      <div className="p-1 border-r border-black flex items-center justify-center h-full">
+                        <h2 className="text-center">EC</h2>
+                      </div>
+
+                      <div className="p-1 text-center">
+                        <p>KUO YEONG PTE LTD</p>
+                        <p>BLK 16 PASIR PANJANG</p>
+                        <p>WHOLESALE CENTRE #01-092</p>
+                        <p>SINGAPORE - 110016</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Consignee and Consignee Bank Section */}
+                  <div className="col-span-7 text-[12px]">
+                    <div className="grid grid-cols-2 h-full">
+                      {/* Consignee */}
+                      <div className="border-r border-black">
+                        <h2 className="font-bold border-b border-black p-1 text-center">
+                          Consignee
+                        </h2>
+                        <div className="p-1 text-center leading-tight">
+                          <p>KUO YEONG PTE LTD</p>
+                          <p>BLK 16 PASIR PANJANG</p>
+                          <p>WHOLESALE CENTRE #01-092</p>
+                          <p>SINGAPORE - 110016</p>
+                        </div>
+                      </div>
+
+                      {/* Consignee Bank */}
+                      <div>
+                        <h2 className="font-bold border-b border-black p-1 text-center">
+                          Consignee Bank
+                        </h2>
+                        <div className="p-1 text-center leading-tight">
+                          <p>KUO YEONG PTE LTD</p>
+                          <p>BLK 16 PASIR PANJANG</p>
+                          <p>WHOLESALE CENTRE #01-092</p>
+                          <p>SINGAPORE - 110016</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-12 border-b border-black">
+                  <div className="col-span-5 border-r border-black text-[12px]">
+                    <h2 className="p-1 py-4">
+                      INDIAN GROUNDNUTS KERNEL HPS 80/90
+                    </h2>
+                  </div>
+                </div>
+                <div className="grid grid-cols-5 border-b border-black text-[12px]">
+                  <div className="border-r border-black h-full p-1 text-center ">
+                    <p className="font-bold">Pre-carriage by:</p>
+                  </div>
+                  <div className="px-2 p-1 h-full text-center border-r border-black ">
+                    <p className="font-bold">Pre-receipt at:</p>
+                  </div>
+                  <div className="px-2 h-full border-r border-black p-1 text-center">
+                    <p className="font-bold">Pre-receipt at:</p>
+                  </div>
+                  <div className="px-2 h-full border-r border-black p-1 text-center">
+                    <p className="font-bold">Pre-receipt at:</p>
+                  </div>
+                  <div className="px-2 h-full  p-1 text-center">
+                    <p className="font-bold">Pre-receipt at:</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-5 border-b border-black text-[12px]">
+                  <div className="border-r border-black px-2 h-full p-1 text-center">
+                    <p className="text-center font-bold"> BANGALORE</p>
+                  </div>
+                  <div className="border-r border-black px-2 h-full p-1 text-center">
+                    <p className="text-center font-bold"> CHENNAI, INDIA</p>
+                  </div>
+                  <div className="border-r border-black px-2 h-full p-1 text-center">
+                    <p className="text-center font-bold"> SINGAPORE</p>
+                  </div>
+                  <div className="border-r border-black px-2 h-full p-1 text-center">
+                    <p className="text-center font-bold"> SINGAPORE</p>
+                  </div>
+                  <div className=" px-2 h-full p-1 text-center">
+                    <p className="text-center font-bold"> SINGAPORE</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-5 border-b border-black text-[12px]">
+                  <div className="border-r border-black h-full p-1 text-center ">
+                    <p>CIF USD</p>
+                  </div>
+                  <div className="px-2 p-1 h-full border-r border-black ">
+                    <p>SINGAPORE</p>
+                  </div>
+                  <div className="px-2 h-full p-1 col-span-3">
+                    <p>SINGAPORE</p>
+                  </div>
+                </div>
+
+                <div className="text-[12px]">
+                  <table className="w-full border-collapse table-auto border-b border-black leading-[13px]">
+                    <thead>
+                      <tr className="border-b border-black">
+                        <th
+                          className="border-r border-black p-2 text-center text-[11px]"
+                          style={{ width: "20%" }}
+                        >
+                          Marks & Nos./ Container No.
+                        </th>
+                        <th
+                          className="border-r border-black p-2 text-center text-[11px]"
+                          style={{ width: "12%" }}
+                        >
+                          No. / KIND OF
+                        </th>
+                        <th
+                          className="border-r border-black p-2 text-center text-[11px]"
+                          style={{ width: "30%" }}
+                        >
+                          DESCRIPTION OF EXPORT GOODS
+                        </th>
+                        <th
+                          className="border-r border-black p-2 px-3 text-center text-[11px]"
+                          style={{ width: "10%" }}
+                        >
+                          QUANTITY IN MT
+                        </th>
+                        <th
+                          className="border-r border-black p-2 text-center text-[11px]"
+                          style={{ width: "10%" }}
+                        >
+                          RATE PER MT IN USD
+                        </th>
+                        <th
+                          className="p-2 text-center text-[11px]"
+                          style={{ width: "13%" }}
+                        >
+                          AMOUNT (USD)
+                        </th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {/* {invoiceSubData.map((item, index) => ( */}
+                      <>
+                        <tr>
+                          <td className="border-r border-black p-2">
+                            {/* {item.invoiceSub_marking} <br /> */}
+                            INDIAN GROUNDNUTS 80/90 25 KGS
+                          </td>
+                          <td className="border-r border-black p-2">
+                            {/* <p className="text-center">
+                                {" "}
+                                {item.invoiceSub_item_bag}
+                              </p>{" "}
+                              <p className="text-center">
+                                {" "}
+                                {item.invoiceSub_sbaga}
+                              </p>{" "} */}
+                            800 JUTE $ 1,400.00 $ 28,000.00 BAGS
+                          </td>
+                          <td className="border-r border-black p-2">
+                            {/* {item.InvoiceSubs.item_hsn && (
+                                <p>HSN : {item.InvoiceSubs.item_hsn}</p>
+                              )}
+                              {item.invoiceSub_item_name && (
+                                <p>{item.invoiceSub_item_name}</p>
+                              )}
+
+                              {item.invoiceSub_descriptionofGoods && (
+                                <p>{item.invoiceSub_descriptionofGoods}</p>
+                              )}
+                              {(item.invoiceSub_packing ||
+                                item.invoiceSub_sbaga) && (
+                                <p>
+                                  PACKED {item.invoiceSub_packing} KGS NET IN
+                                  EACH {item.invoiceSub_sbaga}
+                                </p>
+                              )} */}
+                            <p> INDIAN GROUNDNUTS 80/90</p>{" "}
+                            <p> (SOUTH NEW CROP JAVA GRADE)</p>{" "}
+                            <p> PACKED 25 KGS NET IN EACH JUTE BAGS</p>{" "}
+                          </td>
+                          <td className="border-r border-black p-2 text-center">
+                            {/* {item.invoiceSub_qntyInMt} */}
+                            20.000 MT
+                          </td>
+                          <td className="border-r border-black p-2 text-center">
+                            {/* {item.invoiceSub_rateMT} */}$ 1,400.00
+                          </td>
+                          <td className="p-2 text-right">
+                            $ 28,000.00
+                            {/* {(
+                                item.invoiceSub_qntyInMt *
+                                item.invoiceSub_rateMT
+                              ).toFixed(2)} */}
+                          </td>
+                        </tr>
+                      </>
+                      {/* ))} */}
+
+                      <tr>
+                        <td className="border-r border-black p-2">
+                          <br />
+                          <span className="font-bold block text-[11px]">
+                            {/* (IN {invoicePackingData.invoice_container_size}) */}
+                            (IN 1 x 20FT FCL)
+                          </span>
+                          <span className="font-bold text-[10px]">
+                            {/* ( {sumbag} BAGS IN{" "}
+                            {invoicePackingData.invoice_container_size}) */}
+                            (800 BAGS IN 1 x 20FT FCL)
+                          </span>
                         </td>
-                        <td className="border w-[30%] text-[12px] border-black p-2 text-sm text-gray-900 break-words">
-                          {sub.contractSub_descriptionofGoods}
-                        </td>
-                        <td className="border w-[20%] text-[12px] border-black p-2 text-sm text-gray-900 break-words">
-                          {sub.contractSub_packing} KG NET IN{" "}
-                          {sub.contractSub_bagsize} {sub.contractSub_sbaga}
-                        </td>
-                        <td className="border w-[10%] text-[12px] border-black p-2 text-sm text-gray-900 break-words">
-                          {sub.contractSub_qntyInMt} MTS
-                        </td>
-                        <td className="border w-[10%] text-[12px] border-black p-2 text-sm text-gray-900 break-words">
-                          {sub.contractSub_rateMT} USD/MTS
+                        <td className="border-r border-black p-2"></td>
+                        <td className="border-r border-black p-2"></td>
+                        <td className="border-r border-black p-2"></td>
+                        <td className="border-r border-black p-2"></td>
+                        <td className="border-t border-black p-2 text-right font-bold">
+                          $ 28,000.00
+                          {/* {invoiceSubData
+                            .reduce((total, item) => {
+                              return (
+                                total +
+                                (item.invoiceSub_qntyInMt *
+                                  item.invoiceSub_rateMT || 0)
+                              );
+                            }, 0)
+                            .toFixed(2)} */}
                         </td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="text-[12px] mt-4 ml-[2%] w-[98%] flex flex-col items-start ">
-                {/* Container */}
-                <div className="flex items-center gap-4 w-full">
-                  <span className="w-1/4 text-left">Container</span>
-                  <span className="w-1 text-center">:</span>
-                  <p className="w-3/4">
-                    {contractData?.contract?.contract_container_size}
-                  </p>
+                    </tbody>
+                  </table>
                 </div>
 
-                {/* Specification */}
-                <div className="flex items-center gap-4 w-full">
-                  <span className="w-1/4 text-left">
-                    Specification (If Any)
-                  </span>
-                  <span className="w-1 text-center">:</span>
-                  <p className="w-3/4">
-                    {contractData?.contract.contract_specification1}
+                <div className="text-[10px] ">
+                  <p className="flex px-2">
+                    AMOUNT CHARGEABLE IN WORDS -
+                    {/* <p className=" font-semibold ml-4">{totalInWords}</p> */}
                   </p>
+                  <p className=" font-semibold ml-4">
+                    TWENTY EIGHT THOUSAND US DOLLARS AND NO CENTS.
+                  </p>
+
+                  {/* <p className="block font-semibold ml-4">
+                    {invoicePackingData.invoice_lut_code}
+                  </p>
+                  <p className="block font-semibold ml-4 ">
+                    {invoicePackingData.invoice_gr_code}
+                  </p> */}
                 </div>
-                {contractData?.contract?.contract_specification2 && (
-                  <div className="flex items-center gap-4 w-full">
-                    <span className="w-1/4 text-left"></span>
-                    <span className="w-1 text-center">:</span>
-                    <p className="w-3/4">
-                      {contractData?.contract.contract_specification2}
-                    </p>
+
+                <div className="grid grid-cols-12 text-[12px]">
+                  <div className="col-span-5 p-2">
+                    {" "}
+                    <p className="flex px-2">
+                      TOTAL NET WEIGHT :
+                      <p className=" font-semibold ml-4">20,000.00 KGS</p>
+                    </p>{" "}
                   </div>
-                )}
 
-                {/* Terms of Payment */}
-                <div className="flex items-center gap-4 w-full">
-                  <span className="w-1/4 text-left">TERMS OF PAYMENT</span>
-                  <span className="w-1 text-center">:</span>
-                  <p className="w-3/4">
-                    {contractData?.contract?.contract_payment_terms}
-                  </p>
-                </div>
-
-                {/* Shipper's Bank -- if ship_date is not avaiilbe than show remove - */}
-                <div className="flex items-center gap-4 w-full">
-                  <span className="w-1/4 text-left">SHIPPER'S BANK</span>
-                  <span className="w-1 text-center">:</span>
-                  <p className="w-3/4">
-                    {contractData?.contract?.contract_ship_date}
-                    {contractData?.contract?.contract_ship_date && " - "}
-
-                    {contractData?.contract?.contract_shipment}
-                  </p>
-                </div>
-              </div>
-
-              {/* <div className=" pt-4 mb-6">
-                <h2 className="font-bold">
-                  CONSIGNEE:{contractData?.contract?.contract_consignee}
-                </h2>
-                <div className="ml-4">
-                  {contractData?.contract?.contract_consignee_add
-                    ?.split(/(.{32})/)
-                    .filter(Boolean)
-                    .map((line, index) => (
-                      <p key={index}>{line}</p>
-                    ))}
-            
-                </div>
-              </div> */}
-              <div className="text-[12px] mt-4 ml-[2%] w-[98%] flex flex-col items-start ">
-                {/* Shipment */}
-                <div className="flex items-center gap-4 w-full">
-                  <span className="w-1/4 text-left">Shipment</span>
-                  <span className="w-1 text-center">:</span>
-                  <p className="w-3/4">
-                    ON OR BEFORE - {contractData?.contract?.contract_ship_date}
-                  </p>
-                </div>
-
-                {/* Part of Loading */}
-                <div className="flex items-center gap-4 w-full">
-                  <span className="w-1/4 text-left">Port of Loading</span>
-                  <span className="w-1 text-center">:</span>
-                  <p className="w-3/4">
-                    {contractData?.contract?.contract_loading}, INDIA
-                  </p>
-                </div>
-
-                {/* Port of Discharge */}
-                <div className="flex items-center gap-4 w-full">
-                  <span className="w-1/4 text-left">Port of Discharge</span>
-                  <span className="w-1 text-center">:</span>
-                  <p className="w-3/4">
-                    {contractData?.contract?.contract_discharge},{" "}
-                    {contractData?.contract?.contract_destination_country}
-                  </p>
-                </div>
-              </div>
-
-              <div className="border-b w-fit text-[12px] ml-[2%]   font-semibold border-black pt-4 mb-4">
-                <p>In Case of Shipment via Direct Vessel by Hyundai Liners:</p>
-              </div>
-
-              <div className="text-[12px] mt-4 ml-[2%] w-[98%] flex flex-col items-start ">
-                {/* Port Of loading */}
-                <div className="flex items-center gap-4 w-full">
-                  <span className="w-1/4 text-left">Port of Loading</span>
-                  <span className="w-1 text-center">:</span>
-                  <p className="w-3/4">
-                    {contractData?.contract?.contract_loading}, INDIA
-                  </p>
-                </div>
-                {/* Port of Discharge */}
-                <div className="flex items-center gap-4 w-full">
-                  <span className="w-1/4 text-left">Port of Discharge</span>
-                  <span className="w-1 text-center">:</span>
-                  <p className="w-3/4">
-                    {contractData?.contract?.contract_discharge},{" "}
-                    {contractData?.contract?.contract_destination_country}
-                  </p>
-                </div>
-
-                {/* Special Remarks */}
-                <div className="flex items-center gap-4 w-full">
-                  <span className="w-1/4 text-left">Special Remarks</span>
-                  <span className="w-1 text-center">:</span>
-                  <p className="w-3/4">
-                    {contractData?.contract?.contract_remarks}
-                  </p>
-                </div>
-
-                {/* Documents */}
-                {/* <div className="flex items-center gap-4 w-full">
-                  <span className="w-1/4 text-left">Documents</span>
-                  <span className="w-1 text-center">:</span>
-                  <p className="w-3/4">Lorem ipsum</p>
-                </div> */}
-              </div>
-
-              <div className="border-b w-fit mt-5 text-[12px] ml-[2%]   font-semibold border-black pt-4 mb-1">
-                <p>Kindly Mail your Purchase Order at the earliest.</p>
-              </div>
-
-              <div className="text-[12px] ml-[2%]  w-[98%] pt-4">
-                <p>Thanks & regards,</p>
-                <div className="flex items-center justify-between">
-                  <p>For {contractData?.contract?.branch_name} (Seller)</p>
-                  <p className=" mr-[22%]">(Buyer)</p>
-                </div>
-              </div>
-              <div className="text-[12px] ml-[2%]  w-[98%] pt-4">
-                <div className="flex justify-between mt-10">
-                  <div className=" flex flex-col border-t-2 w-[18rem]  border-black items-center">
-                    <p>{contractData?.branch?.branch_sign_name}</p>
-                    <p>HP : {contractData?.branch?.branch_sign_no}</p>
+                  <div className="col-span-5  p-2">
+                    <p className="flex px-2">
+                      TOTAL GROSS WEIGHT :
+                      <p className=" font-semibold ml-4"> 20,160.00 KGS</p>
+                    </p>{" "}
                   </div>
-                  <div className=" mr-[7%] flex flex-col border-t-2 w-[18rem]  border-black items-center">
-                    <p>Accepted with Co Seal </p>
-                    <p>{getTodayDate()}</p>
-                  </div>
+                  <div className="col-span-2"></div>
+                </div>
+
+                <div className="text-[12px] p-2 border-b border-black">
+                  <h2 className="font-bold">
+                    SUPPLY MEANT FOR EXPORT ON PAYMENT OF IGST 5%
+                  </h2>
+                  <h2 className="font-bold">
+                    SHIPMENT UNDER DUTY DRAWBACK TARRIF ITEM S.NO.12, CHAPTER
+                    12, COLUMN A @ 0.15% - GROUNDNUTS.
+                  </h2>
+                </div>
+                <div className="text-[12px] p-2">
+                  <h2>Remark:</h2>
+                  <h2 className="flex justify-end p-6">Checked By</h2>
                 </div>
               </div>
+              <div className="page-break"></div>
             </div>
           </>
         )}

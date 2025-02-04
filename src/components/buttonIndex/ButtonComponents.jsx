@@ -858,7 +858,23 @@ export const BuyerRDownload = ({ onClick, className }) => {
   );
 };
 BuyerRDownload.page = "BuyerR";
+//PAYMENT
+////////Payment
+export const PaymentCreate = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "PaymentCreate", staticPermissions)) {
+    return null;
+  }
 
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      <SquarePlus className="h-4 w-4" /> Payment
+    </Button>
+  );
+};
+PaymentCreate.page = "Payment";
 export default {
   InvoiceCreate,
   InvoiceEdit,
@@ -912,4 +928,5 @@ export default {
   PreRecepitsCreate,
   PreRecepitsEdit,
   BuyerRDownload,
+  PaymentCreate,
 };

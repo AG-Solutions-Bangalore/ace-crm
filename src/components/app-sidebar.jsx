@@ -1,11 +1,13 @@
 import * as React from "react";
 import {
   AudioWaveform,
+  BadgeIndianRupee,
   BookOpen,
   Bot,
   Command,
   Frame,
   GalleryVerticalEnd,
+  IndianRupee,
   Map,
   PieChart,
   Settings,
@@ -65,10 +67,6 @@ export function AppSidebar({ ...props }) {
         isActive: true,
         icon: Settings2,
         items: [
-          // {
-          //   title: "Branch",
-          //   url: "/branch",
-          // },
           {
             title: "Branch",
             url: "/master/branch",
@@ -179,6 +177,17 @@ export function AppSidebar({ ...props }) {
         url: "/home",
         icon: Frame,
       },
+
+      {
+        name: "Contract",
+        url: "/contract",
+        icon: Map,
+      },
+      {
+        name: "Invoice",
+        url: "/invoice",
+        icon: Map,
+      },
       {
         name: "UserPage",
         url: "/userManagement",
@@ -190,14 +199,9 @@ export function AppSidebar({ ...props }) {
         icon: Settings,
       },
       {
-        name: "Contract",
-        url: "/contract",
-        icon: Map,
-      },
-      {
-        name: "Invoice",
-        url: "/invoice",
-        icon: Map,
+        name: "Payment",
+        url: "/payment-list",
+        icon: BadgeIndianRupee,
       },
     ],
   };

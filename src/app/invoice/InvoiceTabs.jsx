@@ -15,7 +15,7 @@ const InvoiceTabs = () => {
               value="pending"
               className="px-4 py-2 text-sm font-medium transition duration-300 rounded-md data-[state=active]:bg-yellow-500 data-[state=active]:text-white data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200 mr-3"
             >
-              Pending
+              Pre_Shipment
             </TabsTrigger>
             <TabsTrigger
               value="invoice_packing"

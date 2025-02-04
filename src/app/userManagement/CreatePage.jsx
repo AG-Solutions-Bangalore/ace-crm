@@ -9,6 +9,7 @@ import BASE_URL from "@/config/BaseUrl";
 import Page from "../dashboard/page";
 import { Button } from "@/components/ui/button";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { useToast } from "@/hooks/use-toast";
 
 const CreatePage = () => {
   const [selectedPage, setSelectedPage] = useState("");
@@ -20,13 +21,7 @@ const CreatePage = () => {
   const navigate = useNavigate();
   const { fetchPagePermission } = useContext(ContextPanel);
 
-
-
-
-
-
-
-
+  const { toast } = useToast();
 
   const flattenMenuItems = (items) => {
     let flattened = [];
@@ -44,9 +39,6 @@ const CreatePage = () => {
     return flattened;
   };
 
-
-
-  
   useEffect(() => {
     const existingControls = JSON.parse(
       localStorage.getItem("pageControl") || "[]"
@@ -120,9 +112,18 @@ const CreatePage = () => {
 
       return response.json();
     },
+    // onSuccess: async () => {
+    //   await fetchPagePermission();
+    //   toast.success("Page control created successfully!");
+    //   navigate("/userManagement");
+    // },
+
     onSuccess: async () => {
       await fetchPagePermission();
-      toast.success("Page control created successfully!");
+      toast({
+        title: "Success",
+        description: "Page control created successfully!",
+      });
       navigate("/userManagement");
     },
     onError: (error) => {
