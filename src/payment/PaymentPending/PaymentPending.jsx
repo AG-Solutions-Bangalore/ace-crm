@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Page from "../../app/dashboard/page";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -10,7 +10,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, Loader2, Search } from "lucide-react";
+import { ArrowUpDown, ChevronDown, Eye, Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -27,14 +27,35 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import BASE_URL from "@/config/BaseUrl";
-
 import moment from "moment";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const PaymentPending = () => {
+  // State for table management
+  const [sorting, setSorting] = useState([]);
+  const [columnFilters, setColumnFilters] = useState([]);
+  const [columnVisibility, setColumnVisibility] = useState({});
+  const [rowSelection, setRowSelection] = useState({});
+  const [viewData, setViewData] = useState([]);
+  const [selectedId, setSelectedId] = useState(null);
   const {
     data: paymentpending,
     isLoading,
@@ -53,29 +74,36 @@ const PaymentPending = () => {
       return response.data.invoicePaymentAmount;
     },
   });
+  useEffect(() => {
+    const fetchContractData = async (selectedId) => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `${BASE_URL}/api/panel-fetch-invoice-payment-by-invoiceno/${selectedId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-  // State for table management
-  const [sorting, setSorting] = useState([]);
-  const [columnFilters, setColumnFilters] = useState([]);
-  const [columnVisibility, setColumnVisibility] = useState({});
-  const [rowSelection, setRowSelection] = useState({});
+        if (!response.ok) {
+          throw new Error("Failed to fetch contract data");
+        }
 
-  // Define columns for the table
+        const data = await response.json();
+        setViewData(data.paymentSubView);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (selectedId) {
+      fetchContractData(selectedId);
+    }
+  }, [selectedId]);
+  console.log(viewData);
   const columns = [
-    {
-      accessorKey: "invoice_bl_date",
-      header: "Date",
-      cell: ({ row }) => {
-        const date = row.getValue("invoice_bl_date");
-        return moment(date).format("DDD-MMM-YYYY");
-      },
-    },
-    {
-      accessorKey: "invoice_ref",
-      header: "Invoice Ref",
-      cell: ({ row }) => <div>{row.getValue("invoice_ref")}</div>,
-    },
-
     {
       accessorKey: "invoice_no",
       header: ({ column }) => (
@@ -83,26 +111,34 @@ const PaymentPending = () => {
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Invoice No
+          Invoice
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
       cell: ({ row }) => <div>{row.getValue("invoice_no")}</div>,
     },
     {
-      accessorKey: "invoice_i_value_usd",
-      header: "Invoice USD",
-      cell: ({ row }) => <div>{row.getValue("invoice_i_value_usd")}</div>,
+      accessorKey: "invoice_bl_date",
+      header: "BL Date",
+      cell: ({ row }) => {
+        const date = row.getValue("invoice_bl_date");
+        return moment(date).format("DD-MMM-YYYY");
+      },
     },
     {
       accessorKey: "invoice_buyer",
-      header: "Invoice Buyer",
+      header: "Buyer",
       cell: ({ row }) => <div>{row.getValue("invoice_buyer")}</div>,
     },
     {
       accessorKey: "sum_qnty",
-      header: "Sum Qnty",
+      header: "Qnty",
       cell: ({ row }) => <div>{row.getValue("sum_qnty")}</div>,
+    },
+    {
+      accessorKey: "invoice_i_value_usd",
+      header: "Inv USD",
+      cell: ({ row }) => <div>{row.getValue("invoice_i_value_usd")}</div>,
     },
     {
       accessorKey: "received",
@@ -114,9 +150,35 @@ const PaymentPending = () => {
       header: "Balance",
       cell: ({ row }) => <div>{row.getValue("balance")}</div>,
     },
+    {
+      id: "actions",
+      header: "Action",
+      cell: ({ row }) => {
+        const invoiceId = row.original.id;
+
+        return (
+          <div className="flex flex-row">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Eye
+                    className="h-4 w-4 cursor-pointer"
+                    onClick={() => {
+                      const id = row.original.invoice_no;
+                      setViewData(null);
+                      setSelectedId(id);
+                    }}
+                  />
+                </TooltipTrigger>
+                <TooltipContent>View Payment</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        );
+      },
+    },
   ];
 
-  // Create the table instance
   const table = useReactTable({
     data: paymentpending || [],
     columns,
@@ -174,22 +236,15 @@ const PaymentPending = () => {
       </Page>
     );
   }
+
   return (
     <Page>
       <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
           Payment Pending List
         </div>
-        {/* searching and column filter  */}
+        {/* Searching and column filter  */}
         <div className="flex items-center py-4">
-          {/* <Input
-          placeholder="Search..."
-          value={table.getState().globalFilter || ""}
-          onChange={(event) => {
-            table.setGlobalFilter(event.target.value);
-          }}
-          className="max-w-sm"
-        /> */}
           <div className="relative w-72">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
             <Input
@@ -225,15 +280,9 @@ const PaymentPending = () => {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-
-          {/* <div>
-            <PaymentCreate
-              className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-              onClick={() => navigate("/payment-create")}
-            ></PaymentCreate>
-          </div> */}
         </div>
-        {/* table  */}
+
+        {/* Table  */}
         <div className="rounded-md border">
           <Table>
             <TableHeader>
@@ -287,7 +336,8 @@ const PaymentPending = () => {
             </TableBody>
           </Table>
         </div>
-        {/* row slection and pagintaion button  */}
+
+        {/* Row selection and pagination button  */}
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="flex-1 text-sm text-muted-foreground">
             Total Payment Pending : &nbsp;
@@ -313,26 +363,91 @@ const PaymentPending = () => {
           </div>
         </div>
       </div>
-      {/* <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              Payment.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDelete}
-              className={`${ButtonConfig.backgroundColor}  ${ButtonConfig.textColor} hover:bg-red-600`}
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog> */}
+
+      {/* View Payment Dialog */}
+      {viewData && (
+        <AlertDialog
+          open={viewData !== null}
+          onOpenChange={() => setViewData(null)}
+          sx={{
+            "& .MuiDialog-paper": {
+              width: "lg", // You can set a specific width here or use 'lg' if defined
+            },
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Payment Details</AlertDialogTitle>
+            </AlertDialogHeader>
+            {viewData.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead
+                      className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                    >
+                      P Date
+                    </TableHead>
+                    <TableHead
+                      className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                    >
+                      Adj Adv
+                    </TableHead>
+                    <TableHead
+                      className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                    >
+                      Adj Dp
+                    </TableHead>
+                    <TableHead
+                      className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                    >
+                      Adj Da
+                    </TableHead>
+                    <TableHead
+                      className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                    >
+                      Bank Ch
+                    </TableHead>
+                    <TableHead
+                      className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                    >
+                      Discount
+                    </TableHead>
+                    <TableHead
+                      className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                    >
+                      Shortage
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {viewData.map((pending, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        {moment(pending.invoiceP_date).format("DD-MMM-YYYY")}
+                      </TableCell>
+                      <TableCell>{pending.invoicePSub_amt_adv}</TableCell>
+                      <TableCell>{pending.invoicePSub_amt_dp}</TableCell>
+                      <TableCell>{pending.invoicePSub_amt_da}</TableCell>
+                      <TableCell>{pending.invoicePSub_bank_c}</TableCell>
+                      <TableCell>{pending.invoicePSub_discount}</TableCell>
+                      <TableCell>{pending.invoicePSub_shortage}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <h2>No Payment Data Available</h2>
+            )}
+
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setViewData(null)}>
+                Close
+              </AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </Page>
   );
 };

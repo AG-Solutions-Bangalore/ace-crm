@@ -10,7 +10,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, Loader2, Search } from "lucide-react";
+import { ArrowUpDown, ChevronDown, Eye, Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -33,8 +33,16 @@ import BASE_URL from "@/config/BaseUrl";
 
 import moment from "moment";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useNavigate } from "react-router-dom";
 
 const PaymentClose = () => {
+  const navigate = useNavigate();
   const {
     data: paymentclose,
     isLoading,
@@ -63,46 +71,40 @@ const PaymentClose = () => {
   // Define columns for the table
   const columns = [
     {
-      accessorKey: "invoice_bl_date",
-      header: "Date",
-      cell: ({ row }) => {
-        const date = row.getValue("invoice_bl_date");
-        return date ? moment(date).format("DD-MMM-YYYY") : "";
-      },
-    },
-    {
-      accessorKey: "invoice_ref",
-      header: "Invoice Ref",
-      cell: ({ row }) => <div>{row.getValue("invoice_ref")}</div>,
-    },
-
-    {
       accessorKey: "invoice_no",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Invoice No
+          Invoice
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
       cell: ({ row }) => <div>{row.getValue("invoice_no")}</div>,
     },
     {
-      accessorKey: "invoice_i_value_usd",
-      header: "Invoice USD",
-      cell: ({ row }) => <div>{row.getValue("invoice_i_value_usd")}</div>,
+      accessorKey: "invoice_bl_date",
+      header: "BL Date",
+      cell: ({ row }) => {
+        const date = row.getValue("invoice_bl_date");
+        return moment(date).format("DD-MMM-YYYY");
+      },
     },
     {
       accessorKey: "invoice_buyer",
-      header: "Invoice Buyer",
+      header: "Buyer",
       cell: ({ row }) => <div>{row.getValue("invoice_buyer")}</div>,
     },
     {
       accessorKey: "sum_qnty",
-      header: "Sum Qnty",
+      header: "Qnty",
       cell: ({ row }) => <div>{row.getValue("sum_qnty")}</div>,
+    },
+    {
+      accessorKey: "invoice_i_value_usd",
+      header: "Inv USD",
+      cell: ({ row }) => <div>{row.getValue("invoice_i_value_usd")}</div>,
     },
     {
       accessorKey: "received",
@@ -113,6 +115,29 @@ const PaymentClose = () => {
       accessorKey: "balance",
       header: "Balance",
       cell: ({ row }) => <div>{row.getValue("balance")}</div>,
+    },
+    {
+      id: "actions",
+      header: "Action",
+      cell: ({ row }) => {
+        return (
+          <div className="flex flex-row">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Eye
+                    className="h-4 w-4 cursor-pointer"
+                    onClick={() => {
+                      navigate(`/payment-view/${row.original.invoice_no}`);
+                    }}
+                  />
+                </TooltipTrigger>
+                <TooltipContent>View Payment</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        );
+      },
     },
   ];
 

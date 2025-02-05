@@ -1,39 +1,48 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Page from "../../app/dashboard/page";
 import { Button } from "@/components/ui/button";
 import html2pdf from "html2pdf.js";
 import ReactToPrint from "react-to-print";
 import { Printer } from "lucide-react";
+import { useParams } from "react-router-dom";
+import moment from "moment";
+import BASE_URL from "@/config/BaseUrl";
 const PaymentView = () => {
+  const [viewData, setViewData] = useState([]);
+  const [invoice, setInvoice] = useState({});
+
   const containerRef = useRef();
-  //   useEffect(() => {
-  //     const fetchContractData = async () => {
-  //       try {
-  //         const token = localStorage.getItem("token");
-  //         const response = await fetch(
-  //           `${BASE_URL}/api/panel-fetch-contract-by-id/${id}`,
-  //           {
-  //             headers: {
-  //               Authorization: `Bearer ${token}`,
-  //             },
-  //           }
-  //         );
+  const { id } = useParams();
 
-  //         if (!response.ok) {
-  //           throw new Error("Failed to fetch contract data");
-  //         }
+  console.log(id);
+  useEffect(() => {
+    const fetchContractData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `${BASE_URL}/api/panel-fetch-invoice-payment-by-invoiceno/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-  //         const data = await response.json();
-  //         setContractData(data);
-  //         setLoading(false);
-  //       } catch (error) {
-  //         setError(error.message);
-  //         setLoading(false);
-  //       }
-  //     };
+        if (!response.ok) {
+          throw new Error("Failed to fetch contract data");
+        }
 
-  //     fetchContractData();
-  //   }, [id]);
+        const data = await response.json();
+        setViewData(data.paymentSubView);
+        setInvoice(data.invoice);
+      } catch (error) {
+        console.log(error);
+        console.log("erro catch");
+      }
+    };
+
+    fetchContractData();
+  }, [id]);
   const handleSaveAsPdf = () => {
     const element = containerRef.current;
     generatePdf(element);
@@ -127,7 +136,7 @@ const PaymentView = () => {
             </div>
 
             <div className="col-span-5 flex items-center justify-center  p-4  ">
-              Date:04 February 2025
+              Date:{moment().format("DD-MM-YYYY")}
             </div>
           </div>
           {/* //second */}
@@ -142,7 +151,7 @@ const PaymentView = () => {
                 Kindly adjust the following TT remittance receive against our
                 Export
               </p>
-              <p className="ml-12">Bill Raised on SAHA RUNGRUENG CO LTD</p>
+              <p className="ml-12">Bill Raised on {invoice.invoice_buyer}</p>
             </div>
           </div>
           {/* //thord */}
@@ -176,23 +185,41 @@ const PaymentView = () => {
               </thead>
 
               <tbody>
-                <tr>
-                  <td className="border border-black p-2">1</td>
-                  <td className="border border-black p-2">INV001 / SB001</td>
-                  <td className="border border-black p-2">$10,000.00</td>
-                  <td className="border border-black p-2">$9,800.00</td>
-                  <td className="border border-black p-2">$200.00</td>
-                  <td className="border border-black p-2">Cleared</td>
-                </tr>
-                <tr>
-                  <td className="border border-black p-2">2</td>
-                  <td className="border border-black p-2">INV001 / SB001</td>
-                  <td className="border border-black p-2">$10,000.00</td>
-                  <td className="border border-black p-2">$9,800.00</td>
-                  <td className="border border-black p-2">$200.00</td>
-                  <td className="border border-black p-2">Pending</td>
-                </tr>
+                {viewData && viewData.length > 0 ? (
+                  viewData.map((pending, index) => (
+                    <tr key={index}>
+                      <td className="border border-black p-2">
+                        {pending.invoice_no}
+                      </td>
+                      <td className="border border-black p-2">
+                        {pending.invoice_id}
+                      </td>
+                      <td className="border border-black p-2">
+                        {pending.amount}
+                      </td>
+                      <td className="border border-black p-2">
+                        {pending.received}
+                      </td>
+                      <td className="border border-black p-2">
+                        {pending.balance}
+                      </td>
+                      <td className="border border-black p-2">
+                        {pending.status}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan="6"
+                      className="border border-black p-2 text-center"
+                    >
+                      No data available
+                    </td>
+                  </tr>
+                )}
               </tbody>
+
               <tfoot>
                 <tr>
                   <td
