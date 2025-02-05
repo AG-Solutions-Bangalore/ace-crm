@@ -127,7 +127,7 @@ const InvoiceList = () => {
       header: "Date",
       cell: ({ row }) => {
         const date = row.getValue("invoice_date");
-        return moment(date).format("DDD-MMM-YYYY");
+        return moment(date).format("DD-MMM-YYYY");
       },
     },
     {

@@ -51,6 +51,10 @@ import EditUserType from "./app/UserType/EditUserType";
 import PaymentView from "./app/payment/PaymentView";
 import PaymentList from "./app/payment/PaymentList";
 import CreatePayment from "./app/payment/CreatePayment";
+import SalesAccountForm from "./app/reports/salesAccount/SalesAccountForm";
+import SalesAccountReport from "./app/reports/salesAccount/SalesAccountReport";
+import SalesDataForm from "./app/reports/salesData/SalesDataForm";
+import SalesDataReport from "./app/reports/salesData/SalesDataReport";
 
 const queryClient = new QueryClient();
 
@@ -138,11 +142,19 @@ function App() {
           <Route path="/master/prerecepits" element={<PreReceiptList />} />
 
           {/* //Reports */}
+
           {/* Reports -Buyer  */}
           <Route path="/report/buyer-report" element={<Buyer />} />
           <Route path="/report/contract-form" element={<ContractForm />} />
           <Route path="/report/contract-report" element={<ContractReport />} />
-          
+    
+            {/* report - sales account  */}
+            <Route path="/report/sales-account-form" element={<SalesAccountForm />} />
+
+            <Route path="/report/sales-account-report" element={<SalesAccountReport />} />
+            {/* report sales data  */}
+            <Route path="/report/sales-data-form" element={<SalesDataForm />} />
+            <Route path="/report/sales-data-report" element={<SalesDataReport />} />
           {/* //payment */}
           <Route path="/payment-list" element={<PaymentList />} />
           <Route path="/payment-view" element={<PaymentView />} />
