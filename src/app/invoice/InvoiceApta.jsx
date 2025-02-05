@@ -13,6 +13,7 @@ const InvoiceApta = () => {
 
   const { id } = useParams();
   const [spiceBoard, setSpiceBoard] = useState(null);
+  const [spiceBoardBranch, setSpiceBoardBranch] = useState(null);
   const [invoiceSubData, setInvoiceSubData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -36,6 +37,7 @@ const InvoiceApta = () => {
 
         const data = await response.json();
         setSpiceBoard(data?.invoice);
+        setSpiceBoardBranch(data?.branch);
         setInvoiceSubData(data?.invoiceSub);
         setLoading(false);
       } catch (error) {
@@ -197,7 +199,7 @@ const InvoiceApta = () => {
           <p className=" text-left text-[13px] ">{moment(getTodayDate()).format("DD-MMM-YYYY")}</p> 
         </div>
         <div className="mt-16  ">
-          <p className=" text-center text-[13px] ">(ANIL KUMAR JAIN)</p>
+          <p className=" text-center text-[13px] ">(  {spiceBoardBranch.branch_sign_name1})</p>
         </div>
         <div className="mt-48 ">
           <p className=" text-left text-[13px] ">
@@ -219,7 +221,7 @@ const InvoiceApta = () => {
           <p className=" text-left text-[13px] ">REG. NO. 151015</p>
         </div>
         <div className="mt-16  flex flex-col items-end mr-20  gap-10 ">
-          <p className=" pr-20  text-[13px] ">(ANIL KUMAR JAIN)</p>
+          <p className=" pr-20  text-[13px] ">({spiceBoardBranch.branch_sign_name1})</p>
           <p className="  text-[13px] ">BANGALORE DTD. INVOICE NO. 03-Feb-25</p>
         </div>
       </div>
