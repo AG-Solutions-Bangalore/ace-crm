@@ -9,6 +9,7 @@ import InvoiceCertificateOrigin from "./InvoiceCertificateOrigin";
 import InvoiceGst from "./InvoiceGst";
 import BuyerInvoice from "./BuyerInvoice";
 import PerfomaInvoice from "./PerfomaInvoice";
+import BlDraft from "./BlDraft";
 import InvoicePytho from "./InvoicePytho";
 import InvoiceTripartite from "./InvoiceTripartite";
 
@@ -21,7 +22,7 @@ const InvoiceTabs = () => {
           <TabsList className="flex justify-center ">
             <TabsTrigger
               value="pending"
-              className="px-4 py-2 text-sm font-medium transition duration-300 rounded-md data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200 mr-3"
+              className="px-4 py-2 text-sm font-medium transition duration-300 rounded-md data-[state=active]:bg-yellow-500 data-[state=active]:text-white data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200 mr-3"
             >
               Pre_Shipment
             </TabsTrigger>
@@ -40,31 +41,31 @@ const InvoiceTabs = () => {
             </TabsTrigger>
             <TabsTrigger
               value="apta"
-              className="px-4 py-2 text-sm font-medium transition duration-300 rounded-md data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200"
+              className="px-4 py-2 text-sm font-medium transition duration-300 rounded-md data-[state=active]:bg-yellow-500 data-[state=active]:text-white data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200"
             >
               Apta
             </TabsTrigger>
             <TabsTrigger
               value="certificate_origin"
-              className="px-4 py-2 text-sm font-medium transition duration-300 rounded-md data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200"
+              className="px-4 py-2 text-sm font-medium transition duration-300 rounded-md data-[state=active]:bg-yellow-500 data-[state=active]:text-white data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200"
             >
               Cer. Origin
             </TabsTrigger>
             <TabsTrigger
               value="invoice_gst"
-              className="px-4 py-2 text-sm font-medium transition duration-300 rounded-md data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200"
+              className="px-4 py-2 text-sm font-medium transition duration-300 rounded-md data-[state=active]:bg-yellow-500 data-[state=active]:text-white data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200"
             >
               Invoice Gsts
             </TabsTrigger>
             <TabsTrigger
               value="tripartite"
-              className="px-4 py-2 text-sm font-medium transition duration-300 rounded-md data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200"
+              className="px-4 py-2 text-sm font-medium transition duration-300 rounded-md data-[state=active]:bg-yellow-500 data-[state=active]:text-white data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200"
             >
               Tripartite
             </TabsTrigger>
             <TabsTrigger
               value="bldraft"
-              className="px-4 py-2 text-sm font-medium transition duration-300 rounded-md data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200"
+              className="px-4 py-2 text-sm font-medium transition duration-300 rounded-md data-[state=active]:bg-yellow-500 data-[state=active]:text-white data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200"
             >
               Bl Draft
             </TabsTrigger>
@@ -82,7 +83,7 @@ const InvoiceTabs = () => {
             </TabsTrigger>
             <TabsTrigger
               value="pytho"
-              className="px-4 py-2 text-sm font-medium transition duration-300 rounded-md data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200"
+              className="px-4 py-2 text-sm font-medium transition duration-300 rounded-md data-[state=active]:bg-yellow-500 data-[state=active]:text-white data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200"
             >
               Pytho
             </TabsTrigger>
@@ -108,8 +109,12 @@ const InvoiceTabs = () => {
             <TabsContent value="invoice_gst">
               <InvoiceGst />
             </TabsContent>
+            <TabsContent value="tripartite"></TabsContent>
+            <TabsContent value="bldraft">
+              <BlDraft />
+            </TabsContent>
             <TabsContent value="tripartite">
-              <InvoiceTripartite/>
+              <InvoiceTripartite />
             </TabsContent>
             <TabsContent value="bldraft"></TabsContent>
             <TabsContent value="buyerinvoice">
@@ -119,7 +124,7 @@ const InvoiceTabs = () => {
               <PerfomaInvoice />
             </TabsContent>
             <TabsContent value="pytho">
-              <InvoicePytho/>
+              <InvoicePytho />
             </TabsContent>
           </div>
         </Tabs>

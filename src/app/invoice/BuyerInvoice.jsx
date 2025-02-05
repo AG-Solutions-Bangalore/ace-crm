@@ -854,11 +854,18 @@ const BuyerInvoice = () => {
                                 <td className="p-2 text-left" colSpan={5}>
                                   <p> TOTAL GROSS WEIGHT:</p>
                                   <p className="ml-8">
-                                    {invoiceSubData.reduce(
+                                    {/* {invoiceSubData.reduce(
                                       (total, item) =>
                                         total + (item.invoiceSub_item_bag || 0),
                                       0
-                                    )}{" "}
+                                    )}{" "} */}
+                                    {invoiceSubData.reduce(
+                                      (total, item) =>
+                                        total +
+                                        item.invoiceSub_item_bag *
+                                          item.invoiceSub_bagsize,
+                                      0
+                                    )}
                                     KGS
                                   </p>
                                 </td>

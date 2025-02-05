@@ -55,6 +55,11 @@ import SalesAccountForm from "./app/reports/salesAccount/SalesAccountForm";
 import SalesAccountReport from "./app/reports/salesAccount/SalesAccountReport";
 import SalesDataForm from "./app/reports/salesData/SalesDataForm";
 import SalesDataReport from "./app/reports/salesData/SalesDataReport";
+import PaymentView from "./payment/PaymentList/PaymentView";
+import PaymentList from "./payment/PaymentList/PaymentList";
+import CreatePayment from "./payment/PaymentList/CreatePayment";
+import PaymentPending from "./payment/PaymentPending/PaymentPending";
+import PaymentClose from "./payment/PaymentClose/PaymentClose";
 
 const queryClient = new QueryClient();
 
@@ -155,10 +160,13 @@ function App() {
             {/* report sales data  */}
             <Route path="/report/sales-data-form" element={<SalesDataForm />} />
             <Route path="/report/sales-data-report" element={<SalesDataReport />} />
+
           {/* //payment */}
-          <Route path="/payment-list" element={<PaymentList />} />
+          <Route path="/payment-payment-list" element={<PaymentList />} />
           <Route path="/payment-view" element={<PaymentView />} />
           <Route path="/payment-create" element={<CreatePayment />} />
+          <Route path="/payment-payment-pending" element={<PaymentPending />} />
+          <Route path="/payment-payment-close" element={<PaymentClose />} />
 
           {/* //management */}
           <Route path="/userManagement" element={<UserPage />} />

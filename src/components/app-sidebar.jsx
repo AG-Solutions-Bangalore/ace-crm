@@ -177,6 +177,26 @@ export function AppSidebar({ ...props }) {
           },
         ],
       },
+      {
+        title: "Payment",
+        url: "#",
+        icon: Settings2,
+        isActive: true,
+        items: [
+          {
+            title: "PaymentList",
+            url: "/payment-payment-list",
+          },
+          {
+            title: "PaymentPending",
+            url: "/payment-payment-pending",
+          },
+          {
+            title: "PaymentClose",
+            url: "/payment-payment-close",
+          },
+        ],
+      },
     ],
 
     projects: [
@@ -205,11 +225,6 @@ export function AppSidebar({ ...props }) {
         name: "UserType",
         url: "/user-type",
         icon: Settings,
-      },
-      {
-        name: "Payment",
-        url: "/payment-list",
-        icon: BadgeIndianRupee,
       },
     ],
   };

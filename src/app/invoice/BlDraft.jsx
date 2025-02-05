@@ -219,15 +219,15 @@ const BlDraft = () => {
           <>
             <div className="max-w-4xl mx-auto    p-4 ">
               <div className=" border border-black max-w-screen-lg mx-auto text-sm">
-                <div>
-                  <div className="border-b border-black px-8 py-2  text-center text-sm font-bold  ">
-                    INVOICE
-                  </div>
+                <div className="border-b border-black px-[10rem] py-2 text-sm font-bold flex justify-between gap-4">
+                  <span>DRAFT B/L</span>
+                  <span>DRAFT B/L</span>
+                  <span>DRAFT B/L</span>
                 </div>
 
-                <div className="grid grid-cols-12  border-b border-black text-[12px]">
+                <div className="grid grid-cols-12  border-b border-black text-[10px]">
                   <div className="col-span-5 border-r border-black pl-4 pb-2">
-                    <p className="font-bold">EXPORTER / SHIPPER :</p>
+                    <p className="font-bold">SHIPPER :</p>
                     <p className="font-bold">
                       {invoicePackingData.branch_name}
                     </p>
@@ -240,51 +240,17 @@ const BlDraft = () => {
                     </div>
                   </div>
 
-                  <div className="col-span-7 grid grid-rows-3 ">
-                    <div className="flex justify-between border-b border-black p-2">
-                      <div className="font-bold">
-                        Inv. No. & Dt.: {invoicePackingData.invoice_ref}
-                      </div>
-                      <div>
-                        Date:
-                        {moment(invoicePackingData.invoice_date).format(
-                          "DD-MM-YYYY"
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between border-b border-black p-2">
-                      <div className="font-bold">
-                        ORDER TYPE: {invoicePackingData.contract_pono}
-                      </div>
-                      <div className="col-span-2 text-left">
-                        {moment(invoicePackingData.contract_date).format(
-                          "DD-MM-YYYY"
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2 px-2">
-                      <div className="border-r border-black pr-2 mb-1 h-full">
-                        <p className="font-bold">State Code</p>
-                        <p>{branchData.branch_state_no}</p>
-                      </div>
-                      <div className="border-r border-black pr-2 mb-1 h-full">
-                        <p className="font-bold">IEC Code</p>
-                        <p>{branchData.branch_iec}</p>
-                      </div>
-                      <div className=" mb-1 h-full">
-                        <p className="font-bold">GSTIN</p>
-                        <p>{branchData.branch_gst}</p>
-                      </div>
+                  <div className="col-span-7">
+                    <div className="p-2">
+                      <p className="font-bold"> EXPORT REFERENCES:</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex justify-center items-center border-b border-black text-[12px]">
+                <div className="flex justify-center items-center border-b border-black text-[10px]">
                   <div className="grid grid-cols-12 w-full">
-                    <div className="border-r border-black px-4 col-span-5 text-[11px]">
-                      <p className="font-bold">Consignee:</p>
+                    <div className="border-r border-black p-2 col-span-5 text-[10px]">
+                      <p className="font-bold">CONSIGNEE:</p>
                       <p className="font-bold">
                         {invoicePackingData.invoice_consignee}
                       </p>{" "}
@@ -298,122 +264,66 @@ const BlDraft = () => {
                     </div>
 
                     <div className="col-span-7  ">
-                      <div className="border-b border-black p-2 text-[10px] leading-3">
-                        <div className="font-bold mb-[3px]">
-                          Buyer (Other than Consignee):
-                        </div>
-                        <p className="mb-[3px] font-bold">
-                          {invoicePackingData.invoice_consignee}
-                        </p>
-                        <div>
-                          {invoicePackingData.invoice_buyer_add
-                            .split(",")
-                            .map((line, index) => (
-                              <p key={index}>{line.trim()}</p>
-                            ))}
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-3 px-2">
-                        <div className="border-r border-black pr-2 mb-[2px]">
-                          <p className="font-bold text-[8px] text-center">
-                            Country of origin of goods
-                          </p>
-                          <p className="text-center text-[12px]">INDIA</p>
-                        </div>
-
-                        <div className="border-r border-black pr-2 mb-[2px]"></div>
-                        <div className=" pr-2 mb-[2px]">
-                          <p className="font-bold text-[8px] text-center">
-                            Country Destination:
-                          </p>
-                          <p className="text-center text-[12px]">
-                            {" "}
-                            {invoicePackingData.invoice_destination_country}
-                          </p>
-                        </div>
-                      </div>
+                      <div className=" p-2 text-[10px] leading-3"></div>
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-12 border-b border-black text-[12px] h-full">
+                <div className="grid grid-cols-12 border-b border-black text-[10px] h-full">
                   <div className="col-span-5 border-r border-black h-full">
-                    <div className="grid grid-cols-2 px-2 h-full">
-                      <div className="border-r border-black px-2 mb-[2px] h-full">
-                        <p className="font-bold">Pre-carriage by:</p>
-                        <p className="text-center">
+                    <div className="h-full">
+                      <div className="p-2 h-full">
+                        <p className="font-bold">Vessal and Voyage No:</p>
+                        <p>
                           {" "}
-                          {invoicePackingData.invoice_precarriage}
-                        </p>
-                      </div>
-                      <div className="px-2 h-full mb-[1px]">
-                        <p className="font-bold">Pre-receipt at:</p>
-                        <p className="text-center">
-                          {" "}
-                          {invoicePackingData.invoice_prereceipts}
+                          {invoicePackingData.invoice_vessel} /
+                          {invoicePackingData.invoice_voyage}
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="col-span-7 px-4">
-                    <p className="font-bold  pb-1">
-                      Terms of Delivery and Payment:
-                    </p>
-                    <p>
-                      CIF USD {invoicePackingData.invoice_cif} PORT{" "}
-                      {invoicePackingData.invoice_destination_country}
-                    </p>
+                  <div className="col-span-7 p-2">
+                    <p className="font-bold  ">Place of Receipts :</p>
+                    <p>{invoicePackingData.invoice_loading},INDIA</p>
                   </div>
                 </div>
-                <div className="grid grid-cols-12 border-b border-black text-[12px]  h-full">
+                <div className="grid grid-cols-12 border-b border-black text-[10px]  h-full">
                   <div className="col-span-5 border-r border-black  h-full">
-                    <div className="grid grid-cols-2 px-2">
-                      <div className="border-r border-black px-2 mb-[2px] h-full">
-                        <p className="font-bold">Mode of shipment:</p>
-                        <p className="text-center">BY SEA</p>
-                      </div>
-                      <div className="px-2 ">
-                        <p className="font-bold">Port of Loading:</p>
-                        <p className="text-center">
-                          {invoicePackingData.invoice_loading}
-                        </p>
+                    <div className=" p-2">
+                      <div className="px-2 mb-[2px] h-full">
+                        <p className="font-bold">Port of Loading :</p>
+                        <p>{invoicePackingData.invoice_loading},INDIA</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="col-span-7 px-4">
-                    <p className="flex items-center justify-center h-full w-full">
-                      Insurance Terms - Exporter Warehouse to Consignee/Buyer
-                      Warehouse
-                    </p>
+                  <div className="col-span-7 p-2">
+                    <p className="h-full w-full">No. of Originals</p>
                   </div>
                 </div>
-                <div className="grid grid-cols-12 border-b border-black text-[12px]  h-full">
+                <div className="grid grid-cols-12 border-b border-black text-[10px]  h-full">
                   <div className="col-span-5 border-r border-black  h-full">
-                    <div className="grid grid-cols-2 px-2  h-full">
-                      <div className="border-r border-black px-2  h-full">
+                    <div className=" p-2  h-full">
+                      <div className=" px-2  h-full">
                         <p className="font-bold">Port of Discharge :</p>
-                        <p className="text-center">
+                        <p>
                           {" "}
-                          {invoicePackingData.invoice_discharge}
-                        </p>
-                      </div>
-                      <div className="px-2  h-full">
-                        <p className="font-bold">Final Destination</p>
-                        <p className="text-center">
-                          {" "}
-                          {invoicePackingData.invoice_destination_port}
+                          {invoicePackingData.invoice_discharge}/{" "}
+                          {invoicePackingData.invoice_destination_country}
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="col-span-7 px-4">
+                  <div className="col-span-7 p-2">
                     <p className=" pb-1 text-[10px]">
-                      <span className="font-bold"> PAYMENT BY -</span>{" "}
-                      {invoicePackingData.invoice_payment_terms}
+                      <p className="font-bold">Place of Delivery :</p>
+                      <p>
+                        {" "}
+                        {invoicePackingData.invoice_destination_port} /{" "}
+                        {invoicePackingData.invoice_destination_country}
+                      </p>
                     </p>
                   </div>
                 </div>
@@ -424,39 +334,34 @@ const BlDraft = () => {
                       <tr className="border-b border-black text-[12px]">
                         <th
                           className="border-r border-black p-2 text-center text-[11px]"
-                          style={{ width: "20%" }}
+                          style={{ width: "18%" }}
                         >
-                          Marks & Nos./ Container No.
+                          MARKS & NUMBERS.
                         </th>
                         <th
                           className="border-r border-black p-2 text-center text-[11px]"
                           style={{ width: "10%" }}
                         >
-                          No/KIND OF PACKAGE
+                          NUMBER OF PACKAGE
                         </th>
                         <th
                           className="border-r border-black p-2 text-center text-[11px]"
-                          style={{ width: "30%" }}
+                          style={{ width: "29%" }}
                         >
-                          DESCRIPTION OF EXPORT GOODS
+                          <p>KIND OF PACKAGES ;</p>
+                          <p>DESCRIPTION OF EXPORT GOODS ;</p>
                         </th>
                         <th
                           className="border-r border-black p-2 px-3 text-center text-[11px]"
-                          style={{ width: "10%" }}
+                          style={{ width: "15%" }}
                         >
-                          QUANTITY IN MT
-                        </th>
-                        <th
-                          className="border-r border-black p-2 text-center text-[11px]"
-                          style={{ width: "10%" }}
-                        >
-                          RATE PER MT IN USD
+                          GROSS WEIGHT
                         </th>
                         <th
                           className="p-2 text-center text-[11px]"
-                          style={{ width: "15%" }}
+                          style={{ width: "8%" }}
                         >
-                          AMOUNT (USD)
+                          MEASUREMENT
                         </th>
                       </tr>
                     </thead>
@@ -464,8 +369,8 @@ const BlDraft = () => {
                     <tbody>
                       {invoiceSubData.map((item, index) => (
                         <>
-                          <tr key={index}>
-                            <td className="border-r border-black p-2">
+                          <tr key={index} className="text-[10px]">
+                            <td className="border-r border-black p-2 ">
                               {item.invoiceSub_marking} <br />
                             </td>
                             <td className="border-r border-black p-2">
@@ -478,6 +383,7 @@ const BlDraft = () => {
                                 {item.invoiceSub_sbaga}
                               </p>{" "}
                             </td>
+
                             <td className="border-r border-black p-2">
                               {item.invoiceSub_descriptionofGoods && (
                                 <p>{item.invoiceSub_descriptionofGoods}</p>
@@ -490,83 +396,97 @@ const BlDraft = () => {
                                 </p>
                               )}
                             </td>
+
                             <td className="border-r border-black p-2 text-center">
-                              {item.invoiceSub_qntyInMt}
+                              {index === invoiceSubData.length - 1 && (
+                                <>
+                                  <tr>
+                                    <td className="p-2 text-left" colSpan={5}>
+                                      <p> TOTAL NET WEIGHT:</p>
+                                      <p className="ml-8">
+                                        {invoiceSubData.reduce(
+                                          (total, item) =>
+                                            total +
+                                            (item.invoiceSub_qntyInMt * 1000 ||
+                                              0),
+                                          0
+                                        )}{" "}
+                                        KGS
+                                      </p>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td className="p-2 text-left" colSpan={5}>
+                                      <p> TOTAL GROSS WEIGHT:</p>
+                                      <p className="ml-8">
+                                        {/* {invoiceSubData.reduce(
+                                          (total, item) =>
+                                            total +
+                                            (item.invoiceSub_item_bag || 0),
+                                          0
+                                        )}{" "} */}
+                                        {invoiceSubData.reduce(
+                                          (total, item) =>
+                                            total +
+                                            item.invoiceSub_item_bag *
+                                              item.invoiceSub_bagsize,
+                                          0
+                                        )}
+                                        KGS
+                                      </p>
+                                    </td>
+                                  </tr>
+                                </>
+                              )}
                             </td>
-                            <td className="border-r border-black p-2 text-center">
-                              {item.invoiceSub_rateMT}
-                            </td>
-                            <td className="p-2 text-right">
-                              ${" "}
-                              {(
-                                item.invoiceSub_qntyInMt *
-                                item.invoiceSub_rateMT
-                              ).toFixed(2)}
-                            </td>
+                            <td className=" p-2 text-center"></td>
                           </tr>
                         </>
                       ))}
 
-                      <tr>
+                      <tr className="text-[10px]">
                         <td className="border-r border-black p-2">
-                          <br />
+                          <p className="mt-6"> CONTAINER NO:</p>
+
                           <span className="font-bold block text-[11px]">
                             (IN {invoicePackingData.invoice_container_size})
                           </span>
                           <span className="font-bold text-[10px]">
-                            ( {sumbag} BAGS IN{" "}
-                            {invoicePackingData.invoice_container_size})
+                            {/* ( {sumbag} BAGS IN{" "}
+                            {invoicePackingData.invoice_container_size}) */}
+                            FCL / FCL ONE DOOR OPEN CONTAINER
                           </span>
                         </td>
                         <td className="border-r border-black p-2"></td>
-                        <td className="border-r border-black p-2"></td>
-                        <td className="border-r border-black p-2"></td>
-                        <td className="border-r border-black p-2"></td>
-                        <td className="border-t border-black p-2 text-right font-bold">
-                          $
-                          {invoiceSubData
-                            .reduce((total, item) => {
-                              return (
-                                total +
-                                (item.invoiceSub_qntyInMt *
-                                  item.invoiceSub_rateMT || 0)
-                              );
-                            }, 0)
-                            .toFixed(2)}
+                        <td className="border-r border-black p-2">
+                          {" "}
+                          <p className="mt-2">COMMERCIAL INVOICE NO.</p>
+                          <p className="my-1">
+                            {invoicePackingData.invoice_ref}{" "}
+                          </p>
+                          <p className="my-1">
+                            {invoicePackingData.contract_ref}
+                          </p>
+                          <p> {invoicePackingData.contract_date}</p>
+                          <p> {invoicePackingData.invoice_sb_no}</p>
                         </td>
+                        <td className="border-r border-black p-2"></td>
+                        <td className=" p-2"></td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
 
-                <div className="text-[10px] ">
-                  <p className="flex p-2">
-                    AMOUNT CHARGEABLE IN WORDS -
-                    <p className=" font-semibold ml-4">{totalInWords}</p>
-                  </p>
-                </div>
-                <div className="grid grid-cols-2  text-[10px] mt-3">
-                  <div className="col-span-1">
-                    <div className=" px-2 leading-none">
-                      <p className="font-bold mt-1">DECLARATION</p>
-                      <p className="my-2">
-                        WE DECLARE THAT THIS INVOICE SHOWS THE ACTUAL PRICE OF
-                        THE GOODS DESCRIBED AND THAT ALL PARTICULARS ARE TRUE
-                        AND CORRECT.
-                      </p>
+                <div className="text-[10px] p-2">
+                  <div className="grid grid-cols-2 mt-5">
+                    <div className="flex items-start gap-4">
+                      <h2>FREIGHT PREPAID AS ARRANGED.</h2>
+                      <h2>BL DATE:{invoicePackingData.invoice_bl_date}</h2>
                     </div>
-                  </div>
 
-                  <div className="col-span-1 ">
-                    <div className="border-t border-l border-black p-4 h-full">
-                      <p className="font-bold leading-none">
-                        SIGNATURE & DATE :
-                      </p>
-                      <p className="mt-2 leading-none"></p>
-                      <p className="mt-6 leading-none">
-                        {" "}
-                        {moment().format("DD-MM-YYYY")}
-                      </p>
+                    <div className="space-y-3">
+                      <h2>FREIGHT CHARGES:</h2>
+                      <h2>ARBITARY CHARGES:</h2>
                     </div>
                   </div>
                 </div>
@@ -576,349 +496,6 @@ const BlDraft = () => {
           </>
         )}
         {/* //INVOICE ONE END  */}
-        {/* //PACKING 1 STARTS  */}
-        {invoicePackingData && (
-          <>
-            <div className="max-w-4xl mx-auto    p-4">
-              <div className=" border border-black max-w-screen-lg mx-auto text-sm">
-                <div>
-                  <div className="border-b border-black px-8 py-2  text-center text-sm font-bold  ">
-                    PACKING LIST
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-12  border-b border-black text-[12px]">
-                  <div className="col-span-5 border-r border-black pl-4 pb-2">
-                    <p className="font-bold">EXPORTER / SHIPPER :</p>
-                    <p className="font-bold">
-                      {invoicePackingData.branch_name}
-                    </p>
-                    <div>
-                      {invoicePackingData.branch_address
-                        .split(",")
-                        .map((line, index) => (
-                          <p key={index}>{line.trim()}</p>
-                        ))}
-                    </div>
-                  </div>
-
-                  <div className="col-span-7 grid grid-rows-3 ">
-                    <div className="flex justify-between border-b border-black p-2">
-                      <div className="font-bold">
-                        Inv. No. & Dt.: {invoicePackingData.invoice_ref}
-                      </div>
-                      <div>
-                        Date:
-                        {moment(invoicePackingData.invoice_date).format(
-                          "DD-MM-YYYY"
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between border-b border-black p-2">
-                      <div className="font-bold">
-                        ORDER TYPE: {invoicePackingData.contract_pono}
-                      </div>
-                      <div className="col-span-2 text-left">
-                        {moment(invoicePackingData.contract_date).format(
-                          "DD-MM-YYYY"
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2 px-2">
-                      <div className="border-r border-black pr-2 mb-1 h-full">
-                        <p className="font-bold">State Code</p>
-                        <p>{branchData.branch_state_no}</p>
-                      </div>
-                      <div className="border-r border-black pr-2 mb-1 h-full">
-                        <p className="font-bold">IEC Code</p>
-                        <p>{branchData.branch_iec}</p>
-                      </div>
-                      <div className=" pr-2 mb-1 h-full">
-                        <p className="font-bold">GSTIN</p>
-                        <p>{branchData.branch_gst}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-center items-center border-b border-black text-[12px]">
-                  <div className="grid grid-cols-12 w-full">
-                    <div className="border-r border-black px-4 col-span-5 text-[11px]">
-                      <p className="font-bold">Consignee:</p>
-                      <p className="font-bold">
-                        {invoicePackingData.invoice_consignee}
-                      </p>{" "}
-                      <div>
-                        {invoicePackingData.invoice_consignee_add
-                          .split(",")
-                          .map((line, index) => (
-                            <p key={index}>{line.trim()}</p>
-                          ))}
-                      </div>
-                    </div>
-                    <div className="col-span-7  ">
-                      <div className="border-b border-black p-2 text-[10px] leading-3">
-                        <div className="font-bold mb-[3px]">
-                          Buyer (Other than Consignee):
-                        </div>
-                        <p className="mb-[3px] font-bold">
-                          {invoicePackingData.invoice_consignee}
-                        </p>
-                        <div>
-                          {invoicePackingData.invoice_buyer_add
-                            .split(",")
-                            .map((line, index) => (
-                              <p key={index}>{line.trim()}</p>
-                            ))}
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-3 px-2">
-                        <div className="border-r border-black pr-2 mb-[2px]">
-                          <p className="font-bold text-[8px] text-center">
-                            Country of origin of goods
-                          </p>
-                          <p className="text-center text-[12px]">INDIA</p>
-                        </div>
-
-                        <div className="border-r border-black pr-2 mb-[2px]"></div>
-                        <div className=" pr-2 mb-[2px]">
-                          <p className="font-bold text-[8px] text-center">
-                            Country Destination:
-                          </p>
-                          <p className="text-center text-[12px]">
-                            {" "}
-                            {invoicePackingData.invoice_destination_country}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-12 border-b border-black text-[12px] h-full">
-                  <div className="col-span-5 border-r border-black h-full">
-                    <div className="grid grid-cols-2 px-2 h-full">
-                      <div className="border-r border-black px-2 mb-[2px] h-full">
-                        <p className="font-bold">Pre-carriage by:</p>
-                        <p className="text-center">
-                          {" "}
-                          {invoicePackingData.invoice_precarriage}
-                        </p>
-                      </div>
-                      <div className="px-2 h-full mb-[1px]">
-                        <p className="font-bold">Pre-receipt at:</p>
-                        <p className="text-center">
-                          {" "}
-                          {invoicePackingData.invoice_prereceipts}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="col-span-7 px-4"></div>
-                </div>
-                <div className="grid grid-cols-12 border-b border-black text-[12px]  h-full">
-                  <div className="col-span-5 border-r border-black  h-full">
-                    <div className="grid grid-cols-2 px-2">
-                      <div className="border-r border-black px-2 mb-[2px] h-full">
-                        <p className="font-bold">Mode of shipment:</p>
-                        <p className="text-center">BY SEA</p>
-                      </div>
-                      <div className="px-2 ">
-                        <p className="font-bold">Port of Loading:</p>
-                        <p className="text-center">
-                          {invoicePackingData.invoice_loading}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="col-span-7 px-4">
-                    <p className="flex items-center justify-center h-full w-full">
-                      Insurance Terms - Exporter Warehouse to Consignee/Buyer
-                      Warehouse
-                    </p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-12 border-b border-black text-[12px]  h-full">
-                  <div className="col-span-5 border-r border-black  h-full">
-                    <div className="grid grid-cols-2 px-2  h-full">
-                      <div className="border-r border-black px-2  h-full">
-                        <p className="font-bold">Port of Discharge :</p>
-                        <p className="text-center">
-                          {" "}
-                          {invoicePackingData.invoice_discharge}
-                        </p>
-                      </div>
-                      <div className="px-2  h-full">
-                        <p className="font-bold">Final Destination</p>
-                        <p className="text-center">
-                          {" "}
-                          {invoicePackingData.invoice_destination_port}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="col-span-7 px-4"></div>
-                </div>
-
-                <div className="text-[12px]">
-                  <table className="w-full border-collapse table-auto border-b border-black">
-                    <thead>
-                      <tr className="border-b border-black">
-                        <th
-                          className="border-r border-black p-2 text-center text-[11px]"
-                          style={{ width: "20%" }}
-                        >
-                          Marks & Nos./ Container No.
-                        </th>
-                        <th
-                          className="border-r border-black p-2 text-center text-[11px]"
-                          style={{ width: "10%" }}
-                        >
-                          No. / KIND OF PACKAGE
-                        </th>
-                        <th
-                          className="border-r border-black p-2 text-center text-[11px]"
-                          style={{ width: "30%" }}
-                        >
-                          DESCRIPTION OF EXPORT GOODS
-                        </th>
-                        <th
-                          className="border-r border-black p-2 px-3 text-center text-[11px]"
-                          style={{ width: "10%" }}
-                        >
-                          QUANTITY IN MT
-                        </th>
-
-                        <th
-                          className="p-2 text-center text-[11px]"
-                          style={{ width: "15%" }}
-                        >
-                          REMARKS
-                        </th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {invoiceSubData.map((item, index) => (
-                        <tr key={index}>
-                          <td className="border-r border-black p-2">
-                            {item.invoiceSub_marking} <br />
-                          </td>
-                          <td className="border-r border-black p-2">
-                            <p className="text-center">
-                              {item.invoiceSub_item_bag}
-                            </p>
-                            <p className="text-center">
-                              {item.invoiceSub_sbaga}
-                            </p>
-                          </td>
-                          <td className="border-r border-black p-2">
-                            {item.invoiceSub_descriptionofGoods && (
-                              <p>{item.invoiceSub_descriptionofGoods}</p>
-                            )}
-                            {(item.invoiceSub_packing ||
-                              item.invoiceSub_sbaga) && (
-                              <p>
-                                PACKED {item.invoiceSub_packing} KGS NET IN EACH{" "}
-                                {item.invoiceSub_sbaga}
-                              </p>
-                            )}
-                          </td>
-                          <td className="border-r border-black p-2 text-center">
-                            {item.invoiceSub_qntyInMt}
-                          </td>
-
-                          {index === invoiceSubData.length - 1 && (
-                            <>
-                              <tr>
-                                <td className="p-2 text-left" colSpan={5}>
-                                  <p> TOTAL NET WEIGHT:</p>
-                                  <p className="ml-8">
-                                    {invoiceSubData.reduce(
-                                      (total, item) =>
-                                        total +
-                                        (item.invoiceSub_qntyInMt * 1000 || 0),
-                                      0
-                                    )}{" "}
-                                    KGS
-                                  </p>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td className="p-2 text-left" colSpan={5}>
-                                  <p> TOTAL GROSS WEIGHT:</p>
-                                  <p className="ml-8">
-                                    {invoiceSubData.reduce(
-                                      (total, item) =>
-                                        total + (item.invoiceSub_item_bag || 0),
-                                      0
-                                    )}{" "}
-                                    KGS
-                                  </p>
-                                </td>
-                              </tr>
-                            </>
-                          )}
-                        </tr>
-                      ))}
-
-                      <tr>
-                        <td className="border-r border-black p-2">
-                          <br />
-                          <span className="font-bold block text-[11px]">
-                            (IN {invoicePackingData.invoice_container_size})
-                          </span>
-                          <span className="font-bold text-[10px]">
-                            ( {sumbag} BAGS IN{" "}
-                            {invoicePackingData.invoice_container_size})
-                          </span>
-                        </td>
-                        <td className="border-r border-black p-2"></td>
-                        <td className="border-r border-black p-2"></td>
-                        <td className="border-r border-black p-2"></td>
-                        <td className=" p-2 text-right font-bold"></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                <div className="text-[10px] ">
-                  <p className="flex p-2"></p>
-
-                  <p className="block font-semibold ml-4"></p>
-                  <p className="block font-semibold ml-4 "></p>
-                </div>
-                <div className="grid grid-cols-2  text-[10px] mt-3">
-                  <div className="col-span-1">
-                    <div className=" px-2 leading-none">
-                      <p className="font-bold"> </p>
-                    </div>
-                  </div>
-
-                  <div className="col-span-1 ">
-                    <div className="border-t border-l border-black p-4 h-full">
-                      <p className="font-bold leading-none">
-                        SIGNATURE & DATE :
-                      </p>
-                      <p className="mt-2 leading-none"></p>
-                      <p className="mt-6 leading-none">
-                        {" "}
-                        {moment().format("DD-MM-YYYY")}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-        {/* //PACKING 1 ENDS  */}
       </div>
     </div>
   );
