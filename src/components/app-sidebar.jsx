@@ -167,6 +167,14 @@ export function AppSidebar({ ...props }) {
             title: "ContractR",
             url: "/report/contract-form",
           },
+          {
+            title: "Sales Accounts",
+            url: "/report/sales-account-form",
+          },
+          {
+            title: "Sales Data",
+            url: "/report/sales-data-form",
+          },
         ],
       },
       {
