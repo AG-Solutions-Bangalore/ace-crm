@@ -9,7 +9,12 @@ import InvoiceCertificateOrigin from "./InvoiceCertificateOrigin";
 import InvoiceGst from "./InvoiceGst";
 import BuyerInvoice from "./BuyerInvoice";
 import PerfomaInvoice from "./PerfomaInvoice";
+<<<<<<< HEAD
 import BlDraft from "./BlDraft";
+=======
+import InvoicePytho from "./InvoicePytho";
+import InvoiceTripartite from "./InvoiceTripartite";
+>>>>>>> 1d6d2a4dd26c8e227230089e84fa9e404dd82745
 
 const InvoiceTabs = () => {
   return (
@@ -107,17 +112,26 @@ const InvoiceTabs = () => {
             <TabsContent value="invoice_gst">
               <InvoiceGst />
             </TabsContent>
+<<<<<<< HEAD
             <TabsContent value="tripartite"></TabsContent>
             <TabsContent value="bldraft">
               <BlDraft />
             </TabsContent>
+=======
+            <TabsContent value="tripartite">
+              <InvoiceTripartite/>
+            </TabsContent>
+            <TabsContent value="bldraft"></TabsContent>
+>>>>>>> 1d6d2a4dd26c8e227230089e84fa9e404dd82745
             <TabsContent value="buyerinvoice">
               <BuyerInvoice />
             </TabsContent>
             <TabsContent value="performainvoice">
               <PerfomaInvoice />
             </TabsContent>
-            <TabsContent value="pytho"></TabsContent>
+            <TabsContent value="pytho">
+              <InvoicePytho/>
+            </TabsContent>
           </div>
         </Tabs>
       </div>
