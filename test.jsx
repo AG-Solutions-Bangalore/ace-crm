@@ -20,29 +20,33 @@ import {
 import BASE_URL from "@/config/BaseUrl";
 
 // Validation Schema
+
 const productRowSchema = z.object({
-  invoicePSub_inv_ref: z.string().min(1, "Ref is required"),
-  invoicePSub_amt_adv: z.string().min(1, "Amount Advance is required"),
-  invoicePSub_amt_dp: z.number().min(1, "Amount dp required"),
-  invoicePSub_amt_da: z.number().min(1, "Amount da required"),
+  invoicePSub_inv_ref: z.number().optional(),
+  invoicePSub_amt_adv: z.number().optional(), // Consider changing to `.number()` if it's numeric
+  invoicePSub_amt_dp: z.number().optional(), // Corrected: it should be a number
+  invoicePSub_amt_da: z.number().optional(), // Corrected: it should be a number
 
-  invoicePSub_bank_c: z.number().min(1, "Bank c required"),
+  invoicePSub_bank_c: z.number().optional(), // Corrected: it should be a number
 
-  invoicePSub_discount: z.number().min(1, "Discount is required"),
-  invoicePSub_shortage: z.number().min(1, "Shortage is required"),
-  invoiceSub_sbaga: z.string().min(1, "Sbga is required"),
-  nvoicePSub_remarks: z.string().optional(),
+  invoicePSub_discount: z.number().optional(), // Corrected: it should be a number
+  invoicePSub_shortage: z.number().optional(), // Corrected: it should be a number
+  invoiceSub_sbaga: z.number().optional(), // You can keep this as a string
+  invoicePSub_remarks: z.string().optional(), // Optional if it'
 });
 
 const contractFormSchema = z.object({
   invoiceP_year: z.string().min(1, "Invoice Year is required"),
   branch_short: z.string().min(1, "Branch Short is required"),
   branch_name: z.string().min(1, "Branch Name is required"),
-  invoiceP_dollar_rate: z.string().min(1, "Dollor Rate is required"),
+  invoiceP_dollar_rate: z.string().min(1, "Dollar Rate is required"),
   invoiceP_v_date: z.string().min(1, "Invoice Date is required"),
   invoiceP_usd_amount: z.string().min(1, "USD amount is required"),
   invoiceP_irtt_no: z.string().min(1, "IRTT No is required"),
   invoiceP_status: z.string().min(1, "Status is required"),
+  payment_data: z
+    .array(productRowSchema)
+    .min(1, "At least one product is required"),
 });
 
 const BranchHeader = () => {
@@ -70,47 +74,68 @@ const createBranch = async (data) => {
     body: JSON.stringify(data),
   });
 
-  if (!response.ok) throw new Error("Failed to create branch");
+  if (!response.ok) throw new Error("Failed to create Payment");
   return response.json();
 };
 
-const CreateBranch = () => {
+const CreatePayment = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  // const [formData, setFormData] = useState({
-  //   invoiceP_year: "",
-  //   invoiceP_date: "",
-  //   branch_short: "",
-  //   branch_name: "",
-  //   invoiceP_dollar_rate: "",
-  //   invoiceP_v_date: "",
-  //   invoiceP_usd_amount: "",
-  //   invoiceP_irtt_no: "",
-  //   invoiceP_status: "",
-  //   invoiceData: [],
-  // });
-  // const [invoiceData, setInvoiceData] = useState([
-  //   {
-  //     invoiceSub_item_bag: "",
-  //     invoiceSub_item_name: "",
-  //     invoiceSub_marking: "",
-  //     invoiceSub_descriptionofGoods: "",
-  //     invoiceSub_packing: "",
-  //     invoiceSub_bagsize: "",
-  //     invoiceSub_qntyInMt: "",
-  //     invoiceSub_rateMT: "",
-  //     invoiceSub_sbaga: "",
-  //   },
-  // ]);
-
+  const [formData, setFormData] = useState({
+    invoiceP_year: "",
+    invoiceP_date: "",
+    branch_short: "",
+    branch_name: "",
+    invoiceP_dollar_rate: "",
+    invoiceP_v_date: "",
+    invoiceP_usd_amount: "",
+    invoiceP_irtt_no: "",
+    invoiceP_status: "",
+  });
+  const [invoiceData, setInvoiceData] = useState([
+    {
+      invoicePSub_inv_ref: "",
+      invoicePSub_amt_adv: "",
+      invoicePSub_amt_dp: "",
+      invoicePSub_amt_da: "",
+      invoicePSub_bank_c: "",
+      invoicePSub_discount: "",
+      invoicePSub_shortage: "",
+      invoicePSub_remarks: "",
+    },
+  ]);
   const createBranchMutation = useMutation({
     mutationFn: createBranch,
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Branch created successfully",
+        description: "Payment created successfully",
       });
+      setFormData({
+        invoiceP_year: "",
+        invoiceP_date: "",
+        branch_short: "",
+        branch_name: "",
+        invoiceP_dollar_rate: "",
+        invoiceP_v_date: "",
+        invoiceP_usd_amount: "",
+        invoiceP_irtt_no: "",
+        invoiceP_status: "",
+      });
+      setInvoiceData([
+        {
+          invoicePSub_inv_ref: "",
+          invoicePSub_amt_adv: "",
+          invoicePSub_amt_dp: "",
+          invoicePSub_amt_da: "",
+          invoicePSub_bank_c: "",
+          invoicePSub_discount: "",
+          invoicePSub_shortage: "",
+          invoicePSub_remarks: "",
+        },
+      ]);
     },
+
     onError: (error) => {
       toast({
         title: "Error",
@@ -120,13 +145,13 @@ const CreateBranch = () => {
     },
   });
 
-  // const handleInputChange = (e, field) => {
-  //   const value = e.target.value;
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     [field]: value,
-  //   }));
-  // };
+  const handlePaymentChange = (e, field) => {
+    const value = e.target.value;
+    setInvoiceData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
   const handleInputChange = (e, field) => {
     const value = e.target ? e.target.value : e;
 
@@ -166,18 +191,44 @@ const CreateBranch = () => {
     queryKey: ["branch"],
     queryFn: fetchCompanys,
   });
+  const fieldLabels = {
+    invoicePSub_inv_ref: "Ref",
+    invoicePSub_amt_adv: "Advance",
+    invoicePSub_inv_ref: "invoice Ref",
+    invoicePSub_amt_dp: "dp",
+    invoicePSub_bank_c: "bank",
+    invoicePSub_amt_da: "da",
+    invoicePSub_discount: "discount",
+    invoicePSub_shortage: "shortage",
+    invoiceSub_sbaga: "sbaga",
+    nvoicePSub_remarks: "remarks",
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const validatedData = contractFormSchema.parse(formData);
+      const validatedData = contractFormSchema.parse({
+        ...formData,
+        payment_data: invoiceData,
+      });
+
       createBranchMutation.mutate(validatedData);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessages = error.errors.map((err) => {
+        const groupedErrors = error.errors.reduce((acc, err) => {
           const field = err.path.join(".");
-          return `${field}: ${err.message}`;
-        });
+          if (!acc[field]) acc[field] = [];
+          acc[field].push(err.message);
+          return acc;
+        }, {});
+
+        const errorMessages = Object.entries(groupedErrors).map(
+          ([field, messages]) => {
+            const fieldKey = field.split(".").pop();
+            const label = fieldLabels[fieldKey] || field;
+            return `${label}: ${messages.join(", ")}`;
+          }
+        );
 
         toast({
           title: "Validation Error",
@@ -192,16 +243,19 @@ const CreateBranch = () => {
           ),
           variant: "destructive",
         });
-        return;
-      }
+      } else {
+        // Log the actual error for debugging
+        console.error("Unexpected error:", error);
 
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
+
   return (
     <Page>
       <form onSubmit={handleSubmit} className="w-full p-4">
@@ -394,8 +448,11 @@ const CreateBranch = () => {
                 </label>
                 <Input
                   className="bg-white"
+                  name="invoicePSub_inv_ref"
                   value={invoiceData.invoicePSub_inv_ref}
-                  onChange={(e) => handleInputChange(e, "invoicePSub_inv_ref")}
+                  onChange={(e) =>
+                    handlePaymentChange(e, "invoicePSub_inv_ref")
+                  }
                   placeholder="Enter Invoice Year"
                 />
               </div>
@@ -408,8 +465,11 @@ const CreateBranch = () => {
                 <Input
                   className="bg-white"
                   type="number"
+                  name="invoicePSub_amt_adv"
                   value={invoiceData.invoicePSub_amt_adv}
-                  onChange={(e) => handleInputChange(e, "invoicePSub_amt_adv")}
+                  onChange={(e) =>
+                    handlePaymentChange(e, "invoicePSub_amt_adv")
+                  }
                   placeholder="Enter Invoice Year"
                 />
               </div>
@@ -422,8 +482,9 @@ const CreateBranch = () => {
                 <Input
                   className="bg-white"
                   type="number"
+                  name="invoicePSub_amt_dp"
                   value={invoiceData.invoicePSub_amt_dp}
-                  onChange={(e) => handleInputChange(e, "invoicePSub_amt_dp")}
+                  onChange={(e) => handlePaymentChange(e, "invoicePSub_amt_dp")}
                   placeholder="Enter Invoice Year"
                 />
               </div>
@@ -436,8 +497,9 @@ const CreateBranch = () => {
                 <Input
                   className="bg-white"
                   type="number"
+                  name="invoicePSub_amt_da"
                   value={invoiceData.invoicePSub_amt_da}
-                  onChange={(e) => handleInputChange(e, "invoicePSub_amt_da")}
+                  onChange={(e) => handlePaymentChange(e, "invoicePSub_amt_da")}
                   placeholder="Enter Invoice Year"
                 />
               </div>
@@ -450,8 +512,9 @@ const CreateBranch = () => {
                 <Input
                   className="bg-white"
                   // type="number"
+                  name="invoicePSub_bank_c"
                   value={invoiceData.invoicePSub_bank_c}
-                  onChange={(e) => handleInputChange(e, "invoicePSub_bank_c")}
+                  onChange={(e) => handlePaymentChange(e, "invoicePSub_bank_c")}
                   placeholder="Enter Invoice Year"
                 />
               </div>
@@ -464,8 +527,11 @@ const CreateBranch = () => {
                 <Input
                   className="bg-white"
                   type="number"
+                  name="invoicePSub_discount"
                   value={invoiceData.invoicePSub_discount}
-                  onChange={(e) => handleInputChange(e, "invoicePSub_discount")}
+                  onChange={(e) =>
+                    handlePaymentChange(e, "invoicePSub_discount")
+                  }
                   placeholder="Enter Invoice Year"
                 />
               </div>
@@ -477,8 +543,11 @@ const CreateBranch = () => {
                 </label>
                 <Input
                   className="bg-white"
+                  name="invoicePSub_shortage"
                   value={invoiceData.invoicePSub_shortage}
-                  onChange={(e) => handleInputChange(e, "invoicePSub_shortage")}
+                  onChange={(e) =>
+                    handlePaymentChange(e, "invoicePSub_shortage")
+                  }
                   placeholder="Enter Invoice Year"
                 />
               </div>
@@ -490,8 +559,11 @@ const CreateBranch = () => {
                 </label>
                 <Textarea
                   className="bg-white"
+                  name="invoicePSub_remarks"
                   value={invoiceData.invoicePSub_remarks}
-                  onChange={(e) => handleInputChange(e, "invoicePSub_remarks")}
+                  onChange={(e) =>
+                    handlePaymentChange(e, "invoicePSub_remarks")
+                  }
                   placeholder="Enter Invoice Year"
                 />
               </div>
@@ -506,9 +578,7 @@ const CreateBranch = () => {
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
             disabled={createBranchMutation.isPending}
           >
-            {createBranchMutation.isPending
-              ? "Submitting..."
-              : "Create Payment"}
+            {createBranchMutation.isPending ? "Submitting..." : "Create Branch"}
           </Button>
         </div>
       </form>
@@ -516,4 +586,4 @@ const CreateBranch = () => {
   );
 };
 
-export default CreateBranch;
+export default CreatePayment;

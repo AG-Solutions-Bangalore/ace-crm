@@ -163,7 +163,7 @@ function App() {
 
           {/* //payment */}
           <Route path="/payment-payment-list" element={<PaymentList />} />
-          <Route path="/payment-view" element={<PaymentView />} />
+          <Route path="/payment-view/:id" element={<PaymentView />} />
           <Route path="/payment-create" element={<CreatePayment />} />
           <Route path="/payment-payment-pending" element={<PaymentPending />} />
           <Route path="/payment-payment-close" element={<PaymentClose />} />
