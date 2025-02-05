@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import Page from "../dashboard/page";
+import Page from "../../app/dashboard/page";
 import { Button } from "@/components/ui/button";
 import html2pdf from "html2pdf.js";
 import ReactToPrint from "react-to-print";

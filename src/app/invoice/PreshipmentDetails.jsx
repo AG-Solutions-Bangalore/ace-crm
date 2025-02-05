@@ -433,9 +433,6 @@ const PreshipmentDetails = () => {
                               </p>{" "}
                             </td>
                             <td className="border-r border-black p-2">
-                              {item.InvoiceSubs.item_hsn && (
-                                <p>HSN : {item.InvoiceSubs.item_hsn}</p>
-                              )}
                               {item.invoiceSub_item_name && (
                                 <p>{item.invoiceSub_item_name}</p>
                               )}
@@ -484,7 +481,7 @@ const PreshipmentDetails = () => {
                         <td className="border-r border-black p-2"></td>
                         <td className="border-r border-black p-2"></td>
                         <td className="border-t border-black p-2 text-right font-bold">
-                          28,000.00
+                          $
                           {invoiceSubData
                             .reduce((total, item) => {
                               return (
@@ -501,17 +498,8 @@ const PreshipmentDetails = () => {
                 </div>
 
                 <div className="text-[10px] ">
-                  <p className="flex px-2">
-                    AMOUNT CHARGEABLE IN WORDS -
-                    <p className=" font-semibold ml-4">{totalInWords}</p>
-                  </p>
-
-                  <p className="block font-semibold ml-4">
-                    {invoicePackingData.invoice_lut_code}
-                  </p>
-                  <p className="block font-semibold ml-4 ">
-                    {invoicePackingData.invoice_gr_code}
-                  </p>
+                  <p className="flex px-2">AMOUNT CHARGEABLE IN WORDS -</p>
+                  <p className=" font-semibold ml-8">{totalInWords}</p>
                 </div>
 
                 <div className="grid grid-cols-12 text-[12px]">
@@ -519,14 +507,31 @@ const PreshipmentDetails = () => {
                     {" "}
                     <p className="flex px-2">
                       TOTAL NET WEIGHT :
-                      <p className=" font-semibold ml-4">20,000.00 KGS</p>
+                      <p className=" font-semibold ml-4">
+                        {" "}
+                        {invoiceSubData.reduce(
+                          (total, item) =>
+                            total + (item.invoiceSub_qntyInMt * 1000 || 0),
+                          0
+                        )}{" "}
+                        KGS
+                      </p>
                     </p>{" "}
                   </div>
 
                   <div className="col-span-5  p-2">
                     <p className="flex px-2">
                       TOTAL GROSS WEIGHT :
-                      <p className=" font-semibold ml-4"> 20,160.00 KGS</p>
+                      <p className=" font-semibold ml-4">
+                        {" "}
+                        {invoiceSubData.reduce(
+                          (total, item) =>
+                            total +
+                            item.invoiceSub_item_bag * item.invoiceSub_bagsize,
+                          0
+                        )}{" "}
+                        KGS{" "}
+                      </p>
                     </p>{" "}
                   </div>
                   <div className="col-span-2"></div>
@@ -534,15 +539,14 @@ const PreshipmentDetails = () => {
 
                 <div className="text-[12px] p-2 border-b border-black">
                   <h2 className="font-bold">
-                    SUPPLY MEANT FOR EXPORT ON PAYMENT OF IGST 5%
+                    {invoicePackingData.invoice_lut_code}
                   </h2>
                   <h2 className="font-bold">
-                    SHIPMENT UNDER DUTY DRAWBACK TARRIF ITEM S.NO.12, CHAPTER
-                    12, COLUMN A @ 0.15% - GROUNDNUTS.
+                    {invoicePackingData.invoice_gr_code}
                   </h2>
                 </div>
                 <div className="text-[12px] p-2">
-                  <h2>Remark:</h2>
+                  <h2>Remark:{invoicePackingData.invoice_remarks}</h2>
                   <h2 className="flex justify-end p-6">Checked By</h2>
                 </div>
               </div>

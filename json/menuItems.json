@@ -20,10 +20,6 @@
     "href": "/invoice"
   },
   {
-    "title": "Payment",
-    "href": "/payment-list"
-  },
-  {
     "title": "Master",
     "subItems": [
       {

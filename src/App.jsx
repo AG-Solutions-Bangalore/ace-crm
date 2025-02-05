@@ -48,9 +48,11 @@ import CreatePage from "./app/userManagement/CreatePage";
 import CreateButton from "./app/userManagement/CreateButton";
 import UserTypeList from "./app/UserType/UserTypeList";
 import EditUserType from "./app/UserType/EditUserType";
-import PaymentView from "./app/payment/PaymentView";
-import PaymentList from "./app/payment/PaymentList";
-import CreatePayment from "./app/payment/CreatePayment";
+import PaymentView from "./payment/PaymentList/PaymentView";
+import PaymentList from "./payment/PaymentList/PaymentList";
+import CreatePayment from "./payment/PaymentList/CreatePayment";
+import PaymentPending from "./payment/PaymentPending/PaymentPending";
+import PaymentClose from "./payment/PaymentClose/PaymentClose";
 
 const queryClient = new QueryClient();
 
@@ -142,11 +144,13 @@ function App() {
           <Route path="/report/buyer-report" element={<Buyer />} />
           <Route path="/report/contract-form" element={<ContractForm />} />
           <Route path="/report/contract-report" element={<ContractReport />} />
-          
+
           {/* //payment */}
-          <Route path="/payment-list" element={<PaymentList />} />
+          <Route path="/payment-payment-list" element={<PaymentList />} />
           <Route path="/payment-view" element={<PaymentView />} />
           <Route path="/payment-create" element={<CreatePayment />} />
+          <Route path="/payment-payment-pending" element={<PaymentPending />} />
+          <Route path="/payment-payment-close" element={<PaymentClose />} />
 
           {/* //management */}
           <Route path="/userManagement" element={<UserPage />} />
