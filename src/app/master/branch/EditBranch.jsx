@@ -95,6 +95,10 @@ const EditBranch = () => {
     branch_port_of_loading: "",
     branch_sign_name: "",
     branch_sign_no: "",
+    branch_sign_name1: "",
+    branch_sign_no1: "",
+    branch_sign_name2: "",
+    branch_sign_no2: "",
     branch_status: "Active",
   });
 
@@ -142,6 +146,10 @@ const EditBranch = () => {
         branch_port_of_loading: branchDetails.branch.branch_port_of_loading,
         branch_sign_name: branchDetails.branch.branch_sign_name,
         branch_sign_no: branchDetails.branch.branch_sign_no,
+        branch_sign_name1: branchDetails.branch.branch_sign_name1,
+        branch_sign_no1: branchDetails.branch.branch_sign_no1,
+        branch_sign_name2: branchDetails.branch.branch_sign_name2,
+        branch_sign_no2: branchDetails.branch.branch_sign_no2,
         branch_status: branchDetails.branch.branch_status,
       });
     }
@@ -155,7 +163,7 @@ const EditBranch = () => {
         title: "Success",
         description: "Branch updated successfully",
       });
-      navigate("/branch");
+      navigate("/master/branch");
     },
     onError: (error) => {
       toast({
@@ -419,6 +427,63 @@ const EditBranch = () => {
                   placeholder="Enter signatory number"
                 />
               </div>
+
+
+                <div>
+                              <label
+                                className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                              >
+                                Signatory Name 1
+                              </label>
+                              <Input
+                                className="bg-white"
+                                value={formData.branch_sign_name1}
+                                onChange={(e) => handleInputChange(e, "branch_sign_name1")}
+                                placeholder="Enter signatory Name 1"
+                              />
+                            </div>
+              
+                            <div>
+                              <label
+                                className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                              >
+                                Signatory No 1
+                              </label>
+                              <Input
+                                className="bg-white"
+                                value={formData.branch_sign_no1}
+                                onChange={(e) => handleInputChange(e, "branch_sign_no1")}
+                                placeholder="Enter signatory No 1"
+                              />
+                            </div>
+              
+                            <div>
+                              <label
+                                className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                              >
+                                Signatory Name 2
+                              </label>
+                              <Input
+                                className="bg-white"
+                                value={formData.branch_sign_name2}
+                                onChange={(e) => handleInputChange(e, "branch_sign_name2")}
+                                placeholder="Enter signatory Name 2"
+                              />
+                            </div>
+              
+                            <div>
+                              <label
+                                className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                              >
+                                Signatory No 2
+                              </label>
+                              <Input
+                                className="bg-white"
+                                value={formData.branch_sign_no2}
+                                onChange={(e) => handleInputChange(e, "branch_sign_no2")}
+                                placeholder="Enter signatory No 2"
+                              />
+                            </div>
 
               <div>
                    <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>

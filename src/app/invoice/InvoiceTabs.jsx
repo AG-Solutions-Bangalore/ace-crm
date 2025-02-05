@@ -9,6 +9,8 @@ import InvoiceCertificateOrigin from "./InvoiceCertificateOrigin";
 import InvoiceGst from "./InvoiceGst";
 import BuyerInvoice from "./BuyerInvoice";
 import PerfomaInvoice from "./PerfomaInvoice";
+import InvoicePytho from "./InvoicePytho";
+import InvoiceTripartite from "./InvoiceTripartite";
 
 const InvoiceTabs = () => {
   return (
@@ -106,7 +108,9 @@ const InvoiceTabs = () => {
             <TabsContent value="invoice_gst">
               <InvoiceGst />
             </TabsContent>
-            <TabsContent value="tripartite"></TabsContent>
+            <TabsContent value="tripartite">
+              <InvoiceTripartite/>
+            </TabsContent>
             <TabsContent value="bldraft"></TabsContent>
             <TabsContent value="buyerinvoice">
               <BuyerInvoice />
@@ -114,7 +118,9 @@ const InvoiceTabs = () => {
             <TabsContent value="performainvoice">
               <PerfomaInvoice />
             </TabsContent>
-            <TabsContent value="pytho"></TabsContent>
+            <TabsContent value="pytho">
+              <InvoicePytho/>
+            </TabsContent>
           </div>
         </Tabs>
       </div>
