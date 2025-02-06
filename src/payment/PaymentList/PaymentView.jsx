@@ -7,9 +7,12 @@ import { Printer } from "lucide-react";
 import { useParams } from "react-router-dom";
 import moment from "moment";
 import BASE_URL from "@/config/BaseUrl";
+import LetterHead from "../../../public/assets/AceB.png";
 const PaymentView = () => {
   const [viewData, setViewData] = useState([]);
+  const [paymentSub, setPaymentSub] = useState([]);
   const [invoice, setInvoice] = useState({});
+  const [payment, setPaymentData] = useState({});
 
   const containerRef = useRef();
   const { id } = useParams();
@@ -34,6 +37,8 @@ const PaymentView = () => {
 
         const data = await response.json();
         setViewData(data.paymentSubView);
+        setPaymentSub(data.paymentSub);
+        setPaymentData(data.payment);
         setInvoice(data.invoice);
       } catch (error) {
         console.log(error);
@@ -82,7 +87,17 @@ const PaymentView = () => {
       })
       .save();
   };
+  const totalPerEntry = paymentSub.map(
+    (item) =>
+      item.invoicePSub_amt_adv +
+      item.invoicePSub_amt_dp +
+      item.invoicePSub_amt_da
+  );
 
+  const grandTotal = totalPerEntry.reduce((acc, val) => acc + val, 0);
+  const totalPerBalance = paymentSub.map((item) => item.invoicePSub_discount);
+
+  const grandTotalBalance = totalPerBalance.reduce((acc, val) => acc + val, 0);
   return (
     <Page>
       <button
@@ -123,6 +138,8 @@ const PaymentView = () => {
 
       <div ref={containerRef} className="min-h-screen font-normal ">
         <div className="max-w-4xl mx-auto p-4  text-[12px]">
+          <img src={LetterHead} alt="Letter Head" />
+
           {/* //first */}
           <div className="max-w-4xl mx-auto px-4 pt-4 grid grid-cols-12 gap-4">
             <div className="col-span-7  p-4">
@@ -157,9 +174,15 @@ const PaymentView = () => {
           {/* //thord */}
           <div className="max-w-4xl mx-auto px-4 ">
             <div className="col-span-12 grid grid-cols-4 gap-4 mt-4 px-4 py-2">
-              <div className="col-span-2  ">IRTT No: 12345</div>
-              <div className="col-span-1  ">Date: 08-Nov-21</div>
-              <div className="col-span-1  ">Value: $30,616.95</div>
+              <div className="col-span-2  ">
+                IRTT No : {payment.invoiceP_irtt_no}
+              </div>
+              <div className="col-span-1  ">
+                Date : {moment(payment.invoiceP_v_date).format("DD-MMM-YYYY")}
+              </div>
+              <div className="col-span-1  ">
+                Value: $ {payment.invoiceP_usd_amount}
+              </div>
             </div>
           </div>
           {/* //four table */}
@@ -185,26 +208,30 @@ const PaymentView = () => {
               </thead>
 
               <tbody>
-                {viewData && viewData.length > 0 ? (
-                  viewData.map((pending, index) => (
+                {paymentSub && paymentSub.length > 0 ? (
+                  paymentSub.map((pending, index) => (
                     <tr key={index}>
+                      <td className="border border-black p-2">{index + 1}</td>
                       <td className="border border-black p-2">
-                        {pending.invoice_no}
+                        {pending.invoicePSub_inv_ref} DT{" "}
+                        {moment(pending.invoice_date).format("DD-MM-YYYY")} SB
+                        No {pending.invoice_sb_no} DT{" "}
+                        {moment(pending.invoice_sb_date).format("DD-MM-YYYY")}
                       </td>
                       <td className="border border-black p-2">
-                        {pending.invoice_id}
+                        {pending.invoice_i_value_inr}
+                      </td>
+
+                      <td className="border border-black p-2">
+                        {pending.invoicePSub_amt_adv +
+                          pending.invoicePSub_amt_dp +
+                          pending.invoicePSub_amt_da}{" "}
                       </td>
                       <td className="border border-black p-2">
-                        {pending.amount}
+                        {pending.invoicePSub_discount}
                       </td>
                       <td className="border border-black p-2">
-                        {pending.received}
-                      </td>
-                      <td className="border border-black p-2">
-                        {pending.balance}
-                      </td>
-                      <td className="border border-black p-2">
-                        {pending.status}
+                        {pending.invoicePSub_remarks}
                       </td>
                     </tr>
                   ))
@@ -229,10 +256,10 @@ const PaymentView = () => {
                     Total
                   </td>
                   <td className="border border-black p-2 text-center">
-                    99228.28
+                    {grandTotal}
                   </td>
                   <td className="border border-black p-2 text-center">
-                    $ 1,102.02
+                    $ {grandTotalBalance}
                   </td>
 
                   <td className="border border-black p-2 text-center"></td>
@@ -248,6 +275,8 @@ const PaymentView = () => {
               </p>{" "}
               <p className="py-2">Thanking You,</p>
               <p className="py-2">Yours Truly</p>
+              <p className="py-2">For {invoice.branch_name}</p>
+              <p className="mt-12">Authorised Signatory</p>
             </div>
           </div>
         </div>

@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ProgressBar } from "@/components/spinner/ProgressBar";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,18 +28,18 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { useCurrentYear } from "@/hooks/useCurrentYear";
-// Validation Schema
 
 const productRowSchema = z.object({
+  id: z.any().optional(),
   invoicePSub_inv_ref: z.string().min(1, "Ref data is required"),
-  invoicePSub_amt_adv: z.string().optional(),
-  invoicePSub_amt_dp: z.string().optional(),
-  invoicePSub_amt_da: z.string().optional(),
-  invoicePSub_bank_c: z.string().optional(),
-  invoicePSub_discount: z.string().optional(),
-  invoicePSub_shortage: z.string().optional(),
-  invoiceSub_sbaga: z.string().optional(),
-  invoicePSub_remarks: z.string().optional(),
+  invoicePSub_amt_adv: z.any().optional(),
+  invoicePSub_amt_dp: z.any().optional(),
+  invoicePSub_amt_da: z.any().optional(),
+  invoicePSub_bank_c: z.any().optional(),
+  invoicePSub_discount: z.any().optional(),
+  invoicePSub_shortage: z.any().optional(),
+  invoiceSub_sbaga: z.any().optional(),
+  invoicePSub_remarks: z.any().optional(),
 });
 
 const contractFormSchema = z.object({
@@ -48,9 +48,13 @@ const contractFormSchema = z.object({
   invoiceP_dates: z.string().min(1, "P Date is required"),
   branch_short: z.string().min(1, "Branch Short is required"),
   branch_name: z.string().min(1, "Branch Name is required"),
-  invoiceP_dollar_rate: z.string().min(1, "Dollar Rate is required"),
+  invoiceP_dollar_rate: z.number().min(1, "Dollar Rate is required"),
   invoiceP_v_date: z.string().min(1, "Invoice Date is required"),
-  invoiceP_usd_amount: z.string().min(1, "USD amount is required"),
+  invoiceP_usd_amount: z
+    .union([z.string(), z.number()])
+    .refine((val) => Number(val) >= 1, {
+      message: "USD amount is required and must be at least 1",
+    }),
   invoiceP_irtt_no: z.string().min(1, "IRTT No is required"),
   invoiceP_status: z.string().min(1, "Status is required"),
   payment_data: z.array(productRowSchema),
@@ -62,35 +66,14 @@ const BranchHeader = () => {
       className={`flex sticky top-0 z-10 border border-gray-200 rounded-lg justify-between items-start gap-8 mb-2 ${ButtonConfig.cardheaderColor} p-4 shadow-sm`}
     >
       <div className="flex-1">
-        <h1 className="text-3xl font-bold text-gray-800">Create Payment</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Edit Payment</h1>
       </div>
     </div>
   );
 };
 
-const createBranch = async (data) => {
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("No authentication token found");
-
-  const response = await fetch(`${BASE_URL}/api/panel-create-invoice-payment`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-
-  const responseData = await response.json();
-
-  if (!response.ok) {
-    throw responseData;
-  }
-
-  return responseData;
-};
-
-const CreatePayment = () => {
+const EditPaymentList = () => {
+  const { id } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
   const { data: currentYear } = useCurrentYear();
@@ -113,9 +96,9 @@ const CreatePayment = () => {
     invoiceP_irtt_no: "",
     invoiceP_status: "",
   });
-  console.log(formData, "formda");
   const [invoiceData, setInvoiceData] = useState([
     {
+      id: "",
       invoicePSub_inv_ref: "",
       invoicePSub_amt_adv: 0,
       invoicePSub_amt_dp: 0,
@@ -126,29 +109,32 @@ const CreatePayment = () => {
       invoicePSub_remarks: "",
     },
   ]);
-  const addRow = useCallback(() => {
-    setInvoiceData((prev) => [
-      ...prev,
+
+  const createBranch = async (data) => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("No authentication token found");
+
+    const response = await fetch(
+      `${BASE_URL}/api/panel-update-invoice-payment/${id}`,
       {
-        invoicePSub_inv_ref: "",
-        invoicePSub_amt_adv: "",
-        invoicePSub_amt_dp: "",
-        invoicePSub_amt_da: "",
-        invoicePSub_bank_c: "",
-        invoicePSub_discount: "",
-        invoicePSub_shortage: "",
-        invoicePSub_remarks: "",
-      },
-    ]);
-  }, []);
-  const removeRow = useCallback(
-    (index) => {
-      if (invoiceData.length > 1) {
-        setInvoiceData((prev) => prev.filter((_, i) => i !== index));
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       }
-    },
-    [invoiceData.length]
-  );
+    );
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      throw responseData;
+    }
+
+    return responseData;
+  };
+
   const createBranchMutation = useMutation({
     mutationFn: createBranch,
     onSuccess: (response) => {
@@ -170,30 +156,6 @@ const CreatePayment = () => {
           variant: "destructive",
         });
       }
-      setFormData({
-        invoiceP_years: currentYear,
-        invoiceP_dates: "",
-        branch_short: "",
-        branch_name: "",
-        invoiceP_dollar_rate: "",
-        invoiceP_v_date: "",
-        invoiceP_usd_amount: "",
-        invoiceP_irtt_no: "",
-        invoiceP_status: "",
-      });
-
-      setInvoiceData([
-        {
-          invoicePSub_inv_ref: "",
-          invoicePSub_amt_adv: "",
-          invoicePSub_amt_dp: "",
-          invoicePSub_amt_da: "",
-          invoicePSub_bank_c: "",
-          invoicePSub_discount: "",
-          invoicePSub_shortage: "",
-          invoicePSub_remarks: "",
-        },
-      ]);
     },
     onError: (error) => {
       console.error("API Error:", error);
@@ -208,6 +170,7 @@ const CreatePayment = () => {
 
   const handlePaymentChange = (e, rowIndex, fieldName) => {
     const value = e.target.value;
+    console.log(typeof value);
 
     if (
       fieldName === "invoicePSub_inv_ref" ||
@@ -287,29 +250,6 @@ const CreatePayment = () => {
     queryKey: ["payment"],
     queryFn: fetchPaymentStatus,
   });
-  const fetchPaymentAmount = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("No authentication token found");
-
-    const response = await fetch(
-      `${BASE_URL}/api/panel-fetch-invoice-payment-amount`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) throw new Error("Failed to fetch company data");
-    const data = await response.json();
-    return data.invoicePaymentAmount;
-  };
-
-  const { data: PaymentAmount } = useQuery({
-    queryKey: ["paymentamount"],
-    queryFn: fetchPaymentAmount,
-  });
 
   const fieldLabels = {
     invoicePSub_inv_ref: " Invoice Ref",
@@ -373,6 +313,63 @@ const CreatePayment = () => {
     }
   };
 
+  const {
+    data: paymentDatas,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["payment", id],
+    queryFn: async () => {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${BASE_URL}/api/panel-fetch-invoice-payment-by-id/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to fetch payment");
+      return response.json();
+    },
+  });
+  useEffect(() => {
+    if (paymentDatas) {
+      setFormData((prev) => ({
+        ...prev,
+        invoiceP_years: paymentDatas.payment.invoiceP_year || currentYear,
+        invoiceP_dates: paymentDatas.payment.invoiceP_date || "",
+        branch_short: paymentDatas.payment.branch_short || "",
+        branch_name: paymentDatas.payment.branch_name || "",
+        invoiceP_dollar_rate: paymentDatas.payment.invoiceP_dollar_rate || "",
+        invoiceP_v_date: paymentDatas.payment.invoiceP_v_date || "",
+        invoiceP_usd_amount: paymentDatas.payment.invoiceP_usd_amount || "",
+        invoiceP_irtt_no: paymentDatas.payment.invoiceP_irtt_no || "",
+        invoiceP_status: paymentDatas.payment.invoiceP_status || "",
+      }));
+
+      if (Array.isArray(paymentDatas.paymentSub)) {
+        setInvoiceData(
+          paymentDatas.paymentSub.map((sub, index) => {
+            return {
+              id: sub.id ?? "",
+              invoicePSub_inv_ref: sub.invoicePSub_inv_ref || "",
+              invoicePSub_amt_adv: sub.invoicePSub_amt_adv || 0,
+              invoicePSub_amt_dp: sub.invoicePSub_amt_dp || 0,
+              invoicePSub_amt_da: sub.invoicePSub_amt_da || 0,
+              invoicePSub_bank_c: sub.invoicePSub_bank_c || 0,
+              invoicePSub_discount: sub.invoicePSub_discount || 0,
+              invoicePSub_shortage: sub.invoicePSub_shortage || 0,
+              invoicePSub_remarks: sub.invoicePSub_remarks || "",
+            };
+          })
+        );
+      } else {
+        console.warn("paymentSub is not an array:", paymentDatas.paymentSub);
+      }
+    }
+  }, [paymentDatas]);
   return (
     <Page>
       <form onSubmit={handleSubmit} className="w-full p-4">
@@ -389,7 +386,7 @@ const CreatePayment = () => {
                   </label>
                   <Input
                     className="bg-white"
-                    value={formData.invoiceP_dates}
+                    value={formData.invoiceP_dates || ""}
                     onChange={(e) => handleInputChange(e, "invoiceP_dates")}
                     placeholder="Enter Payment Date"
                     type="date"
@@ -402,28 +399,13 @@ const CreatePayment = () => {
                 >
                   Company <span className="text-red-500">*</span>
                 </label>
-                <Select
+
+                <Input
+                  className="bg-white"
                   value={formData.branch_short}
-                  onValueChange={(value) =>
-                    handleInputChange({ target: { value } }, "branch_short")
-                  }
-                >
-                  <SelectTrigger className="bg-white">
-                    <SelectValue placeholder="Select Company" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    <SelectContent>
-                      {branchData?.branch?.map((branch) => (
-                        <SelectItem
-                          key={branch.branch_short}
-                          value={branch.branch_short.toString()}
-                        >
-                          {branch.branch_short}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </SelectContent>
-                </Select>
+                  onChange={(e) => handleInputChange(e, "branch_short")}
+                  disabled
+                />
               </div>
 
               <div>
@@ -476,6 +458,7 @@ const CreatePayment = () => {
                     }
                     placeholder="Enter Dollor Rate"
                     type="number"
+                    disabled
                   />
                 </div>
               </div>
@@ -554,9 +537,6 @@ const CreatePayment = () => {
                     <TableHead className="text-sm font-semibold text-gray-600 py-2 px-4">
                       Remarks
                     </TableHead>
-                    <TableHead className="text-sm font-semibold text-gray-600 py-2 px-4">
-                      Actions
-                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -566,42 +546,18 @@ const CreatePayment = () => {
                       className="border-t border-gray-200 hover:bg-gray-50"
                     >
                       <TableCell className="px-4 py-2">
-                        <Select
+                        <Input
+                          className="bg-white"
                           value={row.invoicePSub_inv_ref}
-                          onValueChange={(value) => {
+                          onChange={(e) =>
                             handlePaymentChange(
                               { target: { value } },
                               rowIndex,
                               "invoicePSub_inv_ref"
-                            );
-                          }}
-                        >
-                          <SelectTrigger className="bg-white border border-gray-300">
-                            <SelectValue placeholder="Select Payment">
-                              {row.invoicePSub_inv_ref || "Select Payment"}
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent className="bg-white border border-gray-300">
-                            {PaymentAmount?.map((status, index) => (
-                              <SelectItem
-                                key={index}
-                                value={status.invoice_ref}
-                              >
-                                <div className="flex flex-col">
-                                  <span className="font-bold text-sm">
-                                    {status.invoice_ref}
-                                  </span>
-                                  <span className="text-gray-600 text-xs">
-                                    Amount (USD): {status.invoice_i_value_usd}
-                                  </span>
-                                  <span className="text-gray-600 text-xs">
-                                    Balance: {status.balance}
-                                  </span>
-                                </div>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                            )
+                          }
+                          disabled
+                        />
                       </TableCell>
                       <TableCell className="px-4 py-2">
                         <Input
@@ -701,27 +657,6 @@ const CreatePayment = () => {
                           placeholder="Enter Remarks"
                         />
                       </TableCell>
-                      <TableCell className="px-4 py-2 text-right">
-                        <div className="flex justify-end space-x-2">
-                          <Button
-                            type="button"
-                            onClick={addRow}
-                            className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-                          >
-                            <PlusCircle className="h-4 w-4 mr-2" />
-                            Add
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            onClick={() => removeRow(rowIndex)}
-                            disabled={invoiceData.length === 1}
-                            className="text-red-500"
-                            type="button"
-                          >
-                            <MinusCircle className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -736,9 +671,7 @@ const CreatePayment = () => {
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
             disabled={createBranchMutation.isPending}
           >
-            {createBranchMutation.isPending
-              ? "Submitting..."
-              : "Create Payment"}
+            {createBranchMutation.isPending ? "Updatting..." : "Update Payment"}
           </Button>
         </div>
       </form>
@@ -746,4 +679,4 @@ const CreatePayment = () => {
   );
 };
 
-export default CreatePayment;
+export default EditPaymentList;

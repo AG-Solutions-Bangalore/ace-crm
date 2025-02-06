@@ -128,7 +128,7 @@ const PaymentList = () => {
       header: "Date",
       cell: ({ row }) => {
         const date = row.getValue("invoiceP_date");
-        return moment(date).format("DDD-MMM-YYYY");
+        return date ? moment(date).format("DD-MMM-YYYY") : "";
       },
     },
     {
@@ -150,10 +150,14 @@ const PaymentList = () => {
       ),
       cell: ({ row }) => <div>{row.getValue("invoiceP_dollar_rate")}</div>,
     },
+
     {
       accessorKey: "invoiceP_v_date",
       header: "V Date",
-      cell: ({ row }) => <div>{row.getValue("invoiceP_v_date")}</div>,
+      cell: ({ row }) => {
+        const date = row.getValue("invoiceP_v_date");
+        return date ? moment(date).format("DD-MMM-YYYY") : "";
+      },
     },
     {
       accessorKey: "invoiceP_usd_amount",
@@ -180,7 +184,7 @@ const PaymentList = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <InvoiceEdit
-                    onClick={() => navigate(`/edit-invoice/${invoiceId}`)}
+                    onClick={() => navigate(`/payment-edit/${invoiceId}`)}
                   ></InvoiceEdit>
                 </TooltipTrigger>
                 <TooltipContent>Edit payment</TooltipContent>
