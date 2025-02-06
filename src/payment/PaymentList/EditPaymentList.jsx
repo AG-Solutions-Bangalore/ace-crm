@@ -265,6 +265,28 @@ const EditPaymentList = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const totalInvoiceSubAmount = invoiceData.reduce(
+        (sum, item) =>
+          sum +
+          (Number(item.invoicePSub_amt_adv) || 0) +
+          (Number(item.invoicePSub_amt_dp) || 0) +
+          (Number(item.invoicePSub_amt_da) || 0) +
+          (Number(item.invoicePSub_bank_c) || 0) +
+          (Number(item.invoicePSub_discount) || 0) +
+          (Number(item.invoicePSub_shortage) || 0),
+        0
+      );
+
+      const invoiceUsdAmount = Number(formData.invoiceP_usd_amount) || 0;
+
+      if (invoiceUsdAmount !== totalInvoiceSubAmount) {
+        throw new z.ZodError([
+          {
+            path: ["invoiceP_usd_amount"],
+            message: "Amount Does Not Match",
+          },
+        ]);
+      }
       const validatedData = contractFormSchema.parse({
         ...formData,
         payment_data: invoiceData,

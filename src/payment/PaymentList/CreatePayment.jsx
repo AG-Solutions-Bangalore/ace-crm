@@ -32,13 +32,13 @@ import { useCurrentYear } from "@/hooks/useCurrentYear";
 
 const productRowSchema = z.object({
   invoicePSub_inv_ref: z.string().min(1, "Ref data is required"),
-  invoicePSub_amt_adv: z.string().optional(),
-  invoicePSub_amt_dp: z.string().optional(),
-  invoicePSub_amt_da: z.string().optional(),
-  invoicePSub_bank_c: z.string().optional(),
-  invoicePSub_discount: z.string().optional(),
-  invoicePSub_shortage: z.string().optional(),
-  invoiceSub_sbaga: z.string().optional(),
+  invoicePSub_amt_adv: z.any().optional(),
+  invoicePSub_amt_dp: z.any().optional(),
+  invoicePSub_amt_da: z.any().optional(),
+  invoicePSub_bank_c: z.any().optional(),
+  invoicePSub_discount: z.any().optional(),
+  invoicePSub_shortage: z.any().optional(),
+  invoiceSub_sbaga: z.any().optional(),
   invoicePSub_remarks: z.string().optional(),
 });
 
@@ -325,6 +325,28 @@ const CreatePayment = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const totalInvoiceSubAmount = invoiceData.reduce(
+        (sum, item) =>
+          sum +
+          (Number(item.invoicePSub_amt_adv) || 0) +
+          (Number(item.invoicePSub_amt_dp) || 0) +
+          (Number(item.invoicePSub_amt_da) || 0) +
+          (Number(item.invoicePSub_bank_c) || 0) +
+          (Number(item.invoicePSub_discount) || 0) +
+          (Number(item.invoicePSub_shortage) || 0),
+        0
+      );
+
+      const invoiceUsdAmount = Number(formData.invoiceP_usd_amount) || 0;
+
+      if (invoiceUsdAmount !== totalInvoiceSubAmount) {
+        throw new z.ZodError([
+          {
+            path: ["invoiceP_usd_amount"],
+            message: "Amount Does Not Match",
+          },
+        ]);
+      }
       const validatedData = contractFormSchema.parse({
         ...formData,
         payment_data: invoiceData,

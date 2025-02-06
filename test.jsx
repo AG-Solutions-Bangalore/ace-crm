@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ProgressBar } from "@/components/spinner/ProgressBar";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import { Textarea } from "@/components/ui/textarea";
@@ -62,7 +62,7 @@ const BranchHeader = () => {
       className={`flex sticky top-0 z-10 border border-gray-200 rounded-lg justify-between items-start gap-8 mb-2 ${ButtonConfig.cardheaderColor} p-4 shadow-sm`}
     >
       <div className="flex-1">
-        <h1 className="text-3xl font-bold text-gray-800">Edit Payment</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Create Payment</h1>
       </div>
     </div>
   );
@@ -90,8 +90,7 @@ const createBranch = async (data) => {
   return responseData;
 };
 
-const EditPaymentList = () => {
-  const { id } = useParams();
+const CreatePayment = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { data: currentYear } = useCurrentYear();
@@ -114,6 +113,7 @@ const EditPaymentList = () => {
     invoiceP_irtt_no: "",
     invoiceP_status: "",
   });
+  console.log(formData, "formda");
   const [invoiceData, setInvoiceData] = useState([
     {
       invoicePSub_inv_ref: "",
@@ -208,7 +208,6 @@ const EditPaymentList = () => {
 
   const handlePaymentChange = (e, rowIndex, fieldName) => {
     const value = e.target.value;
-    console.log(typeof value);
 
     if (
       fieldName === "invoicePSub_inv_ref" ||
@@ -374,56 +373,6 @@ const EditPaymentList = () => {
     }
   };
 
-  const {
-    data: paymentDatas,
-    isLoading,
-    isError,
-    refetch,
-  } = useQuery({
-    queryKey: ["payment", id],
-    queryFn: async () => {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${BASE_URL}/api/panel-fetch-invoice-payment-by-id/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to fetch payment");
-      return response.json();
-    },
-  });
-  useEffect(() => {
-    if (paymentDatas) {
-      setFormData((prev) => ({
-        ...prev,
-        invoiceP_years: paymentDatas.payment.invoiceP_year || currentYear,
-        invoiceP_dates: paymentDatas.payment.invoiceP_date || "",
-        branch_short: paymentDatas.payment.branch_short || "",
-        branch_name: paymentDatas.payment.branch_name || "",
-        invoiceP_dollar_rate: paymentDatas.payment.invoiceP_dollar_rate || "",
-        invoiceP_v_date: paymentDatas.payment.invoiceP_v_date || "",
-        invoiceP_usd_amount: paymentDatas.payment.invoiceP_usd_amount || "",
-        invoiceP_irtt_no: paymentDatas.payment.invoiceP_irtt_no || "",
-        invoiceP_status: paymentDatas.payment.invoiceP_status || "",
-      }));
-
-      setInvoiceData(
-        paymentDatas.paymentSub?.map((sub) => ({
-          invoicePSub_inv_ref: sub.invoicePSub_inv_ref || "",
-          invoicePSub_amt_adv: sub.invoicePSub_amt_adv || 0,
-          invoicePSub_amt_dp: sub.invoicePSub_amt_dp || 0,
-          invoicePSub_amt_da: sub.invoicePSub_amt_da || 0,
-          invoicePSub_bank_c: sub.invoicePSub_bank_c || 0,
-          invoicePSub_discount: sub.invoicePSub_discount || 0,
-          invoicePSub_shortage: sub.invoicePSub_shortage || 0,
-          invoicePSub_remarks: sub.invoicePSub_remarks || "",
-        })) || []
-      );
-    }
-  }, [paymentDatas]);
   return (
     <Page>
       <form onSubmit={handleSubmit} className="w-full p-4">
@@ -440,7 +389,7 @@ const EditPaymentList = () => {
                   </label>
                   <Input
                     className="bg-white"
-                    value={formData.invoiceP_dates || ""}
+                    value={formData.invoiceP_dates}
                     onChange={(e) => handleInputChange(e, "invoiceP_dates")}
                     placeholder="Enter Payment Date"
                     type="date"
@@ -787,7 +736,9 @@ const EditPaymentList = () => {
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
             disabled={createBranchMutation.isPending}
           >
-            {createBranchMutation.isPending ? "Updatting..." : "Update Payment"}
+            {createBranchMutation.isPending
+              ? "Submitting..."
+              : "Create Payment"}
           </Button>
         </div>
       </form>
@@ -795,4 +746,4 @@ const EditPaymentList = () => {
   );
 };
 
-export default EditPaymentList;
+export default CreatePayment;
