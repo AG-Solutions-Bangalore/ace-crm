@@ -64,7 +64,7 @@ export function AppSidebar({ ...props }) {
       {
         title: "Master",
         url: "#",
-        isActive: true,
+        isActive: false,
         icon: Settings2,
         items: [
           {
@@ -157,7 +157,7 @@ export function AppSidebar({ ...props }) {
         title: "Reports",
         url: "#",
         icon: Settings2,
-        isActive: true,
+        isActive: false,
         items: [
           {
             title: "BuyerR",
@@ -181,7 +181,7 @@ export function AppSidebar({ ...props }) {
         title: "Payment",
         url: "#",
         icon: Settings2,
-        isActive: true,
+        isActive: false,
         items: [
           {
             title: "PaymentList",
