@@ -76,6 +76,7 @@ export default function Page({ children }) {
           </div>
         </div>
       </SidebarInset>
+      
     </SidebarProvider>)
   );
 }

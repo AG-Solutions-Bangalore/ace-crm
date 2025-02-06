@@ -116,17 +116,32 @@ const EditBank = ({ bankId }) => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`${BASE_URL}/api/panel-update-bank/${bankId}`, formData, {
+      const response = await axios.put(`${BASE_URL}/api/panel-update-bank/${bankId}`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      toast({
-        title: "Success",
-        description: "Bank updated successfully",
-      });
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+       
+        await queryClient.invalidateQueries(["banks"]);
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
 
-      await queryClient.invalidateQueries(["banks"]);
-      setOpen(false);
+
+
+
     } catch (error) {
       toast({
         title: "Error",

@@ -90,7 +90,7 @@ const EditProduct = ({productId}) => {
       setIsLoading(true);
       try {
         const token = localStorage.getItem("token");
-        await axios.put(
+        const response = await axios.put(
           `${BASE_URL}/api/panel-update-product/${productId}`,
           formData,
           {
@@ -98,13 +98,25 @@ const EditProduct = ({productId}) => {
           }
         );
   
-        toast({
-          title: "Success",
-          description: "Product updated successfully",
-        });
-  
-        await queryClient.invalidateQueries(["product"]);
-        setOpen(false);
+       
+    if (response?.data.code == 200) {
+    
+      toast({
+        title: "Success",
+        description: response.data.msg
+      });
+
+     
+    await queryClient.invalidateQueries(["product"]);
+      setOpen(false);
+    } else {
+     
+      toast({
+        title: "Error",
+        description: response.data.msg,
+        variant: "destructive",
+      });
+    }
       } catch (error) {
         toast({
           title: "Error",

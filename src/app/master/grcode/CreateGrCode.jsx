@@ -46,21 +46,32 @@ const CreateGrCode = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${BASE_URL}/api/panel-create-grcode`, formData, {
+      const response = await axios.post(`${BASE_URL}/api/panel-create-grcode`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      toast({
-        title: "Success",
-        description: "Grcode created successfully",
-      });
 
-      setFormData({
-        gr_code_des: "",
-        product_name: "",
-      });
-      await queryClient.invalidateQueries(["grcodeList"]);
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+        setFormData({
+          gr_code_des: "",
+          product_name: "",
+        });
+        await queryClient.invalidateQueries(["grcodeList"]);
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

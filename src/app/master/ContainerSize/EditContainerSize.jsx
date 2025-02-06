@@ -94,7 +94,7 @@ const EditContainerSize = ({ containerId }) => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
+      const response =  await axios.put(
         `${BASE_URL}/api/panel-update-container-size/${containerId}`,
         formData,
         {
@@ -102,13 +102,23 @@ const EditContainerSize = ({ containerId }) => {
         }
       );
 
-      toast({
-        title: "Success",
-        description: "Container size updated successfully",
-      });
-
-      await queryClient.invalidateQueries(["containersizes"]);
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+        await queryClient.invalidateQueries(["containersizes"]);
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

@@ -89,7 +89,7 @@ const EditGrCode = ({ grcodeId }) => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
+      const response =  await axios.put(
         `${BASE_URL}/api/panel-update-grcode/${grcodeId}`,
         formData,
         {
@@ -97,13 +97,25 @@ const EditGrCode = ({ grcodeId }) => {
         }
       );
 
+     
+    if (response?.data.code == 200) {
+    
       toast({
         title: "Success",
-        description: "GR code updated successfully",
+        description: response.data.msg
       });
 
+      
       await queryClient.invalidateQueries(["grcodeList"]);
       setOpen(false);
+    } else {
+     
+      toast({
+        title: "Error",
+        description: response.data.msg,
+        variant: "destructive",
+      });
+    }
     } catch (error) {
       toast({
         title: "Error",

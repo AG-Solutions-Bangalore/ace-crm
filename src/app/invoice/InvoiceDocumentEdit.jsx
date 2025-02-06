@@ -91,6 +91,8 @@ const InvoiceDocumentEdit = () => {
         invoice_exch_rate: "",
         invoice_let_exports_date: "",
         invoice_vessel: "",
+        invoice_insurance: "",
+        invoice_freight: "",
        
       });
      
@@ -139,6 +141,8 @@ const InvoiceDocumentEdit = () => {
             invoice_exch_rate: documentDetails.invoice.invoice_exch_rate,
             invoice_let_exports_date: documentDetails.invoice.invoice_let_exports_date,
             invoice_vessel: documentDetails.invoice.invoice_vessel,
+            invoice_insurance: documentDetails.invoice.invoice_insurance,
+            invoice_freight: documentDetails.invoice.invoice_freight,
        
           });
         }
@@ -496,6 +500,33 @@ const InvoiceDocumentEdit = () => {
                        />
                      </div>
        
+
+
+                     <div>
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
+                         Insurance <span className="text-red-500">*</span>
+                       </label>
+                       <Input
+                          className="bg-white"
+                         value={formData.invoice_insurance}
+                         onChange={(e) => handleDecimalInputChange(e, "invoice_insurance")}
+                         placeholder="Enter Insurance"
+                       />
+                     </div>
+
+
+
+                     <div>
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
+                         Freight <span className="text-red-500">*</span>
+                       </label>
+                       <Input
+                          className="bg-white"
+                         value={formData.invoice_freight}
+                         onChange={(e) => handleDecimalInputChange(e, "invoice_freight")}
+                         placeholder="Enter Freight"
+                       />
+                     </div>
                   
        
                      {/* <div>

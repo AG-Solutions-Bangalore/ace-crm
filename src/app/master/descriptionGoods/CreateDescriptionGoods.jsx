@@ -38,7 +38,7 @@ const CreateDescriptionGoods = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
+      const response = await axios.post(
         `${BASE_URL}/api/panel-create-descriptionofGoods`,
         formData,
         {
@@ -46,16 +46,26 @@ const CreateDescriptionGoods = () => {
         }
       );
 
-      toast({
-        title: "Success",
-        description: "Description goods created successfully",
-      });
-
-      setFormData({
-        descriptionofGoods: "",
-      });
-      await queryClient.invalidateQueries(["descriptionGoods"]);
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+        setFormData({
+          descriptionofGoods: "",
+        });
+        await queryClient.invalidateQueries(["descriptionGoods"]);
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

@@ -92,7 +92,7 @@ const EditState = ({ stateId }) => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
+      const response = await axios.put(
         `${BASE_URL}/api/panel-update-state/${stateId}`,
         formData,
         {
@@ -100,13 +100,27 @@ const EditState = ({ stateId }) => {
         }
       );
 
-      toast({
-        title: "Success",
-        description: "State updated successfully",
-      });
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+        
+        await queryClient.invalidateQueries(["customers"]);
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
 
-      await queryClient.invalidateQueries(["customers"]);
-      setOpen(false);
+
+
     } catch (error) {
       toast({
         title: "Error",

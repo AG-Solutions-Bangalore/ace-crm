@@ -37,20 +37,31 @@ const CreatePortofLoading = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${BASE_URL}/api/panel-create-portofLoading`, formData, {
+      const response = await axios.post(`${BASE_URL}/api/panel-create-portofLoading`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      toast({
-        title: "Success",
-        description: "PortofLoading created successfully",
-      });
-
-      setFormData({
-        portofLoading: "",
-      });
-      await queryClient.invalidateQueries(["portofLoadingList"]);
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+        setFormData({
+          portofLoading: "",
+        });
+        await queryClient.invalidateQueries(["portofLoadingList"]);
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
+  
     } catch (error) {
       toast({
         title: "Error",

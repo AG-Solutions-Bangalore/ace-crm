@@ -37,20 +37,30 @@ const CreateMarking = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${BASE_URL}/api/panel-create-marking`, formData, {
+      const response = await axios.post(`${BASE_URL}/api/panel-create-marking`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      toast({
-        title: "Success",
-        description: "Marking created successfully",
-      });
-
-      setFormData({
-        marking: "",
-      });
-      await queryClient.invalidateQueries(["markings"]);
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+        setFormData({
+          marking: "",
+        });
+        await queryClient.invalidateQueries(["markings"]);
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

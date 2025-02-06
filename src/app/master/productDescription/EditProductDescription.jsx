@@ -113,7 +113,7 @@ const EditProductDescription = ({ proDescId }) => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
+      const response = await axios.put(
         `${BASE_URL}/api/panel-update-product-description/${proDescId}`,
         formData,
         {
@@ -121,13 +121,25 @@ const EditProductDescription = ({ proDescId }) => {
         }
       );
 
-      toast({
-        title: "Success",
-        description: "Product Desc updated successfully",
-      });
-
-      await queryClient.invalidateQueries(["productsSub"]);
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+       
+        await queryClient.invalidateQueries(["productsSub"]);
+  
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

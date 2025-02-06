@@ -37,20 +37,32 @@ const CreatePreReceipt = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${BASE_URL}/api/panel-create-prereceipts`, formData, {
+      const response = await axios.post(`${BASE_URL}/api/panel-create-prereceipts`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      toast({
-        title: "Success",
-        description: "Pre Receipt created successfully",
-      });
-
-      setFormData({
-        prereceipts_name: "",
-      });
-      await queryClient.invalidateQueries(["prereceipt"]);
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+        setFormData({
+          prereceipts_name: "",
+        });
+        await queryClient.invalidateQueries(["prereceipt"]);
+  
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
+  
     } catch (error) {
       toast({
         title: "Error",

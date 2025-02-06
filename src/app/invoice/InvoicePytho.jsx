@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import { getTodayDate } from "@/utils/currentDate";
-import { Loader2 } from "lucide-react";
+import { Loader2, Printer } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useParams } from "react-router-dom";
@@ -76,39 +76,37 @@ useEffect(() => {
               `,
   });
   
-    if (loading) {
-      return (
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
+  if (loading) {
+    return (
+      <Card className="w-full h-[80vh] flex items-center justify-center">
+        <CardContent>
+          <Button disabled className="flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
             Loading Pytho Data
           </Button>
-        </div>
-      );
-    }
+        </CardContent>
+      </Card>
+    );
+  }
   
-    if (error) {
-      return (
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching Pytho Data
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline">Try Again</Button>
-          </CardContent>
-        </Card>
-      );
-    }
+  if (error) {
+    return (
+      <Card className="w-full">
+        <CardContent className="p-6">
+          <div className="text-red-500 mb-4">Error: {error}</div>
+          <Button variant="outline">Try Again</Button>
+        </CardContent>
+      </Card>
+    );
+  }
   return (
     <div>
       <div>
-        <button
+      <button
           onClick={handlPrintPdf}
-          className="fixed bottom-20 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
+          className="fixed top-5 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
         >
-          Print
+         <Printer className="h-4 w-4"/>
         </button>
       </div>
       <div ref={containerRef} className="max-w-3xl mx-auto p-6 bg-white  ">

@@ -61,25 +61,34 @@ const CreateBank = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${BASE_URL}/api/panel-create-bank`, formData, {
+      const response = await axios.post(`${BASE_URL}/api/panel-create-bank`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      toast({
-        title: "Success",
-        description: "Bank created successfully",
-      });
-
-      setFormData({
-        branch_short: "",
-        bank_name: "",
-        bank_details: "",
-        bank_acc_no: "",
-        bank_branch: "",
-      });
-      await queryClient.invalidateQueries(["banks"]);
-
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+        setFormData({
+          branch_short: "",
+          bank_name: "",
+          bank_details: "",
+          bank_acc_no: "",
+          bank_branch: "",
+        });
+        await queryClient.invalidateQueries(["banks"]);
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

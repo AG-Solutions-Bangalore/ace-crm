@@ -37,20 +37,31 @@ const CreateShipper = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${BASE_URL}/api/panel-create-shipper`, formData, {
+      const response = await axios.post(`${BASE_URL}/api/panel-create-shipper`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      toast({
-        title: "Success",
-        description: "Shipper created successfully",
-      });
-
-      setFormData({
-        shipper_name: "",
-      });
-      await queryClient.invalidateQueries(["shippers"]);
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+        setFormData({
+          shipper_name: "",
+        });
+        await queryClient.invalidateQueries(["shippers"]);
+  
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

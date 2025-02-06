@@ -37,20 +37,30 @@ const CreateQuality = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${BASE_URL}/api/panel-create-quality`, formData, {
+      const response = await axios.post(`${BASE_URL}/api/panel-create-quality`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      toast({
-        title: "Success",
-        description: "Quality created successfully",
-      });
-
-      setFormData({
-        quality: "",
-      });
-      await queryClient.invalidateQueries(["qualityList"]);
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+        setFormData({
+          quality: "",
+        });
+        await queryClient.invalidateQueries(["qualityList"]);
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

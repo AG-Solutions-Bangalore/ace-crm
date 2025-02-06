@@ -50,6 +50,7 @@ const EditBagType = ({ bagTypeId }) => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+
       const bagTypeData = response?.data?.bagType;
       setFormData({
         bagType_status: bagTypeData.bagType_status || "Active",
@@ -57,6 +58,9 @@ const EditBagType = ({ bagTypeId }) => {
       setOriginalData({
         bagType_status: bagTypeData.bagType_status || "Active",
       });
+
+
+
     } catch (error) {
       toast({
         title: "Error",
@@ -104,6 +108,10 @@ const EditBagType = ({ bagTypeId }) => {
 
       await queryClient.invalidateQueries(["bagTypeList"]);
       setOpen(false);
+
+
+
+      
     } catch (error) {
       toast({
         title: "Error",
