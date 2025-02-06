@@ -88,7 +88,7 @@ const PaymentClose = () => {
       header: "BL Date",
       cell: ({ row }) => {
         const date = row.getValue("invoice_bl_date");
-        return moment(date).format("DD-MMM-YYYY");
+        return date ? moment(date).format("DD-MMM-YYYY") : "";
       },
     },
     {
@@ -210,7 +210,7 @@ const PaymentClose = () => {
           <div className="relative w-72">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
             <Input
-              placeholder="Search  Payment Pending ..."
+              placeholder="Search  Payment Close ..."
               value={table.getState().globalFilter || ""}
               onChange={(event) => table.setGlobalFilter(event.target.value)}
               className="pl-8 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-gray-200"

@@ -10,7 +10,14 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, Eye, Loader2, Search } from "lucide-react";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  Eye,
+  Loader2,
+  Search,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -37,16 +44,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+
+import PaymentDetailsDialog from "./PaymentDetailsDialog";
 
 const PaymentPending = () => {
   // State for table management
@@ -54,8 +53,10 @@ const PaymentPending = () => {
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
-  const [viewData, setViewData] = useState([]);
-  const [selectedId, setSelectedId] = useState(null);
+  const [selectedInvoiceNo, setSelectedInvoiceNo] = useState(null);
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const {
     data: paymentpending,
     isLoading,
@@ -74,35 +75,16 @@ const PaymentPending = () => {
       return response.data.invoicePaymentAmount;
     },
   });
-  useEffect(() => {
-    const fetchContractData = async (selectedId) => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `${BASE_URL}/api/panel-fetch-invoice-payment-by-invoiceno/${selectedId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch contract data");
-        }
+  const handleViewClick = (invoiceNo) => {
+    setSelectedInvoiceNo(invoiceNo);
+    setIsDialogOpen(true);
+  };
 
-        const data = await response.json();
-        setViewData(data.paymentSubView);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    if (selectedId) {
-      fetchContractData(selectedId);
-    }
-  }, [selectedId]);
-  console.log(viewData);
+  const handleDialogClose = () => {
+    setSelectedInvoiceNo(null);
+    setIsDialogOpen(false);
+  };
   const columns = [
     {
       accessorKey: "invoice_no",
@@ -122,7 +104,7 @@ const PaymentPending = () => {
       header: "BL Date",
       cell: ({ row }) => {
         const date = row.getValue("invoice_bl_date");
-        return moment(date).format("DD-MMM-YYYY");
+        return date ? moment(date).format("DD-MMM-YYYY") : "";
       },
     },
     {
@@ -154,25 +136,35 @@ const PaymentPending = () => {
       id: "actions",
       header: "Action",
       cell: ({ row }) => {
-        const invoiceId = row.original.id;
+        const Received = row.original.received;
 
         return (
           <div className="flex flex-row">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Eye
-                    className="h-4 w-4 cursor-pointer"
-                    onClick={() => {
-                      const id = row.original.invoice_no;
-                      setViewData(null);
-                      setSelectedId(id);
-                    }}
-                  />
-                </TooltipTrigger>
-                <TooltipContent>View Payment</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            {Received == 0 ? (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Eye className="h-4 w-4 cursor-not-allowed opacity-50" />
+                  </TooltipTrigger>
+                  <TooltipContent>View Payment</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ) : (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Eye
+                      className="h-4 w-4 cursor-pointer"
+                      onClick={() => {
+                        const id = row.original.invoice_no;
+                        handleViewClick(id);
+                      }}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>View Payment</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </div>
         );
       },
@@ -364,90 +356,11 @@ const PaymentPending = () => {
         </div>
       </div>
 
-      {/* View Payment Dialog */}
-      {viewData && (
-        <AlertDialog
-          open={viewData !== null}
-          onOpenChange={() => setViewData(null)}
-          sx={{
-            "& .MuiDialog-paper": {
-              width: "lg", // You can set a specific width here or use 'lg' if defined
-            },
-          }}
-        >
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Payment Details</AlertDialogTitle>
-            </AlertDialogHeader>
-            {viewData.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead
-                      className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
-                    >
-                      P Date
-                    </TableHead>
-                    <TableHead
-                      className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
-                    >
-                      Adj Adv
-                    </TableHead>
-                    <TableHead
-                      className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
-                    >
-                      Adj Dp
-                    </TableHead>
-                    <TableHead
-                      className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
-                    >
-                      Adj Da
-                    </TableHead>
-                    <TableHead
-                      className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
-                    >
-                      Bank Ch
-                    </TableHead>
-                    <TableHead
-                      className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
-                    >
-                      Discount
-                    </TableHead>
-                    <TableHead
-                      className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
-                    >
-                      Shortage
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {viewData.map((pending, index) => (
-                    <TableRow key={index}>
-                      <TableCell>
-                        {moment(pending.invoiceP_date).format("DD-MMM-YYYY")}
-                      </TableCell>
-                      <TableCell>{pending.invoicePSub_amt_adv}</TableCell>
-                      <TableCell>{pending.invoicePSub_amt_dp}</TableCell>
-                      <TableCell>{pending.invoicePSub_amt_da}</TableCell>
-                      <TableCell>{pending.invoicePSub_bank_c}</TableCell>
-                      <TableCell>{pending.invoicePSub_discount}</TableCell>
-                      <TableCell>{pending.invoicePSub_shortage}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <h2>No Payment Data Available</h2>
-            )}
-
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setViewData(null)}>
-                Close
-              </AlertDialogCancel>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
+      <PaymentDetailsDialog
+        isOpen={isDialogOpen}
+        onClose={handleDialogClose}
+        invoiceNo={selectedInvoiceNo}
+      />
     </Page>
   );
 };
