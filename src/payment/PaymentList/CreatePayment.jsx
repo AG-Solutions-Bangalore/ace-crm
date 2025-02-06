@@ -27,18 +27,19 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
+import { useCurrentYear } from "@/hooks/useCurrentYear";
 // Validation Schema
 
 const productRowSchema = z.object({
-  invoicePSub_inv_ref: z.string().optional(),
-  invoicePSub_amt_adv: z.number().optional(),
-  invoicePSub_amt_dp: z.number().optional(),
-  invoicePSub_amt_da: z.number().optional(),
-  invoicePSub_bank_c: z.number().optional(),
-  invoicePSub_discount: z.number().optional(),
-  invoicePSub_shortage: z.number().optional(),
-  invoiceSub_sbaga: z.number().optional(),
-  invoicePSub_remarks: z.number().optional(),
+  invoicePSub_inv_ref: z.string().min(1, "Ref data is required"),
+  invoicePSub_amt_adv: z.any().optional(),
+  invoicePSub_amt_dp: z.any().optional(),
+  invoicePSub_amt_da: z.any().optional(),
+  invoicePSub_bank_c: z.any().optional(),
+  invoicePSub_discount: z.any().optional(),
+  invoicePSub_shortage: z.any().optional(),
+  invoiceSub_sbaga: z.any().optional(),
+  invoicePSub_remarks: z.string().optional(),
 });
 
 const contractFormSchema = z.object({
@@ -52,7 +53,7 @@ const contractFormSchema = z.object({
   invoiceP_usd_amount: z.string().min(1, "USD amount is required"),
   invoiceP_irtt_no: z.string().min(1, "IRTT No is required"),
   invoiceP_status: z.string().min(1, "Status is required"),
-  // payment_data: z.array(productRowSchema),
+  payment_data: z.array(productRowSchema),
 });
 
 const BranchHeader = () => {
@@ -80,36 +81,29 @@ const createBranch = async (data) => {
     body: JSON.stringify(data),
   });
 
-  if (!response.ok) throw new Error("Failed to create Payment");
-  return response.json();
-};
-const fetchYear = async () => {
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("No authentication token found");
+  const responseData = await response.json();
 
-  const response = await fetch(`${BASE_URL}/api/panel-fetch-year`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
+  if (!response.ok) {
+    throw responseData;
+  }
 
-  if (!response.ok) throw new Error("Failed to fetch company data");
-  const data = await response.json();
-  return data.year.current_year;
+  return responseData;
 };
 
 const CreatePayment = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-
-  const { data: PaymentYear } = useQuery({
-    queryKey: ["paymentyear"],
-    queryFn: fetchYear,
-  });
-  console.log(PaymentYear);
+  const { data: currentYear } = useCurrentYear();
+  useEffect(() => {
+    if (currentYear) {
+      setFormData((prev) => ({
+        ...prev,
+        invoiceP_years: currentYear,
+      }));
+    }
+  }, [currentYear]);
   const [formData, setFormData] = useState({
-    invoiceP_years: PaymentYear,
+    invoiceP_years: currentYear,
     invoiceP_dates: "",
     branch_short: "",
     branch_name: "",
@@ -119,7 +113,7 @@ const CreatePayment = () => {
     invoiceP_irtt_no: "",
     invoiceP_status: "",
   });
-
+  console.log(formData, "formda");
   const [invoiceData, setInvoiceData] = useState([
     {
       invoicePSub_inv_ref: "",
@@ -157,13 +151,27 @@ const CreatePayment = () => {
   );
   const createBranchMutation = useMutation({
     mutationFn: createBranch,
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "Payment created successfully",
-      });
+    onSuccess: (response) => {
+      if (response.code == 200) {
+        toast({
+          title: "Success",
+          description: response.msg,
+        });
+      } else if (response.code == 400) {
+        toast({
+          title: "Duplicate Entry",
+          description: response.msg,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Unexpected Response",
+          description: response.msg || "Something unexpected happened.",
+          variant: "destructive",
+        });
+      }
       setFormData({
-        invoiceP_years: PaymentYear,
+        invoiceP_years: currentYear,
         invoiceP_dates: "",
         branch_short: "",
         branch_name: "",
@@ -173,6 +181,7 @@ const CreatePayment = () => {
         invoiceP_irtt_no: "",
         invoiceP_status: "",
       });
+
       setInvoiceData([
         {
           invoicePSub_inv_ref: "",
@@ -187,19 +196,16 @@ const CreatePayment = () => {
       ]);
     },
     onError: (error) => {
+      console.error("API Error:", error);
+
       toast({
         title: "Error",
-        description: error.message,
+        description: error.msg || "Something went wrong",
         variant: "destructive",
       });
     },
   });
 
-  // const handlePaymentChange = (e, rowIndex, fieldName) => {
-  //   const updatedData = [...invoiceData];
-  //   updatedData[rowIndex][fieldName] = e.target.value;
-  //   setInvoiceData(updatedData);
-  // };
   const handlePaymentChange = (e, rowIndex, fieldName) => {
     const value = e.target.value;
 
@@ -307,11 +313,40 @@ const CreatePayment = () => {
 
   const fieldLabels = {
     invoicePSub_inv_ref: " Invoice Ref",
+    invoiceP_dates: "Payment Date",
+    branch_name: "Company Name",
+    invoiceP_dollar_rate: " Dollor Rate",
+    invoiceP_v_date: "Value Date",
+    invoiceP_usd_amount: "Usd Amount",
+    invoiceP_irtt_no: "IRTT No",
+    invoiceP_status: "Status",
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const totalInvoiceSubAmount = invoiceData.reduce(
+        (sum, item) =>
+          sum +
+          (Number(item.invoicePSub_amt_adv) || 0) +
+          (Number(item.invoicePSub_amt_dp) || 0) +
+          (Number(item.invoicePSub_amt_da) || 0) +
+          (Number(item.invoicePSub_bank_c) || 0) +
+          (Number(item.invoicePSub_discount) || 0) +
+          (Number(item.invoicePSub_shortage) || 0),
+        0
+      );
+
+      const invoiceUsdAmount = Number(formData.invoiceP_usd_amount) || 0;
+
+      if (invoiceUsdAmount !== totalInvoiceSubAmount) {
+        throw new z.ZodError([
+          {
+            path: ["invoiceP_usd_amount"],
+            message: "Amount Does Not Match",
+          },
+        ]);
+      }
       const validatedData = contractFormSchema.parse({
         ...formData,
         payment_data: invoiceData,
