@@ -59,7 +59,7 @@ const CreateProductDescription = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
+      const response = await axios.post(
         `${BASE_URL}/api/panel-create-product-description`,
         formData,
         {
@@ -67,20 +67,30 @@ const CreateProductDescription = () => {
         }
       );
 
-      toast({
-        title: "Success",
-        description: "Product Desc created successfully",
-      });
-
-      setFormData({
-        product_name: "",
-        product_description: "",
-        product_hs: "",
-        product_hsn: "",
-      });
-      await queryClient.invalidateQueries(["productsSub"]);
-
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+        setFormData({
+          product_name: "",
+          product_description: "",
+          product_hs: "",
+          product_hsn: "",
+        });
+        await queryClient.invalidateQueries(["productsSub"]);
+  
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

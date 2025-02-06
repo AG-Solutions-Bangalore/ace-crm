@@ -93,7 +93,7 @@ const EditPortofLoading = ({ portId }) => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
+      const response =  await axios.put(
         `${BASE_URL}/api/panel-update-portofLoading/${portId}`,
         formData,
         {
@@ -101,13 +101,25 @@ const EditPortofLoading = ({ portId }) => {
         }
       );
 
-      toast({
-        title: "Success",
-        description: "PortofLoading updated successfully",
-      });
-
-      await queryClient.invalidateQueries(["portofLoadingList"]);
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+       
+        await queryClient.invalidateQueries(["portofLoadingList"]);
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
+  
     } catch (error) {
       toast({
         title: "Error",

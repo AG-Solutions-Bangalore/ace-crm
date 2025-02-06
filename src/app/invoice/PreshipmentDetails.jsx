@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Printer } from "lucide-react";
+import { FileText, Loader2, Printer } from "lucide-react";
 import html2pdf from "html2pdf.js";
 import BASE_URL from "@/config/BaseUrl";
 import { useParams } from "react-router-dom";
@@ -102,31 +102,25 @@ const PreshipmentDetails = () => {
 
   if (loading) {
     return (
-      <div>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
+      <Card className="w-full h-[80vh] flex items-center justify-center">
+        <CardContent>
+          <Button disabled className="flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
             Loading Pre_Shipment Data
           </Button>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     );
   }
 
   if (error) {
     return (
-      <div>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching Pre_Shipment Data
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline">Try Again</Button>
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="w-full">
+        <CardContent className="p-6">
+          <div className="text-red-500 mb-4">Error: {error}</div>
+          <Button variant="outline">Try Again</Button>
+        </CardContent>
+      </Card>
     );
   }
   const totalAmount = invoiceSubData.reduce((total, item) => {
@@ -142,19 +136,15 @@ const PreshipmentDetails = () => {
     <div>
       <button
         onClick={handleSaveAsPdf}
-        className="fixed bottom-10 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
+          className="fixed top-5 right-24 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
       >
-        Save as PDF
+       <FileText  className="w-4 h-4"/>
       </button>
       <ReactToPrint
         trigger={() => (
-          <Button
-            variant="outline"
-            size="icon"
-            className="fixed bottom-20 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
-          >
+          <button className="fixed top-5 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600">
             <Printer className="h-4 w-4" />
-          </Button>
+          </button>
         )}
         content={() => containerRef.current}
         documentTitle={`Preshiment-view`}

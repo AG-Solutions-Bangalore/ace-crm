@@ -61,25 +61,34 @@ const CreateCountry = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${BASE_URL}/api/panel-create-country`, formData, {
+      const response = await axios.post(`${BASE_URL}/api/panel-create-country`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      toast({
-        title: "Success",
-        description: "Country created successfully",
-      });
-
-      setFormData({
-        country_name: "",
-        country_port: "",
-        country_dp: "",
-        country_da: "",
-        country_pol: "",
-      });
-      await queryClient.invalidateQueries(["countries"]);
-
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+        setFormData({
+          country_name: "",
+          country_port: "",
+          country_dp: "",
+          country_da: "",
+          country_pol: "",
+        });
+        await queryClient.invalidateQueries(["countries"]);
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

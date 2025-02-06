@@ -37,7 +37,7 @@ const CreateContainerSize = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
+      const response = await axios.post(
         `${BASE_URL}/api/panel-create-container-size`,
         formData,
         {
@@ -45,9 +45,12 @@ const CreateContainerSize = () => {
         }
       );
 
+     
+    if (response?.data.code == 200) {
+    
       toast({
         title: "Success",
-        description: "Container Size created successfully",
+        description: response.data.msg
       });
 
       setFormData({
@@ -55,6 +58,14 @@ const CreateContainerSize = () => {
       });
       await queryClient.invalidateQueries(["containersizes"]);
       setOpen(false);
+    } else {
+     
+      toast({
+        title: "Error",
+        description: response.data.msg,
+        variant: "destructive",
+      });
+    }
     } catch (error) {
       toast({
         title: "Error",

@@ -38,7 +38,7 @@ const CreateCustomDescription = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
+      const response = await axios.post(
         `${BASE_URL}/api/panel-create-customdescription`,
         formData,
         {
@@ -46,16 +46,26 @@ const CreateCustomDescription = () => {
         }
       );
 
-      toast({
-        title: "Success",
-        description: "Custom description  created successfully",
-      });
-
-      setFormData({
-        customdescription: "",
-      });
-      await queryClient.invalidateQueries(["customDescription"]);
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+        setFormData({
+          customdescription: "",
+        });
+        await queryClient.invalidateQueries(["customDescription"]);
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

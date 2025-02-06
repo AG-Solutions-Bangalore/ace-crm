@@ -93,7 +93,7 @@ const EditMarking = ({ markingId }) => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
+      const response = await axios.put(
         `${BASE_URL}/api/panel-update-marking/${markingId}`,
         formData,
         {
@@ -101,13 +101,24 @@ const EditMarking = ({ markingId }) => {
         }
       );
 
-      toast({
-        title: "Success",
-        description: "Marking updated successfully",
-      });
-
-      await queryClient.invalidateQueries(["markings"]);
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+       
+        await queryClient.invalidateQueries(["markings"]);
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

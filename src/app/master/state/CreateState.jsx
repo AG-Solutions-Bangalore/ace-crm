@@ -39,21 +39,34 @@ const CreateState = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${BASE_URL}/api/panel-create-state`, formData, {
+      const response = await axios.post(`${BASE_URL}/api/panel-create-state`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      toast({
-        title: "Success",
-        description: "State created successfully",
-      });
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+        setFormData({
+          state_name: "",
+          state_no: "",
+        });
+        await queryClient.invalidateQueries(["customers"]);
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
 
-      setFormData({
-        state_name: "",
-        state_no: "",
-      });
-      await queryClient.invalidateQueries(["customers"]);
-      setOpen(false);
+
+
     } catch (error) {
       toast({
         title: "Error",

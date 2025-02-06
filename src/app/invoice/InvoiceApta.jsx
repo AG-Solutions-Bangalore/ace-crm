@@ -1,6 +1,6 @@
 import BASE_URL from "@/config/BaseUrl";
 import { getTodayDate } from "@/utils/currentDate";
-import { Loader2 } from "lucide-react";
+import { Loader2, Printer } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import moment from "moment";
@@ -79,24 +79,22 @@ const InvoiceApta = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-full">
-        <Button disabled>
-          <Loader2 className=" h-4 w-4 animate-spin" />
-          Loading Apta Data
-        </Button>
-      </div>
+      <Card className="w-full h-[80vh] flex items-center justify-center">
+        <CardContent>
+          <Button disabled className="flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading Invoice Apta Data
+          </Button>
+        </CardContent>
+      </Card>
     );
   }
 
   if (error) {
     return (
-      <Card className="w-full max-w-md mx-auto mt-10">
-        <CardHeader>
-          <CardTitle className="text-destructive">
-            Error Fetching Apta Data
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Card className="w-full">
+        <CardContent className="p-6">
+          <div className="text-red-500 mb-4">Error: {error}</div>
           <Button variant="outline">Try Again</Button>
         </CardContent>
       </Card>
@@ -107,9 +105,9 @@ const InvoiceApta = () => {
       <div>
         <button
           onClick={handlPrintPdf}
-          className="fixed bottom-20 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
+          className="fixed top-5 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
         >
-          Print
+          <Printer className="h-4 w-4"/>
         </button>
       </div>
 
@@ -142,7 +140,7 @@ const InvoiceApta = () => {
         <div className="overflow-x-auto mt-14 ">
           <table className="w-full bg-white  text-[12px] table-fixed">
             <tbody className="">
-              {invoiceSubData?.map((item,index) => (
+              {invoiceSubData?.map((item, index) => (
                 <tr key={item.id}>
                   <td className=" w-[15%] text-[12px]  p-2 text-sm text-gray-900 break-words">
                     {/* {sub.contractSub_marking} */}
@@ -178,12 +176,12 @@ const InvoiceApta = () => {
                     KGS
                   </td>
                   {index == 0 && (
-          <td className="w-[15%] text-[12px] p-2 text-sm text-gray-900 break-words">
-            {spiceBoard?.invoice_ref}
-            <br />
-            DT.{spiceBoard?.invoice_date}
-          </td>
-        )}
+                    <td className="w-[15%] text-[12px] p-2 text-sm text-gray-900 break-words">
+                      {spiceBoard?.invoice_ref}
+                      <br />
+                      DT.{spiceBoard?.invoice_date}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -192,14 +190,20 @@ const InvoiceApta = () => {
 
         <div className=" mt-80 flex  flex-col items-start gap-10">
           <p className=" text-left text-[13px] ">INDIA</p>
-          <p className=" text-left text-[13px] ">{spiceBoard?.invoice_destination_country}</p>
+          <p className=" text-left text-[13px] ">
+            {spiceBoard?.invoice_destination_country}
+          </p>
         </div>
         <div className="mt-8  ">
           <p className=" text-left text-[13px] ">BANGALORE</p>
-          <p className=" text-left text-[13px] ">{moment(getTodayDate()).format("DD-MMM-YYYY")}</p> 
+          <p className=" text-left text-[13px] ">
+            {moment(getTodayDate()).format("DD-MMM-YYYY")}
+          </p>
         </div>
         <div className="mt-16  ">
-          <p className=" text-center text-[13px] ">(  {spiceBoardBranch.branch_sign_name1})</p>
+          <p className=" text-center text-[13px] ">
+            ( {spiceBoardBranch.branch_sign_name1})
+          </p>
         </div>
         <div className="mt-48 ">
           <p className=" text-left text-[13px] ">
@@ -221,7 +225,9 @@ const InvoiceApta = () => {
           <p className=" text-left text-[13px] ">REG. NO. 151015</p>
         </div>
         <div className="mt-16  flex flex-col items-end mr-20  gap-10 ">
-          <p className=" pr-20  text-[13px] ">({spiceBoardBranch.branch_sign_name1})</p>
+          <p className=" pr-20  text-[13px] ">
+            ({spiceBoardBranch.branch_sign_name1})
+          </p>
           <p className="  text-[13px] ">BANGALORE DTD. INVOICE NO. 03-Feb-25</p>
         </div>
       </div>

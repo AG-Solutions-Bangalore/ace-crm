@@ -94,7 +94,7 @@ const EditDescriptionGoods = ({ descriptionId }) => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
+      const response = await axios.put(
         `${BASE_URL}/api/panel-update-descriptionofGoods/${descriptionId}`,
         formData,
         {
@@ -102,13 +102,24 @@ const EditDescriptionGoods = ({ descriptionId }) => {
         }
       );
 
-      toast({
-        title: "Success",
-        description: "Description of goods updated successfully",
-      });
-
-      await queryClient.invalidateQueries(["descriptionGoods"]);
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+        
+        await queryClient.invalidateQueries(["descriptionGoods"]);
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

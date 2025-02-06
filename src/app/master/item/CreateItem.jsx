@@ -53,23 +53,32 @@ const CreateItem = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${BASE_URL}/api/panel-create-item`, formData, {
+      const response = await axios.post(`${BASE_URL}/api/panel-create-item`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      toast({
-        title: "Success",
-        description: "Item created successfully",
-      });
-
-      setFormData({
-        item_type: "",
-        item_name: "",
-        item_hsn: "",
-      });
-      await queryClient.invalidateQueries(["items"]);
-
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+        setFormData({
+          item_type: "",
+          item_name: "",
+          item_hsn: "",
+        });
+        await queryClient.invalidateQueries(["items"]);
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

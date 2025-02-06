@@ -90,7 +90,7 @@ const EditVessel = ({ vesselId }) => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
+      const response = await axios.put(
         `${BASE_URL}/api/panel-update-vessel/${vesselId}`,
         formData,
         {
@@ -98,13 +98,25 @@ const EditVessel = ({ vesselId }) => {
         }
       );
 
-      toast({
-        title: "Success",
-        description: "Vessel updated successfully",
-      });
-
-      await queryClient.invalidateQueries(["vessels"]);
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+        
+        await queryClient.invalidateQueries(["vessels"]);
+  
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

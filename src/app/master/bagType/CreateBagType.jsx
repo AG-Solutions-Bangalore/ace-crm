@@ -37,20 +37,31 @@ const CreateBagType = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${BASE_URL}/api/panel-create-bagType`, formData, {
+       const response = await axios.post(`${BASE_URL}/api/panel-create-bagType`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
+    
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg || "Bag type Created successfully", // Show response message if available
+        });
+  
+        setFormData({ bagType: "" });
+        await queryClient.invalidateQueries(["bagTypeList"]);
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
 
-      toast({
-        title: "Success",
-        description: "Bag type created successfully",
-      });
 
-      setFormData({
-        bagType: "",
-      });
-      await queryClient.invalidateQueries(["bagTypeList"]);
-      setOpen(false);
+
     } catch (error) {
       toast({
         title: "Error",

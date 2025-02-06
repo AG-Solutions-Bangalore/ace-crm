@@ -90,7 +90,7 @@ const EditShipper = ({ shipperId }) => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
+      const response = await axios.put(
         `${BASE_URL}/api/panel-update-shipper/${shipperId}`,
         formData,
         {
@@ -98,13 +98,25 @@ const EditShipper = ({ shipperId }) => {
         }
       );
 
-      toast({
-        title: "Success",
-        description: "Shipper updated successfully",
-      });
-
-      await queryClient.invalidateQueries(["shippers"]);
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+      
+        await queryClient.invalidateQueries(["shippers"]);
+  
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

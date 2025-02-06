@@ -37,13 +37,16 @@ const CreatePaymentTermC = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${BASE_URL}/api/panel-create-paymentTermsC`, formData, {
+      const response = await axios.post(`${BASE_URL}/api/panel-create-paymentTermsC`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+     
+    if (response?.data.code == 200) {
+    
       toast({
         title: "Success",
-        description: "Payment Term C created successfully",
+        description: response.data.msg
       });
 
       setFormData({
@@ -51,6 +54,15 @@ const CreatePaymentTermC = () => {
       });
       await queryClient.invalidateQueries(["paymenttermC"]);
       setOpen(false);
+    } else {
+     
+      toast({
+        title: "Error",
+        description: response.data.msg,
+        variant: "destructive",
+      });
+    }
+
     } catch (error) {
       toast({
         title: "Error",

@@ -112,17 +112,28 @@ const EditItem = ({ itemId }) => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`${BASE_URL}/api/panel-update-item/${itemId}`, formData, {
+      const response = await axios.put(`${BASE_URL}/api/panel-update-item/${itemId}`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      toast({
-        title: "Success",
-        description: "Item updated successfully",
-      });
-
-      await queryClient.invalidateQueries(["items"]);
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+      
+        await queryClient.invalidateQueries(["items"]);
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

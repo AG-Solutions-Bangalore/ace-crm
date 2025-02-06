@@ -37,20 +37,30 @@ const CreateType = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${BASE_URL}/api/panel-create-type`, formData, {
+      const response =  await axios.post(`${BASE_URL}/api/panel-create-type`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      toast({
-        title: "Success",
-        description: "Type created successfully",
-      });
-
-      setFormData({
-        type: "",
-      });
-      await queryClient.invalidateQueries(["typedata"]);
-      setOpen(false);
+      if (response?.data.code == 200) {
+    
+        toast({
+          title: "Success",
+          description: response.data.msg
+        });
+  
+        setFormData({
+          type: "",
+        });
+        await queryClient.invalidateQueries(["typedata"]);
+        setOpen(false);
+      } else {
+       
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",

@@ -228,7 +228,7 @@ const InvoiceList = () => {
                       navigate(`/document-edit-invoice/${invoiceId}`)
                     }
                   >
-                    <FilePlus2 className="h-4 w-4" />
+                    <FilePlus2 className="h-4 w-4" /> 
                   </InvoiceDocument>
                 </TooltipTrigger>
                 <TooltipContent>Invoice Document</TooltipContent>
@@ -483,3 +483,5 @@ const InvoiceList = () => {
 };
 
 export default InvoiceList;
+
+//sajid 

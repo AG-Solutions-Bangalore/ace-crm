@@ -602,8 +602,8 @@ const ViewContract = () => {
 
   return (
     <Page>
-      <div className=" flex w-full p-4 gap-2 relative ">
-        <div className="w-[75%]">
+      <div className=" flex w-full p-2 gap-2 relative ">
+        <div className="w-[85%]">
           <div className="      ">
             <img
               src="/api/public/assets/images/letterHead/AceB.png"
@@ -858,76 +858,73 @@ const ViewContract = () => {
             )}
           </div>
         </div>
-        <div className=" w-[25%] flex flex-col shadow-lg shadow-blue-200  p-4">
-          <Tabs defaultValue="header" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="header">Header</TabsTrigger>
-              <TabsTrigger value="w-header">W-Header</TabsTrigger>
+        <div className=" w-[15%] flex flex-col  border border-gray-200  h-screen rounded-lg  p-2 ">
+          <Tabs defaultValue="header" className="w-full ">
+            <TabsList className="grid w-full grid-cols-1">
+              <TabsTrigger value="header">Actions</TabsTrigger>
+          
             </TabsList>
             <TabsContent value="header">
               <div className="flex flex-col gap-2 mt-4">
                 <Button
                   onClick={handlPrintPdf}
-                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center gap-2"
+                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
                 >
                   <Printer className="h-4 w-4" />
-                  Print PDF
+                  <span>Print PDF</span>
                 </Button>
                 <Button
                   onClick={handleSaveAsPdf}
-                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center gap-2"
+                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
                 >
                   <Printer className="h-4 w-4" />
-                  Save as PDF
+                  <span>Save as PDF</span>
                 </Button>
                 <Button
                   onClick={() => {}}
-                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center gap-2"
+                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
                 >
                   <Mail className="h-4 w-4" />
-                  Send Mail
+                  <span>Send Mail</span>
                 </Button>
                 <Button
                   onClick={whatsappPdf}
-                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center gap-2"
+                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
                 >
                   <MessageCircle className="h-4 w-4" />
-                  Send Whatsapp
+                  <span> Whatsapp</span>
                 </Button>
-              </div>
-            </TabsContent>
-            <TabsContent value="w-header">
-              <div className="flex flex-col gap-2 mt-4">
                 <Button
                   onClick={() => {}}
-                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center gap-2"
+                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
                 >
                   <Printer className="h-4 w-4" />
-                  Print W-PDF
+                  <span>Print Wo-PDF</span>
                 </Button>
                 <Button
                   onClick={handleSaveAsWidthoutHeaderPdf}
-                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center gap-2"
+                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
                 >
                   <Printer className="h-4 w-4" />
-                  Save as W-PDF
+                  <span>Save as Wo-PDF</span>
                 </Button>
                 <Button
                   onClick={() => {}}
-                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center gap-2"
+                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
                 >
                   <Mail className="h-4 w-4" />
-                  Send W-Mail
+                  <span>Send Wo-Mail</span>
                 </Button>
                 <Button
                   onClick={whatsappWithoutHeaderPdf}
-                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center gap-2"
+                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
                 >
                   <MessageCircle className="h-4 w-4" />
-                  Send W-Whatsapp
+                  <span>Wo-Whatsapp</span>
                 </Button>
               </div>
             </TabsContent>
+           
           </Tabs>
         </div>
       </div>

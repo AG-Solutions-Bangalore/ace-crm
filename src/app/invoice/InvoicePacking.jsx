@@ -180,24 +180,22 @@ const InvoicePacking = () => {
   };
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-full">
-        <Button disabled>
-          <Loader2 className=" h-4 w-4 animate-spin" />
-          Loading Invoice Packing Data
-        </Button>
-      </div>
+      <Card className="w-full h-[80vh] flex items-center justify-center">
+        <CardContent>
+          <Button disabled className="flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading Invoice Packing Data
+          </Button>
+        </CardContent>
+      </Card>
     );
   }
-
+  
   if (error) {
     return (
-      <Card className="w-full max-w-md mx-auto mt-10">
-        <CardHeader>
-          <CardTitle className="text-destructive">
-            Error Fetching invoice Packing Data
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Card className="w-full">
+        <CardContent className="p-6">
+          <div className="text-red-500 mb-4">Error: {error}</div>
           <Button variant="outline">Try Again</Button>
         </CardContent>
       </Card>
