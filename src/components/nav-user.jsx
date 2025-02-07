@@ -111,20 +111,24 @@ export function NavUser({ user }) {
             </DropdownMenuGroup>
             <DropdownMenuSeparator /> */}
 
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              {/* <DropdownMenuItem>
+            {/* <DropdownMenuGroup> 
+
+           <DropdownMenuItem> 
+                <BadgeCheck /> 
+              Account  
+            </DropdownMenuItem> 
+
+           <DropdownMenuItem>
                 <CreditCard />
                 Billing
-              </DropdownMenuItem> */}
+              </DropdownMenuItem>
+
               <DropdownMenuItem>
                 <Bell />
                 Notifications
               </DropdownMenuItem>
-            </DropdownMenuGroup>
+             
+            </DropdownMenuGroup> */}
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut />

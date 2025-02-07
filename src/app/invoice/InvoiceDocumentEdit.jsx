@@ -88,6 +88,7 @@ const InvoiceDocumentEdit = () => {
         invoice_i_value_usd: "",
         invoice_i_value_inr: "",
         invoice_i_value_fob: "",
+        invoice_fob_inr: "",
         invoice_exch_rate: "",
         invoice_let_exports_date: "",
         invoice_vessel: "",
@@ -206,6 +207,7 @@ const InvoiceDocumentEdit = () => {
             invoice_i_value_usd: formatDecimal(formData.invoice_i_value_usd),
             invoice_i_value_inr: formatDecimal(formData.invoice_i_value_inr),
             invoice_i_value_fob: formatDecimal(formData.invoice_i_value_fob),
+            invoice_fob_inr: formatDecimal(formData.invoice_fob_inr),
             invoice_exch_rate: formatDecimal(formData.invoice_exch_rate)
           };
         updateBranchMutation.mutate({ id, data: formattedData });
@@ -254,8 +256,13 @@ const InvoiceDocumentEdit = () => {
       
       const expectedINRValue = formData.invoice_i_value_usd * formData.invoice_exch_rate;
 
-      const expectedFobValue = formData.invoice_i_value_usd -(formData.invoice_freight + formData.invoice_insurance)
+     
       const isINRValid = isINRValueValid(formData.invoice_i_value_inr, expectedINRValue);
+
+      // auto calculation for fobusd and fobinr
+
+      const expectedFobValue = formData.invoice_i_value_usd -(formData.invoice_freight + formData.invoice_insurance)
+      const expectedFobInrVALUE = (formData.invoice_i_value_usd -(formData.invoice_freight + formData.invoice_insurance))*(formData?.invoice_exch_rate)
   return (
     <Page>
           <form onSubmit={handleSubmit} className="w-full p-0 lg:p-4">
@@ -456,27 +463,41 @@ const InvoiceDocumentEdit = () => {
        
                      <div>
                           <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 flex items-center justify-between font-medium `}>
-                         <span>INR Value <span className="text-red-500">*</span></span>
+                         <span>Invoice Value <span className="text-red-500">*</span></span>
                          <span>{expectedINRValue}</span>
                        </label>
                        <Input
                            className={`bg-white ${!isINRValid ? 'border-red-500' : ''}`}
                          value={formData.invoice_i_value_inr}
                          onChange={(e) => handleDecimalInputChange(e, "invoice_i_value_inr")}
-                         placeholder="Enter INR Value"
+                         placeholder="Enter Invoice Value"
                        />
                      </div>
        
                      <div>
                           <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 flex items-center justify-between font-medium `}>
-                       <span>  FOB Value <span className="text-red-500">*</span></span>
+                       <span>  FOB USD <span className="text-red-500">*</span></span>
                          <span>{expectedFobValue}</span>
                        </label>
                        <Input
-                          className="bg-white"
-                         value={formData.invoice_i_value_fob}
+                         read-only
+                          className="bg-white cursor-not-allowed"
+                         value={expectedFobValue}
                          onChange={(e) => handleDecimalInputChange(e, "invoice_i_value_fob")}
                          placeholder="Enter FOB Value"
+                       />
+                     </div>
+                     <div>
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 flex items-center justify-between font-medium `}>
+                       <span>  FOB INR <span className="text-red-500">*</span></span>
+                         <span>{expectedFobInrVALUE}</span>
+                       </label>
+                       <Input
+                        read-only
+                          className="bg-white cursor-not-allowed"
+                         value={expectedFobInrVALUE}
+                         onChange={(e) => handleDecimalInputChange(e, "invoice_fob_inr")}
+                         placeholder="Enter FOB INR Value"
                        />
                      </div>
        

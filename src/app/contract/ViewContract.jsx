@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Printer, Mail, MessageCircle } from "lucide-react";
 import html2pdf from "html2pdf.js";
-import logo from "../../../public/assets/AceB.png";
 import BASE_URL from "@/config/BaseUrl";
 import { useParams } from "react-router-dom";
 import { getTodayDate } from "@/utils/currentDate";
@@ -19,7 +18,7 @@ const ViewContract = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [logoBase64, setLogoBase64] = useState("");
-  const logoUrl = "/api/public/assets/images/letterHead/AceB.png";
+  
   useEffect(() => {
     const fetchContractData = async () => {
       try {
@@ -48,9 +47,12 @@ const ViewContract = () => {
 
     fetchContractData();
   }, [id]);
+
   useEffect(() => {
     const fetchAndConvertImage = async () => {
+
       try {
+        const logoUrl = `/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`;
         const response = await fetch(logoUrl);
         const blob = await response.blob();
 
@@ -580,7 +582,7 @@ const ViewContract = () => {
   const PrintHeader = () => (
     <div className="print-header hidden print:block" style={{ position: 'fixed', top: 0, left: 0, right: 0, backgroundColor: 'white', zIndex: 1000, height: '200px', }}>
       <img
-        src="/api/public/assets/images/letterHead/AceB.png"
+        src={`/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`}
         alt="logo"
         className="w-full max-h-[120px] object-contain"
       />
