@@ -88,6 +88,7 @@ const InvoiceDocumentEdit = () => {
         invoice_i_value_usd: "",
         invoice_i_value_inr: "",
         invoice_i_value_fob: "",
+        invoice_fob_inr: "",
         invoice_exch_rate: "",
         invoice_let_exports_date: "",
         invoice_vessel: "",
@@ -95,7 +96,8 @@ const InvoiceDocumentEdit = () => {
         invoice_freight: "",
        
       });
-     
+      const { data: vesselData } = useFetchVessel();
+      const { data: shipperData } = useFetchShipper();
       // Fetch branch data by ID
       const {
         data: documentDetails,
@@ -122,34 +124,23 @@ const InvoiceDocumentEdit = () => {
       });
     
       useEffect(() => {
-        if (documentDetails) {
-          setFormData({
-            invoice_ref: documentDetails?.invoice?.invoice_ref,
-            invoice_bl_no: documentDetails?.invoice.invoice_bl_no,
-            invoice_bl_date: documentDetails.invoice.invoice_bl_date,
-            invoice_sb_no: documentDetails.invoice.invoice_sb_no,
-            invoice_sb_date: documentDetails.invoice.invoice_sb_date,
-            invoice_container: documentDetails.invoice.invoice_container,
-            invoice_voyage: documentDetails.invoice.invoice_voyage,
-            invoice_seal: documentDetails.invoice.invoice_seal,
-            invoice_shipper: documentDetails.invoice.invoice_shipper,
-            invoice_etd_date: documentDetails.invoice.invoice_etd_date,
-            invoice_eta_date: documentDetails.invoice.invoice_eta_date,
-            invoice_i_value_usd: documentDetails.invoice.invoice_i_value_usd,
-            invoice_i_value_inr: documentDetails.invoice.invoice_i_value_inr,
-            invoice_i_value_fob: documentDetails.invoice.invoice_i_value_fob,
-            invoice_exch_rate: documentDetails.invoice.invoice_exch_rate,
-            invoice_let_exports_date: documentDetails.invoice.invoice_let_exports_date,
-            invoice_vessel: documentDetails.invoice.invoice_vessel,
-            invoice_insurance: documentDetails.invoice.invoice_insurance,
-            invoice_freight: documentDetails.invoice.invoice_freight,
-       
-          });
+        if (documentDetails?.invoice) {
+          setFormData(prev => ({
+            ...prev,
+            ...documentDetails.invoice
+          }));
         }
       }, [documentDetails]);
-      const { data: vesselData } = useFetchVessel();
-      const { data: shipperData } = useFetchShipper();
-      // Update branch mutation
+      useEffect(() => {
+        if (vesselData?.vessel?.length > 0 && shipperData?.shipper?.length > 0 && documentDetails?.invoice) {
+          setFormData(prev => ({
+            ...prev,
+            invoice_vessel: documentDetails.invoice.invoice_vessel || '',
+            invoice_shipper: documentDetails.invoice.invoice_shipper || ''
+          }));
+        }
+      }, [vesselData, shipperData, documentDetails]);
+   
       const updateBranchMutation = useMutation({
         mutationFn: updateBranch,
         onSuccess: () => {
@@ -216,6 +207,7 @@ const InvoiceDocumentEdit = () => {
             invoice_i_value_usd: formatDecimal(formData.invoice_i_value_usd),
             invoice_i_value_inr: formatDecimal(formData.invoice_i_value_inr),
             invoice_i_value_fob: formatDecimal(formData.invoice_i_value_fob),
+            invoice_fob_inr: formatDecimal(formData.invoice_fob_inr),
             invoice_exch_rate: formatDecimal(formData.invoice_exch_rate)
           };
         updateBranchMutation.mutate({ id, data: formattedData });
@@ -233,6 +225,8 @@ const InvoiceDocumentEdit = () => {
           </Page>
         );
       }
+
+      
     
       if (isError) {
         return (
@@ -261,7 +255,14 @@ const InvoiceDocumentEdit = () => {
       };
       
       const expectedINRValue = formData.invoice_i_value_usd * formData.invoice_exch_rate;
+
+     
       const isINRValid = isINRValueValid(formData.invoice_i_value_inr, expectedINRValue);
+
+      // auto calculation for fobusd and fobinr
+
+      const expectedFobValue = formData.invoice_i_value_usd -(formData.invoice_freight + formData.invoice_insurance)
+      const expectedFobInrVALUE = (formData.invoice_i_value_usd -(formData.invoice_freight + formData.invoice_insurance))*(formData?.invoice_exch_rate)
   return (
     <Page>
           <form onSubmit={handleSubmit} className="w-full p-0 lg:p-4">
@@ -323,7 +324,7 @@ const InvoiceDocumentEdit = () => {
                        />
                      </div>
        
-                     <div>
+                     <div className='col-span-1 lg:col-span-2'>
                           <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
                           Container <span className="text-red-500">*</span>
                        </label>
@@ -407,31 +408,7 @@ const InvoiceDocumentEdit = () => {
                      </Select>
                      </div>
        
-                     <div>
-                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
-                          Etd Date <span className="text-red-500">*</span>
-                       </label>
-                       <Input
-                           type="date"
-                          className="bg-white"
-                         value={formData.invoice_etd_date}
-                         onChange={(e) => handleInputChange(e, "invoice_etd_date")}
-                         placeholder="Enter  Etd Date"
-                       />
-                     </div>
-       
-                     <div>
-                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
-                          Eta Date <span className="text-red-500">*</span>
-                       </label>
-                       <Input
-                       type="date"
-                          className="bg-white"
-                         value={formData.invoice_eta_date}
-                         onChange={(e) => handleInputChange(e, "invoice_eta_date")}
-                         placeholder="Enter  Eta Date"
-                       />
-                     </div>
+                     
        
                      <div>
                           <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
@@ -457,50 +434,6 @@ const InvoiceDocumentEdit = () => {
                          placeholder="Enter Invoice Exchange rate"
                        />
                      </div>
-       
-                     <div>
-                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 flex items-center justify-between font-medium `}>
-                         <span>INR Value <span className="text-red-500">*</span></span>
-                         <span>{expectedINRValue}</span>
-                       </label>
-                       <Input
-                           className={`bg-white ${!isINRValid ? 'border-red-500' : ''}`}
-                         value={formData.invoice_i_value_inr}
-                         onChange={(e) => handleDecimalInputChange(e, "invoice_i_value_inr")}
-                         placeholder="Enter INR Value"
-                       />
-                     </div>
-       
-                     <div>
-                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
-                         FOB Value <span className="text-red-500">*</span>
-                       </label>
-                       <Input
-                          className="bg-white"
-                         value={formData.invoice_i_value_fob}
-                         onChange={(e) => handleDecimalInputChange(e, "invoice_i_value_fob")}
-                         placeholder="Enter FOB Value"
-                       />
-                     </div>
-       
-                   
-       
-                     <div>
-                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
-                         Let Export date <span className="text-red-500">*</span>
-                       </label>
-                       <Input
-                       type="date"
-                          className="bg-white"
-                         value={formData.invoice_let_exports_date}
-                         onChange={(e) =>
-                           handleInputChange(e, "invoice_let_exports_date")
-                         }
-                         placeholder="Enter Let Export date"
-                       />
-                     </div>
-       
-
 
                      <div>
                           <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
@@ -527,6 +460,93 @@ const InvoiceDocumentEdit = () => {
                          placeholder="Enter Freight"
                        />
                      </div>
+       
+                     <div>
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 flex items-center justify-between font-medium `}>
+                         <span>Invoice Value <span className="text-red-500">*</span></span>
+                         <span>{expectedINRValue}</span>
+                       </label>
+                       <Input
+                           className={`bg-white ${!isINRValid ? 'border-red-500' : ''}`}
+                         value={formData.invoice_i_value_inr}
+                         onChange={(e) => handleDecimalInputChange(e, "invoice_i_value_inr")}
+                         placeholder="Enter Invoice Value"
+                       />
+                     </div>
+       
+                     <div>
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 flex items-center justify-between font-medium `}>
+                       <span>  FOB USD <span className="text-red-500">*</span></span>
+                         <span>{expectedFobValue}</span>
+                       </label>
+                       <Input
+                         read-only
+                          className="bg-white cursor-not-allowed"
+                         value={expectedFobValue}
+                         onChange={(e) => handleDecimalInputChange(e, "invoice_i_value_fob")}
+                         placeholder="Enter FOB Value"
+                       />
+                     </div>
+                     <div>
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 flex items-center justify-between font-medium `}>
+                       <span>  FOB INR <span className="text-red-500">*</span></span>
+                         <span>{expectedFobInrVALUE}</span>
+                       </label>
+                       <Input
+                        read-only
+                          className="bg-white cursor-not-allowed"
+                         value={expectedFobInrVALUE}
+                         onChange={(e) => handleDecimalInputChange(e, "invoice_fob_inr")}
+                         placeholder="Enter FOB INR Value"
+                       />
+                     </div>
+       
+                   
+       
+                     <div>
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
+                         Let Export date <span className="text-red-500">*</span>
+                       </label>
+                       <Input
+                       type="date"
+                          className="bg-white"
+                         value={formData.invoice_let_exports_date}
+                         onChange={(e) =>
+                           handleInputChange(e, "invoice_let_exports_date")
+                         }
+                         placeholder="Enter Let Export date"
+                       />
+                     </div>
+
+                     <div>
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
+                          Etd Date <span className="text-red-500">*</span>
+                       </label>
+                       <Input
+                           type="date"
+                          className="bg-white"
+                         value={formData.invoice_etd_date}
+                         onChange={(e) => handleInputChange(e, "invoice_etd_date")}
+                         placeholder="Enter  Etd Date"
+                       />
+                     </div>
+       
+                     <div>
+                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
+                          Eta Date <span className="text-red-500">*</span>
+                       </label>
+                       <Input
+                       type="date"
+                          className="bg-white"
+                         value={formData.invoice_eta_date}
+                         onChange={(e) => handleInputChange(e, "invoice_eta_date")}
+                         placeholder="Enter  Eta Date"
+                       />
+                     </div>
+       
+
+
+                     
                   
        
                      {/* <div>

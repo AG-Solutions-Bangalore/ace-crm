@@ -10,6 +10,14 @@ import { useNavigate } from "react-router-dom";
 import { ProgressBar } from "@/components/spinner/ProgressBar";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useFetchPortofLoadings, useFetchScheme, useFetchState } from "@/hooks/useApi";
 
 // Validation Schema
 const branchFormSchema = z.object({
@@ -17,20 +25,20 @@ const branchFormSchema = z.object({
   branch_name: z.string().min(1, "Branch name is required"),
   branch_name_short: z.string().min(1, "Branch short name is required"),
   branch_address: z.string().min(1, "Branch address is required"),
-  branch_spice_board: z.string().min(1, "Spice board details are required"),
+  branch_spice_board: z.string().optional(),
   branch_iec: z.string().min(1, "IEC code is required"),
-  branch_apeda: z.string().min(1, "APEDA details are required"),
+  branch_apeda: z.string().optional(),
   branch_gst: z.string().min(1, "GST number is required"),
   branch_state: z.string().min(1, "State is required"),
   branch_state_no: z.string().min(1, "State number is required"),
-  branch_scheme: z.string().min(1, "Scheme details are required"),
+  branch_scheme: z.string().optional(),
   branch_pan_no: z.string().min(1, "PAN number is required"),
-  branch_ecgcncb: z.string().min(1, "ECGC/NCB details are required"),
-  branch_ecgc_policy: z.string().min(1, "ECGC policy details are required"),
-  branch_reg_no: z.string().min(1, "Registration number is required"),
-  branch_port_of_loading: z.string().min(1, "Port of loading is required"),
-  branch_sign_name: z.string().min(1, "Signatory name is required"),
-  branch_sign_no: z.string().min(1, "Signatory number is required"),
+  branch_ecgcncb: z.string().optional(),
+  branch_ecgc_policy: z.string().optional(),
+  branch_reg_no: z.string().optional(),
+  branch_port_of_loading: z.string().optional(),
+  branch_sign_name: z.string().optional(),
+  branch_sign_no: z.string().optional(),
   branch_sign_name1: z.string().optional(),
   branch_sign_no1: z.string().optional(),
   branch_sign_name2: z.string().optional(),
@@ -123,7 +131,9 @@ const CreateBranch = () => {
     branch_sign_no2: "",
   });
   const [progress, setProgress] = useState(0);
-
+  const { data: portofLoadingData } = useFetchPortofLoadings();
+  const { data: stateData } = useFetchState();
+  const { data: schemeData } = useFetchScheme();
   const createBranchMutation = useMutation({
     mutationFn: createBranch,
     
@@ -182,7 +192,7 @@ const CreateBranch = () => {
       if (error instanceof z.ZodError) {
         const errorMessages = error.errors.map((err) => {
           const field = err.path.join(".");
-          return `${field}: ${err.message}`;
+          return ` ${err.message}`;
         });
 
         toast({
@@ -234,20 +244,6 @@ const CreateBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Branch Short Name <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  className="bg-white"
-                  value={formData.branch_short}
-                  onChange={(e) => handleInputChange(e, "branch_short")}
-                  placeholder="Enter branch short name"
-                />
-              </div>
-
-              <div>
-                <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                >
                   Branch Name <span className="text-red-500">*</span>
                 </label>
                 <Input
@@ -257,61 +253,36 @@ const CreateBranch = () => {
                   placeholder="Enter branch name"
                 />
               </div>
+              <div>
+                <label
+                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                >
+                  Branch Short  <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  className="bg-white"
+                  value={formData.branch_short}
+                  onChange={(e) => handleInputChange(e, "branch_short")}
+                  placeholder="Enter branch short "
+                />
+              </div>
+
+           
 
               <div>
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Branch Short Name <span className="text-red-500">*</span>
+                  Branch Prefix <span className="text-red-500">*</span>
                 </label>
                 <Input
                   className="bg-white"
                   value={formData.branch_name_short}
                   onChange={(e) => handleInputChange(e, "branch_name_short")}
-                  placeholder="Enter branch short name"
+                  placeholder="Enter branch prefix"
                 />
               </div>
-              <div>
-                <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                >
-                  Spice Board Details <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  className="bg-white"
-                  value={formData.branch_spice_board}
-                  onChange={(e) => handleInputChange(e, "branch_spice_board")}
-                  placeholder="Enter spice board details"
-                />
-              </div>
-
-              <div>
-                <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                >
-                  IEC Code <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  className="bg-white"
-                  value={formData.branch_iec}
-                  onChange={(e) => handleInputChange(e, "branch_iec")}
-                  placeholder="Enter IEC code"
-                />
-              </div>
-
-              <div>
-                <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                >
-                  APEDA Details <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  className="bg-white"
-                  value={formData.branch_apeda}
-                  onChange={(e) => handleInputChange(e, "branch_apeda")}
-                  placeholder="Enter APEDA details"
-                />
-              </div>
+             
 
               <div>
                 <label
@@ -331,44 +302,15 @@ const CreateBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  State <span className="text-red-500">*</span>
+                  IEC Code <span className="text-red-500">*</span>
                 </label>
                 <Input
                   className="bg-white"
-                  value={formData.branch_state}
-                  onChange={(e) => handleInputChange(e, "branch_state")}
-                  placeholder="Enter state"
+                  value={formData.branch_iec}
+                  onChange={(e) => handleInputChange(e, "branch_iec")}
+                  placeholder="Enter IEC code"
                 />
               </div>
-
-              <div>
-                <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                >
-                  State Number <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  className="bg-white"
-                  value={formData.branch_state_no}
-                  onChange={(e) => handleInputChange(e, "branch_state_no")}
-                  placeholder="Enter state number"
-                />
-              </div>
-
-              <div>
-                <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                >
-                  Scheme Details <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  className="bg-white"
-                  value={formData.branch_scheme}
-                  onChange={(e) => handleInputChange(e, "branch_scheme")}
-                  placeholder="Enter scheme details"
-                />
-              </div>
-
               <div>
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
@@ -387,7 +329,115 @@ const CreateBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  ECGC/NCB Details <span className="text-red-500">*</span>
+                  State <span className="text-red-500">*</span>
+                </label>
+                <Select
+                  value={formData.branch_state}
+                  onValueChange={(value) =>
+                    handleInputChange(
+                      { target: { value } },
+                      "branch_state"
+                    )
+                  }
+                >
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder="Enter state" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {stateData?.state?.map((item) => (
+                      <SelectItem
+                        value={item.state_name}
+                        key={item.state_name}
+                      >
+                        {item.state_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label
+                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                >
+                  State Code <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  className="bg-white"
+                  value={formData.branch_state_no}
+                  onChange={(e) => handleInputChange(e, "branch_state_no")}
+                  placeholder="Enter state code"
+                />
+              </div>
+
+              <div>
+                <label
+                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                >
+                  APEDA Details 
+                </label>
+                <Input
+                  className="bg-white"
+                  value={formData.branch_apeda}
+                  onChange={(e) => handleInputChange(e, "branch_apeda")}
+                  placeholder="Enter APEDA details"
+                />
+              </div>
+
+              <div>
+                <label
+                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                >
+                  Spice Board Details 
+                </label>
+                <Input
+                  className="bg-white"
+                  value={formData.branch_spice_board}
+                  onChange={(e) => handleInputChange(e, "branch_spice_board")}
+                  placeholder="Enter spice board details"
+                />
+              </div>
+
+             
+
+              <div>
+                <label
+                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                >
+                  Scheme Details 
+                </label>
+                <Select
+                                value={formData.branch_scheme}
+                                onValueChange={(value) =>
+                                  handleInputChange(
+                                    { target: { value } },
+                                    "branch_scheme"
+                                  )
+                                }
+                              >
+                                <SelectTrigger className="bg-white">
+                                  <SelectValue placeholder="Enter scheme details" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-white">
+                                  {schemeData?.scheme?.map((item) => (
+                                    <SelectItem
+                                      value={item.scheme_short}
+                                      key={item.scheme_short}
+                                    >
+                                      {item.scheme_short}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+              </div>
+
+             
+
+              <div>
+                <label
+                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                >
+                  ECGC/NCB Details 
                 </label>
                 <Input
                   className="bg-white"
@@ -401,7 +451,7 @@ const CreateBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  ECGC Policy Details <span className="text-red-500">*</span>
+                  ECGC Policy Details 
                 </label>
                 <Input
                   className="bg-white"
@@ -415,7 +465,7 @@ const CreateBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Registration Number <span className="text-red-500">*</span>
+                  Registration Number 
                 </label>
                 <Input
                   className="bg-white"
@@ -429,44 +479,31 @@ const CreateBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Port of Loading <span className="text-red-500">*</span>
+                  Port of Loading 
                 </label>
-                <Input
-                  className="bg-white"
-                  value={formData.branch_port_of_loading}
-                  onChange={(e) =>
-                    handleInputChange(e, "branch_port_of_loading")
-                  }
-                  placeholder="Enter port of loading"
-                />
-              </div>
-
-              <div>
-                <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                >
-                  Signatory Name <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  className="bg-white"
-                  value={formData.branch_sign_name}
-                  onChange={(e) => handleInputChange(e, "branch_sign_name")}
-                  placeholder="Enter signatory name"
-                />
-              </div>
-
-              <div>
-                <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                >
-                  Signatory Number <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  className="bg-white"
-                  value={formData.branch_sign_no}
-                  onChange={(e) => handleInputChange(e, "branch_sign_no")}
-                  placeholder="Enter signatory number"
-                />
+                 <Select
+                                  value={formData.branch_port_of_loading}
+                                  onValueChange={(value) =>
+                                    handleInputChange(
+                                      { target: { value } },
+                                      "branch_port_of_loading"
+                                    )
+                                  }
+                                >
+                                  <SelectTrigger className="bg-white">
+                                    <SelectValue placeholder="Enter port of loading" />
+                                  </SelectTrigger>
+                                  <SelectContent className="bg-white">
+                                    {portofLoadingData?.portofLoading?.map((item) => (
+                                      <SelectItem
+                                        value={item.portofLoading}
+                                        key={item.portofLoading}
+                                      >
+                                        {item.portofLoading}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
               </div>
 
               <div>
@@ -477,9 +514,9 @@ const CreateBranch = () => {
                 </label>
                 <Input
                   className="bg-white"
-                  value={formData.branch_sign_name1}
-                  onChange={(e) => handleInputChange(e, "branch_sign_name1")}
-                  placeholder="Enter signatory Name 1"
+                  value={formData.branch_sign_name}
+                  onChange={(e) => handleInputChange(e, "branch_sign_name")}
+                  placeholder="Enter signatory name 1"
                 />
               </div>
 
@@ -487,17 +524,45 @@ const CreateBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Signatory No 1
+                  Signatory Number 1 
+                </label>
+                <Input
+                  className="bg-white"
+                  value={formData.branch_sign_no}
+                  onChange={(e) => handleInputChange(e, "branch_sign_no")}
+                  placeholder="Enter signatory number 1"
+                />
+              </div>
+
+              <div>
+                <label
+                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                >
+                  Signatory Name 2
+                </label>
+                <Input
+                  className="bg-white"
+                  value={formData.branch_sign_name1}
+                  onChange={(e) => handleInputChange(e, "branch_sign_name1")}
+                  placeholder="Enter signatory Name 2"
+                />
+              </div>
+
+              <div>
+                <label
+                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                >
+                  Signatory No 2
                 </label>
                 <Input
                   className="bg-white"
                   value={formData.branch_sign_no1}
                   onChange={(e) => handleInputChange(e, "branch_sign_no1")}
-                  placeholder="Enter signatory No 1"
+                  placeholder="Enter signatory No 2"
                 />
               </div>
 
-              <div>
+              {/* <div>
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
@@ -523,7 +588,7 @@ const CreateBranch = () => {
                   onChange={(e) => handleInputChange(e, "branch_sign_no2")}
                   placeholder="Enter signatory No 2"
                 />
-              </div>
+              </div> */}
             </div>
           </CardContent>
         </Card>

@@ -1,15 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
-
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { Table, ChevronDown, Plus } from "lucide-react";
-import menuItems from "../../../json/menuItems.json";
 import { useNavigate } from "react-router-dom";
+import { Plus } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
 import { ContextPanel } from "@/lib/ContextPanel";
-import BASE_URL from "@/config/BaseUrl";
-import Page from "../dashboard/page";
 import { Button } from "@/components/ui/button";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import { useToast } from "@/hooks/use-toast";
+import Page from "../dashboard/page";
+import BASE_URL from "@/config/BaseUrl";
 
 const CreatePage = () => {
   const [selectedPage, setSelectedPage] = useState("");
@@ -20,44 +18,106 @@ const CreatePage = () => {
   const [availablePages, setAvailablePages] = useState([]);
   const navigate = useNavigate();
   const { fetchPagePermission } = useContext(ContextPanel);
-
   const { toast } = useToast();
 
-  const flattenMenuItems = (items) => {
-    let flattened = [];
-    items.forEach((item) => {
-      if (item.href && !item.subItems) {
-        flattened.push({
-          title: item.title,
-          href: item.href,
-        });
-      }
-      if (item.subItems) {
-        flattened = [...flattened, ...flattenMenuItems(item.subItems)];
-      }
-    });
-    return flattened;
+  const getAllPages = () => {
+    const pages = [];
+    
+    const extractPages = (items) => {
+      items.forEach(item => {
+        if (item.url && item.url !== "#") {
+          pages.push({
+            title: item.title || item.name,
+            url: item.url
+          });
+        }
+        if (item.items) {
+          extractPages(item.items);
+        }
+      });
+    };
+
+
+    const sidebarData = {
+      navMain: [
+        {
+          title: "Master",
+          url: "#",
+          items: [
+            { title: "Branch", url: "/master/branch" },
+            { title: "State", url: "/master/state" },
+            { title: "Bank", url: "/master/bank" },
+            { title: "Scheme", url: "/master/scheme" },
+            { title: "Country", url: "/master/country" },
+            { title: "Container Size", url: "/master/containersize" },
+            { title: "Payment TermsC", url: "/master/paymentTermC" },
+            { title: "Description of Goods", url: "/master/descriptionGoods" },
+            { title: "Bag Type", url: "/master/bagType" },
+            { title: "Custom Description", url: "/master/customdescription" },
+            { title: "Type", url: "/master/type" },
+            { title: "Quality", url: "/master/quality" },
+            { title: "Item", url: "/master/item" },
+            { title: "Marking", url: "/master/marking" },
+            { title: "Port of Loading", url: "/master/portofloading" },
+            { title: "GR Code", url: "/master/grcode" },
+            { title: "Product", url: "/master/product" },
+            { title: "Product Description", url: "/master/productdescription" },
+            { title: "Shipper", url: "/master/shipper" },
+            { title: "Vessel", url: "/master/vessel" },
+            { title: "Pre Recepits", url: "/master/prerecepits" }
+          ]
+        },
+        {
+          title: "Reports",
+          url: "#",
+          items: [
+            { title: "BuyerR", url: "/report/buyer-report" },
+            { title: "ContractR", url: "/report/contract-form" },
+            { title: "Sales Accounts", url: "/report/sales-account-form" },
+            { title: "Sales Data", url: "/report/sales-data-form" }
+          ]
+        },
+        {
+          title: "Payment",
+          url: "#",
+          items: [
+            { title: "PaymentList", url: "/payment-payment-list" },
+            { title: "PaymentPending", url: "/payment-payment-pending" },
+            { title: "PaymentClose", url: "/payment-payment-close" }
+          ]
+        }
+      ],
+      projects: [
+        { name: "Dashboard", url: "/home" },
+        { name: "Contract", url: "/contract" },
+        { name: "Invoice", url: "/invoice" }
+      ],
+      userManagement: [
+        { name: "User Management", url: "/userManagement" },
+        { name: "UserType", url: "/user-type" }
+      ]
+    };
+
+    // Extract pages from all sections
+    extractPages(sidebarData.navMain);
+    extractPages(sidebarData.projects.map(p => ({ title: p.name, url: p.url })));
+    extractPages(sidebarData.userManagement.map(p => ({ title: p.name, url: p.url })));
+
+    return pages;
   };
 
   useEffect(() => {
-    const existingControls = JSON.parse(
-      localStorage.getItem("pageControl") || "[]"
+    const existingControls = JSON.parse(localStorage.getItem("pageControl") || "[]");
+    const allPages = getAllPages();
+
+    const filteredPages = allPages.filter(page => 
+      !existingControls.some(control => 
+        control.page === page.title || 
+        control.url === page.url.replace("/", "")
+      )
     );
-    const allFlattenedPages = flattenMenuItems(menuItems);
 
-    const filteredPages = allFlattenedPages.filter((menuItem) => {
-      return !existingControls.some(
-        (control) =>
-          control.page === menuItem.title ||
-          control.url === menuItem.href.replace("/", "")
-      );
-    });
-
-    if (filteredPages.length > 0) {
-      setAvailablePages(["All", ...filteredPages.map((item) => item.title)]);
-    } else {
-      setAvailablePages([]);
-    }
+    setAvailablePages(["All", ...filteredPages.map(page => page.title)]);
   }, []);
 
   const handlePageChange = (e) => {
@@ -65,25 +125,22 @@ const CreatePage = () => {
     setSelectedPage(page);
 
     if (page === "All") {
-      const existingControls = JSON.parse(
-        localStorage.getItem("pageControl") || "[]"
-      );
-      const allFlattenedPages = flattenMenuItems(menuItems);
+      const existingControls = JSON.parse(localStorage.getItem("pageControl") || "[]");
+      const allPages = getAllPages();
 
-      const filteredPages = allFlattenedPages.filter((menuItem) => {
-        return !existingControls.some(
-          (control) =>
-            control.page === menuItem.title ||
-            control.url === menuItem.href.replace("/", "")
-        );
-      });
+      const filteredPages = allPages.filter(menuItem => 
+        !existingControls.some(control => 
+          control.page === menuItem.title || 
+          control.url === menuItem.url.replace("/", "")
+        )
+      );
 
       setSelectedItems(filteredPages);
       setSelectedUrl("");
     } else {
-      const item = flattenMenuItems(menuItems).find((i) => i.title === page);
+      const item = getAllPages().find(i => i.title === page);
       if (item) {
-        setSelectedUrl(item.href.replace("/", ""));
+        setSelectedUrl(item.url.replace("/", ""));
         setSelectedItems([item]);
       }
     }
@@ -92,19 +149,14 @@ const CreatePage = () => {
   const createMutation = useMutation({
     mutationFn: async (data) => {
       const token = localStorage.getItem("token");
-      console.log("data sent: ", data);
-
-      const response = await fetch(
-        `${BASE_URL}/api/panel-create-usercontrol-new`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      const response = await fetch(`${BASE_URL}/api/panel-create-usercontrol-new`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status} ${response.statusText}`);
@@ -112,12 +164,6 @@ const CreatePage = () => {
 
       return response.json();
     },
-    // onSuccess: async () => {
-    //   await fetchPagePermission();
-    //   toast.success("Page control created successfully!");
-    //   navigate("/userManagement");
-    // },
-
     onSuccess: async () => {
       await fetchPagePermission();
       toast({
@@ -127,7 +173,11 @@ const CreatePage = () => {
       navigate("/userManagement");
     },
     onError: (error) => {
-      toast.error(`Error: ${error.message}`);
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -135,29 +185,22 @@ const CreatePage = () => {
     let payloadData;
 
     if (selectedPage === "All") {
-      payloadData = selectedItems.map((item) => ({
+      payloadData = selectedItems.map(item => ({
         page: item.title,
-        url: item.href.replace("/", ""),
+        url: item.url.replace("/", ""),
         userIds,
         status,
       }));
     } else {
-      payloadData = [
-        {
-          page: selectedPage,
-          url: selectedUrl,
-          userIds,
-          status,
-        },
-      ];
+      payloadData = [{
+        page: selectedPage,
+        url: selectedUrl,
+        userIds,
+        status,
+      }];
     }
 
-    const payload = {
-      usercontrol_data: payloadData,
-    };
-
-    console.log("Submitting payload:", payload);
-    createMutation.mutate(payload);
+    createMutation.mutate({ usercontrol_data: payloadData });
   };
 
   return (
@@ -177,7 +220,7 @@ const CreatePage = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Page</option>
-                {availablePages.map((page) => (
+                {availablePages.map(page => (
                   <option key={page} value={page}>
                     {page}
                   </option>
@@ -249,7 +292,7 @@ const CreatePage = () => {
                           {item.title}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap border-b">
-                          {item.href.replace("/", "")}
+                          {item.url.replace("/", "")}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap border-b">
                           {userIds}
@@ -265,28 +308,30 @@ const CreatePage = () => {
             </div>
           )}
 
-          <Button
-            onClick={handleSubmit}
-            disabled={!selectedPage || createMutation.isLoading}
-            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-          >
-            <Plus size={20} />
-            Create
-          </Button>
+          <div className="mt-6">
+            <Button
+              onClick={handleSubmit}
+              disabled={!selectedPage || createMutation.isLoading}
+              className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Create
+            </Button>
 
-          {createMutation.isLoading && (
-            <div className="mt-4 text-blue-600">Creating...</div>
-          )}
-          {createMutation.isError && (
-            <div className="mt-4 text-red-600">
-              Error: {createMutation.error.message}
-            </div>
-          )}
-          {createMutation.isSuccess && (
-            <div className="mt-4 text-green-600">
-              Successfully created page control!
-            </div>
-          )}
+            {createMutation.isLoading && (
+              <div className="mt-4 text-blue-600">Creating...</div>
+            )}
+            {createMutation.isError && (
+              <div className="mt-4 text-red-600">
+                Error: {createMutation.error.message}
+              </div>
+            )}
+            {createMutation.isSuccess && (
+              <div className="mt-4 text-green-600">
+                Successfully created page control!
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </Page>

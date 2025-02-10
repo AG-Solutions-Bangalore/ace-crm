@@ -7,11 +7,11 @@ import { Printer } from "lucide-react";
 import { useParams } from "react-router-dom";
 import moment from "moment";
 import BASE_URL from "@/config/BaseUrl";
-import LetterHead from "../../../public/assets/AceB.png";
 const PaymentView = () => {
   const [viewData, setViewData] = useState([]);
   const [paymentSub, setPaymentSub] = useState([]);
   const [invoice, setInvoice] = useState({});
+  const [branch, setBranch] = useState({});
   const [payment, setPaymentData] = useState({});
 
   const containerRef = useRef();
@@ -39,6 +39,7 @@ const PaymentView = () => {
         setViewData(data.paymentSubView);
         setPaymentSub(data.paymentSub);
         setPaymentData(data.payment);
+        setBranch(data.branch);
         setInvoice(data.invoice);
       } catch (error) {
         console.log(error);
@@ -138,7 +139,7 @@ const PaymentView = () => {
 
       <div ref={containerRef} className="min-h-screen font-normal ">
         <div className="max-w-4xl mx-auto p-4  text-[12px]">
-          <img src={LetterHead} alt="Letter Head" />
+          <img  src={`/api/public/assets/images/letterHead/${branch?.branch_letter_head}`} alt="Letter Head" />
 
           {/* //first */}
           <div className="max-w-4xl mx-auto px-4 pt-4 grid grid-cols-12 gap-4">

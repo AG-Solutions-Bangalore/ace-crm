@@ -935,7 +935,7 @@ const InvoiceAdd = () => {
         <Card className={`mb-6 ${ButtonConfig.cardColor}`}>
           <CardContent className="p-6">
             {/* Basic Details Section */}
-            <div className="mb-8">
+            <div className="mb-3">
               <div className="grid grid-cols-5 gap-6">
                 <div>
                      <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
@@ -1013,7 +1013,7 @@ const InvoiceAdd = () => {
               </div>
             </div>
 
-            <div className="mb-8">
+            <div className="mb-3">
               <div className="grid grid-cols-4 gap-6">
                 <div>
                      <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
@@ -1146,7 +1146,7 @@ const InvoiceAdd = () => {
               </div>
             </div>
 
-            <div className="mb-8">
+            <div className="mb-3">
               <div className="grid grid-cols-4 gap-6">
                 <div>
                   <Textarea
@@ -1200,7 +1200,7 @@ const InvoiceAdd = () => {
               </div>
             </div>
 
-            <div className="mb-8">
+            <div className="mb-3">
               <div className="grid grid-cols-5 gap-6">
                 <div>
                      <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
@@ -1296,7 +1296,7 @@ const InvoiceAdd = () => {
                 </div>
               </div>
             </div>
-            <div className="mb-8">
+            <div className="mb-3">
               <div className="grid grid-cols-3 gap-6">
                 <div>
                      <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
@@ -1355,7 +1355,7 @@ const InvoiceAdd = () => {
                 </div>
               </div>
             </div>
-            <div className="mb-8">
+            <div className="mb-3">
               <div className="grid grid-cols-3 gap-6">
                 <div>
                      <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
@@ -1417,7 +1417,7 @@ const InvoiceAdd = () => {
                 </div>
               </div>
             </div>
-            <div className="mb-8">
+            <div className="mb-3">
               <div className="grid grid-cols-1 gap-6">
                 <div>
                      <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>

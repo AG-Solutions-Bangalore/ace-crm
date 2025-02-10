@@ -105,6 +105,16 @@ export const useFetchItemNames = () => {
     createQueryConfig(["itemNames"], "/api/panel-fetch-itemname")
   );
 };
+export const useFetchState = () => {
+  return useQuery(
+    createQueryConfig(["state"], "/api/panel-fetch-state")
+  );
+};
+export const useFetchScheme = () => {
+  return useQuery(
+    createQueryConfig(["scheme"], "/api/panel-fetch-scheme")
+  );
+};
 
 export const useFetchDescriptionofGoods = () => {
   return useQuery(

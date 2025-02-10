@@ -55,7 +55,7 @@ export default function LoginAuth() {
     setIsLoading(true);
 
     const formData = new FormData();
-    formData.append("username", email); // Ensure API expects "username"
+    formData.append("username", email); 
     formData.append("password", password);
 
     try {
@@ -63,8 +63,7 @@ export default function LoginAuth() {
 
       const res = await axios.post(`${BASE_URL}/api/panel-login`, formData);
 
-      console.log("Full API Response:", res); // Debugging: See full API response
-      console.log("Response Data:", res.data); // Debugging: See response content
+    
 
       if (res.status === 200) {
         console.log("Login Success ✅ Checking UserInfo...");
@@ -76,19 +75,19 @@ export default function LoginAuth() {
           return;
         }
 
-        const { UserInfo, userN } = res.data;
+        const { UserInfo, userN,company_detils } = res.data;
 
         console.log("Saving user details to local storage...");
         localStorage.setItem("token", UserInfo.token);
         localStorage.setItem("allUsers", JSON.stringify(userN));
         localStorage.setItem("id", UserInfo.user.id);
         localStorage.setItem("name", UserInfo.user.name);
-        localStorage.setItem("username", UserInfo.user.full_name);
         localStorage.setItem("userType", UserInfo.user.user_type);
         localStorage.setItem("companyID", UserInfo.user.company_id);
-
+        localStorage.setItem("companyName", company_detils?.company_name);
         localStorage.setItem("branchId", UserInfo.user.branch_id);
         localStorage.setItem("email", UserInfo.user.email);
+        localStorage.setItem("token-expire-time", UserInfo.token_expires_at);
 
         await fetchPermissions();
         await fetchPagePermission();
