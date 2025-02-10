@@ -76,7 +76,7 @@ const InvoiceCertificateOrigin = () => {
 
   if (loading) {
     return (
-      <Card className="w-full h-[80vh] flex items-center justify-center">
+      <Card className="w-[80vw] h-[80vh] flex items-center justify-center">
         <CardContent>
           <Button disabled className="flex items-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />

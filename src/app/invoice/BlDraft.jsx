@@ -137,7 +137,7 @@ const BlDraft = () => {
   };
   if (loading) {
     return (
-      <Card className="w-full h-[80vh] flex items-center justify-center">
+      <Card className="w-[80vw] h-[80vh] flex items-center justify-center">
       <CardContent>
         <Button disabled className="flex items-center gap-2">
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -150,7 +150,7 @@ const BlDraft = () => {
 
   if (error) {
     return (
-      <Card className="w-full">
+      <Card className="w-[80vw]">
       <CardContent className="p-6">
         <div className="text-red-500 mb-4">Error: {error}</div>
         <Button variant="outline">Try Again</Button>
