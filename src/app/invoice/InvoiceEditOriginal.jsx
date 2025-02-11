@@ -802,7 +802,7 @@ const InvoiceEdit = () => {
     mutationFn: async (productId) => {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `https://exportbiz.in/public/api/panel-delete-invoice-sub/${productId}`,
+        `${BASE_URL}/api/panel-delete-invoice-sub/${productId}`,
         {
           method: "DELETE",
           headers: {

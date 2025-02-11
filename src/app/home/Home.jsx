@@ -1,6 +1,6 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -8,15 +8,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { 
-  FileText, 
-  ClipboardCheck, 
-  CheckCircle, 
+} from "@/components/ui/table";
+import {
+  FileText,
+  ClipboardCheck,
+  CheckCircle,
   XCircle,
-  Loader2
-} from 'lucide-react';
-import Page from '../dashboard/page';
+  Loader2,
+} from "lucide-react";
+import Page from "../dashboard/page";
+import BASE_URL from "@/config/BaseUrl";
 
 const StatCard = ({ title, value, icon: Icon, className }) => (
   <Card className="relative overflow-hidden">
@@ -44,7 +45,9 @@ const EnquiryTable = ({ enquiries }) => (
             <TableRow>
               <TableHead className="font-medium text-black">Customer</TableHead>
               <TableHead className="font-medium text-black">Branch</TableHead>
-              <TableHead className="font-medium text-black">Reference</TableHead>
+              <TableHead className="font-medium text-black">
+                Reference
+              </TableHead>
               <TableHead className="font-medium text-black">Date</TableHead>
               <TableHead className="font-medium text-black">Products</TableHead>
             </TableRow>
@@ -70,18 +73,15 @@ const EnquiryTable = ({ enquiries }) => (
 
 const Home = () => {
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['dashboard'],
+    queryKey: ["dashboard"],
     queryFn: async () => {
-      const token = localStorage.getItem('token');
-      const response = await fetch(
-        'https://exportbiz.in/public/api/panel-fetch-dashboard',
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error('Failed to fetch dashboard data');
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${BASE_URL}/api/panel-fetch-dashboard`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch dashboard data");
       return response.json();
     },
   });
@@ -145,4 +145,3 @@ const Home = () => {
 };
 
 export default Home;
-

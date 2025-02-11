@@ -544,12 +544,32 @@ const InvoiceEdit = () => {
 
   const updateInvoiceMutation = useMutation({
     mutationFn: updateInvoice,
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "Invoice updated successfully",
-      });
-      navigate("/invoice");
+    // onSuccess: () => {
+    //   toast({
+    //     title: "Success",
+    //     description: "Invoice updated successfully",
+    //   });
+    //   navigate("/invoice");
+    // },
+    onSuccess: (response) => {
+      if (response.code == 200) {
+        toast({
+          title: "Success",
+          description: response.msg,
+        });
+      } else if (response.code == 400) {
+        toast({
+          title: "Duplicate Entry",
+          description: response.msg,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Unexpected Response",
+          description: response.msg || "Something unexpected happened.",
+          variant: "destructive",
+        });
+      }
     },
     onError: (error) => {
       toast({
@@ -803,7 +823,7 @@ const InvoiceEdit = () => {
     mutationFn: async (productId) => {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `https://exportbiz.in/public/api/panel-delete-invoice-sub/${productId}`,
+        `${BASE_URL}/api/panel-delete-invoice-sub/${productId}`,
         {
           method: "DELETE",
           headers: {
@@ -864,6 +884,7 @@ const InvoiceEdit = () => {
         invoice_data: processedContractData,
       };
       updateInvoiceMutation.mutate({ id, data: updateData });
+      navigate("/invoice");
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {
@@ -1018,7 +1039,9 @@ const InvoiceEdit = () => {
 
     return (
       <Card className="mb-2 " ref={containerRef}>
-        <div className={ `p-4 ${ButtonConfig.cardColor} flex items-center justify-between`}>
+        <div
+          className={`p-4 ${ButtonConfig.cardColor} flex items-center justify-between`}
+        >
           <h2 className="text-lg font-semibold  flex items-center gap-2">
             <p className="flex gap-1 relative items-center">
               {" "}
@@ -1032,37 +1055,36 @@ const InvoiceEdit = () => {
               </span>
             </p>
           </h2>
-         
-                  
+
           <div className="flex items-center gap-2">
             <span className=" flex items-center gap-2    text-xs font-medium  text-yellow-800 ">
               {/* {invoiceDatas?.invoice?.invoice_status} */}
               <MemoizedSelect
-                    value={formData.invoice_product}
-                    onChange={(value) =>
-                      handleSelectChange("invoice_product", value)
-                    }
-                    options={
-                      productData?.product?.map((product) => ({
-                        value: product.product_name,
-                        label: product.product_name,
-                      })) || []
-                    }
-                    placeholder="Select Product"
-                  />
+                value={formData.invoice_product}
+                onChange={(value) =>
+                  handleSelectChange("invoice_product", value)
+                }
+                options={
+                  productData?.product?.map((product) => ({
+                    value: product.product_name,
+                    label: product.product_name,
+                  })) || []
+                }
+                placeholder="Select Product"
+              />
               <MemoizedSelect
-                    value={formData.invoice_status}
-                    onChange={(value) =>
-                      handleSelectChange("invoice_status", value)
-                    }
-                    options={
-                      statusData?.invoiceStatus?.map((status) => ({
-                        value: status.invoice_status,
-                        label: status.invoice_status,
-                      })) || []
-                    }
-                    placeholder="Select Status"
-                  />
+                value={formData.invoice_status}
+                onChange={(value) =>
+                  handleSelectChange("invoice_status", value)
+                }
+                options={
+                  statusData?.invoiceStatus?.map((status) => ({
+                    value: status.invoice_status,
+                    label: status.invoice_status,
+                  })) || []
+                }
+                placeholder="Select Status"
+              />
             </span>
 
             {isExpanded ? (
@@ -1120,21 +1142,18 @@ const InvoiceEdit = () => {
   };
   return (
     <Page>
-      <form
-        onSubmit={handleSubmit}
-        className="w-full p-4 bg-blue-50/30"
-      >
+      <form onSubmit={handleSubmit} className="w-full p-4 bg-blue-50/30">
         {/* <EnquiryHeader progress={progress} /> */}
         <CompactViewSection invoiceDatas={invoiceDatas} />
-        
+
         <Card className={`    ${ButtonConfig.cardColor}`}>
           <CardContent className="p-6">
-           
-
             <div className="mb-0">
               <div className="grid grid-cols-3 gap-6">
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Buyer <span className="text-red-500">*</span>
                   </label>
 
@@ -1153,7 +1172,9 @@ const InvoiceEdit = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Consignee <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1171,8 +1192,10 @@ const InvoiceEdit = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
-                    Consig. Bank 
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
+                    Consig. Bank
                   </label>
                   <MemoizedSelect
                     value={formData.invoice_consig_bank}
@@ -1188,7 +1211,6 @@ const InvoiceEdit = () => {
                     placeholder="Select Consig. Bank"
                   />
                 </div>
-                
               </div>
             </div>
 
@@ -1225,14 +1247,15 @@ const InvoiceEdit = () => {
                     }
                   />
                 </div>
-                
               </div>
             </div>
 
             <div className="mb-3">
               <div className="grid grid-cols-6 gap-6">
-              <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                <div>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Pre-Receipts <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1250,7 +1273,9 @@ const InvoiceEdit = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Port of Loading <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1271,14 +1296,19 @@ const InvoiceEdit = () => {
                 </div>
                 <div>
                   <label className=" text-sm flex flex-row items-center justify-between font-medium mb-2">
-                   <span> Dest. Port <span className="text-red-500">*</span></span>
+                    <span>
+                      {" "}
+                      Dest. Port <span className="text-red-500">*</span>
+                    </span>
                     <p
-                    type="button"
-                    onClick={() => setShowDischargeAndCIF(!showDischargeAndCIF)}
-                    className=" underline text-xs text-black hover:text-red-700 cursor-pointer"
-                  >
-                    Change D/C
-                  </p>
+                      type="button"
+                      onClick={() =>
+                        setShowDischargeAndCIF(!showDischargeAndCIF)
+                      }
+                      className=" underline text-xs text-black hover:text-red-700 cursor-pointer"
+                    >
+                      Change D/C
+                    </p>
                   </label>
                   <MemoizedSelect
                     value={formData.invoice_destination_port}
@@ -1293,12 +1323,13 @@ const InvoiceEdit = () => {
                     }
                     placeholder="Select Destination Port"
                   />
-                 
                 </div>
                 {showDischargeAndCIF && (
                   <>
                     <div>
-                         <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                      <label
+                        className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                      >
                         Discharge <span className="text-red-500">*</span>
                       </label>
                       <MemoizedSelect
@@ -1316,7 +1347,9 @@ const InvoiceEdit = () => {
                       />
                     </div>
                     <div>
-                         <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                      <label
+                        className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                      >
                         CIF <span className="text-red-500">*</span>
                       </label>
                       <MemoizedSelect
@@ -1336,7 +1369,9 @@ const InvoiceEdit = () => {
                   </>
                 )}
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Dest. Country <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1354,7 +1389,9 @@ const InvoiceEdit = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Containers/Size <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1374,7 +1411,9 @@ const InvoiceEdit = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Custom Des <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1412,7 +1451,9 @@ const InvoiceEdit = () => {
                   />
                 </div> */}
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Payment Terms
                   </label>
                   <MemoizedSelect
@@ -1430,7 +1471,9 @@ const InvoiceEdit = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     LUT Code <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1452,7 +1495,9 @@ const InvoiceEdit = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     GR Code <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1470,7 +1515,9 @@ const InvoiceEdit = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Remarks
                   </label>
                   <Textarea
@@ -1483,11 +1530,9 @@ const InvoiceEdit = () => {
                 </div>
               </div>
             </div>
-          
-          
 
             {/* Products Section */}
-            <div >
+            <div>
               <div className="flex justify-between items-center mb-4">
                 <div className="flex flex-row items-center">
                   <h2 className="text-xl font-semibold">Products</h2>
@@ -1528,7 +1573,10 @@ const InvoiceEdit = () => {
                   </TableHeader>
                   <TableBody>
                     {invoiceData.map((row, rowIndex) => (
-                      <TableRow key={rowIndex} className="hover:bg-blue-200 hover:cursor-pointer">
+                      <TableRow
+                        key={rowIndex}
+                        className="hover:bg-blue-200 hover:cursor-pointer"
+                      >
                         <TableCell className="p-2 border">
                           <MemoizedProductSelect
                             value={row.invoiceSub_marking}
@@ -1590,7 +1638,7 @@ const InvoiceEdit = () => {
                         </TableCell>
 
                         <TableCell className="p-2 border w-32">
-                          <div className="flex flex-col gap-2"> 
+                          <div className="flex flex-col gap-2">
                             <Input
                               value={row.invoiceSub_item_bag}
                               onChange={(e) =>

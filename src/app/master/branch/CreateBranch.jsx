@@ -17,7 +17,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useFetchPortofLoadings, useFetchScheme, useFetchState } from "@/hooks/useApi";
+import {
+  useFetchPortofLoadings,
+  useFetchScheme,
+  useFetchState,
+} from "@/hooks/useApi";
 
 // Validation Schema
 const branchFormSchema = z.object({
@@ -87,17 +91,14 @@ const createBranch = async (data) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
 
-  const response = await fetch(
-    "https://exportbiz.in/public/api/panel-create-branch",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    }
-  );
+  const response = await fetch(`${BASE_URL}/api/panel-create-branch`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
 
   if (!response.ok) throw new Error("Failed to create branch");
   return response.json();
@@ -136,18 +137,18 @@ const CreateBranch = () => {
   const { data: schemeData } = useFetchScheme();
   const createBranchMutation = useMutation({
     mutationFn: createBranch,
-    
+
     onSuccess: (response) => {
       if (response.code == 200) {
         toast({
           title: "Success",
-          description: response.msg, 
+          description: response.msg,
         });
         navigate("/master/branch");
       } else {
         toast({
           title: "Error",
-          description: response.msg, 
+          description: response.msg,
           variant: "destructive",
         });
       }
@@ -257,7 +258,7 @@ const CreateBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Branch Short  <span className="text-red-500">*</span>
+                  Branch Short <span className="text-red-500">*</span>
                 </label>
                 <Input
                   className="bg-white"
@@ -266,8 +267,6 @@ const CreateBranch = () => {
                   placeholder="Enter branch short "
                 />
               </div>
-
-           
 
               <div>
                 <label
@@ -282,7 +281,6 @@ const CreateBranch = () => {
                   placeholder="Enter branch prefix"
                 />
               </div>
-             
 
               <div>
                 <label
@@ -334,10 +332,7 @@ const CreateBranch = () => {
                 <Select
                   value={formData.branch_state}
                   onValueChange={(value) =>
-                    handleInputChange(
-                      { target: { value } },
-                      "branch_state"
-                    )
+                    handleInputChange({ target: { value } }, "branch_state")
                   }
                 >
                   <SelectTrigger className="bg-white">
@@ -345,10 +340,7 @@ const CreateBranch = () => {
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     {stateData?.state?.map((item) => (
-                      <SelectItem
-                        value={item.state_name}
-                        key={item.state_name}
-                      >
+                      <SelectItem value={item.state_name} key={item.state_name}>
                         {item.state_name}
                       </SelectItem>
                     ))}
@@ -374,7 +366,7 @@ const CreateBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  APEDA Details 
+                  APEDA Details
                 </label>
                 <Input
                   className="bg-white"
@@ -388,7 +380,7 @@ const CreateBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Spice Board Details 
+                  Spice Board Details
                 </label>
                 <Input
                   className="bg-white"
@@ -398,46 +390,39 @@ const CreateBranch = () => {
                 />
               </div>
 
-             
-
               <div>
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Scheme Details 
+                  Scheme Details
                 </label>
                 <Select
-                                value={formData.branch_scheme}
-                                onValueChange={(value) =>
-                                  handleInputChange(
-                                    { target: { value } },
-                                    "branch_scheme"
-                                  )
-                                }
-                              >
-                                <SelectTrigger className="bg-white">
-                                  <SelectValue placeholder="Enter scheme details" />
-                                </SelectTrigger>
-                                <SelectContent className="bg-white">
-                                  {schemeData?.scheme?.map((item) => (
-                                    <SelectItem
-                                      value={item.scheme_short}
-                                      key={item.scheme_short}
-                                    >
-                                      {item.scheme_short}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
+                  value={formData.branch_scheme}
+                  onValueChange={(value) =>
+                    handleInputChange({ target: { value } }, "branch_scheme")
+                  }
+                >
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder="Enter scheme details" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {schemeData?.scheme?.map((item) => (
+                      <SelectItem
+                        value={item.scheme_short}
+                        key={item.scheme_short}
+                      >
+                        {item.scheme_short}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-
-             
 
               <div>
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  ECGC/NCB Details 
+                  ECGC/NCB Details
                 </label>
                 <Input
                   className="bg-white"
@@ -451,7 +436,7 @@ const CreateBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  ECGC Policy Details 
+                  ECGC Policy Details
                 </label>
                 <Input
                   className="bg-white"
@@ -465,7 +450,7 @@ const CreateBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Registration Number 
+                  Registration Number
                 </label>
                 <Input
                   className="bg-white"
@@ -479,31 +464,31 @@ const CreateBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Port of Loading 
+                  Port of Loading
                 </label>
-                 <Select
-                                  value={formData.branch_port_of_loading}
-                                  onValueChange={(value) =>
-                                    handleInputChange(
-                                      { target: { value } },
-                                      "branch_port_of_loading"
-                                    )
-                                  }
-                                >
-                                  <SelectTrigger className="bg-white">
-                                    <SelectValue placeholder="Enter port of loading" />
-                                  </SelectTrigger>
-                                  <SelectContent className="bg-white">
-                                    {portofLoadingData?.portofLoading?.map((item) => (
-                                      <SelectItem
-                                        value={item.portofLoading}
-                                        key={item.portofLoading}
-                                      >
-                                        {item.portofLoading}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
+                <Select
+                  value={formData.branch_port_of_loading}
+                  onValueChange={(value) =>
+                    handleInputChange(
+                      { target: { value } },
+                      "branch_port_of_loading"
+                    )
+                  }
+                >
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder="Enter port of loading" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {portofLoadingData?.portofLoading?.map((item) => (
+                      <SelectItem
+                        value={item.portofLoading}
+                        key={item.portofLoading}
+                      >
+                        {item.portofLoading}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
@@ -524,7 +509,7 @@ const CreateBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Signatory Number 1 
+                  Signatory Number 1
                 </label>
                 <Input
                   className="bg-white"
