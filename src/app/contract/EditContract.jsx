@@ -376,6 +376,7 @@ const EditContract = () => {
           title: "Success",
           description: response.msg,
         });
+        navigate("/contract");
       } else if (response.code == 400) {
         toast({
           title: "Duplicate Entry",
@@ -671,7 +672,6 @@ const EditContract = () => {
         contract_data: processedContractData,
       };
       updateContractMutation.mutate({ id, data: updateData });
-      navigate("/contract");
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {
