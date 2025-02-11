@@ -92,7 +92,7 @@ const updateBranch = async ({ id, data }) => {
   if (!token) throw new Error("No authentication token found");
 
   const response = await fetch(
-    `https://exportbiz.in/public/api/panel-update-branch/${id}`,
+    `${BASE_URL}/api/panel-update-branch/${id}`,
     {
       method: "PUT",
       headers: {
@@ -148,7 +148,7 @@ const EditBranch = () => {
     queryFn: async () => {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `https://exportbiz.in/public/api/panel-fetch-branch-by-id/${id}`,
+        `${BASE_URL}/api/panel-fetch-branch-by-id/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

@@ -13,23 +13,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import BASE_URL from "@/config/BaseUrl";
-import { Loader } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ContextPanel } from "@/lib/ContextPanel";
 
-export default function LoginAuth() {
+export default function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUserName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { fetchPagePermission, fetchPermissions } = useContext(ContextPanel);
 
   const loadingMessages = [
     "Setting things up for you...",
-    "Checking your credentials...",
-    "Preparing your dashboard...",
+    "Preparing your Password...",
     "Almost there...",
   ];
 
@@ -55,57 +52,52 @@ export default function LoginAuth() {
     setIsLoading(true);
 
     const formData = new FormData();
-    formData.append("username", email);
-    formData.append("password", password);
+    formData.append("email", email);
+    formData.append("username", username);
 
     try {
-      console.log("Submitting login request...");
+      console.log("Submitting forgot password request...");
 
-      const res = await axios.post(`${BASE_URL}/api/panel-login`, formData);
+      const res = await axios.post(
+        `${BASE_URL}/api/panel-send-password`,
+        formData
+      );
 
       if (res.status === 200) {
-        console.log("Login Success ✅ Checking UserInfo...");
+        const response = res.data;
 
-        if (!res.data.UserInfo || !res.data.UserInfo.token) {
-          console.warn("⚠️ Login failed: Token missing in response");
-          toast.error("Login Failed: No token received.");
-          setIsLoading(false);
-          return;
+        if (response.code === 200) {
+          toast({
+            title: "Success",
+            description: response.msg,
+          });
+        } else if (response.code === 400) {
+          toast({
+            title: "Duplicate Entry",
+            description: response.msg,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Unexpected Response",
+            description: response.msg,
+            variant: "destructive",
+          });
         }
-
-        const { UserInfo, userN, company_detils } = res.data;
-
-        console.log("Saving user details to local storage...");
-        localStorage.setItem("token", UserInfo.token);
-        localStorage.setItem("allUsers", JSON.stringify(userN));
-        localStorage.setItem("id", UserInfo.user.id);
-        localStorage.setItem("name", UserInfo.user.name);
-        localStorage.setItem("userType", UserInfo.user.user_type);
-        localStorage.setItem("companyID", UserInfo.user.company_id);
-        localStorage.setItem("companyName", company_detils?.company_name);
-        localStorage.setItem("branchId", UserInfo.user.branch_id);
-        localStorage.setItem("email", UserInfo.user.email);
-        localStorage.setItem("token-expire-time", UserInfo.token_expires_at);
-
-        await fetchPermissions();
-        await fetchPagePermission();
-
-        console.log("✅ Login successful! Redirecting to /home...");
-        navigate("/home");
       } else {
-        console.warn("⚠️ Unexpected API response:", res);
-        toast.error("Login Failed: Unexpected response.");
+        toast({
+          title: "Error",
+          description: "Unexpected response from the server.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
-      console.error("❌ Login Error:", error.response?.data || error.message);
-
       toast({
+        title: "Request Failed",
+        description: error.response?.data?.message || "Please try again later.",
         variant: "destructive",
-        title: "Login Failed",
-        description:
-          error.response?.data?.message || "Please check your credentials.",
       });
-
+    } finally {
       setIsLoading(false);
     }
   };
@@ -127,7 +119,9 @@ export default function LoginAuth() {
       >
         <Card className="w-80 max-w-md">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center">Login</CardTitle>
+            <CardTitle className="text-2xl text-center">
+              Forgot Password
+            </CardTitle>
             <CardDescription className="text-center">
               Enter your username and password to access your account
             </CardDescription>
@@ -136,7 +130,7 @@ export default function LoginAuth() {
             <form onSubmit={handleSubmit}>
               <div className="grid gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="email">Username</Label>
+                  <Label htmlFor="email">Email</Label>
                   <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -144,8 +138,8 @@ export default function LoginAuth() {
                   >
                     <Input
                       id="email"
-                      type="text"
-                      placeholder="Enter your username"
+                      type="email"
+                      placeholder="Enter your Email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -154,7 +148,7 @@ export default function LoginAuth() {
                 </div>
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="username">UserName</Label>
                   </div>
                   <motion.div
                     initial={{ opacity: 0, x: 20 }}
@@ -162,11 +156,11 @@ export default function LoginAuth() {
                     transition={{ delay: 0.3 }}
                   >
                     <Input
-                      id="password"
-                      type="password"
-                      placeholder="*******"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      id="username"
+                      type="text"
+                      placeholder="Enter your UserName"
+                      value={username}
+                      onChange={(e) => setUserName(e.target.value)}
                       required
                     />
                   </motion.div>
@@ -198,7 +192,7 @@ export default function LoginAuth() {
                         </motion.span>
                       </motion.span>
                     ) : (
-                      "Sign in"
+                      "Reset Password"
                     )}
                   </Button>
                 </motion.div>
@@ -206,9 +200,9 @@ export default function LoginAuth() {
             </form>
             <CardDescription
               className="cursor-pointer flex justify-end mt-4 underline"
-              onClick={() => navigate("/forgot-password")}
+              onClick={() => navigate("/")}
             >
-              Forgot Password
+              Sign In
             </CardDescription>
           </CardContent>
         </Card>

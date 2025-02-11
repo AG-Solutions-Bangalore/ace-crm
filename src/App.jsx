@@ -61,6 +61,7 @@ import CreatePayment from "./payment/PaymentList/CreatePayment";
 import PaymentPending from "./payment/PaymentPending/PaymentPending";
 import PaymentClose from "./payment/PaymentClose/PaymentClose";
 import EditPaymentList from "./payment/PaymentList/EditPaymentList";
+import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +73,7 @@ function App() {
         <Routes>
           {/* Login Page        */}
           <Route path="/" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           {/* Dashboard  */}
           <Route path="/home" element={<Home />} />
           {/* Contract  */}

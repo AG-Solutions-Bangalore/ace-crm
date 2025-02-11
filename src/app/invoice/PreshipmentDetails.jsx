@@ -592,4 +592,3 @@ const PreshipmentDetails = () => {
 };
 
 export default PreshipmentDetails;
-//sajid

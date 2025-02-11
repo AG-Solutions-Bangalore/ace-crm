@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ContextPanel } from "@/lib/ContextPanel";
 import BASE_URL from "@/config/BaseUrl";
 import Page from "../dashboard/page";
-//sajid
+
 const ManagementDashboard = () => {
   const { id } = useParams();
   const userId = Number(id);
