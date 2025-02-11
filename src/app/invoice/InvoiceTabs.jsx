@@ -13,11 +13,11 @@ import BlDraft from "./BlDraft";
 import InvoicePytho from "./InvoicePytho";
 import InvoiceTripartite from "./InvoiceTripartite";
 import { StepBack, StepForward } from "lucide-react";
-import WordTest from "./WordTest";
+
 
 const TABS = [
   { value: "pending", label: "Pre_Shipment", component: PreshipmentDetails },
-  {
+  { 
     value: "invoice_packing",
     label: "Invoice Packing ECGC",
     component: InvoiceView,
@@ -39,7 +39,7 @@ const TABS = [
     component: PerfomaInvoice,
   },
   { value: "pytho", label: "Pytho", component: InvoicePytho },
-  { value: "word_test", label: "Word Test", component: WordTest },
+ 
 ];
 
 const InvoiceTabs = () => {
