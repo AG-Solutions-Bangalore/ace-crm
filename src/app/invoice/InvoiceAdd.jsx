@@ -604,6 +604,7 @@ const InvoiceAdd = () => {
           title: "Success",
           description: response.msg,
         });
+        navigate("/invoice");
       } else if (response.code == 400) {
         toast({
           title: "Duplicate Entry",
@@ -898,7 +899,6 @@ const InvoiceAdd = () => {
         invoice_data: processedContractData,
       });
       createInvoiceMutation.mutate(validatedData);
-      navigate("/invoice");
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {

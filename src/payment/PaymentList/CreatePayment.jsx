@@ -157,6 +157,7 @@ const CreatePayment = () => {
           title: "Success",
           description: response.msg,
         });
+        navigate("/payment-payment-list");
       } else if (response.code == 400) {
         toast({
           title: "Duplicate Entry",
@@ -353,7 +354,6 @@ const CreatePayment = () => {
       });
 
       createBranchMutation.mutate(validatedData);
-      navigate("/payment-payment-list");
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {
