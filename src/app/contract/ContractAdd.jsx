@@ -350,12 +350,32 @@ const ContractAdd = () => {
 
   const createContractMutation = useMutation({
     mutationFn: createContract,
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "Contract created successfully",
-      });
-      navigate("/contract");
+    // onSuccess: () => {
+    //   toast({
+    //     title: "Success",
+    //     description: "Contract created successfully",
+    //   });
+    //   navigate("/contract");
+    // },
+    onSuccess: (response) => {
+      if (response.code == 200) {
+        toast({
+          title: "Success",
+          description: response.msg,
+        });
+      } else if (response.code == 400) {
+        toast({
+          title: "Duplicate Entry",
+          description: response.msg,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Unexpected Response",
+          description: response.msg || "Something unexpected happened.",
+          variant: "destructive",
+        });
+      }
     },
     onError: (error) => {
       toast({
@@ -584,12 +604,13 @@ const ContractAdd = () => {
         contractSub_packing: parseFloat(row.contractSub_packing),
         contractSub_bagsize: parseFloat(row.contractSub_bagsize),
       }));
-  
+
       const validatedData = contractFormSchema.parse({
         ...formData,
         contract_data: processedContractData,
       });
       createContractMutation.mutate(validatedData);
+      navigate("/contract");
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {
@@ -633,18 +654,19 @@ const ContractAdd = () => {
 
   return (
     <Page>
-      
       <form
         onSubmit={handleSubmit}
         className="w-full p-4 bg-blue-50/30 rounded-lg"
       >
-        <Card className={`mb-6 ${ButtonConfig.cardColor} `}>  
+        <Card className={`mb-6 ${ButtonConfig.cardColor} `}>
           <CardContent className="p-6">
             {/* Basic Details Section */}
             <div className="mb-0">
               <div className="grid grid-cols-4 gap-6">
                 <div>
-                  <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Buyer <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -662,7 +684,9 @@ const ContractAdd = () => {
                   />
                 </div>
                 <div>
-                <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Consignee <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -680,7 +704,9 @@ const ContractAdd = () => {
                   />
                 </div>
                 <div>
-                <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Company <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -698,7 +724,9 @@ const ContractAdd = () => {
                   />
                 </div>
                 <div>
-                <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Contract No <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -745,7 +773,10 @@ const ContractAdd = () => {
                     }
                   />
                 </div>
-                <div style={{ textAlign: "center" }} className="bg-white rounded-md">
+                <div
+                  style={{ textAlign: "center" }}
+                  className="bg-white rounded-md"
+                >
                   <span style={{ fontSize: "12px" }}>
                     {formData.branch_name}
                   </span>
@@ -755,7 +786,9 @@ const ContractAdd = () => {
                   </span>
                 </div>
                 <div>
-                <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Contract Date <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -773,7 +806,9 @@ const ContractAdd = () => {
             <div className="mb-2 ">
               <div className="grid grid-cols-5 gap-6">
                 <div>
-                <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Contract Ref. <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -781,28 +816,32 @@ const ContractAdd = () => {
                     placeholder="Enter Contract Ref"
                     value={formData.contract_ref}
                     disabled
-                      className="bg-white"
+                    className="bg-white"
                     onChange={(e) =>
                       handleInputChange("contract_ref", e.target.value)
                     }
                   />
                 </div>
                 <div>
-                <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Contract PONO. <span className="text-red-500">*</span>
                   </label>
                   <Input
                     type="text"
                     placeholder="Enter Contract PoNo"
                     value={formData.contract_pono}
-                      className="bg-white"
+                    className="bg-white"
                     onChange={(e) =>
                       handleInputChange("contract_pono", e.target.value)
                     }
                   />
                 </div>
                 <div>
-                <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Product <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -820,7 +859,9 @@ const ContractAdd = () => {
                   />
                 </div>
                 <div>
-                <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Port of Loading <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -840,7 +881,9 @@ const ContractAdd = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Destination Port <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -862,7 +905,9 @@ const ContractAdd = () => {
             <div className="mb-2">
               <div className="grid grid-cols-6 gap-6">
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Discharge <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -880,7 +925,9 @@ const ContractAdd = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     CIF <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -898,7 +945,9 @@ const ContractAdd = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Dest. Country <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -917,7 +966,9 @@ const ContractAdd = () => {
                 </div>
                 {/* container-size */}
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Containers/Size <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -938,12 +989,14 @@ const ContractAdd = () => {
                 </div>
 
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Shipment Date
                   </label>
                   <Input
                     type="date"
-                      className="bg-white"
+                    className="bg-white"
                     value={formData.contract_ship_date}
                     onChange={(e) =>
                       handleInputChange("contract_ship_date", e.target.value)
@@ -951,7 +1004,9 @@ const ContractAdd = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Shipment
                   </label>
                   <Input
@@ -969,12 +1024,14 @@ const ContractAdd = () => {
             <div className="mb-2">
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Specification1
                   </label>
                   <Textarea
                     type="text"
-                      className="bg-white"
+                    className="bg-white"
                     placeholder="Enter Specification1"
                     value={formData.contract_specification1}
                     onChange={(e) =>
@@ -986,12 +1043,14 @@ const ContractAdd = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Specification2
                   </label>
                   <Textarea
                     type="text"
-                      className="bg-white"
+                    className="bg-white"
                     placeholder="Enter Specification2"
                     value={formData.contract_specification2}
                     onChange={(e) =>
@@ -1007,7 +1066,9 @@ const ContractAdd = () => {
             <div className="">
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Payment Terms
                   </label>
                   <MemoizedSelect
@@ -1026,12 +1087,14 @@ const ContractAdd = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Remarks
                   </label>
                   <Textarea
                     type="text"
-                      className="bg-white"
+                    className="bg-white"
                     placeholder="Enter Remarks"
                     value={formData.contract_remarks}
                     onChange={(e) =>
@@ -1155,7 +1218,7 @@ const ContractAdd = () => {
                                   e.target.value
                                 )
                               }
-                                className="bg-white"
+                              className="bg-white"
                               placeholder="Enter Bags"
                               type="text"
                             />
@@ -1189,7 +1252,7 @@ const ContractAdd = () => {
                                   e.target.value
                                 )
                               }
-                                className="bg-white"
+                              className="bg-white"
                               placeholder="Enter Net"
                               type="text"
                             />
@@ -1202,7 +1265,7 @@ const ContractAdd = () => {
                                   e.target.value
                                 )
                               }
-                                className="bg-white"
+                              className="bg-white"
                               placeholder="Enter Gross"
                               type="text"
                             />
@@ -1212,7 +1275,7 @@ const ContractAdd = () => {
                         <TableCell className="p-2 border w-24">
                           <Input
                             value={row.contractSub_qntyInMt}
-                              className="bg-white"
+                            className="bg-white"
                             onChange={(e) =>
                               handleRowDataChange(
                                 rowIndex,
@@ -1223,14 +1286,19 @@ const ContractAdd = () => {
                             placeholder="Enter Qnty (MT)"
                             type="text"
                           />
-                         <p className="text-xs mt-1   ml-2">
-    {row.contractSub_item_bag && row.contractSub_packing
-      ? `${(
-          parseFloat(row.contractSub_item_bag) *
-          parseFloat(row.contractSub_packing)
-        ).toFixed(2)/1000}`
-      : <span className="text-[11px]"> Bags X Net</span>}
-  </p>
+                          <p className="text-xs mt-1   ml-2">
+                            {row.contractSub_item_bag &&
+                            row.contractSub_packing ? (
+                              `${
+                                (
+                                  parseFloat(row.contractSub_item_bag) *
+                                  parseFloat(row.contractSub_packing)
+                                ).toFixed(2) / 1000
+                              }`
+                            ) : (
+                              <span className="text-[11px]"> Bags X Net</span>
+                            )}
+                          </p>
                         </TableCell>
                         <TableCell className="p-2 border w-24">
                           <Input
@@ -1245,7 +1313,6 @@ const ContractAdd = () => {
                             }
                             placeholder="Enter Rate"
                             type="text"
-                            
                           />
                         </TableCell>
 
@@ -1298,5 +1365,3 @@ const ContractAdd = () => {
 };
 
 export default ContractAdd;
-
-

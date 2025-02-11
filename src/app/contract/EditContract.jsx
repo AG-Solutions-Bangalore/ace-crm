@@ -64,7 +64,6 @@ import { ButtonConfig } from "@/config/ButtonConfig";
 
 // Validation Schemas
 
-
 // Update Contract
 const updateContract = async ({ id, data }) => {
   const token = localStorage.getItem("token");
@@ -371,12 +370,25 @@ const EditContract = () => {
 
   const updateContractMutation = useMutation({
     mutationFn: updateContract,
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "Contract updated successfully",
-      });
-      navigate("/contract");
+    onSuccess: (response) => {
+      if (response.code == 200) {
+        toast({
+          title: "Success",
+          description: response.msg,
+        });
+      } else if (response.code == 400) {
+        toast({
+          title: "Duplicate Entry",
+          description: response.msg,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Unexpected Response",
+          description: response.msg || "Something unexpected happened.",
+          variant: "destructive",
+        });
+      }
     },
     onError: (error) => {
       toast({
@@ -496,8 +508,6 @@ const EditContract = () => {
     ]
   );
 
-  
-
   const handleRowDataChange = useCallback((rowIndex, field, value) => {
     const numericFields = [
       "contractSub_bagsize",
@@ -599,7 +609,7 @@ const EditContract = () => {
     mutationFn: async (productId) => {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `https://exportbiz.in/public/api/panel-delete-contract-sub/${productId}`,
+        `${BASE_URL}/api/panel-delete-contract-sub/${productId}`,
         {
           method: "DELETE",
           headers: {
@@ -655,12 +665,13 @@ const EditContract = () => {
         contractSub_bagsize: parseFloat(row.contractSub_bagsize),
       }));
       console.log("After processing:", processedContractData);
-     // i remove the create one and zod 
+      // i remove the create one and zod
       const updateData = {
         ...formData,
         contract_data: processedContractData,
       };
       updateContractMutation.mutate({ id, data: updateData });
+      navigate("/contract");
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {
@@ -746,7 +757,9 @@ const EditContract = () => {
             <div className="mb-0">
               <div className="grid grid-cols-4 gap-6">
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Buyer <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -764,7 +777,9 @@ const EditContract = () => {
                   />
                 </div>
                 <div>
-                    <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Consignee <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -782,7 +797,9 @@ const EditContract = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Company <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -800,7 +817,9 @@ const EditContract = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Contract No <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -860,7 +879,9 @@ const EditContract = () => {
                   </span>
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Contract Date <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -878,7 +899,9 @@ const EditContract = () => {
             <div className="mb-2 ">
               <div className="grid grid-cols-5 gap-6">
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Contract Ref. <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -893,7 +916,9 @@ const EditContract = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Contract PONO. <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -907,7 +932,9 @@ const EditContract = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Product <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -925,7 +952,9 @@ const EditContract = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Contract Status <span className="text-red-500">*</span>
                   </label>
                   <ShadcnSelect
@@ -933,7 +962,6 @@ const EditContract = () => {
                     onValueChange={(value) =>
                       handleInputChange("contract_status", value)
                     }
-                  
                   >
                     <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Select status" />
@@ -946,7 +974,9 @@ const EditContract = () => {
                   </ShadcnSelect>
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Port of Loading <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -966,7 +996,9 @@ const EditContract = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Destination Port <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -988,7 +1020,9 @@ const EditContract = () => {
             <div className="mb-2">
               <div className="grid grid-cols-6 gap-6">
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Discharge <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1006,7 +1040,9 @@ const EditContract = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     CIF <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1024,7 +1060,9 @@ const EditContract = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Dest. Country <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1043,7 +1081,9 @@ const EditContract = () => {
                 </div>
                 {/* container-size */}
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Containers/Size <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
@@ -1064,7 +1104,9 @@ const EditContract = () => {
                 </div>
 
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Shipment Date
                   </label>
                   <Input
@@ -1077,7 +1119,9 @@ const EditContract = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Shipment
                   </label>
                   <Input
@@ -1095,7 +1139,9 @@ const EditContract = () => {
             <div className="mb-2">
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Specification1
                   </label>
                   <Textarea
@@ -1112,7 +1158,9 @@ const EditContract = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Specification2
                   </label>
                   <Textarea
@@ -1133,7 +1181,9 @@ const EditContract = () => {
             <div className="">
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Payment Terms
                   </label>
                   <MemoizedSelect
@@ -1152,7 +1202,9 @@ const EditContract = () => {
                   />
                 </div>
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
                     Remarks
                   </label>
                   <Textarea
@@ -1352,10 +1404,12 @@ const EditContract = () => {
                           <p className="text-xs mt-1   ml-2">
                             {row.contractSub_item_bag &&
                             row.contractSub_packing ? (
-                              `${(
-                                parseFloat(row.contractSub_item_bag) *
-                                parseFloat(row.contractSub_packing)
-                              ).toFixed(2)/1000}`
+                              `${
+                                (
+                                  parseFloat(row.contractSub_item_bag) *
+                                  parseFloat(row.contractSub_packing)
+                                ).toFixed(2) / 1000
+                              }`
                             ) : (
                               <span className="text-[11px]"> Bags X Net</span>
                             )}
@@ -1378,26 +1432,26 @@ const EditContract = () => {
                         </TableCell>
 
                         <TableCell className="p-2 border">
-                        {row.id ? (
-                          <Button
-                            variant="ghost"
-                            onClick={() => handleDeleteRow(row.id)}
-                            className="text-red-500"
-                            type="button"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        ):(
-                          <Button
-                            variant="ghost"
-                            onClick={() => removeRow(rowIndex)}
-                            disabled={contractData.length === 1}
-                            className="text-red-500 "
-                            type="button"
-                          >
-                            <MinusCircle className="h-4 w-4" />
-                          </Button>
-                            )}
+                          {row.id ? (
+                            <Button
+                              variant="ghost"
+                              onClick={() => handleDeleteRow(row.id)}
+                              className="text-red-500"
+                              type="button"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              onClick={() => removeRow(rowIndex)}
+                              disabled={contractData.length === 1}
+                              className="text-red-500 "
+                              type="button"
+                            >
+                              <MinusCircle className="h-4 w-4" />
+                            </Button>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -1438,7 +1492,7 @@ const EditContract = () => {
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete the
-             contract product from this enquiry.
+              contract product from this enquiry.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
