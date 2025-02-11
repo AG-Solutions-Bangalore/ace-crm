@@ -8,7 +8,8 @@ import { useParams } from "react-router-dom";
 import ReactToPrint from "react-to-print";
 import moment from "moment";
 import { toWords } from "number-to-words";
-
+import { FaRegFileWord } from "react-icons/fa";
+import { FaRegFilePdf } from "react-icons/fa";
 const PerfomaInvoice = () => {
   const containerRef = useRef();
   const { id } = useParams();
@@ -92,7 +93,7 @@ const PerfomaInvoice = () => {
   const generatePdf = (element) => {
     const options = {
       margin: [0, 0, 0, 0],
-      filename: "Invoice_Packing.pdf",
+      filename: "Invoice_Performal.pdf",
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: {
         scale: 2,
@@ -135,6 +136,39 @@ const PerfomaInvoice = () => {
       })
       .save();
   };
+  const handleSaveAsWord = () => {
+    const content = containerRef.current.innerHTML;
+
+    const styles = `
+      <style>
+        table { border-collapse: collapse; width: 100%; }
+        td { border: 0px solid black; padding: 0px; }
+      </style>
+    `;
+
+    const html = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+        <head>
+          <meta charset="utf-8">
+          ${styles}
+        </head>
+        <body>
+          ${content}
+        </body>
+      </html>
+    `;
+
+    const blob = new Blob([html], { type: "application/msword" });
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "Invoice_Performal.doc";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+  };
   if (loading) {
     return (
       <Card className="w-[80vw] h-[80vh] flex items-center justify-center">
@@ -170,11 +204,17 @@ const PerfomaInvoice = () => {
 
   return (
     <div>
+           <button
+              onClick={handleSaveAsWord}
+              className="fixed top-5 right-40 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
+            >
+              <FaRegFileWord className="w-4 h-4" />
+            </button>
       <button
         onClick={handleSaveAsPdf}
           className="fixed top-5 right-24 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
       >
-       <FileText  className="w-4 h-4"/>
+         <FaRegFilePdf className="w-4 h-4" />
       </button>
       <ReactToPrint
         trigger={() => (
