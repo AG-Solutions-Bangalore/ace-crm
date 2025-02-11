@@ -100,6 +100,47 @@ const PreshipmentDetails = () => {
       .save();
   };
 
+
+  const handleSaveAsWord = () => {
+    // Get the HTML content
+    const content = containerRef.current.innerHTML;
+    
+    // Create styles for Word document
+    const styles = `
+      <style>
+        table { border-collapse: collapse; width: 100%; }
+        td { border: 1px solid black; padding: 8px; }
+      </style>
+    `;
+    
+    // Combine styles and content
+    const html = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+        <head>
+          <meta charset="utf-8">
+          ${styles}
+        </head>
+        <body>
+          ${content}
+        </body>
+      </html>
+    `;
+
+    // Convert to Blob
+    const blob = new Blob([html], { type: 'application/msword' });
+    
+    // Create download link
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'SpiceBoard_Document.doc';
+    
+    // Trigger download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+  };
+
   if (loading) {
     return (
       <Card className="w-[80vw] h-[80vh] flex items-center justify-center">
@@ -134,6 +175,7 @@ const PreshipmentDetails = () => {
   }`;
   return (
     <div>
+      
       <button
         onClick={handleSaveAsPdf}
           className="fixed top-5 right-24 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
@@ -550,3 +592,4 @@ const PreshipmentDetails = () => {
 };
 
 export default PreshipmentDetails;
+//sajid

@@ -49,35 +49,9 @@ const InvoiceSpiceBoard = () => {
 
   const handleSaveAsPdf = () => {
     const element = containerRef.current;
-
-    const images = element.getElementsByTagName("img");
-    let loadedImages = 0;
-
-    if (images.length === 0) {
-      generatePdf(element);
-      return;
-    }
-
-    Array.from(images).forEach((img) => {
-      if (img.complete) {
-        loadedImages++;
-        if (loadedImages === images.length) {
-          generatePdf(element);
-        }
-      } else {
-        img.onload = () => {
-          loadedImages++;
-          if (loadedImages === images.length) {
-            generatePdf(element);
-          }
-        };
-      }
-    });
-  };
-
-  const generatePdf = (element) => {
+  
     const options = {
-      margin: [0, 0, 0, 0],
+      margin: [5, 5, 5, 5],
       filename: "spice_board.pdf",
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: {
@@ -93,7 +67,7 @@ const InvoiceSpiceBoard = () => {
       },
       pagebreak: { mode: "avoid" },
     };
-
+  
     html2pdf()
       .from(element)
       .set(options)
@@ -103,10 +77,10 @@ const InvoiceSpiceBoard = () => {
         const totalPages = pdf.internal.getNumberOfPages();
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
-
+  
         console.log(`Element Height: ${element.scrollHeight}`);
         console.log(`Page Width: ${pageWidth}, Page Height: ${pageHeight}`);
-
+  
         for (let i = 1; i <= totalPages; i++) {
           pdf.setPage(i);
           pdf.setFontSize(10);
@@ -121,6 +95,7 @@ const InvoiceSpiceBoard = () => {
       })
       .save();
   };
+  
 
   const handlPrintPdf = useReactToPrint({
     content: () => containerRef.current,
@@ -128,7 +103,7 @@ const InvoiceSpiceBoard = () => {
     pageStyle: `
         @page {
         size: auto;
-        margin: 0mm;
+        margin: 2mm;
         
       }
       @media print {
@@ -136,7 +111,7 @@ const InvoiceSpiceBoard = () => {
           border: 0px solid #000;
               font-size: 10px; 
           margin: 0mm;
-          padding: 0mm;
+          padding: 2mm;
           min-height: 100vh;
         }
            table {
@@ -153,11 +128,11 @@ const InvoiceSpiceBoard = () => {
     return (
       <Card className="w-[80vw] h-[80vh] flex items-center justify-center">
         <CardContent>
-          <Button disabled className="flex items-center gap-2">
+          <Button disabled className="flex items-center gap-[0.4rem]">
             <Loader2 className="h-4 w-4 animate-spin" />
             Loading Spice Data
           </Button>
-        </CardContent>
+        </CardContent> 
       </Card>
     );
   }
@@ -190,7 +165,7 @@ const InvoiceSpiceBoard = () => {
       </div>
       <div ref={containerRef} className="max-w-4xl mx-auto p-6 bg-white  ">
         <div className="mb-4">
-          <p className="font-bold text-left text-[13px] underline">TO</p>
+          <p className="font-bold text-left  text-[13px] underlinebg-red-100 ">TO</p>
           <p className="font-bold text-left text-[13px] underline">
             THE SPICE BOARD, REGIONAL OFFICE
           </p>
@@ -210,58 +185,58 @@ const InvoiceSpiceBoard = () => {
           </h2>
         </div>
 
-        <table className="w-full border  text-[13px] border-black">
+        <table className="w-full border  text-[13px]   border-black">
           <tbody>
             <tr>
-              <td className="p-1 border-r border-b border-black text-center w-[4%]">
+              <td className="p-[0.4rem] pt-0 border-r border-b border-black text-center w-[4%]">
                 1
               </td>
-              <td className="p-1 border-b border-r border-black text-left w-[23%]">
+              <td className="p-[0.4rem] pt-0 border-b border-r border-black text-left w-[23%]">
                 Name & Address of the Exporter
               </td>
-              <td className="border-b font-bold border-black px-2 py-1 w-[73%]">
+              <td className="border-b font-bold border-black px-2 pb-2 pt-0 w-[73%]">
                 {spiceBoard?.branch_name} <br />
                 {spiceBoard?.branch_address}
               </td>
             </tr>
             <tr>
-              <td className="p-1 border-r border-b border-black  text-center">
+              <td className="p-[0.4rem] border-r border-b border-black  text-center">
                 2
               </td>
-              <td className="p-1 border-b border-r border-black text-left">
+              <td className="p-[0.4rem] border-b border-r border-black text-left ">
                 Certificate of Registration
               </td>
-              <td className="p-1 border-b border-black"></td>
+              <td className=" border-b px-2 pb-2 pt-0 border-black  "></td>
             </tr>
             <tr>
-              <td className="p-1 border-r border-b border-black text-center">
+              <td className="p-[0.4rem] border-r border-b border-black text-center">
                 3
               </td>
-              <td className="p-1 border-b border-r border-black text-left">
+              <td className="p-[0.4rem] border-b border-r border-black text-left">
                 Name & Address of the processor, if different from the Exporter
               </td>
-              <td className="p-1 border-b font-bold border-black">
+              <td className="px-2 pb-2 pt-0 border-b font-bold border-black">
                 {spiceBoard?.branch_name}
                 <br />
                 {spiceBoard?.branch_address}
               </td>
             </tr>
             <tr>
-              <td className="p-1 border-r border-b border-black text-center">
+              <td className="p-[0.4rem] border-r border-b border-black text-center">
                 4
               </td>
-              <td className="p-1 border-b border-r border-black text-left">
+              <td className="p-[0.4rem] border-b border-r border-black text-left">
                 Details of items to be Exported
               </td>
               <td className="border-b border-black ">
                 <table className="w-full">
                   <thead>
                     <tr className="bg-white">
-                      <th className="border-b border-r border-black">Name</th>
-                      <th className="border-b border-r border-black">
+                      <th className="border-b border-r pb-2 border-black">Name</th>
+                      <th className="border-b border-r pb-2 border-black">
                         QTY. (MT)
                       </th>
-                      <th className="border-b border-black">
+                      <th className="border-b pb-2 border-black">
                         FOB Price (Rs/Kg)
                       </th>
                     </tr>
@@ -269,18 +244,18 @@ const InvoiceSpiceBoard = () => {
                   <tbody>
                     {invoiceSubData?.map((item, index) => (
                       <tr key={index}>
-                        <td className="border-r border-black px-2 py-1">
+                        <td className="border-r border-black px-4 py-2">
                           {item?.invoiceSub_descriptionofGoods}
                         </td>
-                        <td className="border-r border-black px-2 py-1">
+                        <td className="border-r border-black px-4 py-2">
                           {item?.invoiceSub_qntyInMt} MT
                         </td>
                         {index === Math.floor(invoiceSubData.length / 2) ? (
-                          <td className="px-2 py-1 text-center font-bold">
+                          <td className="px-4 py-2 text-center font-bold">
                             60.00 PER KG
                           </td>
                         ) : (
-                          <td className="px-2 py-1"></td>
+                          <td className="px-4 py-2"></td>
                         )}
                       </tr>
                     ))}
@@ -289,13 +264,13 @@ const InvoiceSpiceBoard = () => {
               </td>
             </tr>
             <tr>
-              <td className="p-1 border-r border-b border-black text-center">
+              <td className="p-[0.4rem] border-r border-b border-black text-center">
                 5
               </td>
-              <td className="p-1 border-b border-r border-black text-left">
+              <td className="p-[0.4rem] border-b border-r border-black text-left">
                 Quantity & FOB Price of Export
               </td>
-              <td className="p-1  font-bold border-b border-black">
+              <td className="px-2 pb-2 pt-0  font-bold border-b border-black">
                 QTY{" "}
                 {invoiceSubData
                   ?.reduce(
@@ -318,28 +293,28 @@ const InvoiceSpiceBoard = () => {
             </tr>
 
             <tr>
-              <td className="p-1 border-r border-b border-black text-center">
+              <td className="p-[0.4rem] border-r border-b border-black text-center">
                 6
               </td>
-              <td className="p-1 border-b border-r border-black text-left">
+              <td className="p-[0.4rem] border-b border-r border-black text-left">
                 Address of the place where container is to be stuffed and
                 Customs clearance if different from Port of Shipment
               </td>
-              <td className="p-1 border-b border-black"></td>
+              <td className="px-2 pb-2 pt-0 border-b border-black"></td>
             </tr>
 
             <tr>
-              <td className="p-1 border-r border-b border-black text-center">
+              <td className="p-[0.4rem] border-r border-b border-black text-center">
                 7
               </td>
-              <td className="p-1 border-b border-r border-black text-left">
+              <td className="p-[0.4rem] border-b border-r border-black text-left">
                 Lot No. & Shipping Marks
               </td>
 
-              <td className="p-1 border-b border-black align-top">
+              <td className="px-2 pb-2 pt-0 border-b border-black align-top">
                 <div className="flex flex-col">
                   {invoiceSubData?.map((item, index) => (
-                    <span key={index} className="py-1">
+                    <span key={index} className="py-2">
                       {item?.invoiceSub_marking}
                     </span>
                   ))}
@@ -348,68 +323,68 @@ const InvoiceSpiceBoard = () => {
             </tr>
 
             <tr>
-              <td className="p-1 border-r border-b border-black text-center">
+              <td className="p-[0.4rem] border-r border-b border-black text-center">
                 8
               </td>
-              <td className="p-1 border-b border-r border-black text-left">
+              <td className="p-[0.4rem] border-b border-r border-black text-left">
                 Probable date of Shipment
               </td>
-              <td className="p-1 border-b border-black"></td>
+              <td className="px-2 pb-2 pt-0 border-b border-black"></td>
             </tr>
             <tr>
-              <td className="p-1 border-r border-b border-black text-center">
+              <td className="p-[0.4rem] border-r border-b border-black text-center">
                 9
               </td>
-              <td className="p-1 border-b border-r border-black text-left">
+              <td className="p-[0.4rem] border-b border-r border-black text-left">
                 Port of Shipment
               </td>
-              <td className="p-1 border-b font-bold border-black">
+              <td className="px-2 pb-2 pt-0 border-b font-bold border-black">
                 {spiceBoard?.invoice_loading}, INDIA
               </td>
             </tr>
             <tr>
-              <td className="p-1 border-r border-b border-black text-center">
+              <td className="p-[0.4rem] border-r border-b border-black text-center">
                 10
               </td>
-              <td className="p-1 border-b border-r border-black text-left">
+              <td className="p-[0.4rem] border-b border-r border-black text-left">
                 Port & Country of Discharge
               </td>
-              <td className="p-1 font-bold border-b border-black">
+              <td className="px-2 pb-2 pt-0 font-bold border-b border-black">
                 {spiceBoard?.invoice_destination_port},{" "}
                 {spiceBoard?.invoice_destination_country}
               </td>
             </tr>
             <tr>
-              <td className="p-1 border-r border-b border-black text-center">
+              <td className="p-[0.4rem] border-r border-b border-black text-center">
                 11
               </td>
-              <td className="p-1 border-b border-r border-black text-left">
+              <td className="p-[0.4rem] border-b border-r border-black text-left">
                 Name of the Vessel
               </td>
-              <td className="p-1 border-b border-black">
+              <td className="px-2 pb-2 pt-0 border-b border-black">
                 {spiceBoard?.invoice_vessel}
               </td>
             </tr>
             <tr>
-              <td className="p-1 border-r border-b border-black text-center">
+              <td className="p-[0.4rem] border-r border-b border-black text-center">
                 12
               </td>
-              <td className="p-1 border-b border-r border-black text-left">
+              <td className="p-[0.4rem] border-b border-r border-black text-left">
                 Container No.
               </td>
-              <td className="p-1 border-b border-black">
+              <td className="px-2 pb-2 pt-0 border-b border-black">
                 {spiceBoard?.invoice_container}
               </td>
             </tr>
 
             <tr>
-              <td className="p-1 border-r border-b border-black text-center">
+              <td className="p-[0.4rem] border-r border-b border-black text-center">
                 13
               </td>
-              <td className="p-1 border-b border-r border-black text-left">
+              <td className="p-[0.4rem] border-b border-r border-black text-left">
                 Contact CHA Agent at Chennai
               </td>
-              <td className="p-1 border-b font-bold border-black">
+              <td className="px-2 pb-2 pt-0 border-b font-bold border-black">
                 NIFCO SEAFREIGHT PVT. LTD., CHENNAI <br />
                 PH: 044-25353405 / 25353392 <br />
                 CTP: MR. VIJAY, Mob: 9841582641 <br />
@@ -419,7 +394,7 @@ const InvoiceSpiceBoard = () => {
           </tbody>
         </table>
 
-        <div className="mt-2 flex flex-row items-center justify-around">
+        <div className=" flex flex-row items-center justify-around">
           <div>
             <p className="text-sm">
               PLACE : <strong>{spiceBoard?.invoice_loading}</strong>
@@ -430,7 +405,7 @@ const InvoiceSpiceBoard = () => {
             </p>
           </div>
           <div>
-            <p className=" mt-10 text-center text-sm">Signature</p>
+            <p className=" mt-8 text-center text-sm">Signature</p>
             <p className="text-sm">Name & Designation (With Seal)</p>
           </div>
         </div>
