@@ -63,6 +63,7 @@ import PaymentClose from "./payment/PaymentClose/PaymentClose";
 import EditPaymentList from "./payment/PaymentList/EditPaymentList";
 import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
 
+
 const queryClient = new QueryClient();
 
 function App() {
@@ -148,6 +149,8 @@ function App() {
           <Route path="/master/vessel" element={<VesselList />} />
           {/* Master - prerecepits*/}
           <Route path="/master/prerecepits" element={<PreReceiptList />} />
+
+       
 
           {/* //Reports */}
 

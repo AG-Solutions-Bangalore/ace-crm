@@ -80,51 +80,7 @@ const ContractForm = () => {
     },
   });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const validatedData = contractFormSchema.parse({
-        ...formData,
-      });
-      localStorage.setItem("from_date", formData.from_date);
-      localStorage.setItem("to_date", formData.to_date);
-      localStorage.setItem("branch_short", formData.branch_short);
-      localStorage.setItem("buyer", formData.buyer);
-      localStorage.setItem("consignee", formData.consignee);
-      localStorage.setItem("container_size", formData.container_size);
-      localStorage.setItem("product", formData.product);
-      localStorage.setItem("status", formData.status);
-
-      createContractMutation.mutate(validatedData);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const errorMessages = error.errors.map(
-          (err) => `${err.path.join(".")}: ${err.message}`
-        );
-
-        toast({
-          title: "Validation Error",
-          description: (
-            <div>
-              <ul className="list-disc pl-5">
-                {errorMessages.map((message, index) => (
-                  <li key={index}>{message}</li>
-                ))}
-              </ul>
-            </div>
-          ),
-          variant: "destructive",
-        });
-        return;
-      }
-
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
-    }
-  };
+ 
 
   const handleInputChange = (e, field) => {
     const value = e.target.value;
@@ -252,6 +208,51 @@ const ContractForm = () => {
         });
       });
   };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const validatedData = contractFormSchema.parse({
+        ...formData,
+      });
+      localStorage.setItem("from_date", formData.from_date);
+      localStorage.setItem("to_date", formData.to_date);
+      localStorage.setItem("branch_short", formData.branch_short);
+      localStorage.setItem("buyer", formData.buyer);
+      localStorage.setItem("consignee", formData.consignee);
+      localStorage.setItem("container_size", formData.container_size);
+      localStorage.setItem("product", formData.product);
+      localStorage.setItem("status", formData.status);
+
+      createContractMutation.mutate(validatedData);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errorMessages = error.errors.map(
+          (err) => `${err.path.join(".")}: ${err.message}`
+        );
+
+        toast({
+          title: "Validation Error",
+          description: (
+            <div>
+              <ul className="list-disc pl-5">
+                {errorMessages.map((message, index) => (
+                  <li key={index}>{message}</li>
+                ))}
+              </ul>
+            </div>
+          ),
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    }
+  };
   return (
     <Page>
       <BranchHeader />
@@ -309,7 +310,7 @@ const ContractForm = () => {
                         {branchData?.branch?.map((branch) => (
                           <SelectItem
                             key={branch.branch_short}
-                            value={branch.branch_short.toString()}
+                            value={branch.branch_short}
                           >
                             {branch.branch_short}
                           </SelectItem>
@@ -338,7 +339,7 @@ const ContractForm = () => {
                       {buyerData?.buyer?.map((buyer) => (
                         <SelectItem
                           key={buyer.buyer_name}
-                          value={buyer.buyer_name.toString()}
+                          value={buyer.buyer_name}
                         >
                           {buyer.buyer_name}
                         </SelectItem>
@@ -365,7 +366,7 @@ const ContractForm = () => {
                       {buyerData?.buyer?.map((buyer) => (
                         <SelectItem
                           key={buyer.buyer_name}
-                          value={buyer.buyer_name.toString()}
+                          value={buyer.buyer_name}
                         >
                           {buyer.buyer_name}
                         </SelectItem>
@@ -392,7 +393,7 @@ const ContractForm = () => {
                         (containerSize) => (
                           <SelectItem
                             key={containerSize.containerSize}
-                            value={containerSize.containerSize.toString()}
+                            value={containerSize.containerSize}
                           >
                             {containerSize.containerSize}
                           </SelectItem>
@@ -419,7 +420,7 @@ const ContractForm = () => {
                       {productData?.product?.map((product) => (
                         <SelectItem
                           key={product.product_name}
-                          value={product.product_name.toString()}
+                          value={product.product_name}
                         >
                           {product.product_name}
                         </SelectItem>

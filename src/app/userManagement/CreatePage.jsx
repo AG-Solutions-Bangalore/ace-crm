@@ -64,7 +64,8 @@ const CreatePage = () => {
             { title: "Product Description", url: "/master/productdescription" },
             { title: "Shipper", url: "/master/shipper" },
             { title: "Vessel", url: "/master/vessel" },
-            { title: "Pre Recepits", url: "/master/prerecepits" }
+            { title: "Pre Recepits", url: "/master/prerecepits" },
+            { title: "Team", url: "/master/team" }
           ]
         },
         {

@@ -34,7 +34,8 @@ const branchFormSchema = z.object({
   branch_apeda: z.string().optional(),
   branch_gst: z.string().min(1, "GST number is required"),
   branch_state: z.string().min(1, "State is required"),
-  branch_state_no: z.string().min(1, "State number is required"),
+  branch_state_no: z.string().min(1, "State Code is required"),
+  branch_state_short: z.string().min(1, "State Short is required"),
   branch_scheme: z.string().optional(),
   branch_pan_no: z.string().min(1, "PAN number is required"),
   branch_ecgcncb: z.string().optional(),
@@ -130,6 +131,7 @@ const CreateBranch = () => {
     branch_sign_no1: "",
     branch_sign_name2: "",
     branch_sign_no2: "",
+    branch_state_short: "",
   });
   const [progress, setProgress] = useState(0);
   const { data: portofLoadingData } = useFetchPortofLoadings();
@@ -359,6 +361,19 @@ const CreateBranch = () => {
                   value={formData.branch_state_no}
                   onChange={(e) => handleInputChange(e, "branch_state_no")}
                   placeholder="Enter state code"
+                />
+              </div>
+              <div>
+                <label
+                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                >
+                  State Short <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  className="bg-white"
+                  value={formData.branch_state_short}
+                  onChange={(e) => handleInputChange(e, "branch_state_short")}
+                  placeholder="Enter state short"
                 />
               </div>
 

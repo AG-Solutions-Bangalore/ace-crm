@@ -180,6 +180,10 @@ export function AppSidebar({ ...props }) {
               title: "Pre Recepits",
               url: "/master/prerecepits",
             },
+            // {
+            //   title: "Team",
+            //   url: "/master/team",
+            // },
           ],
         },
         {

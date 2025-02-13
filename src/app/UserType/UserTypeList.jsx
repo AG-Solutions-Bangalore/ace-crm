@@ -77,7 +77,9 @@ const UserTypeList = () => {
             <thead>
               <tr className="bg-gray-100">
                 <th className="border p-2 text-left">User Type</th>
+             
                 <th className="border p-2 text-left">Role</th>
+                <th className="border p-2 text-left">User Position</th>
                 <th className="border p-2 text-left">Default Button</th>
                 <th className="border p-2 text-left">Default Page</th>
                 <th className="border p-2 text-center">Action</th>
@@ -90,6 +92,7 @@ const UserTypeList = () => {
                     <tr className="border-b hover:bg-gray-50">
                       <td className="border p-2">{user.user_type}</td>
                       <td className="border p-2">{user.user_role}</td>
+                      <td className="border p-2">{user.user_position}</td>
                       <td className="border p-2">
                         {user.default_button_role ? (
                           <div className="flex items-center space-x-2">

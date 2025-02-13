@@ -141,3 +141,20 @@ export const useFetchVessel = () => {
 export const useFetchShipper = () => {
   return useQuery(createQueryConfig(["shippers"], "/api/panel-fetch-shipper"));
 };
+
+// payment edit invoice 
+
+export const useFetchPaymentAmount = () => {
+  return useQuery(createQueryConfig(["paymentamount"], "/api/panel-fetch-invoice-payment-amount"));
+};
+
+
+
+//create Team
+
+export const useFetchCompanies = () => {
+  return useQuery(createQueryConfig(["companies"], "/api/panel-fetch-company"));
+};
+export const useFetchUserType = () => {
+  return useQuery(createQueryConfig(["usertype"], "/api/panel-fetch-usertypes"));
+};

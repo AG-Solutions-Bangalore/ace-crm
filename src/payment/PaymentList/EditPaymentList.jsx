@@ -11,14 +11,31 @@ import { ProgressBar } from "@/components/spinner/ProgressBar";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Select as SelectStatus,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Select from "react-select";
 import BASE_URL from "@/config/BaseUrl";
-import { MinusCircle, PlusCircle } from "lucide-react";
+import {
+  MinusCircle,
+  PlusCircle,
+  ChevronDown,
+  Trash2,
+  Loader2,
+} from "lucide-react";
 import {
   Table,
   TableHeader,
@@ -28,6 +45,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { useCurrentYear } from "@/hooks/useCurrentYear";
+import { useFetchPaymentAmount } from "@/hooks/useApi";
 
 const productRowSchema = z.object({
   id: z.any().optional(),
@@ -71,20 +89,103 @@ const BranchHeader = () => {
     </div>
   );
 };
+const MemoizedProductSelect = React.memo(
+  ({ value, onChange, options, placeholder }) => {
+    const selectOptions = options.map((option) => ({
+      value: option.value,
+      label: option.label,
+    }));
 
+    const selectedOption = selectOptions.find(
+      (option) => option.value === value
+    );
+
+    const customStyles = {
+      control: (provided, state) => ({
+        ...provided,
+        minHeight: "36px",
+        borderRadius: "6px",
+        borderColor: state.isFocused ? "black" : "#e5e7eb",
+        boxShadow: state.isFocused ? "black" : "none",
+        "&:hover": {
+          borderColor: "none",
+          cursor: "text",
+        },
+      }),
+      option: (provided, state) => ({
+        ...provided,
+        fontSize: "14px",
+        backgroundColor: state.isSelected
+          ? "#A5D6A7"
+          : state.isFocused
+          ? "#f3f4f6"
+          : "white",
+        color: state.isSelected ? "black" : "#1f2937",
+        "&:hover": {
+          backgroundColor: "#EEEEEE",
+          color: "black",
+        },
+      }),
+
+      menu: (provided) => ({
+        ...provided,
+        borderRadius: "6px",
+        border: "1px solid #e5e7eb",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+      }),
+      placeholder: (provided) => ({
+        ...provided,
+        color: "#616161",
+        fontSize: "14px",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "start",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+      }),
+      singleValue: (provided) => ({
+        ...provided,
+        color: "black",
+        fontSize: "14px",
+      }),
+    };
+
+    const DropdownIndicator = (props) => {
+      return (
+        <div {...props.innerProps}>
+          <ChevronDown className="h-4 w-4 mr-3 text-gray-500" />
+        </div>
+      );
+    };
+
+    return (
+      <Select
+        value={selectedOption}
+        onChange={(selected) => onChange(selected ? selected.value : "")}
+        options={selectOptions}
+        placeholder={placeholder}
+        styles={customStyles}
+        components={{
+          IndicatorSeparator: () => null,
+          DropdownIndicator,
+        }}
+        menuPortalTarget={document.body}
+        menuPosition="fixed"
+        getOptionLabel={(option) => option.label} // Show only the invoice reference in the input
+        getOptionValue={(option) => option.value} // Use the value for the option
+      />
+    );
+  }
+);
 const EditPaymentList = () => {
   const { id } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
   const { data: currentYear } = useCurrentYear();
-  useEffect(() => {
-    if (currentYear) {
-      setFormData((prev) => ({
-        ...prev,
-        invoiceP_years: currentYear,
-      }));
-    }
-  }, [currentYear]);
+  const [crossedRows, setCrossedRows] = useState(new Set());
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const [formData, setFormData] = useState({
     invoiceP_years: currentYear,
     invoiceP_dates: "",
@@ -96,6 +197,7 @@ const EditPaymentList = () => {
     invoiceP_irtt_no: "",
     invoiceP_status: "",
   });
+
   const [invoiceData, setInvoiceData] = useState([
     {
       id: "",
@@ -109,6 +211,134 @@ const EditPaymentList = () => {
       invoicePSub_remarks: "",
     },
   ]);
+
+  useEffect(() => {
+    if (currentYear) {
+      setFormData((prev) => ({
+        ...prev,
+        invoiceP_years: currentYear,
+      }));
+    }
+  }, [currentYear]);
+
+  const {
+    data: paymentDatas,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["payment", id],
+    queryFn: async () => {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${BASE_URL}/api/panel-fetch-invoice-payment-by-id/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to fetch payment");
+      return response.json();
+    },
+  });
+
+  const fetchPaymentStatus = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("No authentication token found");
+
+    const response = await fetch(
+      `${BASE_URL}/api/panel-fetch-invoice-payment-status`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) throw new Error("Failed to fetch company data");
+    const data = await response.json();
+    return data.invoicePaymentStatus;
+  };
+
+  const { data: PaymentData } = useQuery({
+    queryKey: ["payment"],
+    queryFn: fetchPaymentStatus,
+  });
+
+  const { data: invoiceNoData } = useFetchPaymentAmount();
+
+  useEffect(() => {
+    if (paymentDatas && PaymentData) {
+      setFormData((prev) => ({
+        ...prev,
+        invoiceP_status: paymentDatas.payment.invoiceP_status || "",
+      }));
+    }
+  }, [paymentDatas, PaymentData]);
+
+  useEffect(() => {
+    if (paymentDatas) {
+      setFormData((prev) => ({
+        ...prev,
+        invoiceP_years: paymentDatas.payment.invoiceP_year || currentYear,
+        invoiceP_dates: paymentDatas.payment.invoiceP_date || "",
+        branch_short: paymentDatas.payment.branch_short || "",
+        branch_name: paymentDatas.payment.branch_name || "",
+        invoiceP_dollar_rate: paymentDatas.payment.invoiceP_dollar_rate || "",
+        invoiceP_v_date: paymentDatas.payment.invoiceP_v_date || "",
+        invoiceP_usd_amount: paymentDatas.payment.invoiceP_usd_amount || "",
+        invoiceP_irtt_no: paymentDatas.payment.invoiceP_irtt_no || "",
+        invoiceP_status: paymentDatas.payment?.invoiceP_status || "",
+      }));
+
+      if (Array.isArray(paymentDatas.paymentSub)) {
+        setInvoiceData(
+          paymentDatas.paymentSub.map((sub) => ({
+            id: sub.id ?? "",
+            invoicePSub_inv_ref: sub.invoicePSub_inv_ref || "",
+            invoicePSub_amt_adv: sub.invoicePSub_amt_adv || 0,
+            invoicePSub_amt_dp: sub.invoicePSub_amt_dp || 0,
+            invoicePSub_amt_da: sub.invoicePSub_amt_da || 0,
+            invoicePSub_bank_c: sub.invoicePSub_bank_c || 0,
+            invoicePSub_discount: sub.invoicePSub_discount || 0,
+            invoicePSub_shortage: sub.invoicePSub_shortage || 0,
+            invoicePSub_remarks: sub.invoicePSub_remarks || "",
+          }))
+        );
+      }
+    }
+  }, [paymentDatas]);
+
+  const handleDeleteRow = (rowId) => {
+    setCrossedRows((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(rowId)) {
+        newSet.delete(rowId);
+      } else {
+        newSet.add(rowId);
+      }
+      return newSet;
+    });
+  };
+
+  const deleteProductMutation = useMutation({
+    mutationFn: async (invoiceId) => {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${BASE_URL}/api/panel-delete-invoice-payment-sub/${invoiceId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to delete invoice Table");
+      return response.json();
+    },
+  });
 
   const createBranch = async (data) => {
     const token = localStorage.getItem("token");
@@ -138,13 +368,13 @@ const EditPaymentList = () => {
   const createBranchMutation = useMutation({
     mutationFn: createBranch,
     onSuccess: (response) => {
-      if (response.code == 200) {
+      if (response.code === 200) {
         toast({
           title: "Success",
           description: response.msg,
         });
         navigate("/payment-payment-list");
-      } else if (response.code == 400) {
+      } else if (response.code === 400) {
         toast({
           title: "Duplicate Entry",
           description: response.msg,
@@ -159,8 +389,6 @@ const EditPaymentList = () => {
       }
     },
     onError: (error) => {
-      console.error("API Error:", error);
-
       toast({
         title: "Error",
         description: error.msg || "Something went wrong",
@@ -170,132 +398,116 @@ const EditPaymentList = () => {
   });
 
   const handlePaymentChange = (e, rowIndex, fieldName) => {
-    const value = e.target.value;
-    console.log(typeof value);
-
-    if (
-      fieldName === "invoicePSub_inv_ref" ||
-      fieldName === "invoicePSub_remarks"
-    ) {
+    if (fieldName === "invoicePSub_inv_ref") {
+      const value = typeof e === "string" ? e : e.target.value;
       const updatedData = [...invoiceData];
       updatedData[rowIndex][fieldName] = value;
       setInvoiceData(updatedData);
+    } else if (fieldName === "invoicePSub_remarks") {
+      const updatedData = [...invoiceData];
+      updatedData[rowIndex][fieldName] = e.target.value;
+      setInvoiceData(updatedData);
     } else {
-      if (/^\d*$/.test(value)) {
+      if (/^\d*$/.test(e.target.value)) {
         const updatedData = [...invoiceData];
-        updatedData[rowIndex][fieldName] = value;
+        updatedData[rowIndex][fieldName] = e.target.value;
         setInvoiceData(updatedData);
-      } else {
-        console.log("Invalid input. Only digits are allowed.");
       }
     }
   };
 
   const handleInputChange = (e, field) => {
     const value = e.target ? e.target.value : e;
-
-    setFormData((prev) => {
-      if (field === "branch_short") {
-        const selectedBranch = branchData?.branch.find(
-          (branch) => branch.branch_short === value
-        );
-        return {
-          ...prev,
-          branch_short: value,
-          branch_name: selectedBranch ? selectedBranch.branch_name : "",
-        };
-      }
-      return { ...prev, [field]: value };
-    });
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const fetchCompanys = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("No authentication token found");
-
-    const response = await fetch(`${BASE_URL}/api/panel-fetch-branch`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) throw new Error("Failed to fetch company data");
-    return response.json();
-  };
-
-  const { data: branchData } = useQuery({
-    queryKey: ["branch"],
-    queryFn: fetchCompanys,
-  });
-  const fetchPaymentStatus = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("No authentication token found");
-
-    const response = await fetch(
-      `${BASE_URL}/api/panel-fetch-invoice-payment-status`,
+  const addRow = useCallback(() => {
+    setInvoiceData((prev) => [
+      ...prev,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+        invoicePSub_inv_ref: "",
+        invoicePSub_amt_adv: "",
+        invoicePSub_amt_dp: "",
+        invoicePSub_amt_da: "",
+        invoicePSub_bank_c: "",
+        invoicePSub_discount: "",
+        invoicePSub_shortage: "",
+        invoicePSub_remarks: "",
+      },
+    ]);
+  }, []);
+
+  const removeRow = useCallback(
+    (index) => {
+      if (invoiceData.length > 1) {
+        setInvoiceData((prev) => prev.filter((_, i) => i !== index));
       }
-    );
-
-    if (!response.ok) throw new Error("Failed to fetch company data");
-    const data = await response.json();
-    return data.invoicePaymentStatus;
-  };
-
-  const { data: PaymentData } = useQuery({
-    queryKey: ["payment"],
-    queryFn: fetchPaymentStatus,
-  });
-
-  const fieldLabels = {
-    invoicePSub_inv_ref: " Invoice Ref",
-    invoiceP_dates: "Payment Date",
-    branch_name: "Company Name",
-    invoiceP_dollar_rate: " Dollor Rate",
-    invoiceP_v_date: "Value Date",
-    invoiceP_usd_amount: "Usd Amount",
-    invoiceP_irtt_no: "IRTT No",
-    invoiceP_status: "Status",
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const totalInvoiceSubAmount = invoiceData.reduce(
-        (sum, item) =>
+    },
+    [invoiceData.length]
+  );
+  const calculateTotalInvoiceSubAmount = () => {
+    return invoiceData.reduce((sum, item) => {
+      if (!crossedRows.has(item.id)) {
+        return (
           sum +
           (Number(item.invoicePSub_amt_adv) || 0) +
           (Number(item.invoicePSub_amt_dp) || 0) +
-          (Number(item.invoicePSub_amt_da) || 0) +
-          (Number(item.invoicePSub_bank_c) || 0) +
-          (Number(item.invoicePSub_discount) || 0) +
-          (Number(item.invoicePSub_shortage) || 0),
-        0
-      );
+          (Number(item.invoicePSub_amt_da) || 0)
+        );
+      }
+      return sum;
+    }, 0);
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
+    try {
+      const totalInvoiceSubAmount = calculateTotalInvoiceSubAmount();
       const invoiceUsdAmount = Number(formData.invoiceP_usd_amount) || 0;
-
       if (invoiceUsdAmount !== totalInvoiceSubAmount) {
-        throw new z.ZodError([
-          {
-            path: ["invoiceP_usd_amount"],
-            message: "Amount Does Not Match",
-          },
-        ]);
+        toast({
+          title: "Validation Error",
+          description: "The total invoice amounts do not match the USD amount.",
+          variant: "destructive",
+        });
+        return; 
+      }
+      if (crossedRows.size > 0) {
+        setIsDeleting(true);
+        toast({
+          title: "Processing",
+          description: "Deleting selected rows...",
+        });
+
+        const deletionPromises = Array.from(crossedRows).map((rowId) =>
+          deleteProductMutation.mutateAsync(rowId)
+        );
+
+        await Promise.all(deletionPromises);
+        toast({
+          title: "Success",
+          description: "Selected rows deleted successfully",
+        });
       }
       const validatedData = contractFormSchema.parse({
         ...formData,
-        payment_data: invoiceData,
+        payment_data: invoiceData.filter((row) => !crossedRows.has(row.id)),
       });
 
-      createBranchMutation.mutate(validatedData);
+      await createBranchMutation.mutateAsync(validatedData);
     } catch (error) {
       if (error instanceof z.ZodError) {
+        const fieldLabels = {
+          invoicePSub_inv_ref: "Invoice Ref",
+          invoiceP_dates: "Payment Date",
+          branch_name: "Company Name",
+          invoiceP_dollar_rate: "Dollar Rate",
+          invoiceP_v_date: "Value Date",
+          invoiceP_usd_amount: "USD Amount",
+          invoiceP_irtt_no: "IRTT No",
+          invoiceP_status: "Status",
+        };
+
         const groupedErrors = error.errors.reduce((acc, err) => {
           const field = err.path.join(".");
           if (!acc[field]) acc[field] = [];
@@ -332,66 +544,11 @@ const EditPaymentList = () => {
           variant: "destructive",
         });
       }
+    } finally {
+      setIsDeleting(false);
     }
   };
 
-  const {
-    data: paymentDatas,
-    isLoading,
-    isError,
-    refetch,
-  } = useQuery({
-    queryKey: ["payment", id],
-    queryFn: async () => {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${BASE_URL}/api/panel-fetch-invoice-payment-by-id/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to fetch payment");
-      return response.json();
-    },
-  });
-  useEffect(() => {
-    if (paymentDatas) {
-      setFormData((prev) => ({
-        ...prev,
-        invoiceP_years: paymentDatas.payment.invoiceP_year || currentYear,
-        invoiceP_dates: paymentDatas.payment.invoiceP_date || "",
-        branch_short: paymentDatas.payment.branch_short || "",
-        branch_name: paymentDatas.payment.branch_name || "",
-        invoiceP_dollar_rate: paymentDatas.payment.invoiceP_dollar_rate || "",
-        invoiceP_v_date: paymentDatas.payment.invoiceP_v_date || "",
-        invoiceP_usd_amount: paymentDatas.payment.invoiceP_usd_amount || "",
-        invoiceP_irtt_no: paymentDatas.payment.invoiceP_irtt_no || "",
-        invoiceP_status: paymentDatas.payment.invoiceP_status || "",
-      }));
-
-      if (Array.isArray(paymentDatas.paymentSub)) {
-        setInvoiceData(
-          paymentDatas.paymentSub.map((sub, index) => {
-            return {
-              id: sub.id ?? "",
-              invoicePSub_inv_ref: sub.invoicePSub_inv_ref || "",
-              invoicePSub_amt_adv: sub.invoicePSub_amt_adv || 0,
-              invoicePSub_amt_dp: sub.invoicePSub_amt_dp || 0,
-              invoicePSub_amt_da: sub.invoicePSub_amt_da || 0,
-              invoicePSub_bank_c: sub.invoicePSub_bank_c || 0,
-              invoicePSub_discount: sub.invoicePSub_discount || 0,
-              invoicePSub_shortage: sub.invoicePSub_shortage || 0,
-              invoicePSub_remarks: sub.invoicePSub_remarks || "",
-            };
-          })
-        );
-      } else {
-        console.warn("paymentSub is not an array:", paymentDatas.paymentSub);
-      }
-    }
-  }, [paymentDatas]);
   return (
     <Page>
       <form onSubmit={handleSubmit} className="w-full p-4">
@@ -461,7 +618,13 @@ const EditPaymentList = () => {
                       handleInputChange(e, "invoiceP_usd_amount")
                     }
                     placeholder="Enter  USD Amount"
-                    type="number"
+                    type="tel"
+                    onKeyPress={(e) => {
+                      // Allow only numbers, backspace, and dot (for decimal)
+                      if (!/[0-9.]/.test(e.key) && e.key !== 'Backspace') {
+                        e.preventDefault();
+                      }
+                    }}
                   />
                 </div>
               </div>
@@ -508,8 +671,8 @@ const EditPaymentList = () => {
                 >
                   Status<span className="text-red-500">*</span>
                 </label>
-                <Select
-                  value={formData.invoiceP_status}
+                <SelectStatus
+                  value={formData?.invoiceP_status}
                   onValueChange={(value) =>
                     handleInputChange({ target: { value } }, "invoiceP_status")
                   }
@@ -527,7 +690,7 @@ const EditPaymentList = () => {
                       </SelectItem>
                     ))}
                   </SelectContent>
-                </Select>
+                </SelectStatus>
               </div>
             </div>
 
@@ -559,31 +722,74 @@ const EditPaymentList = () => {
                     <TableHead className="text-sm font-semibold text-gray-600 py-2 px-4">
                       Remarks
                     </TableHead>
+                    <TableHead className="text-sm font-semibold text-gray-600 py-2 px-4">
+                      <Trash2 className="w-5 h-5 text-red-500" />
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {invoiceData.map((row, rowIndex) => (
                     <TableRow
                       key={rowIndex}
-                      className="border-t border-gray-200 hover:bg-gray-50"
+                      className={`border-t border-gray-200 hover:bg-gray-50 ${
+                        crossedRows.has(row.id) ? "bg-red-200   opacity-70" : ""
+                      }`}
                     >
                       <TableCell className="px-4 py-2">
-                        <Input
-                          className="bg-white"
-                          value={row.invoicePSub_inv_ref}
-                          onChange={(e) =>
-                            handlePaymentChange(
-                              { target: { value } },
-                              rowIndex,
-                              "invoicePSub_inv_ref"
-                            )
-                          }
-                          disabled
-                        />
+                        {row.id ? (
+                          <Input
+                            className="bg-white"
+                            value={row.invoicePSub_inv_ref}
+                            onChange={(e) =>
+                              handlePaymentChange(
+                                e,
+                                rowIndex,
+                                "invoicePSub_inv_ref"
+                              )
+                            }
+                            disabled
+                          />
+                        ) : (
+                          <MemoizedProductSelect
+                            value={row.invoicePSub_inv_ref}
+                            onChange={(value) =>
+                              handlePaymentChange(
+                                value,
+                                rowIndex,
+                                "invoicePSub_inv_ref"
+                              )
+                            }
+                            options={
+                              invoiceNoData?.invoicePaymentAmount?.map(
+                                (status) => ({
+                                  value: status.invoice_ref,
+                                  label: (
+                                    <div className="flex flex-col">
+                                      <span className="font-bold text-sm">
+                                        {status.invoice_ref}
+                                      </span>
+                                      <span className="text-gray-600 text-[10px]">
+                                        Amount (USD):{" "}
+                                        {status.invoice_i_value_usd}
+                                      </span>
+                                      <span className="text-gray-600 text-[10px]">
+                                        Balance: {status.balance}
+                                      </span>
+                                      <span className="text-gray-600 text-[10px]">
+                                        Received: {status.received}
+                                      </span>
+                                    </div>
+                                  ),
+                                })
+                              ) || []
+                            }
+                            placeholder="Select Payment"
+                          />
+                        )}
                       </TableCell>
                       <TableCell className="px-4 py-2">
                         <Input
-                          className="bg-white border border-gray-300"
+                          className="bg-white"
                           value={row.invoicePSub_amt_adv}
                           onChange={(e) =>
                             handlePaymentChange(
@@ -597,7 +803,7 @@ const EditPaymentList = () => {
                       </TableCell>
                       <TableCell className="px-4 py-2">
                         <Input
-                          className="bg-white border border-gray-300"
+                          className="bg-white"
                           value={row.invoicePSub_amt_dp}
                           onChange={(e) =>
                             handlePaymentChange(
@@ -611,7 +817,7 @@ const EditPaymentList = () => {
                       </TableCell>
                       <TableCell className="px-4 py-2">
                         <Input
-                          className="bg-white border border-gray-300"
+                          className="bg-white"
                           value={row.invoicePSub_amt_da}
                           onChange={(e) =>
                             handlePaymentChange(
@@ -625,7 +831,7 @@ const EditPaymentList = () => {
                       </TableCell>
                       <TableCell className="px-4 py-2">
                         <Input
-                          className="bg-white border border-gray-300"
+                          className="bg-white"
                           value={row.invoicePSub_bank_c}
                           onChange={(e) =>
                             handlePaymentChange(
@@ -639,7 +845,7 @@ const EditPaymentList = () => {
                       </TableCell>
                       <TableCell className="px-4 py-2">
                         <Input
-                          className="bg-white border border-gray-300"
+                          className="bg-white"
                           value={row.invoicePSub_discount}
                           onChange={(e) =>
                             handlePaymentChange(
@@ -653,7 +859,7 @@ const EditPaymentList = () => {
                       </TableCell>
                       <TableCell className="px-4 py-2">
                         <Input
-                          className="bg-white border border-gray-300"
+                          className="bg-white"
                           value={row.invoicePSub_shortage}
                           onChange={(e) =>
                             handlePaymentChange(
@@ -667,7 +873,7 @@ const EditPaymentList = () => {
                       </TableCell>
                       <TableCell className="px-4 py-2">
                         <Textarea
-                          className="bg-white border border-gray-300"
+                          className="bg-white"
                           value={row.invoicePSub_remarks}
                           onChange={(e) =>
                             handlePaymentChange(
@@ -679,10 +885,47 @@ const EditPaymentList = () => {
                           placeholder="Enter Remarks"
                         />
                       </TableCell>
+                      <TableCell className="p-2 border">
+                        {row.id ? (
+                          <Button
+                            variant="ghost"
+                            onClick={() => handleDeleteRow(row.id)}
+                            className={`${
+                              crossedRows.has(row.id)
+                                ? "text-green-500"
+                                : "text-red-500"
+                            }`}
+                            type="button"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="ghost"
+                            onClick={() => removeRow(rowIndex)}
+                            disabled={invoiceData.length === 1}
+                            className="text-red-500"
+                            type="button"
+                          >
+                            <MinusCircle className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
+              <p>Total of tables: {calculateTotalInvoiceSubAmount()}</p>
+              <div className="mt-4 flex justify-end">
+                <Button
+                  type="button"
+                  onClick={addRow}
+                  className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+                >
+                  <PlusCircle className="h-4 w-4 mr-2" />
+                  Add Invoice
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -691,9 +934,21 @@ const EditPaymentList = () => {
           <Button
             type="submit"
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
-            disabled={createBranchMutation.isPending}
+            disabled={isDeleting || createBranchMutation.isPending}
           >
-            {createBranchMutation.isPending ? "Updatting..." : "Update Payment"}
+            {isDeleting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Deleting rows...
+              </>
+            ) : createBranchMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Updating Payment...
+              </>
+            ) : (
+              "Update Payment"
+            )}
           </Button>
         </div>
       </form>
