@@ -180,10 +180,14 @@ export function AppSidebar({ ...props }) {
               title: "Pre Recepits",
               url: "/master/prerecepits",
             },
-            // {
-            //   title: "Team",
-            //   url: "/master/team",
-            // },
+            {
+              title: "Vendor",
+              url: "/master/vendor",
+            },
+            {
+              title: "Purchase Product",
+              url: "/master/purchase-product",
+            },
           ],
         },
         {
@@ -247,6 +251,11 @@ export function AppSidebar({ ...props }) {
         {
           name: "Invoice",
           url: "/invoice",
+          icon: Map,
+        },
+        {
+          name: "Purchase Order",
+          url: "/purchase-order",
           icon: Map,
         },
     
