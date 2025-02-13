@@ -18,7 +18,7 @@ const ViewContract = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [logoBase64, setLogoBase64] = useState("");
-  
+
   useEffect(() => {
     const fetchContractData = async () => {
       try {
@@ -47,12 +47,13 @@ const ViewContract = () => {
 
     fetchContractData();
   }, [id]);
-
+  const logoUrl = `/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`;
   useEffect(() => {
     const fetchAndConvertImage = async () => {
-
       try {
-        const logoUrl = `/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`;
+        console.log("logourl before", contractData?.branch?.branch_letter_head);
+
+        console.log("logourl fter", logoUrl);
         const response = await fetch(logoUrl);
         const blob = await response.blob();
 
@@ -67,7 +68,7 @@ const ViewContract = () => {
     };
 
     fetchAndConvertImage();
-  }, []);
+  }, [contractData?.branch?.branch_letter_head]);
 
   const handleSaveAsPdf = () => {
     if (!logoBase64) {
@@ -100,7 +101,6 @@ const ViewContract = () => {
       }
     });
   };
- 
 
   const generatePdf = (element) => {
     if (!logoBase64) {
@@ -283,16 +283,15 @@ const ViewContract = () => {
       .save();
   };
 
-  
   const whatsappPdf = async () => {
     try {
       const element = containerRef.current;
-  
+
       if (!logoBase64) {
         console.error("Logo not yet loaded");
         return;
       }
-  
+
       const options = {
         margin: [55, 0, 15, 0],
         filename: "Sales_Contract.pdf",
@@ -309,7 +308,7 @@ const ViewContract = () => {
         },
         pagebreak: { mode: "avoid-all" },
       };
-  
+
       const pdfOutput = await html2pdf()
         .from(element)
         .set(options)
@@ -319,43 +318,53 @@ const ViewContract = () => {
           const totalPages = pdf.internal.getNumberOfPages();
           const pageWidth = pdf.internal.pageSize.getWidth();
           const pageHeight = pdf.internal.pageSize.getHeight();
-          
+
           for (let i = 1; i <= totalPages; i++) {
             pdf.setPage(i);
-  
+
             // Add logo to each page
             const imgData = logoBase64.split(",")[1];
             pdf.addImage(imgData, "JPEG", 0, 10, pageWidth, 30);
-  
+
             // Add contract title
             pdf.setFontSize(12);
             pdf.setFont(undefined, "normal");
             const title = "SALES CONTRACT";
-            const titleWidth = (pdf.getStringUnitWidth(title) * 16) / pdf.internal.scaleFactor;
+            const titleWidth =
+              (pdf.getStringUnitWidth(title) * 16) / pdf.internal.scaleFactor;
             pdf.text(title, (pageWidth - titleWidth) / 2, 45);
-  
+
             // Add contract details
             pdf.setFontSize(9);
-            pdf.text(`Cont No.: ${contractData?.contract?.contract_ref || ""}`, 4, 55);
-            pdf.text(`DATE: ${contractData?.contract?.contract_date || ""}`, pageWidth - 31, 55);
-  
+            pdf.text(
+              `Cont No.: ${contractData?.contract?.contract_ref || ""}`,
+              4,
+              55
+            );
+            pdf.text(
+              `DATE: ${contractData?.contract?.contract_date || ""}`,
+              pageWidth - 31,
+              55
+            );
+
             // Add page numbers
             pdf.setFontSize(10);
             pdf.setTextColor(0, 0, 0);
             const text = `Page ${i} of ${totalPages}`;
-            const textWidth = (pdf.getStringUnitWidth(text) * 10) / pdf.internal.scaleFactor;
+            const textWidth =
+              (pdf.getStringUnitWidth(text) * 10) / pdf.internal.scaleFactor;
             const x = pageWidth - textWidth - 10;
             const y = pageHeight - 10;
             pdf.text(text, x, y);
           }
           return pdf;
         });
-  
-      const pdfBlob = pdfOutput.output('blob');
+
+      const pdfBlob = pdfOutput.output("blob");
       const file = new File([pdfBlob], "Sales_Contract.pdf", {
         type: "application/pdf",
       });
-  
+
       const message = `Contract details for ${
         contractData?.contract?.contract_ref || ""
       }\n\nContract Date: ${
@@ -363,7 +372,7 @@ const ViewContract = () => {
       }\nBuyer: ${
         contractData?.contract?.contract_buyer || ""
       }\n\nPlease find the attached contract document.`;
-  
+
       try {
         if (
           navigator.share &&
@@ -379,10 +388,10 @@ const ViewContract = () => {
       } catch (shareError) {
         console.log("Web Share API failed:", shareError);
       }
-  
+
       if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
         const fileUrl = URL.createObjectURL(file);
-  
+
         if (navigator.share) {
           try {
             await navigator.share({
@@ -395,21 +404,23 @@ const ViewContract = () => {
             console.log("Mobile share failed:", mobileShareError);
           }
         }
-  
-        const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(message)}`;
+
+        const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(
+          message
+        )}`;
         window.location.href = whatsappUrl;
-  
+
         setTimeout(() => {
           const webWhatsappUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(
             message
           )}`;
           window.open(webWhatsappUrl, "_blank");
         }, 1000);
-  
+
         URL.revokeObjectURL(fileUrl);
         return;
       }
-  
+
       const webWhatsappUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(
         message
       )}`;
@@ -419,7 +430,6 @@ const ViewContract = () => {
       alert("There was an error sharing the PDF. Please try again.");
     }
   };
-
 
   const whatsappWithoutHeaderPdf = async () => {
     try {
@@ -517,7 +527,6 @@ const ViewContract = () => {
       alert("There was an error sharing the PDF. Please try again.");
     }
   };
- 
 
   const handlPrintPdf = useReactToPrint({
     content: () => containerRef.current,
@@ -580,7 +589,18 @@ const ViewContract = () => {
   }
 
   const PrintHeader = () => (
-    <div className="print-header hidden print:block" style={{ position: 'fixed', top: 0, left: 0, right: 0, backgroundColor: 'white', zIndex: 1000, height: '200px', }}>
+    <div
+      className="print-header hidden print:block"
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: "white",
+        zIndex: 1000,
+        height: "200px",
+      }}
+    >
       <img
         src={`/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`}
         alt="logo"
@@ -608,7 +628,7 @@ const ViewContract = () => {
         <div className="w-[85%]">
           <div className="      ">
             <img
-              src="/api/public/assets/images/letterHead/AceB.png"
+              src={`/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`}
               alt="logo"
               className="w-full"
             />
@@ -622,12 +642,14 @@ const ViewContract = () => {
               </p>
               <p>
                 <span className="font-semibold text-[12px]">DATE:</span>{" "}
-                {moment(contractData?.contract?.contract_date).format("DD-MMM-YYYY")}
+                {moment(contractData?.contract?.contract_date).format(
+                  "DD-MMM-YYYY"
+                )}
               </p>
             </div>
           </div>
-          <div ref={containerRef} className="    min-h-screen font-normal " >
-            <PrintHeader/>
+          <div ref={containerRef} className="    min-h-screen font-normal ">
+            <PrintHeader />
             {contractData && (
               <>
                 <div className="max-w-4xl mx-auto    p-4">
@@ -864,7 +886,6 @@ const ViewContract = () => {
           <Tabs defaultValue="header" className="w-full ">
             <TabsList className="grid w-full grid-cols-1">
               <TabsTrigger value="header">Actions</TabsTrigger>
-          
             </TabsList>
             <TabsContent value="header">
               <div className="flex flex-col gap-2 mt-4">
@@ -926,7 +947,6 @@ const ViewContract = () => {
                 </Button>
               </div>
             </TabsContent>
-           
           </Tabs>
         </div>
       </div>

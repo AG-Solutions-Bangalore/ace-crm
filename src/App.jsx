@@ -66,7 +66,7 @@ import VendorList from "./app/master/vendor/VendorList";
 import CreateVendor from "./app/master/vendor/CreateVendor";
 import PurchaseOrderList from "./app/purchaseOrder/PurchaseOrderList";
 import PurchaseProductList from "./app/master/purchaseProduct/PurchaseProductList";
-
+import ViewPurchaseOrder from "./app/purchaseOrder/ViewPurchaseOrder";
 
 const queryClient = new QueryClient();
 
@@ -99,7 +99,8 @@ function App() {
 
           {/* purchase order  */}
 
-  <Route path="/purchase-order" element={<PurchaseOrderList />} />
+          <Route path="/purchase-order" element={<PurchaseOrderList />} />
+          <Route path="/view-purchase-order" element={<ViewPurchaseOrder />} />
           {/* Master - Branch  */}
 
           <Route path="/master/branch" element={<BranchList />} />
@@ -156,13 +157,17 @@ function App() {
           <Route path="/master/vessel" element={<VesselList />} />
           {/* Master - prerecepits*/}
           <Route path="/master/prerecepits" element={<PreReceiptList />} />
-         {/* master - v */}
+          {/* master - v */}
           <Route path="/master/vendor" element={<VendorList />} />
-          <Route path="/master/vendor/create-vendor" element={<CreateVendor />} />
+          <Route
+            path="/master/vendor/create-vendor"
+            element={<CreateVendor />}
+          />
           {/* master purchase order  */}
-          <Route path="/master/purchase-product" element={<PurchaseProductList />} />
-
-       
+          <Route
+            path="/master/purchase-product"
+            element={<PurchaseProductList />}
+          />
 
           {/* //Reports */}
 
