@@ -65,7 +65,8 @@ const CreatePage = () => {
             { title: "Shipper", url: "/master/shipper" },
             { title: "Vessel", url: "/master/vessel" },
             { title: "Pre Recepits", url: "/master/prerecepits" },
-            { title: "Team", url: "/master/team" }
+            { title: "Purchase Product", url: "/master/purchase-product" },
+            { title: "Vendor", url: "/master/vendor" }
           ]
         },
         {
@@ -91,7 +92,8 @@ const CreatePage = () => {
       projects: [
         { name: "Dashboard", url: "/home" },
         { name: "Contract", url: "/contract" },
-        { name: "Invoice", url: "/invoice" }
+        { name: "Invoice", url: "/invoice" },
+        { name: "Purchase Order", url: "/purchase-order" }
       ],
       userManagement: [
         { name: "User Management", url: "/userManagement" },

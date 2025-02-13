@@ -62,6 +62,10 @@ import PaymentPending from "./payment/PaymentPending/PaymentPending";
 import PaymentClose from "./payment/PaymentClose/PaymentClose";
 import EditPaymentList from "./payment/PaymentList/EditPaymentList";
 import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
+import VendorList from "./app/master/vendor/VendorList";
+import CreateVendor from "./app/master/vendor/CreateVendor";
+import PurchaseOrderList from "./app/purchaseOrder/PurchaseOrderList";
+import PurchaseProductList from "./app/master/purchaseProduct/PurchaseProductList";
 
 
 const queryClient = new QueryClient();
@@ -93,6 +97,9 @@ function App() {
           />
           <Route path="/view-invoice/:id" element={<InvoiceTabs />} />
 
+          {/* purchase order  */}
+
+  <Route path="/purchase-order" element={<PurchaseOrderList />} />
           {/* Master - Branch  */}
 
           <Route path="/master/branch" element={<BranchList />} />
@@ -149,6 +156,11 @@ function App() {
           <Route path="/master/vessel" element={<VesselList />} />
           {/* Master - prerecepits*/}
           <Route path="/master/prerecepits" element={<PreReceiptList />} />
+         {/* master - v */}
+          <Route path="/master/vendor" element={<VendorList />} />
+          <Route path="/master/vendor/create-vendor" element={<CreateVendor />} />
+          {/* master purchase order  */}
+          <Route path="/master/purchase-product" element={<PurchaseProductList />} />
 
        
 

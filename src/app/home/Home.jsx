@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { motion } from "framer-motion";
 import {
   FileText,
   ClipboardCheck,
@@ -140,6 +141,9 @@ const Home = () => {
 
         {/* <EnquiryTable enquiries={data.enquiry} /> */}
       </div>
+
+
+    
     </Page>
   );
 };

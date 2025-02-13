@@ -280,7 +280,7 @@ const BranchList = () => {
             <BranchCreate
               className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
               onClick={() => navigate("/create-branch")}
-            ></BranchCreate>
+            />
           </div>
         </div>
         {/* table  */}
