@@ -88,12 +88,13 @@ const SalesAccountReport = () => {
             className="grid bg-white"
             style={{
               gridTemplateColumns:
-                "minmax(30px, auto) minmax(200px, auto) minmax(90px, auto) minmax(60px, auto) minmax(100px, auto) minmax(110px, auto) minmax(110px, auto) minmax(70px, auto) minmax(100px, auto) minmax(100px, auto) minmax(100px, auto) ",
+                "minmax(30px, auto) minmax(110px, auto) minmax(90px, auto) minmax(90px, auto) minmax(60px, auto) minmax(100px, auto) minmax(110px, auto) minmax(110px, auto) minmax(70px, auto) minmax(100px, auto) minmax(100px, auto) minmax(100px, auto) ",
             }}
           >
             {/* Header */}
             {[
               "Invoice No",
+              "Buyer",
               "S B No",
               "B L No",
               "BL Date",
@@ -117,6 +118,9 @@ const SalesAccountReport = () => {
               <React.Fragment key={index}>
                 <div className="p-2 border-b border-r border-black">
                   {item.invoice_no}
+                </div>
+                <div className="p-2 border-b border-r border-black">
+                  {item.invoice_buyer}
                 </div>
                 <div className="p-2 border-b border-r border-black">
                   {item.invoice_sb_no}
@@ -150,6 +154,7 @@ const SalesAccountReport = () => {
             ))}
             {/* Branch Wise Total */}
             <div className="p-2 border-b  border-black font-bold"></div>
+            <div className="p-2 border-b border-black"></div>
             <div className="p-2 border-b border-black"></div>
             <div className="p-2 border-b  border-black"></div>
             <div className="p-2 border-b  border-black"></div>
@@ -200,9 +205,10 @@ const SalesAccountReport = () => {
         className="grid bg-gray-100 border-t border-l border-r border-black font-bold text-[11px]"
         style={{
           gridTemplateColumns:
-            "minmax(88px, auto) minmax(200px, auto) minmax(90px, auto) minmax(60px, auto) minmax(100px, auto) minmax(110px, auto) minmax(110px, auto) minmax(70px, auto) minmax(100px, auto) minmax(100px, auto) minmax(100px, auto) ",
+            "minmax(88px, auto) minmax(170px, auto) minmax(90px, auto) minmax(90px, auto) minmax(60px, auto) minmax(100px, auto) minmax(110px, auto) minmax(110px, auto) minmax(70px, auto) minmax(100px, auto) minmax(100px, auto) minmax(100px, auto) ",
         }}
       >
+        <div className="p-2 border-b  border-black"></div>
         <div className="p-2 border-b border-black"></div>
         <div className="p-2 border-b border-black"></div>
         <div className="p-2 border-b border-black"></div>

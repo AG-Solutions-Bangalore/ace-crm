@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import TeamList from "../master/team/TeamList";
 
 const UserPage = () => {
 
@@ -67,10 +68,10 @@ const UserPage = () => {
 
   return (
     <Page>
-      <div className="container mx-auto p-6">
-        <div className="bg-white rounded-lg shadow-lg p-6">
+      {/* <div className="container mx-auto p-6"> */}
+        {/* <div className="bg-white rounded-lg shadow-lg p-6"> */}
           {/* Search and Filter Section */}
-          <div className="flex gap-4 mb-6">
+          {/* <div className="flex flex-col lg:flex-row gap-4 mb-6">
             <div className="flex-1">
               <input
                 type="text"
@@ -80,42 +81,8 @@ const UserPage = () => {
                 className="w-full px-3 py-2 border border-black rounded-md"
               />
             </div>
-            {/* <Menu>
-              <MenuHandler>
-                <Button variant="outlined" className="flex items-center gap-2">
-                  <Filter className="h-4 w-4" />
-                  Filters
-                </Button>
-              </MenuHandler>
-              <MenuList>
-                <MenuItem
-                  onClick={() => setFilters({ ...filters, userType: "all" })}
-                >
-                  All Types
-                </MenuItem>
-                <MenuItem
-                  onClick={() => setFilters({ ...filters, userType: 1 })}
-                >
-                  User
-                </MenuItem>
-                <MenuItem
-                  onClick={() => setFilters({ ...filters, userType: 2 })}
-                >
-                  Admin
-                </MenuItem>
-                <MenuItem
-                  onClick={() => setFilters({ ...filters, userType: 3 })}
-                >
-                  Super Admin
-                </MenuItem>
-                <MenuItem
-                  onClick={() => setFilters({ ...filters, userType: 4 })}
-                >
-                  Super Admins
-                </MenuItem>
-              </MenuList>
-            </Menu> */}
-
+           
+              <div className="flex flex-row items-center">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -164,13 +131,18 @@ const UserPage = () => {
             >
               + Button
             </Button>
-          </div>
-          <div className="overflow-x-auto">
+           
+            </div>
+          </div> */}
+          {/* <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead>
                 <tr className="border-b border-gray-200">
                   <th className="text-left py-3 px-4 font-semibold text-sm text-gray-700">
                     User Info
+                  </th>
+                  <th className="text-left py-3 px-4 font-semibold text-sm text-gray-700">
+                    Position
                   </th>
                   <th className="text-left py-3 px-4 font-semibold text-sm text-gray-700">
                     Role
@@ -186,6 +158,9 @@ const UserPage = () => {
                     <td className="py-3 px-4">
                       <span className="inline-block bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
                         {user.name}
+                      </span>
+                      <span className="inline-block bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                        {user.user_position}
                       </span>
                     </td>
                     <td className="py-3 px-4">
@@ -228,9 +203,10 @@ const UserPage = () => {
                 ))}
               </tbody>
             </table>
-          </div>
-        </div>
-      </div>
+          </div> */}
+          <TeamList/>
+        {/* </div> */}
+      {/* </div> */}
     </Page>
   );
 };

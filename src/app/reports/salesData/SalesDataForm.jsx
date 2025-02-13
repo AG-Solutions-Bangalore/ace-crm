@@ -1,12 +1,13 @@
 import Page from "@/app/dashboard/page";
 import { Input } from "@/components/ui/input";
 import {
-  Select,
+  Select as SelectStatus,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Select from "react-select";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
@@ -15,10 +16,10 @@ import BASE_URL from "@/config/BaseUrl";
 import moment from "moment";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Download } from "lucide-react";
+import { Download,ChevronDown } from "lucide-react";
 import axios from "axios";
 import { ButtonConfig } from "@/config/ButtonConfig";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   useFetchBuyers,
   useFetchCountrys,
@@ -54,7 +55,95 @@ const createContract = async (data) => {
   if (!response.ok) throw new Error("Failed to create sales account");
   return response.json();
 };
+const MemoizedProductSelect = React.memo(
+  ({ value, onChange, options, placeholder }) => {
+    const selectOptions = options.map((option) => ({
+      value: option.value,
+      label: option.label,
+    }));
 
+    const selectedOption = selectOptions.find(
+      (option) => option.value === value
+    );
+
+    const customStyles = {
+      control: (provided, state) => ({
+        ...provided,
+        minHeight: "36px",
+        borderRadius: "6px",
+        borderColor: state.isFocused ? "black" : "#e5e7eb",
+        boxShadow: state.isFocused ? "black" : "none",
+        "&:hover": {
+          borderColor: "none",
+          cursor: "text",
+        },
+      }),
+      option: (provided, state) => ({
+        ...provided,
+        fontSize: "14px",
+        backgroundColor: state.isSelected
+          ? "#A5D6A7"
+          : state.isFocused
+          ? "#f3f4f6"
+          : "white",
+        color: state.isSelected ? "black" : "#1f2937",
+        "&:hover": {
+          backgroundColor: "#EEEEEE",
+          color: "black",
+        },
+      }),
+
+      menu: (provided) => ({
+        ...provided,
+        borderRadius: "6px",
+        border: "1px solid #e5e7eb",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+      }),
+      placeholder: (provided) => ({
+        ...provided,
+        color: "#616161",
+        fontSize: "14px",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "start",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+      }),
+      singleValue: (provided) => ({
+        ...provided,
+        color: "black",
+        fontSize: "14px",
+      }),
+    };
+
+    const DropdownIndicator = (props) => {
+      return (
+        <div {...props.innerProps}>
+          <ChevronDown className="h-4 w-4 mr-3 text-gray-500" />
+        </div>
+      );
+    };
+
+    return (
+      <Select
+        value={selectedOption}
+        onChange={(selected) => onChange(selected ? selected.value : "")}
+        options={selectOptions}
+        placeholder={placeholder}
+        styles={customStyles}
+        components={{
+          IndicatorSeparator: () => null,
+          DropdownIndicator,
+        }}
+        menuPortalTarget={document.body}
+        menuPosition="fixed"
+        getOptionLabel={(option) => option.label} // Show only the invoice reference in the input
+          getOptionValue={(option) => option.value} // Use the value for the option
+      />
+    );
+  }
+);
 const SalesDataForm = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -245,7 +334,7 @@ const SalesDataForm = () => {
                   >
                     Branch <span className="text-red-500"></span>
                   </label>
-                  <Select
+                  <SelectStatus
                     value={formData.branch_name}
                     onValueChange={(value) =>
                       handleInputChange("branch_name", value)
@@ -266,7 +355,7 @@ const SalesDataForm = () => {
                         ))}
                       </SelectContent>
                     </SelectContent>
-                  </Select>
+                  </SelectStatus>
                 </div>
 
                 <div>
@@ -275,28 +364,19 @@ const SalesDataForm = () => {
                   >
                     Buyer <span className="text-red-500"></span>
                   </label>
-                  <Select
-                    value={formData.invoice_buyer}
-                    onValueChange={(value) =>
-                      handleInputChange("invoice_buyer", value)
-                    }
-                  >
-                    <SelectTrigger className="bg-white">
-                      <SelectValue placeholder="Select Buyer" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      <SelectContent>
-                        {buyerData?.buyer?.map((branch) => (
-                          <SelectItem
-                            key={branch.buyer_name}
-                            value={branch.buyer_name.toString()}
-                          >
-                            {branch.buyer_name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </SelectContent>
-                  </Select>
+                  <MemoizedProductSelect
+value={formData.invoice_buyer}
+onChange={(value) =>
+    handleInputChange("invoice_buyer", value)
+  }
+options={
+    buyerData?.buyer?.map((branch) => ({
+    value: branch.buyer_name,
+    label: branch.buyer_name,
+  })) || []
+}
+placeholder="Select Buyer"
+/>
                 </div>
                 <div>
                   <label
@@ -304,7 +384,7 @@ const SalesDataForm = () => {
                   >
                     Country <span className="text-red-500"></span>
                   </label>
-                  <Select
+                  <SelectStatus
                     value={formData.invoice_destination_country}
                     onValueChange={(value) =>
                       handleInputChange("invoice_destination_country", value)
@@ -325,7 +405,7 @@ const SalesDataForm = () => {
                         ))}
                       </SelectContent>
                     </SelectContent>
-                  </Select>
+                  </SelectStatus>
                 </div>
                 <div>
                   <label
@@ -333,7 +413,7 @@ const SalesDataForm = () => {
                   >
                     Product <span className="text-red-500"></span>
                   </label>
-                  <Select
+                  <SelectStatus
                     value={formData.invoice_product}
                     onValueChange={(value) =>
                       handleInputChange("invoice_product", value)
@@ -354,7 +434,7 @@ const SalesDataForm = () => {
                         ))}
                       </SelectContent>
                     </SelectContent>
-                  </Select>
+                  </SelectStatus>
                 </div>
               </div>
               <div className="flex flex-row items-end mt-3 justify-end w-full">

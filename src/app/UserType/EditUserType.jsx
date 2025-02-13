@@ -146,7 +146,7 @@ const EditUserType = () => {
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center justify-between mb-6 border-b pb-4">
             <h1 className="text-2xl font-semibold">
-              Edit User Type: {userData?.user_type}
+              Edit User Type: {userData?.user_position}
             </h1>
             <button
               onClick={() => navigate("/user-type")}

@@ -438,7 +438,7 @@ const CreatePayment = () => {
                       {branchData?.branch?.map((branch) => (
                         <SelectItem
                           key={branch.branch_short}
-                          value={branch.branch_short.toString()}
+                          value={branch.branch_short}
                         >
                           {branch.branch_short}
                         </SelectItem>
