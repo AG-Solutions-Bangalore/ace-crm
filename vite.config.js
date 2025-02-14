@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'ace-crm.vercel.app',
+        target: 'https://exportbiz.in',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
