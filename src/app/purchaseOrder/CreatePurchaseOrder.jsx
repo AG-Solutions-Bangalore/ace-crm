@@ -891,13 +891,10 @@ const CreatePurchaseOrder = () => {
                   <TableHeader>
                     <TableRow className="bg-gray-50">
                       <TableHead className="p-2 text-center border text-sm font-medium">
-                        Product Name
+                        Product /Description
                       </TableHead>
 
-                      <TableHead className="p-2 text-center border text-sm font-medium">
-                        Hsn / Description
-                        <span className="text-red-500">*</span>
-                      </TableHead>
+
 
                       <TableHead className="p-2 text-center border text-sm font-medium">
                         Rate / Quantity <span className="text-red-500">*</span>
@@ -916,6 +913,7 @@ const CreatePurchaseOrder = () => {
                     {contractData.map((row, rowIndex) => (
                       <TableRow key={rowIndex} className="hover:bg-gray-50">
                         <TableCell className="p-2 border">
+                        <div className="flex flex-col gap-2">
                           <MemoizedProductSelect
                             value={row.purchase_productSub_name}
                             onChange={(value) =>
@@ -935,23 +933,7 @@ const CreatePurchaseOrder = () => {
                             }
                             placeholder="Select Product"
                           />
-                        </TableCell>
-                        <TableCell className="p-2 border">
-                          <div className="flex flex-col gap-2">
-                            <Input
-                              value={row.purchase_productSub_name_hsn}
-                              onChange={(e) =>
-                                handleRowDataChange(
-                                  rowIndex,
-                                  "purchase_productSub_name_hsn",
-                                  e.target.value
-                                )
-                              }
-                              className="bg-white"
-                              placeholder="Enter Hsn"
-                              type="text"
-                            />
-                            <Input
+                           <Input
                               value={row.purchase_productSub_description}
                               onChange={(e) =>
                                 handleRowDataChange(
@@ -964,9 +946,42 @@ const CreatePurchaseOrder = () => {
                               placeholder="Enter Description"
                               type="text"
                             />
+                            </div>
+                        </TableCell>
+                      
+
+                      
+
+                        <TableCell className="p-2 border ">
+                        <div className="flex flex-col gap-2">
+                          <Input
+                            className="bg-white"
+                            value={row.purchase_productSub_packing}
+                            onChange={(e) =>
+                              handleRowDataChange(
+                                rowIndex,
+                                "purchase_productSub_packing",
+                                e.target.value
+                              )
+                            }
+                            placeholder="Enter Packing"
+                            type="text"
+                          />
+                          <Input
+                            className="bg-white"
+                            value={row.purchase_productSub_marking}
+                            onChange={(e) =>
+                              handleRowDataChange(
+                                rowIndex,
+                                "purchase_productSub_marking",
+                                e.target.value
+                              )
+                            }
+                            placeholder="Enter Marking"
+                            type="text"
+                          />
                           </div>
                         </TableCell>
-
                         <TableCell className="p-2 border w-40">
                           <div className="flex flex-col gap-2">
                             <Input
@@ -997,36 +1012,6 @@ const CreatePurchaseOrder = () => {
                             />
                           </div>
                         </TableCell>
-
-                        <TableCell className="p-2 border w-40">
-                          <Input
-                            className="bg-white"
-                            value={row.purchase_productSub_packing}
-                            onChange={(e) =>
-                              handleRowDataChange(
-                                rowIndex,
-                                "purchase_productSub_packing",
-                                e.target.value
-                              )
-                            }
-                            placeholder="Enter Packing"
-                            type="text"
-                          />
-                          <Input
-                            className="bg-white"
-                            value={row.purchase_productSub_marking}
-                            onChange={(e) =>
-                              handleRowDataChange(
-                                rowIndex,
-                                "purchase_productSub_marking",
-                                e.target.value
-                              )
-                            }
-                            placeholder="Enter Marking"
-                            type="text"
-                          />
-                        </TableCell>
-
                         <TableCell className="p-2 border">
                           <Button
                             variant="ghost"

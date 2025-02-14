@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Printer, Mail, MessageCircle } from "lucide-react";
 import html2pdf from "html2pdf.js";
-import BASE_URL from "@/config/BaseUrl";
+import BASE_URL, { getImageUrl } from "@/config/BaseUrl";
 import { useParams } from "react-router-dom";
 import { getTodayDate } from "@/utils/currentDate";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -611,7 +611,8 @@ const ViewContract = () => {
       }}
     >
       <img
-        src={`/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`}
+       
+        src={getImageUrl(contractData?.branch?.branch_letter_head)}
         alt="logo"
         className="w-full max-h-[120px] object-contain"
       />
@@ -637,7 +638,8 @@ const ViewContract = () => {
         <div className="w-[85%]">
           <div className="      ">
             <img
-              src={`/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`}
+
+              src={getImageUrl(contractData?.branch?.branch_letter_head)}
               alt="logo"
               className="w-full"
             />
