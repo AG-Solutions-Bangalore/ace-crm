@@ -87,7 +87,7 @@ const createPurchaseOrder = async (data) => {
   if (!token) throw new Error("No authentication token found");
     console.log("pur data",data)
   const response = await fetch(
-    `${BASE_URL}/api/panel-create-purchase-products`,
+    `${BASE_URL}/api/panel-create-purchase-product`,
     {
       method: "POST",
       headers: {
@@ -643,7 +643,7 @@ const CreatePurchaseOrder = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
                   >
-                    Product No <span className="text-red-500">*</span>
+                    Purchase Order No <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
                     value={formData?.purchase_product_no}
@@ -656,7 +656,7 @@ const CreatePurchaseOrder = () => {
                         label: item,
                       })) || []
                     }
-                    placeholder="Select product No"
+                    placeholder="Select purchase order No"
                   />
                 </div>
               </div>
@@ -722,7 +722,7 @@ const CreatePurchaseOrder = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
                   >
-                    Product Date <span className="text-red-500">*</span>
+                    P.O. Date <span className="text-red-500">*</span>
                   </label>
                   <Input
                     type="date"
@@ -742,11 +742,11 @@ const CreatePurchaseOrder = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
                   >
-                    Product Ref. <span className="text-red-500">*</span>
+                     Ref. <span className="text-red-500">*</span>
                   </label>
                   <Input
                     type="text"
-                    placeholder="Enter Product Ref"
+                    placeholder="Enter purchase order Ref"
                     value={formData.purchase_product_ref}
                     disabled
                     className="bg-white"
@@ -823,12 +823,12 @@ const CreatePurchaseOrder = () => {
                     <label
                       className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
                     >
-                      Product Tc
+                      Other Term & Cond.
                     </label>
                     <Textarea
                       type="text"
                       className="bg-white"
-                      placeholder="Enter Product Tc"
+                      placeholder="Enter other term & condition"
                       value={formData.purchase_product_tc}
                       onChange={(e) =>
                         handleInputChange("purchase_product_tc", e.target.value)
@@ -840,12 +840,12 @@ const CreatePurchaseOrder = () => {
                     <label
                       className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
                     >
-                      Gst Notification
+                      GST Notification
                     </label>
                     <Textarea
                       type="text"
                       className="bg-white"
-                      placeholder="Enter Gst Notification"
+                      placeholder="Enter GST Notification"
                       value={formData.purchase_product_gst_notification}
                       onChange={(e) =>
                         handleInputChange(
@@ -859,12 +859,12 @@ const CreatePurchaseOrder = () => {
                     <label
                       className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
                     >
-                      Product Quality
+                       Quality
                     </label>
                     <Textarea
                       type="text"
                       className="bg-white"
-                      placeholder="Enter Product Quality"
+                      placeholder="Enter purchase order Quality"
                       value={formData.purchase_product_quality}
                       onChange={(e) =>
                         handleInputChange(
@@ -882,7 +882,7 @@ const CreatePurchaseOrder = () => {
             <div className="mb-2">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex flex-row items-center">
-                  <h2 className="text-xl font-semibold">Purchase Products </h2>
+                  <h2 className="text-xl font-semibold">Purchase Order </h2>
                 </div>
               </div>
 
