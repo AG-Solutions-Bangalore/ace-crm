@@ -51,6 +51,7 @@ const ViewContract = () => {
   useEffect(() => {
     const fetchAndConvertImage = async () => {
       try {
+      
         console.log("logourl before", contractData?.branch?.branch_letter_head);
 
         console.log("logourl fter", logoUrl);
