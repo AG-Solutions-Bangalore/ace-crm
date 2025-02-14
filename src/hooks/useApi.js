@@ -67,6 +67,32 @@ export const useFetchContractNos = (company_sort) => {
 
   return { ...query, prefetchNextContractNos };
 };
+export const useFetchProductNos = (company_sort) => {
+  const queryClient = useQueryClient();
+
+  const query = useQuery(
+    createQueryConfig(
+      ["productnoss", company_sort],
+      `/api/panel-fetch-purchase-product-no/${company_sort}`,
+      {
+        enabled: Boolean(company_sort),
+      }
+    )
+  );
+
+  const prefetchNextProductNos = async () => {
+    if (company_sort) {
+      await queryClient.prefetchQuery(
+        createQueryConfig(
+          ["productnoss", company_sort],
+          `/api/panel-fetch-purchase-product-no/${company_sort}`
+        )
+      );
+    }
+  };
+
+  return { ...query, prefetchNextProductNos };
+};
 
 export const useFetchPortofLoadings = () => {
   return useQuery(
@@ -164,4 +190,7 @@ export const useFetchUserType = () => {
 
 export const useFetchVendor = () => {
   return useQuery(createQueryConfig(["vendor"], "/api/panel-fetch-vendor"));
+};
+export const useFetchPurchaseProduct = () => {
+  return useQuery(createQueryConfig(["purchaseproduct"], "/api/panel-fetch-purchase-order-product"));
 };

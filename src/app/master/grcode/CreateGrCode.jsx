@@ -154,7 +154,7 @@ const CreateGrCode = () => {
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                Buyer <span className="text-red-500"></span>
+                Product <span className="text-red-500"></span>
               </label>
               <Select
                 value={formData.product_name}
