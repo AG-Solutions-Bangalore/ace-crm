@@ -70,6 +70,7 @@ import VendorEdit from "./app/master/vendor/VendorEdit";
 import CreatePurchaseOrder from "./app/purchaseOrder/CreatePurchaseOrder";
 
 import ViewPurchaseOrder from "./app/purchaseOrder/ViewPurchaseOrder";
+import BuyerList from "./app/master/buyer/BuyerList";
 
 const queryClient = new QueryClient();
 
@@ -115,6 +116,8 @@ function App() {
           <Route path="/master/state" element={<StateList />} />
           {/* Master -  Bank */}
           <Route path="/master/bank" element={<BankList />} />
+          {/* master -buyer  */}
+          <Route path="/master/buyer" element={<BuyerList />} />
           {/* Master Scheme  */}
           <Route path="/master/scheme" element={<SchemeList />} />
 

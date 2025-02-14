@@ -16,6 +16,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { Link, useLocation } from "react-router-dom";
+import React from "react";
 
 const itemVariants = {
   open: { opacity: 1, height: "auto", transition: { duration: 0.3 } },
@@ -28,21 +29,62 @@ const buttonVariants = {
 
 export function NavMain({ items }) {
   const location = useLocation();
+  
+  const handleLinkClick = (e) => {
+    const sidebarContent = document.querySelector(".sidebar-content");
+    if (sidebarContent) {
+      sessionStorage.setItem("sidebarScrollPosition", sidebarContent.scrollTop);
+    }
+  };
+
+  React.useEffect(() => {
+    const sidebarContent = document.querySelector(".sidebar-content");
+    const scrollPosition = sessionStorage.getItem("sidebarScrollPosition");
+
+    if (sidebarContent && scrollPosition) {
+      sidebarContent.scrollTop = parseInt(scrollPosition);
+    }
+  }, [location.pathname]);
+
   if (!items || items.length === 0) {
     return null;
   }
-  const hasActiveItems = items.length > 0;
-  if (!hasActiveItems) {
-    return null;
-  }
+
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Home</SidebarGroupLabel>
+        <SidebarGroupLabel>Home</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
-          const isParentActive = item.items?.some(
-            (subItem) => subItem.url === location.pathname
-          );
+          const hasSubItems = item.items && item.items.length > 0;
+          const isParentActive = hasSubItems 
+            ? item.items.some((subItem) => subItem.url === location.pathname)
+            : location.pathname === item.url;
+
+          if (!hasSubItems) {
+          
+            return (
+              <SidebarMenuItem key={item.title}>
+                <Link to={item.url} onClick={handleLinkClick}>
+                  <motion.div variants={buttonVariants} whileHover="hover">
+                    <SidebarMenuButton tooltip={item.title}>
+                      {item.icon && <item.icon />}
+                      <span
+                        className={`transition-colors duration-200 ${
+                          isParentActive
+                            ? "text-blue-500"
+                            : "hover:text-blue-500"
+                        }`}
+                      >
+                        {item.title}
+                      </span>
+                    </SidebarMenuButton>
+                  </motion.div>
+                </Link>
+              </SidebarMenuItem>
+            );
+          }
+
+         
           return (
             <Collapsible
               key={item.title}
@@ -64,7 +106,7 @@ export function NavMain({ items }) {
                       >
                         {item.title}
                       </span>
-                      <ChevronRight className="ml-auto  transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                     </SidebarMenuButton>
                   </motion.div>
                 </CollapsibleTrigger>
@@ -72,20 +114,19 @@ export function NavMain({ items }) {
                   as={motion.div}
                   variants={itemVariants}
                   initial="closed"
-                  animate={isParentActive ? "open" : "closed"}
+                  animate={isParentActive ? "open " : "closed"}
                 >
-                  <SidebarMenuSub>
+                  <SidebarMenuSub className="border-l border-blue-500">
                     {item.items?.map((subItem) => {
                       const isSubItemActive = location.pathname === subItem.url;
                       return (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
-                            <Link to={subItem.url}>
-                              {/* <span className="transition-colors duration-200 hover:text-blue-500">{subItem.title}</span> */}
+                            <Link to={subItem.url} onClick={handleLinkClick}>
                               <motion.span
                                 className={`transition-colors duration-200 ${
                                   isSubItemActive
-                                    ? "text-blue-500"
+                                    ? "text-blue-500 "
                                     : "hover:text-blue-500"
                                 }`}
                                 whileHover={{ scale: 1.05 }}
@@ -107,5 +148,3 @@ export function NavMain({ items }) {
     </SidebarGroup>
   );
 }
-//sajid
-

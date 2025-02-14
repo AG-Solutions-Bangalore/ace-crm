@@ -37,6 +37,12 @@ const ViewContract = () => {
         }
 
         const data = await response.json();
+        if (!data?.branch?.branch_letter_head) {
+          setLoading(true);
+          setError("Letter head data is missing");
+          return;
+        }
+        
         setContractData(data);
         setLoading(false);
       } catch (error) {
@@ -47,14 +53,16 @@ const ViewContract = () => {
 
     fetchContractData();
   }, [id]);
-  const logoUrl = `/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`;
+ 
   useEffect(() => {
+    if (!contractData?.branch?.branch_letter_head) {
+      setLoading(false);
+      return;
+    }
     const fetchAndConvertImage = async () => {
       try {
-      
-        console.log("logourl before", contractData?.branch?.branch_letter_head);
+        const logoUrl = `/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`;
 
-        console.log("logourl fter", logoUrl);
         const response = await fetch(logoUrl);
         const blob = await response.blob();
 

@@ -8,6 +8,13 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +26,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import { BankCreate } from "@/components/buttonIndex/ButtonComponents";
+import { useFetchCompanys } from "@/hooks/useApi";
 
 const CreateBank = () => {
   const [open, setOpen] = useState(false);
@@ -34,13 +42,22 @@ const CreateBank = () => {
     bank_branch: "",
   });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleInputChange = (e, key, value) => {
+    if (e && e.target) {
+      const { name, value } = e.target;
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [key]: value,
+      }));
+    }
   };
+
+  const { data: branchData } = useFetchCompanys();
 
   const handleSubmit = async () => {
     if (
@@ -61,17 +78,20 @@ const CreateBank = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.post(`${BASE_URL}/api/panel-create-bank`, formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.post(
+        `${BASE_URL}/api/panel-create-bank`,
+        formData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (response?.data.code == 200) {
-    
         toast({
           title: "Success",
-          description: response.data.msg
+          description: response.data.msg,
         });
-  
+
         setFormData({
           branch_short: "",
           bank_name: "",
@@ -82,7 +102,6 @@ const CreateBank = () => {
         await queryClient.invalidateQueries(["banks"]);
         setOpen(false);
       } else {
-       
         toast({
           title: "Error",
           description: response.data.msg,
@@ -131,6 +150,26 @@ const CreateBank = () => {
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
+          <div>
+            <Label htmlFor="branch_short">Branch Name</Label>
+            <Select
+              value={formData.branch_short}
+              onValueChange={(value) =>
+                handleInputChange(null, "branch_short", value)
+              }
+            >
+              <SelectTrigger className="bg-white">
+                <SelectValue placeholder="Select Branch" />
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                {branchData?.branch?.map((branch, index) => (
+                  <SelectItem key={index} value={branch.branch_short}>
+                    {branch.branch_short}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="grid gap-2">
             <Label htmlFor="bank_name">Bank Name</Label>
             <Input
@@ -139,17 +178,6 @@ const CreateBank = () => {
               value={formData.bank_name}
               onChange={handleInputChange}
               placeholder="Enter Bank name"
-            />
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="branch_short">Short Name</Label>
-            <Input
-              id="branch_short"
-              name="branch_short"
-              value={formData.branch_short}
-              onChange={handleInputChange}
-              placeholder="Enter Short name"
             />
           </div>
 
@@ -164,17 +192,17 @@ const CreateBank = () => {
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="bank_acc_no">Bank A/C Details</Label>
+            <Label htmlFor="bank_acc_no">Bank A/C No</Label>
             <Input
               id="bank_acc_no"
               name="bank_acc_no"
               value={formData.bank_acc_no}
               onChange={handleInputChange}
-              placeholder="Enter Bank A/C Details "
+              placeholder="Enter Bank A/C no "
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="bank_branch">Bank Branch Details</Label>
+            <Label htmlFor="bank_branch">Bank Branch </Label>
             <Input
               id="bank_branch"
               name="bank_branch"

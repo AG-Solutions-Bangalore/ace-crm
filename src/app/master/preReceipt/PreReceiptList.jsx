@@ -71,9 +71,9 @@ const PreReceiptList = () => {
       // Define columns for the table
       const columns = [
         {
-          accessorKey: "id",
-          header: "ID",
-          cell: ({ row }) => <div>{row.getValue("id")}</div>,
+          accessorKey: "index",
+          header: "Sl No",
+          cell: ({ row }) => <div>{row.index + 1}</div>,
         },
         {
           accessorKey: "prereceipts_name",

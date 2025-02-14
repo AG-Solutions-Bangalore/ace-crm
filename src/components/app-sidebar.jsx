@@ -91,6 +91,12 @@ export function AppSidebar({ ...props }) {
       ],
       navMain: [
         {
+          title: "Dashboard",
+          url: "/home",
+          icon: Frame,
+          isActive: false,
+        },
+        {
           title: "Master",
           url: "#",
           isActive: false,
@@ -107,6 +113,10 @@ export function AppSidebar({ ...props }) {
             {
               title: "Bank",
               url: "/master/bank",
+            },
+            {
+              title: "Buyer",
+              url: "/master/buyer",
             },
             {
               title: "Scheme",
@@ -191,6 +201,43 @@ export function AppSidebar({ ...props }) {
           ],
         },
         {
+          title: "Contract",
+          url: "/contract",
+          icon: Map,
+          isActive: false,
+        },
+        {
+          title: "Invoice",
+          url: "/invoice",
+          icon: Map,
+          isActive: false,
+        },
+        {
+          title: "Purchase Order",
+          url: "/purchase-order",
+          icon: Map,
+        },
+        {
+          title: "Payment",
+          url: "#",
+          icon: Settings2,
+          isActive: false,
+          items: [
+            {
+              title: "PaymentList",
+              url: "/payment-payment-list",
+            },
+            {
+              title: "PaymentPending",
+              url: "/payment-payment-pending",
+            },
+            {
+              title: "PaymentClose",
+              url: "/payment-payment-close",
+            },
+          ],
+        },
+        {
           title: "Reports",
           url: "#",
           icon: Settings2,
@@ -214,52 +261,33 @@ export function AppSidebar({ ...props }) {
             },
           ],
         },
-        {
-          title: "Payment",
-          url: "#",
-          icon: Settings2,
-          isActive: false,
-          items: [
-            {
-              title: "PaymentList",
-              url: "/payment-payment-list",
-            },
-            {
-              title: "PaymentPending",
-              url: "/payment-payment-pending",
-            },
-            {
-              title: "PaymentClose",
-              url: "/payment-payment-close",
-            },
-          ],
-        },
+       
       ],
   
-      projects: [
-        {
-          name: "Dashboard",
-          url: "/home",
-          icon: Frame,
-        },
+      // projects: [
+      //   {
+      //     name: "Dashboard",
+      //     url: "/home",
+      //     icon: Frame,
+      //   },
   
-        {
-          name: "Contract",
-          url: "/contract",
-          icon: Map,
-        },
-        {
-          name: "Invoice",
-          url: "/invoice",
-          icon: Map,
-        },
-        {
-          name: "Purchase Order",
-          url: "/purchase-order",
-          icon: Map,
-        },
+      //   {
+      //     name: "Contract",
+      //     url: "/contract",
+      //     icon: Map,
+      //   },
+      //   {
+      //     name: "Invoice",
+      //     url: "/invoice",
+      //     icon: Map,
+      //   },
+      //   {
+      //     name: "Purchase Order",
+      //     url: "/purchase-order",
+      //     icon: Map,
+      //   },
     
-      ],
+      // ],
       userManagement: [
       
         {
@@ -277,14 +305,14 @@ export function AppSidebar({ ...props }) {
 
   // Filter menu items based on user permissions
   const filteredNavMain = filterMenuItems(initialData.navMain, pageControl, userId);
-  const filteredProjects = filterMenuItems(initialData.projects.map(p => ({
-    title: p.name,
-    url: p.url
-  })), pageControl, userId).map(p => ({
-    name: p.title,
-    url: p.url,
-    icon: initialData.projects.find(orig => orig.name === p.title)?.icon || Frame
-  }));
+  // const filteredProjects = filterMenuItems(initialData.projects.map(p => ({
+  //   title: p.name,
+  //   url: p.url
+  // })), pageControl, userId).map(p => ({
+  //   name: p.title,
+  //   url: p.url,
+  //   icon: initialData.projects.find(orig => orig.name === p.title)?.icon || Frame
+  // }));
   const filteredUserManagement = filterMenuItems(initialData.userManagement.map(p => ({
     title: p.name,
     url: p.url
@@ -297,7 +325,7 @@ export function AppSidebar({ ...props }) {
   const data = {
     ...initialData,
     navMain: filteredNavMain,
-    projects: filteredProjects,
+    // projects: filteredProjects,
     userManagement: filteredUserManagement,
   };
 
@@ -306,8 +334,8 @@ export function AppSidebar({ ...props }) {
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
-      <SidebarContent>
-        <NavProjects projects={data.projects} />
+      <SidebarContent className="sidebar-content">
+        {/* <NavProjects projects={data.projects} /> */}
         <NavMain items={data.navMain} />
         <NavMainUser projects={data.userManagement} />
       </SidebarContent>
@@ -318,3 +346,6 @@ export function AppSidebar({ ...props }) {
     </Sidebar>
   );
 }
+
+
+//sajid 

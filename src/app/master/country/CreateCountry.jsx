@@ -61,17 +61,20 @@ const CreateCountry = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.post(`${BASE_URL}/api/panel-create-country`, formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.post(
+        `${BASE_URL}/api/panel-create-country`,
+        formData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (response?.data.code == 200) {
-    
         toast({
           title: "Success",
-          description: response.data.msg
+          description: response.data.msg,
         });
-  
+
         setFormData({
           country_name: "",
           country_port: "",
@@ -82,7 +85,6 @@ const CreateCountry = () => {
         await queryClient.invalidateQueries(["countries"]);
         setOpen(false);
       } else {
-       
         toast({
           title: "Error",
           description: response.data.msg,
@@ -161,6 +163,12 @@ const CreateCountry = () => {
               value={formData.country_dp}
               onChange={handleInputChange}
               placeholder="Enter DP Details "
+              type="tel"
+              onKeyPress={(e) => {
+                if (!/[0-9.]/.test(e.key) && e.key !== "Backspace") {
+                  e.preventDefault();
+                }
+              }}
             />
           </div>
           <div className="grid gap-2">
@@ -171,6 +179,12 @@ const CreateCountry = () => {
               value={formData.country_da}
               onChange={handleInputChange}
               placeholder="Enter DA Details "
+              type="tel"
+              onKeyPress={(e) => {
+                if (!/[0-9.]/.test(e.key) && e.key !== "Backspace") {
+                  e.preventDefault();
+                }
+              }}
             />
           </div>
           <div className="grid gap-2">
@@ -181,6 +195,12 @@ const CreateCountry = () => {
               value={formData.country_pol}
               onChange={handleInputChange}
               placeholder="Enter POL Details "
+              type="tel"
+              onKeyPress={(e) => {
+                if (!/[0-9.]/.test(e.key) && e.key !== "Backspace") {
+                  e.preventDefault();
+                }
+              }}
             />
           </div>
         </div>
