@@ -8,6 +8,13 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +26,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import { ProductDescriptionCreate } from "@/components/buttonIndex/ButtonComponents";
+import { useFetchProduct } from "@/hooks/useApi";
 
 const CreateProductDescription = () => {
   const [open, setOpen] = useState(false);
@@ -33,14 +41,21 @@ const CreateProductDescription = () => {
     product_hsn: "",
   });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleInputChange = (e, key, value) => {
+    if (e && e.target) {
+      const { name, value } = e.target;
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [key]: value,
+      }));
+    }
   };
-
+const { data: productData } = useFetchProduct();
   const handleSubmit = async () => {
     if (
       !formData.product_name ||
@@ -136,13 +151,24 @@ const CreateProductDescription = () => {
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="product_name">Product Name</Label>
-            <Input
-              id="product_name"
-              name="product_name"
+         
+            <Select
               value={formData.product_name}
-              onChange={handleInputChange}
-              placeholder="Enter Product  name"
-            />
+              onValueChange={(value) =>
+                handleInputChange(null, "product_name", value)
+              }
+            >
+              <SelectTrigger className="bg-white">
+                <SelectValue placeholder="Select product " />
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                {productData?.product?.map((product, index) => (
+                  <SelectItem key={index} value={product.product_name}>
+                    {product.product_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid gap-2">

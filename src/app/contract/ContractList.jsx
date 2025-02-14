@@ -125,7 +125,7 @@ const ContractList = () => {
       header: "Date",
       cell: ({ row }) => {
         const date = row.getValue("contract_date");
-        return moment(date).format("DDD-MMM-YYYY");
+        return moment(date).format("DD-MMM-YYYY");
       },
     },
     {

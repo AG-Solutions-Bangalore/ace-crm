@@ -71,6 +71,8 @@ import CreatePurchaseOrder from "./app/purchaseOrder/CreatePurchaseOrder";
 
 import ViewPurchaseOrder from "./app/purchaseOrder/ViewPurchaseOrder";
 import BuyerList from "./app/master/buyer/BuyerList";
+import MonthwisePurchaseForm from "./app/reports/monthwisePurchase/MonthwisePurchaseForm";
+import MonthwisePurchaseReport from "./app/reports/monthwisePurchase/MonthwisePurchaseReport";
 
 const queryClient = new QueryClient();
 
@@ -198,6 +200,10 @@ function App() {
             path="/report/sales-data-report"
             element={<SalesDataReport />}
           />
+
+          {/* report monthwise purchase  */}
+          <Route path="/report/monthwise-purchase-form" element={<MonthwisePurchaseForm />} />
+          <Route path="/report/monthwise-purchase-report" element={<MonthwisePurchaseReport />} />
 
           {/* //payment */}
           <Route path="/payment-payment-list" element={<PaymentList />} />

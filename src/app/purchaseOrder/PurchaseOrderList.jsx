@@ -60,32 +60,26 @@ import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import { useToast } from "@/hooks/use-toast";
 import { ButtonConfig } from "@/config/ButtonConfig";
-import {
-  ContractCreate,
-  ContractDelete,
-  ContractEdit,
-  ContractView,
-} from "@/components/buttonIndex/ButtonComponents";
 const PurchaseOrderList = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteContractId, setDeleteContractId] = useState(null);
   const { toast } = useToast();
   const {
-    data: contract,
+    data: purchaseProducts,
     isLoading,
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["contract"],
+    queryKey: ["purchaseProducts"],
     queryFn: async () => {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `${BASE_URL}/api/panel-fetch-contract-list`,
+        `${BASE_URL}/api/panel-fetch-purchase-product-list`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      return response.data.contract;
+      return response.data.purchaseProduct;
     },
   });
 
@@ -121,47 +115,35 @@ const PurchaseOrderList = () => {
   // Define columns for the table
   const columns = [
     {
-      accessorKey: "contract_date",
+      accessorKey: "purchase_product_date",
       header: "Date",
       cell: ({ row }) => {
-        const date = row.getValue("contract_date");
-        return moment(date).format("DDD-MMM-YYYY");
+        const date = row.getValue("purchase_product_date");
+        return moment(date).format("DD-MMM-YYYY");
       },
     },
     {
-      accessorKey: "branch_short",
-      header: "Company",
-      cell: ({ row }) => <div>{row.getValue("branch_short")}</div>,
+      accessorKey: "purchase_product_ref",
+      header: "Ref",
+      cell: ({ row }) => <div>{row.getValue("purchase_product_ref")}</div>,
     },
 
+   
     {
-      accessorKey: "contract_no",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Contract No
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => <div>{row.getValue("contract_no")}</div>,
+      accessorKey: "purchase_product_seller",
+      header: "Seller",
+      cell: ({ row }) => <div>{row.getValue("purchase_product_seller")}</div>,
     },
     {
-      accessorKey: "contract_buyer",
-      header: "Buyer Name",
-      cell: ({ row }) => <div>{row.getValue("contract_buyer")}</div>,
+      accessorKey: "purchase_product_broker",
+      header: "Broker",
+      cell: ({ row }) => <div>{row.getValue("purchase_product_broker")}</div>,
     },
     {
-      accessorKey: "contract_consignee",
-      header: "Consignee Name",
-      cell: ({ row }) => <div>{row.getValue("contract_consignee")}</div>,
-    },
-    {
-      accessorKey: "contract_status",
+      accessorKey: "purchase_product_status",
       header: "Status",
       cell: ({ row }) => {
-        const status = row.getValue("contract_status");
+        const status = row.getValue("purchase_product_status");
 
         const statusColors = {
           PENDING: "bg-blue-100 text-blue-800",
@@ -185,25 +167,23 @@ const PurchaseOrderList = () => {
       id: "actions",
       header: "Action",
       cell: ({ row }) => {
-        const contractId = row.original.id;
+        const purchaseId = row.original.id;
 
         return (
           <div className="flex flex-row">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  {/* <Button
+                  <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => navigate(`/view-contract/${contractId}`)}
+                    onClick={() => navigate(`/view-purchase-order`)}
                   >
                     <Eye className="h-4 w-4" />
-                  </Button> */}
-                  <ContractView
-                    onClick={() => navigate(`/view-purchase-order`)}
-                  ></ContractView>
+                  </Button>
+                 
                 </TooltipTrigger>
-                <TooltipContent>View Contract</TooltipContent>
+                <TooltipContent>View Purchase</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
@@ -214,7 +194,7 @@ const PurchaseOrderList = () => {
 
   // Create the table instance
   const table = useReactTable({
-    data: contract || [],
+    data: purchaseProducts || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -237,28 +217,26 @@ const PurchaseOrderList = () => {
     },
   });
 
-  // Render loading state
   if (isLoading) {
     return (
       <Page>
         <div className="flex justify-center items-center h-full">
           <Button disabled>
             <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading Contract
+            Loading Purchase Order
           </Button>
         </div>
       </Page>
     );
   }
 
-  // Render error state
   if (isError) {
     return (
       <Page>
         <Card className="w-full max-w-md mx-auto mt-10">
           <CardHeader>
             <CardTitle className="text-destructive">
-              Error Fetching Contract
+              Error Fetching Purchase Order
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -271,7 +249,7 @@ const PurchaseOrderList = () => {
     );
   }
   return (
-    <Page>
+    <Page> 
            <div className="w-full p-4">
                 <div className="flex text-left text-2xl text-gray-800 font-[400]">
                   Purchase Order List
@@ -281,7 +259,7 @@ const PurchaseOrderList = () => {
                   <div className="relative w-72">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
                     <Input
-                      placeholder="Search contract..."
+                      placeholder="Search purchase order..."
                       value={table.getState().globalFilter || ""}
                       onChange={(event) => table.setGlobalFilter(event.target.value)}
                       className="pl-8 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-gray-200"
@@ -379,7 +357,7 @@ const PurchaseOrderList = () => {
                 {/* row slection and pagintaion button  */}
                 <div className="flex items-center justify-end space-x-2 py-4">
                   <div className="flex-1 text-sm text-muted-foreground">
-                    Total Contract : &nbsp;
+                    Total Purchase Order : &nbsp;
                     {table.getFilteredRowModel().rows.length}
                   </div>
                   <div className="space-x-2">
