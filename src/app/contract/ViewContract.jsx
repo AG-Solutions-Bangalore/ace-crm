@@ -59,9 +59,9 @@ const ViewContract = () => {
       setLoading(false);
       return;
     }
-    const fetchAndConvertImage = async () => {
+    const fetchAndConvertImage = async () => { 
       try {
-        const logoUrl = `https://exportbiz.in/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`;
+        const logoUrl = `/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`;
 
         const response = await fetch(logoUrl);
         const blob = await response.blob();

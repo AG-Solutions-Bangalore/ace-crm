@@ -259,6 +259,10 @@ export function AppSidebar({ ...props }) {
               title: "Sales Data",
               url: "/report/sales-data-form",
             },
+            {
+              title: "Monthwise Purchase",
+              url: "/report/monthwise-purchase-form",
+            },
           ],
         },
        
