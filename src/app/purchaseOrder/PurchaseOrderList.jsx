@@ -316,13 +316,13 @@ const PurchaseOrderList = () => {
                         })}
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  {/* <Button
+                  <Button
                     variant="default"
                     className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
                     onClick={() => navigate("/create-purchase-order")}
                   >
                     <SquarePlus className="h-4 w-4" /> Purchase Order
-                  </Button> */}
+                  </Button>
               
                 </div>
                 {/* table  */}

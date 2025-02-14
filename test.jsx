@@ -1,20 +1,37 @@
+branch_short
 
+branch_name
+branch_address
+purchase_product_year
+purchase_product_date
+purchase_product_no 
 
+purchase_product_ref
 
-vendor_city
-vendor_state 
-vendor_pincode
-vendor_contact_person
-vendor_mobile1
-vendor_mobile2
-vendor_landline
-vendor_fax
-vendor_remarks
-vendor_bank
-vendor_branch
-vendor_account_name
-vendor_account_no
-vendor_ifscode
-vendor_tin_no
-vendor_gst_no
-vendor_product  
+purchase_product_seller
+
+purchase_product_seller_add
+
+purchase_product_seller_gst
+
+purchase_product_seller_contact
+
+purchase_product_broker
+
+purchase_product_broker_add
+
+purchase_product_delivery_date
+purchase_product_delivery_at
+purchase_product_payment_terms
+purchase_product_tc
+purchase_product_gst_notification
+purchase_product_quality
+purchase_product_data[
+    
+    purchase_productSub_name,
+    purchase_productSub_name_hsn,purchase_productSub_description,purchase_productSub_rateInMt,
+    purchase_productSub_qntyInMt,
+    purchase_productSub_packing,
+    purchase_productSub_marking
+
+]

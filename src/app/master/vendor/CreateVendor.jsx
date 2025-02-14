@@ -18,23 +18,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useFetchProduct, useFetchState } from "@/hooks/useApi";
+import BASE_URL from "@/config/BaseUrl";
 
 
 // Validation Schema
 const branchFormSchema = z.object({
-    vendor_alias: z.string().min(1, "Branch short name is required"),
-    vendor_prefix: z.string().min(1, "Branch name is required"),
-    vendor_name: z.string().min(1, "Branch short name is required"),
-    vendor_address: z.string().min(1, "Branch address is required"),
-    vendor_city: z.string().optional(),
-    vendor_state: z.string().min(1, "IEC code is required"),
-    vendor_pincode: z.string().optional(),
-    vendor_contact_person: z.string().min(1, "GST number is required"),
-    vendor_mobile1: z.string().min(1, "State is required"),
-    vendor_mobile2: z.string().min(1, "State Code is required"),
-    vendor_landline: z.string().min(1, "State Short is required"),
+    vendor_alias: z.string().min(1, "Alias is required"),
+    vendor_prefix: z.string().min(1, "Prefix is required"),
+    vendor_name: z.string().min(1, "Name is required"),
+    vendor_address: z.string().min(1, "Address is required"),
+    vendor_city: z.string().min(1, "City is required"),
+    vendor_state: z.string().min(1, "State is required"),
+    vendor_pincode: z.string().min(1, "Pincode is required"),
+    vendor_contact_person: z.string().min(1, "Contact person is required"),
+    vendor_mobile1: z.string().min(1, "Mobile 1 is required"),
+    vendor_mobile2: z.string().optional(),
+    vendor_landline: z.string().optional(),
     vendor_fax: z.string().optional(),
-    vendor_remarks: z.string().min(1, "PAN number is required"),
+    vendor_remarks: z.string().optional(),
     vendor_bank: z.string().optional(),
     vendor_branch: z.string().optional(),
     vendor_account_name: z.string().optional(),
@@ -282,48 +283,21 @@ const CreateVendor = () => {
                      />
                    </div>
 
-                   
+
                    <div>
                      <label
                        className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                      >
-                       GST Number <span className="text-red-500">*</span>
+                       City <span className="text-red-500">*</span>
                      </label>
                      <Input
                        className="bg-white"
-                       value={formData.branch_gst}
-                       onChange={(e) => handleInputChange(e, "branch_gst")}
-                       placeholder="Enter GST number"
+                       value={formData.vendor_city}
+                       onChange={(e) => handleInputChange(e, "vendor_city")}
+                       placeholder="Enter city"
                      />
                    </div>
-     
-                   <div>
-                     <label
-                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                     >
-                       IEC Code <span className="text-red-500">*</span>
-                     </label>
-                     <Input
-                       className="bg-white"
-                       value={formData.branch_iec}
-                       onChange={(e) => handleInputChange(e, "branch_iec")}
-                       placeholder="Enter IEC code"
-                     />
-                   </div>
-                   <div>
-                     <label
-                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                     >
-                       PAN Number <span className="text-red-500">*</span>
-                     </label>
-                     <Input
-                       className="bg-white"
-                       value={formData.branch_pan_no}
-                       onChange={(e) => handleInputChange(e, "branch_pan_no")}
-                       placeholder="Enter PAN number"
-                     />
-                   </div>
-     
+
                    <div>
                      <label
                        className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
@@ -331,9 +305,9 @@ const CreateVendor = () => {
                        State <span className="text-red-500">*</span>
                      </label>
                      <Select
-                       value={formData.branch_state}
+                       value={formData.vendor_state}
                        onValueChange={(value) =>
-                         handleInputChange({ target: { value } }, "branch_state")
+                         handleInputChange({ target: { value } }, "vendor_state")
                        }
                      >
                        <SelectTrigger className="bg-white">
@@ -348,216 +322,75 @@ const CreateVendor = () => {
                        </SelectContent>
                      </Select>
                    </div>
-     
+
+
+
                    <div>
                      <label
                        className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                      >
-                       State Code <span className="text-red-500">*</span>
+                       Pincode <span className="text-red-500">*</span>
                      </label>
                      <Input
                        className="bg-white"
-                       value={formData.branch_state_no}
-                       onChange={(e) => handleInputChange(e, "branch_state_no")}
-                       placeholder="Enter state code"
+                       value={formData.vendor_pincode}
+                       onChange={(e) => handleInputChange(e, "vendor_pincode")}
+                       placeholder="Enter pincode"
                      />
                    </div>
                    <div>
                      <label
                        className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                      >
-                       State Short <span className="text-red-500">*</span>
+                      Gst No
                      </label>
                      <Input
                        className="bg-white"
-                       value={formData.branch_state_short}
-                       onChange={(e) => handleInputChange(e, "branch_state_short")}
-                       placeholder="Enter state short"
+                       value={formData.vendor_gst_no}
+                       onChange={(e) => handleInputChange(e, "vendor_gst_no")}
+                       placeholder="Enter gst no"
+                     />
+                   </div>
+                   <div>
+                     <label
+                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                     >
+                       Contact Person <span className="text-red-500">*</span>
+                     </label>
+                     <Input
+                       className="bg-white"
+                       value={formData.vendor_contact_person}
+                       onChange={(e) => handleInputChange(e, "vendor_contact_person")}
+                       placeholder="Enter contact person"
                      />
                    </div>
      
+                 
+     
                    <div>
                      <label
                        className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                      >
-                       APEDA Details
+                       Mobile 1 <span className="text-red-500">*</span>
                      </label>
                      <Input
                        className="bg-white"
-                       value={formData.branch_apeda}
-                       onChange={(e) => handleInputChange(e, "branch_apeda")}
-                       placeholder="Enter APEDA details"
+                       value={formData.vendor_mobile1}
+                       onChange={(e) => handleInputChange(e, "vendor_mobile1")}
+                       placeholder="Enter mobile 1"
                      />
                    </div>
-     
                    <div>
                      <label
                        className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                      >
-                       Spice Board Details
+                       Mobile 2 <span className="text-red-500">*</span>
                      </label>
                      <Input
                        className="bg-white"
-                       value={formData.branch_spice_board}
-                       onChange={(e) => handleInputChange(e, "branch_spice_board")}
-                       placeholder="Enter spice board details"
-                     />
-                   </div>
-     
-                   <div>
-                     <label
-                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                     >
-                       Scheme Details
-                     </label>
-                     <Select
-                       value={formData.branch_scheme}
-                       onValueChange={(value) =>
-                         handleInputChange({ target: { value } }, "branch_scheme")
-                       }
-                     >
-                       <SelectTrigger className="bg-white">
-                         <SelectValue placeholder="Enter scheme details" />
-                       </SelectTrigger>
-                       <SelectContent className="bg-white">
-                         {schemeData?.scheme?.map((item) => (
-                           <SelectItem
-                             value={item.scheme_short}
-                             key={item.scheme_short}
-                           >
-                             {item.scheme_short}
-                           </SelectItem>
-                         ))}
-                       </SelectContent>
-                     </Select>
-                   </div>
-     
-                   <div>
-                     <label
-                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                     >
-                       ECGC/NCB Details
-                     </label>
-                     <Input
-                       className="bg-white"
-                       value={formData.branch_ecgcncb}
-                       onChange={(e) => handleInputChange(e, "branch_ecgcncb")}
-                       placeholder="Enter ECGC/NCB details"
-                     />
-                   </div>
-     
-                   <div>
-                     <label
-                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                     >
-                       ECGC Policy Details
-                     </label>
-                     <Input
-                       className="bg-white"
-                       value={formData.branch_ecgc_policy}
-                       onChange={(e) => handleInputChange(e, "branch_ecgc_policy")}
-                       placeholder="Enter ECGC policy details"
-                     />
-                   </div>
-     
-                   <div>
-                     <label
-                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                     >
-                       Registration Number
-                     </label>
-                     <Input
-                       className="bg-white"
-                       value={formData.branch_reg_no}
-                       onChange={(e) => handleInputChange(e, "branch_reg_no")}
-                       placeholder="Enter registration number"
-                     />
-                   </div>
-     
-                   <div>
-                     <label
-                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                     >
-                       Port of Loading
-                     </label>
-                     <Select
-                       value={formData.branch_port_of_loading}
-                       onValueChange={(value) =>
-                         handleInputChange(
-                           { target: { value } },
-                           "branch_port_of_loading"
-                         )
-                       }
-                     >
-                       <SelectTrigger className="bg-white">
-                         <SelectValue placeholder="Enter port of loading" />
-                       </SelectTrigger>
-                       <SelectContent className="bg-white">
-                         {portofLoadingData?.portofLoading?.map((item) => (
-                           <SelectItem
-                             value={item.portofLoading}
-                             key={item.portofLoading}
-                           >
-                             {item.portofLoading}
-                           </SelectItem>
-                         ))}
-                       </SelectContent>
-                     </Select>
-                   </div>
-     
-                   <div>
-                     <label
-                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                     >
-                       Signatory Name 1
-                     </label>
-                     <Input
-                       className="bg-white"
-                       value={formData.branch_sign_name}
-                       onChange={(e) => handleInputChange(e, "branch_sign_name")}
-                       placeholder="Enter signatory name 1"
-                     />
-                   </div>
-     
-                   <div>
-                     <label
-                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                     >
-                       Signatory Number 1
-                     </label>
-                     <Input
-                       className="bg-white"
-                       value={formData.branch_sign_no}
-                       onChange={(e) => handleInputChange(e, "branch_sign_no")}
-                       placeholder="Enter signatory number 1"
-                     />
-                   </div>
-     
-                   <div>
-                     <label
-                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                     >
-                       Signatory Name 2
-                     </label>
-                     <Input
-                       className="bg-white"
-                       value={formData.branch_sign_name1}
-                       onChange={(e) => handleInputChange(e, "branch_sign_name1")}
-                       placeholder="Enter signatory Name 2"
-                     />
-                   </div>
-     
-                   <div>
-                     <label
-                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                     >
-                       Signatory No 2
-                     </label>
-                     <Input
-                       className="bg-white"
-                       value={formData.branch_sign_no1}
-                       onChange={(e) => handleInputChange(e, "branch_sign_no1")}
-                       placeholder="Enter signatory No 2"
+                       value={formData.vendor_mobile2}
+                       onChange={(e) => handleInputChange(e, "vendor_mobile2")}
+                       placeholder="Enter mobile 2"
                      />
                    </div>
      
@@ -565,13 +398,13 @@ const CreateVendor = () => {
                      <label
                        className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                      >
-                       Signatory Name 2
+                       Landline
                      </label>
                      <Input
                        className="bg-white"
-                       value={formData.branch_sign_name2}
-                       onChange={(e) => handleInputChange(e, "branch_sign_name2")}
-                       placeholder="Enter signatory Name 2"
+                       value={formData.vendor_landline}
+                       onChange={(e) => handleInputChange(e, "vendor_landline")}
+                       placeholder="Enter landline"
                      />
                    </div>
      
@@ -579,15 +412,188 @@ const CreateVendor = () => {
                      <label
                        className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                      >
-                       Signatory No 2
+                      Fax
                      </label>
                      <Input
                        className="bg-white"
-                       value={formData.branch_sign_no2}
-                       onChange={(e) => handleInputChange(e, "branch_sign_no2")}
-                       placeholder="Enter signatory No 2"
+                       value={formData.vendor_fax}
+                       onChange={(e) => handleInputChange(e, "vendor_fax")}
+                       placeholder="Enter fax"
                      />
                    </div> */}
+
+
+<div>
+                     <label
+                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                     >
+                       Product
+                     </label>
+                     <Select
+                       value={formData.vendor_product}
+                       onValueChange={(value) =>
+                         handleInputChange({ target: { value } }, "vendor_product")
+                       }
+                     >
+                       <SelectTrigger className="bg-white">
+                         <SelectValue placeholder="Enter product" />
+                       </SelectTrigger>
+                       <SelectContent className="bg-white">
+                         {productData?.product?.map((item) => (
+                           <SelectItem
+                             value={item.product_name}
+                             key={item.product_name}
+                           >
+                             {item.product_name}
+                           </SelectItem>
+                         ))}
+                       </SelectContent>
+                     </Select>
+                   </div>
+
+                   <div className="col-span-1 lg:col-span-3">
+                     <label
+                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                     >
+                      Remark
+                     </label>
+                     <Input
+                       className="bg-white"
+                       value={formData.vendor_remarks}
+                       onChange={(e) => handleInputChange(e, "vendor_remarks")}
+                       placeholder="Enter remark"
+                     />
+                   </div>
+                   <div className=" col-span-4 lg:col-span-4">
+                    <h1 className="border-b-2 border-white text-xl">Bank Details</h1>
+                   </div>
+                   <div>
+                     <label
+                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                     >
+                      Bank
+                     </label>
+                     <Input
+                       className="bg-white"
+                       value={formData.vendor_bank}
+                       onChange={(e) => handleInputChange(e, "vendor_bank")}
+                       placeholder="Enter bank"
+                     />
+                   </div>
+     
+                   {/* <div>
+                     <label
+                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                     >
+                      Branch
+                     </label>
+                     <Input
+                       className="bg-white"
+                       value={formData.vendor_branch}
+                       onChange={(e) => handleInputChange(e, "vendor_branch")}
+                       placeholder="Enter branch"
+                     />
+                   </div> */} 
+     <div>
+                     <label
+                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                     >
+                      Account No
+                     </label>
+                     <Input
+                       className="bg-white"
+                       value={formData.vendor_account_no}
+                       onChange={(e) => handleInputChange(e, "vendor_account_no")}
+                       placeholder="Enter account no"
+                     />
+                   </div>
+                   <div>
+                     <label
+                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                     >
+                      Account Name
+                     </label>
+                     <Input
+                       className="bg-white"
+                       value={formData.vendor_account_name}
+                       onChange={(e) => handleInputChange(e, "vendor_account_name")}
+                       placeholder="Enter account name"
+                     />
+                   </div>
+
+
+                   
+                   <div>
+                     <label
+                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                     >
+                      Ifs Code
+                     </label>
+                     <Input
+                       className="bg-white"
+                       value={formData.vendor_ifscode}
+                       onChange={(e) => handleInputChange(e, "vendor_ifscode")}
+                       placeholder="Enter ifscode"
+                     />
+                   </div>
+
+
+                   {/* <div>
+                     <label
+                       className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                     >
+                      Tin No
+                     </label>
+                     <Input
+                       className="bg-white"
+                       value={formData.vendor_tin_no}
+                       onChange={(e) => handleInputChange(e, "vendor_tin_no")}
+                       placeholder="Enter tin no"
+                     />
+                   </div> */}
+               
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                   
+     
                  </div>
                </CardContent>
              </Card>
@@ -600,7 +606,7 @@ const CreateVendor = () => {
                  className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
                  disabled={createBranchMutation.isPending}
                >
-                 {createBranchMutation.isPending ? "Submitting..." : "Create Branch"}
+                 {createBranchMutation.isPending ? "Submitting..." : "Create Vendor"}
                </Button>
              </div>
            </form>

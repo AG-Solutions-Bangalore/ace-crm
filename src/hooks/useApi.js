@@ -158,3 +158,10 @@ export const useFetchCompanies = () => {
 export const useFetchUserType = () => {
   return useQuery(createQueryConfig(["usertype"], "/api/panel-fetch-usertypes"));
 };
+
+
+// create purchase order
+
+export const useFetchVendor = () => {
+  return useQuery(createQueryConfig(["vendor"], "/api/panel-fetch-vendor"));
+};

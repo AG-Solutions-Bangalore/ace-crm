@@ -47,12 +47,12 @@ const ViewContract = () => {
 
     fetchContractData();
   }, [id]);
-
+  const logoUrl = `/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`;
   useEffect(() => {
     const fetchAndConvertImage = async () => {
 
       try {
-        const logoUrl = `/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`;
+      
         const response = await fetch(logoUrl);
         const blob = await response.blob();
 
