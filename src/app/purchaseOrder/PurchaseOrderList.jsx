@@ -67,7 +67,7 @@ import {
   ContractView,
 } from "@/components/buttonIndex/ButtonComponents";
 const PurchaseOrderList = () => {
-    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteContractId, setDeleteContractId] = useState(null);
   const { toast } = useToast();
   const {
@@ -189,7 +189,6 @@ const PurchaseOrderList = () => {
 
         return (
           <div className="flex flex-row">
-         
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -201,14 +200,12 @@ const PurchaseOrderList = () => {
                     <Eye className="h-4 w-4" />
                   </Button> */}
                   <ContractView
-                    onClick={() => navigate(`/view-contract/${contractId}`)}
+                    onClick={() => navigate(`/view-purchase-order`)}
                   ></ContractView>
                 </TooltipTrigger>
                 <TooltipContent>View Contract</TooltipContent>
               </Tooltip>
             </TooltipProvider>
-
-          
           </div>
         );
       },
@@ -407,7 +404,7 @@ const PurchaseOrderList = () => {
               </div>
              
     </Page>
-  )
-}
+  );
+};
 
-export default PurchaseOrderList
+export default PurchaseOrderList;
