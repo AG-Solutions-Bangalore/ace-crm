@@ -82,6 +82,17 @@ const CreatePage = () => {
           ]
         },
         {
+          title: "Purchase",
+          url: "#",
+          items: [
+            { title: "Purchase Order", url: "/purchase-order" },
+            { title: "Purchase", url: "/purchase/market-purchase" },
+            { title: "Production", url: "/purchase/market-production" },
+            { title: "Processing", url: "/purchase/market-processing" },
+            { title: "Dispacth", url: "/purchase/market-dispatch" }
+          ]
+        },
+        {
           title: "Payment",
           url: "#",
           items: [

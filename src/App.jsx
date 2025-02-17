@@ -75,11 +75,15 @@ import MonthwisePurchaseForm from "./app/reports/monthwisePurchase/MonthwisePurc
 import MonthwisePurchaseReport from "./app/reports/monthwisePurchase/MonthwisePurchaseReport";
 import SessionTimeoutTracker from "./components/SessionTimeoutTracker/SessionTimeoutTracker";
 import BASE_URL from "./config/BaseUrl";
+import MarketDispatch from "./app/purchase/market-dispatch/MarketDispatch";
+import MarketProcessing from "./app/purchase/marketProcessing/MarketProcessing";
+import MarketProduction from "./app/purchase/marketProduction/MarketProduction";
+import MarketPurchase from "./app/purchase/marketPurchase/MarketPurchase";
 
 const queryClient = new QueryClient();
 
 function App() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const handleLogout = async () => {
     try {
       const response = await fetch(`${BASE_URL}/api/panel-logout`, {
@@ -103,10 +107,10 @@ function App() {
     <>
       <QueryClientProvider client={queryClient}>
         <Toaster />
-        <SessionTimeoutTracker 
-        expiryTime="2025-02-17 10:55:47"
-        onLogout={handleLogout}
-      />
+        <SessionTimeoutTracker
+          expiryTime="2025-02-18 11:55:47"
+          onLogout={handleLogout}
+        />
         <Routes>
           {/* Login Page        */}
           <Route path="/" element={<Login />} />
@@ -129,11 +133,37 @@ function App() {
           />
           <Route path="/view-invoice/:id" element={<InvoiceTabs />} />
 
-          {/* purchase order  */}
-
-  <Route path="/purchase-order" element={<PurchaseOrderList />} />
-  <Route path="/create-purchase-order" element={<CreatePurchaseOrder />} />
+          {/* purchase   */}
+          {/* pruchase - purchase order  */}
+          <Route path="/purchase-order" element={<PurchaseOrderList />} />
+          <Route
+            path="/create-purchase-order"
+            element={<CreatePurchaseOrder />}
+          />
           <Route path="/view-purchase-order" element={<ViewPurchaseOrder />} />
+
+          {/* purchase -market purchase  */}
+          <Route
+            path="/purchase/market-purchase"
+            element={<MarketPurchase />}
+          />
+          {/* purchase -market production */}
+          <Route
+            path="/purchase/market-production"
+            element={<MarketProduction />}
+          />
+          {/* purchase -market processing  */}
+          <Route
+            path="/purchase/market-processing"
+            element={<MarketProcessing />}
+          />
+          {/* purchase -market dispatch  */}
+
+          <Route
+            path="/purchase/market-dispatch"
+            element={<MarketDispatch />}
+          />
+
           {/* Master - Branch  */}
 
           <Route path="/master/branch" element={<BranchList />} />
@@ -194,16 +224,20 @@ function App() {
           <Route path="/master/prerecepits" element={<PreReceiptList />} />
           {/* master - v */}
           <Route path="/master/vendor" element={<VendorList />} />
-          <Route path="/master/vendor/create-vendor" element={<CreateVendor />} />
-          <Route path="/master/vendor/edit-vendor/:id" element={<VendorEdit />} />
-         
-          {/* master purchase order  */}
+          <Route
+            path="/master/vendor/create-vendor"
+            element={<CreateVendor />}
+          />
+          <Route
+            path="/master/vendor/edit-vendor/:id"
+            element={<VendorEdit />}
+          />
+
+          {/* master purchase product  */}
           <Route
             path="/master/purchase-product"
             element={<PurchaseProductList />}
           />
-
-          {/* //Reports */}
 
           {/* Reports -Buyer  */}
           <Route path="/report/buyer-report" element={<Buyer />} />
@@ -228,8 +262,14 @@ function App() {
           />
 
           {/* report monthwise purchase  */}
-          <Route path="/report/monthwise-purchase-form" element={<MonthwisePurchaseForm />} />
-          <Route path="/report/monthwise-purchase-report" element={<MonthwisePurchaseReport />} />
+          <Route
+            path="/report/monthwise-purchase-form"
+            element={<MonthwisePurchaseForm />}
+          />
+          <Route
+            path="/report/monthwise-purchase-report"
+            element={<MonthwisePurchaseReport />}
+          />
 
           {/* //payment */}
           <Route path="/payment-payment-list" element={<PaymentList />} />
