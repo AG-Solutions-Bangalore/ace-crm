@@ -146,9 +146,9 @@ const PurchaseOrderList = () => {
         const status = row.getValue("purchase_product_status");
 
         const statusColors = {
-          PENDING: "bg-blue-100 text-blue-800",
-          OPEN: "bg-green-100 text-green-800",
-          CLOSE: "bg-red-100 text-red-800",
+          Pending: "bg-blue-100 text-blue-800",
+          Cancel: "bg-green-100 text-green-800",
+          Close: "bg-red-100 text-red-800",
         };
 
         return (
@@ -162,7 +162,7 @@ const PurchaseOrderList = () => {
         );
       },
     },
-
+ 
     {
       id: "actions",
       header: "Action",

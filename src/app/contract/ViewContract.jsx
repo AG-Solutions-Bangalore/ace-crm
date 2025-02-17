@@ -10,6 +10,7 @@ import { getTodayDate } from "@/utils/currentDate";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ReactToPrint, { useReactToPrint } from "react-to-print";
 import moment from "moment";
+import ContractActions from "./ContractActions";
 
 const ViewContract = () => {
   const containerRef = useRef();
@@ -894,7 +895,7 @@ const ViewContract = () => {
           </div>
         </div>
         <div className=" w-[15%] flex flex-col  border border-gray-200  h-screen rounded-lg  p-2 ">
-          <Tabs defaultValue="header" className="w-full ">
+          {/* <Tabs defaultValue="header" className="w-full ">
             <TabsList className="grid w-full grid-cols-1">
               <TabsTrigger value="header">Actions</TabsTrigger>
             </TabsList>
@@ -958,7 +959,16 @@ const ViewContract = () => {
                 </Button>
               </div>
             </TabsContent>
-          </Tabs>
+          </Tabs> */}
+        
+  <ContractActions 
+    handlPrintPdf={handlPrintPdf}
+    handleSaveAsPdf={handleSaveAsPdf}
+    whatsappPdf={whatsappPdf}
+    handleSaveAsWidthoutHeaderPdf={handleSaveAsWidthoutHeaderPdf}
+    whatsappWithoutHeaderPdf={whatsappWithoutHeaderPdf}
+  />
+
         </div>
       </div>
     </Page>
