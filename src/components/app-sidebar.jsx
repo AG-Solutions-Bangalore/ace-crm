@@ -212,10 +212,38 @@ export function AppSidebar({ ...props }) {
           icon: Map,
           isActive: false,
         },
+        // {
+        //   title: "Purchase Order",
+        //   url: "/purchase-order",
+        //   icon: Map,
+        // },
         {
-          title: "Purchase Order",
-          url: "/purchase-order",
-          icon: Map,
+          title: "Purchase",
+          url: "#",
+          icon: Settings2,
+          isActive: false,
+          items: [
+            {
+              title: "Purchase Order",
+              url: "/purchase-order",
+            },
+            {
+              title: "Purchase",
+              url: "/purchase/market-purchase",
+            },
+            {
+              title: "Production",
+              url: "/purchase/market-production",
+            },
+            {
+              title: "Processing",
+              url: "/purchase/market-processing",
+            },
+            {
+              title: "Dispacth",
+              url: "/purchase/market-dispatch",
+            },
+          ],
         },
         {
           title: "Payment",
