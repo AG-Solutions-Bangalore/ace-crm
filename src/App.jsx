@@ -1,5 +1,5 @@
 import Login from "./app/auth/Login";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import { Toaster } from "./components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Home from "./app/home/Home";
@@ -73,14 +73,40 @@ import ViewPurchaseOrder from "./app/purchaseOrder/ViewPurchaseOrder";
 import BuyerList from "./app/master/buyer/BuyerList";
 import MonthwisePurchaseForm from "./app/reports/monthwisePurchase/MonthwisePurchaseForm";
 import MonthwisePurchaseReport from "./app/reports/monthwisePurchase/MonthwisePurchaseReport";
+import SessionTimeoutTracker from "./components/SessionTimeoutTracker/SessionTimeoutTracker";
+import BASE_URL from "./config/BaseUrl";
 
 const queryClient = new QueryClient();
 
 function App() {
+  const navigate = useNavigate()
+  const handleLogout = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/panel-logout`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await response.json();
+      console.log("Logout successful:", result);
+      localStorage.clear();
+      navigate("/");
+    } catch (error) {
+      console.error("Logout failed:", error.message);
+    }
+  };
+
   return (
     <>
       <QueryClientProvider client={queryClient}>
         <Toaster />
+        <SessionTimeoutTracker 
+        expiryTime="2025-02-17 10:55:47"
+        onLogout={handleLogout}
+      />
         <Routes>
           {/* Login Page        */}
           <Route path="/" element={<Login />} />
