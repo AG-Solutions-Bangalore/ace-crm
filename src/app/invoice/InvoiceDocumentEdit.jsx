@@ -17,6 +17,7 @@ import { ProgressBar } from "@/components/spinner/ProgressBar";
 import { Loader2 } from "lucide-react";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import { useFetchShipper, useFetchVessel } from "@/hooks/useApi";
+import BASE_URL from "@/config/BaseUrl";
 const DocumentHeader = ({ documentDetails }) => {
   return (
     <div
