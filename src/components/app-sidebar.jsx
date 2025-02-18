@@ -214,7 +214,7 @@ export function AppSidebar({ ...props }) {
       //   url: "/purchase-order",
       //   icon: Map,
       // },
-      { 
+      {
         title: "Purchase",
         url: "#",
         icon: TicketPlus,
@@ -249,7 +249,6 @@ export function AppSidebar({ ...props }) {
       {
         title: "Payment",
         url: "#",
-        icon: Settings2,
         icon: BadgeIndianRupee,
         isActive: false,
         items: [
@@ -393,4 +392,3 @@ export function AppSidebar({ ...props }) {
   );
 }
 
-//sajid

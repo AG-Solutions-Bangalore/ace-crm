@@ -16,7 +16,7 @@ import BASE_URL from "@/config/BaseUrl";
 import moment from "moment";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Download,ChevronDown } from "lucide-react";
+import { Download, ChevronDown } from "lucide-react";
 import axios from "axios";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import React, { useState } from "react";
@@ -25,6 +25,10 @@ import {
   useFetchCountrys,
   useFetchProduct,
 } from "@/hooks/useApi";
+import {
+  SalesDataDownload,
+  SalesDataView,
+} from "@/components/buttonIndex/ButtonComponents";
 
 const salesAccountFormSchema = z.object({
   from_date: z.string().min(1, "From date is required"),
@@ -139,7 +143,7 @@ const MemoizedProductSelect = React.memo(
         menuPortalTarget={document.body}
         menuPosition="fixed"
         getOptionLabel={(option) => option.label} // Show only the invoice reference in the input
-          getOptionValue={(option) => option.value} // Use the value for the option
+        getOptionValue={(option) => option.value} // Use the value for the option
       />
     );
   }
@@ -251,8 +255,8 @@ const SalesDataForm = () => {
         className={`flex sticky top-0 z-10 border border-gray-200 rounded-lg justify-between ${ButtonConfig.cardheaderColor} items-start gap-8 mb-2  p-4 shadow-sm`}
       >
         <div className="flex-1">
-          <h1 className="text-3xl font-bold text-gray-800">Sales Data</h1>
-          <p className="text-gray-600 mt-2">Add a Contract to Vist Repost</p>
+          <h1 className="text-3xl font-bold text-gray-800">Sales Summary</h1>
+          <p className="text-gray-600 mt-2">Add a Sales to Vist Repost</p>
         </div>
       </div>
     );
@@ -365,18 +369,18 @@ const SalesDataForm = () => {
                     Buyer <span className="text-red-500"></span>
                   </label>
                   <MemoizedProductSelect
-value={formData.invoice_buyer}
-onChange={(value) =>
-    handleInputChange("invoice_buyer", value)
-  }
-options={
-    buyerData?.buyer?.map((branch) => ({
-    value: branch.buyer_name,
-    label: branch.buyer_name,
-  })) || []
-}
-placeholder="Select Buyer"
-/>
+                    value={formData.invoice_buyer}
+                    onChange={(value) =>
+                      handleInputChange("invoice_buyer", value)
+                    }
+                    options={
+                      buyerData?.buyer?.map((branch) => ({
+                        value: branch.buyer_name,
+                        label: branch.buyer_name,
+                      })) || []
+                    }
+                    placeholder="Select Buyer"
+                  />
                 </div>
                 <div>
                   <label
@@ -440,14 +444,11 @@ placeholder="Select Buyer"
               <div className="flex flex-row items-end mt-3 justify-end w-full">
                 {createSalesAccountMutation.isPending}
 
-                <Button
-                  variant="default"
+                <SalesDataDownload
                   className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
                   onClick={onSubmit}
-                >
-                  <Download className="h-4 w-4" /> Download
-                </Button>
-                <Button
+                ></SalesDataDownload>
+                <SalesDataView
                   type="submit"
                   className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} ml-2 flex items-center mt-2`}
                   disabled={createSalesAccountMutation.isPending}
@@ -455,7 +456,7 @@ placeholder="Select Buyer"
                   {createSalesAccountMutation.isPending
                     ? "Submitting..."
                     : "Submit Sales Data"}
-                </Button>
+                </SalesDataView>
               </div>
             </form>
           </div>

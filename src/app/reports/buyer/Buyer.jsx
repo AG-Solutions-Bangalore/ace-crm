@@ -105,7 +105,7 @@ const Buyer = () => {
     <Page>
       <div className="p-4">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-semibold">Buyer Details</h1>
+          <h1 className="text-2xl font-semibold">Buyer Summary</h1>
           <div className="flex gap-2">
             {/* <Button
               variant="default"
@@ -127,25 +127,25 @@ const Buyer = () => {
             <thead className="bg-gray-100">
               <tr>
                 <th className="border border-gray-300 px-4 py-2 text-left">
-                  Buyer Sort
+                  Sort
                 </th>
                 <th className="border border-gray-300 px-4 py-2 text-left">
-                  Buyer Group
+                  Group
                 </th>
                 <th className="border border-gray-300 px-4 py-2 text-left">
                   Buyer Name
                 </th>
                 <th className="border border-gray-300 px-4 py-2 text-left">
-                  Buyer Address
+                  Address
                 </th>
                 <th className="border border-gray-300 px-4 py-2 text-left">
-                  Buyer Port
+                  Port
                 </th>
                 <th className="border border-gray-300 px-4 py-2 text-left">
-                  Buyer Country
+                  Country
                 </th>
                 <th className="border border-gray-300 px-4 py-2 text-left">
-                  Buyer Status
+                  Status
                 </th>
               </tr>
             </thead>
