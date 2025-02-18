@@ -13,7 +13,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { PlusCircle, MinusCircle, ChevronDown, Trash2 } from "lucide-react";
-import Page from "../dashboard/page";
+
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { getTodayDate } from "@/utils/currentDate";
@@ -21,84 +21,58 @@ import { ProgressBar } from "@/components/spinner/ProgressBar";
 import BASE_URL from "@/config/BaseUrl";
 import { Textarea } from "@/components/ui/textarea";
 import Select from "react-select";
-import { useCurrentYear } from "@/hooks/useCurrentYear";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import {
   useFetchCompanys,
-  useFetchProductNos,
+  useFetchDispatchDcNo,
+  useFetchGoDown,
   useFetchPurchaseProduct,
   useFetchVendor,
 } from "@/hooks/useApi";
+import Page from "@/app/dashboard/page";
 
 // Validation Schemas
 const productRowSchema = z.object({
-  purchase_productSub_name: z.string().min(1, "Product name is required"),
-  purchase_productSub_name_hsn: z
-    .string()
-    .optional(),
+  mpds_product_name: z.string().min(1, "Product name is required"),
 
-  purchase_productSub_description: z.string().min(1, "Description is required"),
-  purchase_productSub_rateInMt: z.number().min(1, "rate  is required"),
-  purchase_productSub_qntyInMt: z.number().min(1, "Quantity is required"),
-  purchase_productSub_packing: z.number().min(1, "Packing is required"),
-  purchase_productSub_marking: z.number().min(1, "Marking price is required"),
+  mpds_product_description: z.string().min(1, "Description is required"),
+  mpds_bag: z.number().min(1, "Bag  is required"),
+  mpds_qnty: z.number().min(1, "Quantity is required"),
+  mpds_rate: z.number().min(1, "Rate is required"),
+  mpds_amount: z.number().min(1, "Amount price is required"),
 });
 
 const contractFormSchema = z.object({
   branch_short: z.string().min(1, "Company Sort is required"),
   branch_name: z.string().min(1, "Company Name is required"),
   branch_address: z.string().min(1, "Company Address is required"),
-  purchase_product_year: z.string().optional(),
-  purchase_product_date: z.string().min(1, "Product date is required"),
-  purchase_product_no: z.number().min(1, "Product No is required"),
-  purchase_product_ref: z.string().min(1, "Product Ref is required"),
+  mpd_date: z.string().min(1, "Date is required"),
+  mpd_dc_no: z.string().min(1, "Dc No is required"),
+  mpd_bill_ref: z.string().min(1, "Bill Ref is required"),
+  mpd_vendor_name: z.string().min(1, "Vendor is required"),
 
-  purchase_product_seller: z.string().min(1, "Seller Name is required"),
-  purchase_product_seller_add: z.string().min(1, "Seller Address is required"),
-  purchase_product_seller_gst: z.string().min(1, "gst is required"),
-  purchase_product_seller_contact: z
-    .string()
-    .min(1, "contact is required"),
+  mpd_bill_value: z.string().min(1, "Bill Value is required"),
+  mpd_godown: z.string().min(1, "Godown is required"),
+  mpd_remark: z.string().min(1, "Remark is required"),
 
-  purchase_product_broker: z.string().min(1, "Broker Name is required"),
-  purchase_product_broker_add: z
-    .string()
-    .min(1, "Broker Address is required"),
-
-  purchase_product_delivery_date: z
-    .string()
-    .optional(),
-  purchase_product_delivery_at: z
-    .string()
-    .optional(),
-  purchase_product_payment_terms: z.string().optional(),
-  purchase_product_tc: z.string().optional(),
-  purchase_product_gst_notification: z
-    .string()
-    .optional(),
-  purchase_product_quality: z.string().optional(),
-
-  purchase_product_data: z
+  dispatch_data: z
     .array(productRowSchema)
     .min(1, "At least one product is required"),
 });
-const createPurchaseOrder = async (data) => {
+const createDispatchOrder = async (data) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
-    console.log("pur data",data)
-  const response = await fetch(
-    `${BASE_URL}/api/panel-create-purchase-product`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    }
-  );
+ 
+  const response = await fetch(`${BASE_URL}/api/panel-create-market-dispatch`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
 
-  if (!response.ok) throw new Error("Failed to create purchase order");
+  if (!response.ok) throw new Error("Failed to create dispatch order");
   return response.json();
 };
 
@@ -277,61 +251,43 @@ const MemoizedProductSelect = React.memo(
     );
   }
 );
-const CreatePurchaseOrder = () => {
+const CreateMarketDispatch = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const [contractData, setContractData] = useState([
     {
-      purchase_productSub_name: "",
-      purchase_productSub_name_hsn: "",
-      purchase_productSub_description: "",
-      purchase_productSub_rateInMt: "",
-      purchase_productSub_qntyInMt: "",
-      purchase_productSub_packing: "",
-      purchase_productSub_marking: "",
+      mpds_product_name: "",
+      mpds_product_description: "",
+      mpds_bag: "",
+      mpds_qnty: "",
+      mpds_rate: "",
+      mpds_amount: "",
     },
   ]);
-
-  const { data: currentYear } = useCurrentYear();
-  useEffect(() => {
-    if (currentYear) {
-      setFormData((prev) => ({
-        ...prev,
-        purchase_product_year: currentYear,
-      }));
-    }
-  }, [currentYear]);
 
   const [formData, setFormData] = useState({
     branch_short: "",
     branch_name: "",
     branch_address: "",
-    purchase_product_year: currentYear,
-    purchase_product_date: getTodayDate(),
-    purchase_product_no: "",
-    purchase_product_ref: "",
-    purchase_product_seller: "",
-    purchase_product_seller_add: "",
-    purchase_product_seller_gst: "",
-    purchase_product_seller_contact: "",
-    purchase_product_broker: "",
-    purchase_product_broker_add: "",
-    purchase_product_delivery_date: "",
-    purchase_product_delivery_at: "",
-    purchase_product_payment_terms: "",
-    purchase_product_tc: "",
-    purchase_product_gst_notification: "",
-    purchase_product_quality: "",
+
+    mpd_date: getTodayDate(),
+    mpd_dc_no: "",
+    mpd_bill_ref: "",
+    mpd_vendor_name: "",
+    mpd_bill_value: "",
+    mpd_godown: "",
+    mpd_remark: "",
   });
 
   const { data: branchData } = useFetchCompanys();
   const { data: vendorData } = useFetchVendor();
+  const { data: goDownData } = useFetchGoDown();
   const { data: purchaseProductData } = useFetchPurchaseProduct();
-  const { data: productNoData } = useFetchProductNos(formData.branch_short);
+  const { data: disptachData } = useFetchDispatchDcNo();
 
-  const createPurchaseMutation = useMutation({
-    mutationFn: createPurchaseOrder,
+  const createDispatchMutation = useMutation({
+    mutationFn: createDispatchOrder,
 
     onSuccess: (response) => {
       if (response.code == 200) {
@@ -339,7 +295,7 @@ const CreatePurchaseOrder = () => {
           title: "Success",
           description: response.msg,
         });
-        navigate("/purchase-order");
+        navigate("/purchase/market-dispatch");
       } else if (response.code == 400) {
         toast({
           title: "Duplicate Entry",
@@ -377,78 +333,31 @@ const CreatePurchaseOrder = () => {
         [field]: value,
       }));
 
-    
-
       if (field === "branch_short") {
         const selectedCompanySort = branchData?.branch?.find(
           (branch) => branch.branch_short === value
         );
         if (selectedCompanySort) {
-          const productRef = `${selectedCompanySort.branch_name_short}/${selectedCompanySort.branch_state_short}/${formData?.purchase_product_no}/${formData.purchase_product_year}`;
+       
           setFormData((prev) => ({
             ...prev,
             branch_name: selectedCompanySort.branch_name,
             branch_address: selectedCompanySort.branch_address,
-            purchase_product_ref: productRef,
+       
           }));
         }
       }
 
-      if (field === "purchase_product_seller") {
-        const selectedSeller = vendorData?.vendor?.find(
-          (vendor) => vendor.vendor_name === value
-        );
-        if (selectedSeller) {
-          setFormData((prev) => ({
-            ...prev,
-            purchase_product_seller_add: selectedSeller.vendor_address,
-            purchase_product_seller_gst: selectedSeller.vendor_gst_no,
-            purchase_product_seller_contact:
-              selectedSeller.vendor_contact_person,
-          }));
-        }
-      }
 
-      if (field === "purchase_product_broker") {
-        const selectedBroker = vendorData?.vendor?.find(
-          (vendor) => vendor.vendor_name === value
-        );
-        if (selectedBroker) {
-          setFormData((prev) => ({
-            ...prev,
-            purchase_product_broker_add: selectedBroker.vendor_address,
-          }));
-        }
-      }
+     
 
-      if (field === "purchase_product_no") {
-        const selectedCompanySort = branchData?.branch?.find(
-          (branch) => branch.branch_short === formData.branch_short
-        );
-        if (selectedCompanySort) {
-          const productRef = `${selectedCompanySort.branch_name_short}/${selectedCompanySort.branch_state_short}/${value}/${formData.purchase_product_year}`;
-          setFormData((prev) => ({
-            ...prev,
-            purchase_product_ref: productRef,
-          }));
-        }
-      }
+      
     },
-    [
-      branchData,
-      formData.branch_short,
-      formData.purchase_product_no,
-      formData.purchase_product_year,
-    ]
+    [branchData, formData.branch_short]
   );
 
   const handleRowDataChange = useCallback((rowIndex, field, value) => {
-    const numericFields = [
-      "purchase_productSub_rateInMt",
-      "purchase_productSub_qntyInMt",
-      "purchase_productSub_packing",
-      "purchase_productSub_marking",
-    ];
+    const numericFields = ["mpds_bag", "mpds_qnty", "mpds_rate", "mpds_amount"];
 
     if (numericFields.includes(field)) {
       const sanitizedValue = value.replace(/[^\d.]/g, "");
@@ -480,13 +389,12 @@ const CreatePurchaseOrder = () => {
     setContractData((prev) => [
       ...prev,
       {
-        purchase_productSub_name: "",
-        purchase_productSub_name_hsn: "",
-        purchase_productSub_description: "",
-        purchase_productSub_rateInMt: "",
-        purchase_productSub_qntyInMt: "",
-        purchase_productSub_packing: "",
-        purchase_productSub_marking: "",
+        mpds_product_name: "",
+        mpds_product_description: "",
+        mpds_bag: "",
+        mpds_qnty: "",
+        mpds_rate: "",
+        mpds_amount: "",
       },
     ]);
   }, []);
@@ -504,10 +412,19 @@ const CreatePurchaseOrder = () => {
     branch_short: "Company Sort",
     branch_name: "Company Name",
     branch_address: "Company Address",
-    purchase_product_year: "Contract Year",
-    purchase_product_date: "Contract Date",
-    purchase_product_no: "Contract No",
-    purchase_product_ref: "Contract Ref",
+    mpd_date: " Date",
+    mpd_dc_no: "Dc No",
+    mpd_bill_ref: "Red",
+    mpd_vendor_name: "Vendor",
+    mpd_bill_value: "Bill",
+    mpd_godown: "Go Down",
+    mpd_remark: "Remark",
+    mpds_product_name: "Product",
+    mpds_product_description: "Description",
+    mpds_bag: "Bag",
+    mpds_qnty: "Quantity",
+    mpds_rate: "Rate",
+    mpds_amount: "Amount",
   };
 
   const handleSubmit = async (e) => {
@@ -515,17 +432,17 @@ const CreatePurchaseOrder = () => {
     try {
       const processedPurchaseData = contractData.map((row) => ({
         ...row,
-        purchase_productSub_rateInMt: parseFloat(row.purchase_productSub_rateInMt),
-        purchase_productSub_qntyInMt: parseFloat(row.purchase_productSub_qntyInMt),
-        purchase_productSub_packing: parseFloat(row.purchase_productSub_packing),
-        purchase_productSub_marking: parseFloat(row.purchase_productSub_marking),
+        mpds_bag: parseFloat(row.mpds_bag),
+        mpds_qnty: parseFloat(row.mpds_qnty),
+        mpds_rate: parseFloat(row.mpds_rate),
+        mpds_amount: parseFloat(row.mpds_amount),
       }));
 
       const validatedData = contractFormSchema.parse({
         ...formData,
-        purchase_product_data: processedPurchaseData,
+        dispatch_data: processedPurchaseData,
       });
-      createPurchaseMutation.mutate(validatedData);
+      createDispatchMutation.mutate(validatedData);
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {
@@ -597,44 +514,40 @@ const CreatePurchaseOrder = () => {
                     placeholder="Select Company"
                   />
                 </div>
+
                 <div>
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
                   >
-                    Seller <span className="text-red-500">*</span>
+                    Dc No <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
-                    value={formData.purchase_product_seller}
-                    onChange={(value) =>
-                      handleSelectChange("purchase_product_seller", value)
-                    }
+                    value={formData?.mpd_dc_no}
+                    onChange={(value) => handleSelectChange("mpd_dc_no", value)}
                     options={
-                      vendorData?.vendor?.map((vendor) => ({
-                        value: vendor.vendor_name,
-                        label: vendor.vendor_name,
+                      disptachData?.dispatchDcNo?.map((item) => ({
+                        value: String(item),
+                        label: String(item),
                       })) || []
                     }
-                    placeholder="Select Seller"
+                    placeholder="Select Dc No"
                   />
                 </div>
                 <div>
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
                   >
-                    Broker <span className="text-red-500">*</span>
+                    Ref. <span className="text-red-500">*</span>
                   </label>
-                  <MemoizedSelect
-                    value={formData.purchase_product_broker}
-                    onChange={(value) =>
-                      handleSelectChange("purchase_product_broker", value)
+                  <Input
+                    type="text"
+                    placeholder="Enter dispatch order Ref"
+                    value={formData.mpd_bill_ref}
+                 
+                    className="bg-white"
+                    onChange={(e) =>
+                      handleInputChange("mpd_bill_ref", e.target.value)
                     }
-                    options={
-                      vendorData?.vendor?.map((vendor) => ({
-                        value: vendor.vendor_name,
-                        label: vendor.vendor_name,
-                      })) || []
-                    }
-                    placeholder="Select Broker"
                   />
                 </div>
 
@@ -642,20 +555,20 @@ const CreatePurchaseOrder = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
                   >
-                    Purchase Order No <span className="text-red-500">*</span>
+                    Vendor <span className="text-red-500">*</span>
                   </label>
                   <MemoizedSelect
-                    value={formData?.purchase_product_no}
+                    value={formData.mpd_vendor_name}
                     onChange={(value) =>
-                      handleSelectChange("purchase_product_no", value)
+                      handleSelectChange("mpd_vendor_name", value)
                     }
                     options={
-                      productNoData?.purchaseProductNo?.map((item) => ({
-                        value: item,
-                        label: item,
+                      vendorData?.vendor?.map((vendor) => ({
+                        value: vendor.vendor_name,
+                        label: vendor.vendor_name,
                       })) || []
                     }
-                    placeholder="Select purchase order No"
+                    placeholder="Select Vendor"
                   />
                 </div>
               </div>
@@ -675,213 +588,92 @@ const CreatePurchaseOrder = () => {
                     {formData.branch_address}
                   </span>
                 </div>
-                <div>
-                  <Textarea
-                    type="text"
-                    placeholder="Enter seller Address"
-                    value={formData.purchase_product_seller_add}
-                    className=" text-[9px] bg-white border-none hover:border-none "
-                    onChange={(e) =>
-                      handleInputChange(
-                        "purchase_product_seller_add",
-                        e.target.value
-                      )
-                    }
-                  />
-                  <div className="flex flex-row justify-between">
-                    <p className="text-[10px]">
-                      seller gst:{formData.purchase_product_seller_gst}
-                    </p>
-                    <p className="text-[10px]">
-                      seller contact:{formData.purchase_product_seller_contact}
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <Textarea
-                    type="text"
-                    placeholder="Enter Broker Address"
-                    className=" text-[9px] bg-white border-none hover:border-none"
-                    value={formData.purchase_product_broker_add}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "purchase_product_broker_add",
-                        e.target.value
-                      )
-                    }
-                  />
-                  <div className="flex flex-row justify-between">
-                    <p className="text-[10px]">
-                      year:{formData.purchase_product_year}
-                    </p>
-                  </div>
-                </div>
 
                 <div>
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
                   >
-                    P.O. Date <span className="text-red-500">*</span>
+                    Dispatch Date <span className="text-red-500">*</span>
                   </label>
                   <Input
                     type="date"
-                    value={formData.purchase_product_date}
+                    value={formData.mpd_date}
                     className="bg-white"
                     onChange={(e) =>
-                      handleInputChange("purchase_product_date", e.target.value)
+                      handleInputChange("mpd_date", e.target.value)
                     }
+                  />
+                </div>
+                <div>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
+                    Bill Value
+                  </label>
+                  <Input
+                    type="text"
+                    placeholder="Enter dispatch  bill Value"
+                    value={formData.mpd_bill_value}
+                    className="bg-white"
+                    onChange={(e) =>
+                      handleInputChange("mpd_bill_value", e.target.value)
+                    }
+                    onKeyPress={(e) => {
+                        if (!/[0-9.]/.test(e.key) && e.key !== "Backspace") {
+                          e.preventDefault();
+                        }
+                      }}
+                  />
+                </div>
+                <div>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
+                    Go Down
+                  </label>
+                  <MemoizedSelect
+                    value={formData.mpd_godown}
+                    onChange={(value) =>
+                      handleSelectChange("mpd_godown", value)
+                    }
+                    options={
+                      goDownData?.godown?.map((item) => ({
+                        value: item.godown,
+                        label: item.godown,
+                      })) || []
+                    }
+                    placeholder="Select Go Down"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="mb-2 ">
-              <div className="grid grid-cols-4 gap-6">
-                <div>
-                  <label
-                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                  >
-                     Ref. <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    type="text"
-                    placeholder="Enter purchase order Ref"
-                    value={formData.purchase_product_ref}
-                    disabled
-                    className="bg-white"
-                    onChange={(e) =>
-                      handleInputChange("purchase_product_ref", e.target.value)
-                    }
-                  />
-                </div>
-
-                <div>
-                  <label
-                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                  >
-                    Delivery Date
-                  </label>
-                  <Input
-                    type="date"
-                    className="bg-white"
-                    value={formData.purchase_product_delivery_date}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "purchase_product_delivery_date",
-                        e.target.value
-                      )
-                    }
-                  />
-                </div>
-                <div className=" col-span-1 lg:col-span-2">
-                    <label
-                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                    >
-                      Delivery At
-                    </label>
-                    <Textarea
-                      type="text"
-                      className="bg-white"
-                      placeholder="Enter Delivery At"
-                      value={formData.purchase_product_delivery_at}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "purchase_product_delivery_at",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </div>
-              </div>
-         
-              <div className="mb-2">
-                <div className="grid grid-cols-4 gap-6">
-                
-
+            <div className="mb-2">
+                <div className="grid grid-cols-1 gap-6">
                   <div>
                     <label
                       className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
                     >
-                      Payment Terms
+                      Remarks
                     </label>
                     <Textarea
                       type="text"
                       className="bg-white"
-                      placeholder="Enter Payment Terms"
-                      value={formData.purchase_product_payment_terms}
+                      placeholder="Enter remarks"
+                      value={formData.mpd_remark}
                       onChange={(e) =>
-                        handleInputChange(
-                          "purchase_product_payment_terms",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                    >
-                      Other Term & Cond.
-                    </label>
-                    <Textarea
-                      type="text"
-                      className="bg-white"
-                      placeholder="Enter other term & condition"
-                      value={formData.purchase_product_tc}
-                      onChange={(e) =>
-                        handleInputChange("purchase_product_tc", e.target.value)
-                      }
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                    >
-                      GST Notification
-                    </label>
-                    <Textarea
-                      type="text"
-                      className="bg-white"
-                      placeholder="Enter GST Notification"
-                      value={formData.purchase_product_gst_notification}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "purchase_product_gst_notification",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label
-                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                    >
-                       Quality
-                    </label>
-                    <Textarea
-                      type="text"
-                      className="bg-white"
-                      placeholder="Enter purchase order Quality"
-                      value={formData.purchase_product_quality}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "purchase_product_quality",
-                          e.target.value
-                        )
+                        handleInputChange("mpd_remark", e.target.value)
                       }
                     />
                   </div>
                 </div>
               </div>
-            </div>
 
             {/* Products Section */}
             <div className="mb-2">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex flex-row items-center">
-                  <h2 className="text-xl font-semibold">Purchase Order </h2>
+                  <h2 className="text-xl font-semibold">Dispatch Order </h2>
                 </div>
               </div>
 
@@ -893,14 +685,11 @@ const CreatePurchaseOrder = () => {
                         Product /Description
                       </TableHead>
 
-
-
                       <TableHead className="p-2 text-center border text-sm font-medium">
-                        Rate / Quantity <span className="text-red-500">*</span>
+                        Bag / Quantity <span className="text-red-500">*</span>
                       </TableHead>
                       <TableHead className="p-2 text-center border text-sm font-medium">
-                        Packing / Marking{" "}
-                        <span className="text-red-500">*</span>
+                        Rate / Amount <span className="text-red-500">*</span>
                       </TableHead>
 
                       <TableHead className="p-2 text-left border w-16">
@@ -912,32 +701,32 @@ const CreatePurchaseOrder = () => {
                     {contractData.map((row, rowIndex) => (
                       <TableRow key={rowIndex} className="hover:bg-gray-50">
                         <TableCell className="p-2 border">
-                        <div className="flex flex-col gap-2">
-                          <MemoizedProductSelect
-                            value={row.purchase_productSub_name}
-                            onChange={(value) =>
-                              handleRowDataChange(
-                                rowIndex,
-                                "purchase_productSub_name",
-                                value
-                              )
-                            }
-                            options={
-                              purchaseProductData?.purchaseorderproduct?.map(
-                                (item) => ({
-                                  value: item.purchaseOrderProduct,
-                                  label: item.purchaseOrderProduct,
-                                })
-                              ) || []
-                            }
-                            placeholder="Select Product"
-                          />
-                           <Input
-                              value={row.purchase_productSub_description}
+                          <div className="flex flex-col gap-2">
+                            <MemoizedProductSelect
+                              value={row.mpds_product_name}
+                              onChange={(value) =>
+                                handleRowDataChange(
+                                  rowIndex,
+                                  "mpds_product_name",
+                                  value
+                                )
+                              }
+                              options={
+                                purchaseProductData?.purchaseorderproduct?.map(
+                                  (item) => ({
+                                    value: item.purchaseOrderProduct,
+                                    label: item.purchaseOrderProduct,
+                                  })
+                                ) || []
+                              }
+                              placeholder="Select Product"
+                            />
+                            <Input
+                              value={row.mpds_product_description}
                               onChange={(e) =>
                                 handleRowDataChange(
                                   rowIndex,
-                                  "purchase_productSub_description",
+                                  "mpds_product_description",
                                   e.target.value
                                 )
                               }
@@ -945,50 +734,47 @@ const CreatePurchaseOrder = () => {
                               placeholder="Enter Description"
                               type="text"
                             />
-                            </div>
+                          </div>
                         </TableCell>
-                      
-
-                      
 
                         <TableCell className="p-2 border ">
-                        <div className="flex flex-col gap-2">
-                          <Input
-                            className="bg-white"
-                            value={row.purchase_productSub_packing}
-                            onChange={(e) =>
-                              handleRowDataChange(
-                                rowIndex,
-                                "purchase_productSub_packing",
-                                e.target.value
-                              )
-                            }
-                            placeholder="Enter Packing"
-                            type="text"
-                          />
-                          <Input
-                            className="bg-white"
-                            value={row.purchase_productSub_marking}
-                            onChange={(e) =>
-                              handleRowDataChange(
-                                rowIndex,
-                                "purchase_productSub_marking",
-                                e.target.value
-                              )
-                            }
-                            placeholder="Enter Marking"
-                            type="text"
-                          />
+                          <div className="flex flex-col gap-2">
+                            <Input
+                              className="bg-white"
+                              value={row.mpds_bag}
+                              onChange={(e) =>
+                                handleRowDataChange(
+                                  rowIndex,
+                                  "mpds_bag",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Enter Bag"
+                              type="text"
+                            />
+                            <Input
+                              className="bg-white"
+                              value={row.mpds_qnty}
+                              onChange={(e) =>
+                                handleRowDataChange(
+                                  rowIndex,
+                                  "mpds_qnty",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Enter Quantity"
+                              type="text"
+                            />
                           </div>
                         </TableCell>
                         <TableCell className="p-2 border w-40">
                           <div className="flex flex-col gap-2">
                             <Input
-                              value={row.purchase_productSub_rateInMt}
+                              value={row.mpds_rate}
                               onChange={(e) =>
                                 handleRowDataChange(
                                   rowIndex,
-                                  "purchase_productSub_rateInMt",
+                                  "mpds_rate",
                                   e.target.value
                                 )
                               }
@@ -997,16 +783,16 @@ const CreatePurchaseOrder = () => {
                               type="text"
                             />
                             <Input
-                              value={row.purchase_productSub_qntyInMt}
+                              value={row.mpds_amount}
                               onChange={(e) =>
                                 handleRowDataChange(
                                   rowIndex,
-                                  "purchase_productSub_qntyInMt",
+                                  "mpds_amount",
                                   e.target.value
                                 )
                               }
                               className="bg-white"
-                              placeholder="Enter Quantity"
+                              placeholder="Enter Amount"
                               type="text"
                             />
                           </div>
@@ -1043,15 +829,15 @@ const CreatePurchaseOrder = () => {
         </Card>
 
         <div className="flex flex-col items-end">
-          {createPurchaseMutation.isPending && <ProgressBar progress={70} />}
+          {createDispatchMutation.isPending && <ProgressBar progress={70} />}
           <Button
             type="submit"
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
-            disabled={createPurchaseMutation.isPending}
+            disabled={createDispatchMutation.isPending}
           >
-            {createPurchaseMutation.isPending
+            {createDispatchMutation.isPending
               ? "Submitting..."
-              : "Submit Purchase Order"}
+              : "Submit Dispatch Order"}
           </Button>
         </div>
       </form>
@@ -1059,4 +845,4 @@ const CreatePurchaseOrder = () => {
   );
 };
 
-export default CreatePurchaseOrder;
+export default CreateMarketDispatch;

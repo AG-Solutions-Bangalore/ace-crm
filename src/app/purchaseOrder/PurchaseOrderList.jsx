@@ -186,6 +186,21 @@ const PurchaseOrderList = () => {
                 <TooltipContent>View Purchase</TooltipContent>
               </Tooltip>
             </TooltipProvider>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => navigate(`/edit-purchase-order/${purchaseId}`)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                 
+                </TooltipTrigger>
+                <TooltipContent>Edit Purchase</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         );
       },
