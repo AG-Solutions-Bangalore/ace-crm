@@ -39,11 +39,11 @@ const productRowSchema = z.object({
   mps_qnty: z.number().min(1, "Quantity is required"),
   mps_rate: z.number().min(1, "Rate is required"),
   mps_amount: z.number().min(1, "Amount is required"),
+  mp_godown: z.string().min(1, "Go Down is required"),
 });
 
 const contractFormSchema = z.object({
   mp_date: z.string().min(1, "Date is required"),
-  mp_godown: z.string().min(1, "Go Down is required"),
   mp_bill_ref: z.string().min(1, "Ref is required"),
   mp_vendor_name: z.string().min(1, "Vendor Name is required"),
   mp_bill_value: z.string().min(1, "Bill Value is required"),
@@ -251,6 +251,7 @@ const CreateMarketOrder = () => {
 
   const [MarketData, setMarketData] = useState([
     {
+      mp_godown: "",
       mps_product_name: "",
       mps_product_description: "",
       mps_bag: "",
@@ -262,7 +263,6 @@ const CreateMarketOrder = () => {
 
   const [formData, setFormData] = useState({
     mp_date: "",
-    mp_godown: "",
     mp_bill_ref: "",
     mp_vendor_name: "",
     mp_bill_value: "",
@@ -522,40 +522,22 @@ const CreateMarketOrder = () => {
                     }
                   />
                 </div>
-                <div>
-                  <label
-                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                  >
-                    Go Down <span className="text-red-500">*</span>
-                  </label>
-                  <MemoizedSelect
-                    value={formData.mp_godown}
-                    onChange={(value) => handleSelectChange("mp_godown", value)}
-                    options={
-                      godownPurchaseData?.godown?.map((godown) => ({
-                        value: godown.godown,
-                        label: godown.godown,
-                      })) || []
-                    }
-                    placeholder="Select Godown"
-                  />
-                </div>
-                <div>
-                  <label
-                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                  >
-                    Remark <span className="text-red-500">*</span>
-                  </label>
-                  <Textarea
-                    type="text"
-                    placeholder="Enter Remark"
-                    value={formData.mp_remark}
-                    className=" text-[9px] bg-white border-none hover:border-none "
-                    onChange={(e) =>
-                      handleInputChange("mp_remark", e.target.value)
-                    }
-                  />
-                </div>
+              </div>
+              <div>
+                <label
+                  className={`block  ${ButtonConfig.cardLabel} text-xs my-[4px] font-medium `}
+                >
+                  Remark
+                </label>
+                <Textarea
+                  type="text"
+                  placeholder="Enter Remark"
+                  value={formData.mp_remark}
+                  className="  bg-white border-none hover:border-none "
+                  onChange={(e) =>
+                    handleInputChange("mp_remark", e.target.value)
+                  }
+                />
               </div>
             </div>
 
@@ -572,7 +554,11 @@ const CreateMarketOrder = () => {
                   <TableHeader>
                     <TableRow className="bg-gray-50">
                       <TableHead className="p-2 text-center border text-sm font-medium">
+                        Godown<span className="text-red-500">*</span>
+                      </TableHead>
+                      <TableHead className="p-2 text-center border text-sm font-medium">
                         Product /Description
+                        <span className="text-red-500">*</span>
                       </TableHead>
 
                       <TableHead className="p-2 text-center border text-sm font-medium">
@@ -590,6 +576,27 @@ const CreateMarketOrder = () => {
                   <TableBody>
                     {MarketData.map((row, rowIndex) => (
                       <TableRow key={rowIndex} className="hover:bg-gray-50">
+                        <TableCell className="p-2 border">
+                          <div className="flex flex-col gap-2">
+                            <MemoizedProductSelect
+                              value={row.mp_godown}
+                              onChange={(value) =>
+                                handleRowDataChange(
+                                  rowIndex,
+                                  "mp_godown",
+                                  value
+                                )
+                              }
+                              options={
+                                godownPurchaseData?.godown?.map((godown) => ({
+                                  value: godown.godown,
+                                  label: godown.godown,
+                                })) || []
+                              }
+                              placeholder="Select Godown"
+                            />
+                          </div>
+                        </TableCell>
                         <TableCell className="p-2 border">
                           <div className="flex flex-col gap-2">
                             <MemoizedProductSelect
@@ -726,8 +733,8 @@ const CreateMarketOrder = () => {
             disabled={createPurchaseMutation.isPending}
           >
             {createPurchaseMutation.isPending
-              ? "Submitting..."
-              : "Submit Purchase Order"}
+              ? "Creatting..."
+              : "Create Purchase Order"}
           </Button>
         </div>
       </form>

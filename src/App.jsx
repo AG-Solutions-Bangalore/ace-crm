@@ -89,6 +89,9 @@ import CreateMarketProcessing from "./app/purchase/marketProcessing/CreateMarket
 import CreateMarketDispatch from "./app/purchase/market-dispatch/CreateMarketDispatch";
 import EditMarketDispatch from "./app/purchase/market-dispatch/EditMarketDispatch";
 import EditMarketProcessing from "./app/purchase/marketProcessing/EditMarketProcessing";
+import StockView from "./app/purchase/stock/StockView";
+import ProductStock from "./app/reports/productStock/ProductStock";
+import ProductStockView from "./app/reports/productStock/ProductStockView";
 
 const queryClient = new QueryClient();
 
@@ -207,6 +210,7 @@ function App() {
             path="/purchase/market-dispatch"
             element={<MarketDispatch />}
           />
+          <Route path="/purchase/stock" element={<StockView />} />
 
           {/* Master - Branch  */}
 
@@ -317,6 +321,12 @@ function App() {
           <Route
             path="/report/monthwise-purchase-seller-report"
             element={<MonthwisePurchaseSellerReport />}
+          />
+          {/* //productstock */}
+          <Route path="/report/product-stock" element={<ProductStock />} />
+          <Route
+            path="/report/product-stock/view"
+            element={<ProductStockView />}
           />
 
           {/* //payment */}

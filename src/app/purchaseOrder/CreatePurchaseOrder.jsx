@@ -1050,8 +1050,8 @@ const CreatePurchaseOrder = () => {
             disabled={createPurchaseMutation.isPending}
           >
             {createPurchaseMutation.isPending
-              ? "Submitting..."
-              : "Submit Purchase Order"}
+              ? "Creatting..."
+              : "Create Purchase Order"}
           </Button>
         </div>
       </form>

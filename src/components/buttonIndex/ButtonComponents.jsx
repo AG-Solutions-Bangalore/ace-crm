@@ -3,6 +3,7 @@ import {
   Edit,
   Eye,
   FilePlus2,
+  MinusCircle,
   SquarePlus,
   Trash,
 } from "lucide-react";
@@ -11,6 +12,12 @@ import { checkPermission } from "./checkPermission";
 import { Button } from "@/components/ui/button";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import { useNavigate } from "react-router-dom";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 const getStaticPermissions = () => {
   const buttonPermissions = localStorage.getItem("buttonControl");
@@ -875,6 +882,274 @@ export const PaymentCreate = ({ onClick, className }) => {
   );
 };
 PaymentCreate.page = "Payment";
+
+//Purchase page
+//Purchase Order List
+export const PurchaseOrderCreate = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "PurchaseOrderCreate", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      <SquarePlus className="h-4 w-4" /> Purchase Order
+    </Button>
+  );
+};
+PurchaseOrderCreate.page = "Purchase Order";
+
+export const PurchaseOrderEdit = ({ onClick, className }) => {
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "PurchaseOrderEdit", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          onClick={onClick}
+          className={className}
+          variant="ghost"
+          size="icon"
+        >
+          <Edit className="h-4 w-4 text-black" />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>Edit Purchase Order</TooltipContent>
+    </Tooltip>
+  );
+};
+PurchaseOrderEdit.page = "Purchase Order";
+
+export const PurchaseOrderView = ({ onClick, className }) => {
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "PurchaseOrderView", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            onClick={onClick}
+            className={className}
+            variant="ghost"
+            size="icon"
+          >
+            <Eye className="h-4 w-4 text-black" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>View Purchase Order</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+PurchaseOrderView.page = "Purchase Order";
+//Purchase  List
+export const PurchaseCreate = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "PurchaseCreate", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      <SquarePlus className="h-4 w-4" /> Market Purchase
+    </Button>
+  );
+};
+PurchaseCreate.page = "Purchase";
+
+export const PurchaseEdit = ({ onClick, className }) => {
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "PurchaseEdit", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          onClick={onClick}
+          className={className}
+          variant="ghost"
+          size="icon"
+        >
+          <Edit className="h-4 w-4 text-black" />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>Edit Purchase</TooltipContent>
+    </Tooltip>
+  );
+};
+PurchaseEdit.page = "Purchase";
+//Production  List
+export const ProductionCreate = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "ProductionCreate", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      <SquarePlus className="h-4 w-4" /> Market Purchase
+    </Button>
+  );
+};
+ProductionCreate.page = "Production";
+
+export const ProductionEdit = ({ onClick, className }) => {
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "ProductionEdit", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          onClick={onClick}
+          className={className}
+          variant="ghost"
+          size="icon"
+        >
+          <Edit className="h-4 w-4 text-black" />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>Edit Production</TooltipContent>
+    </Tooltip>
+  );
+};
+ProductionEdit.page = "Production";
+export const ProductionDelete = ({ onClick, className }) => {
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "ProductionDelete", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          onClick={onClick}
+          className={className}
+          variant="ghost"
+          size="icon"
+        >
+          <Trash className="h-4 w-4  text-red-500 " />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>Delete Production</TooltipContent>
+    </Tooltip>
+  );
+};
+ProductionDelete.page = "Production";
+
+export const ProductionremoveRow = ({ onClick, className }) => {
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "ProductionremoveRow", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          onClick={onClick}
+          className={className}
+          variant="ghost"
+          size="icon"
+        >
+          <MinusCircle className="h-4 w-4  text-red-500 " />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>Delete Production</TooltipContent>
+    </Tooltip>
+  );
+};
+ProductionremoveRow.page = "Production";
+
+//Processing  List
+export const ProcessingCreate = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "ProcessingCreate", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      <SquarePlus className="h-4 w-4" /> Processing
+    </Button>
+  );
+};
+ProcessingCreate.page = "Processing";
+
+export const ProcessingEdit = ({ onClick, className }) => {
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "ProcessingEdit", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          onClick={onClick}
+          className={className}
+          variant="ghost"
+          size="icon"
+        >
+          <Edit className="h-4 w-4 text-black" />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>Edit Processing</TooltipContent>
+    </Tooltip>
+  );
+};
+ProcessingEdit.page = "Processing";
+export const ProcessingDelete = ({ onClick, className }) => {
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "ProcessingDelete", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          onClick={onClick}
+          className={className}
+          variant="ghost"
+          size="icon"
+        >
+          <Trash className="h-4 w-4  text-red-500 " />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>Delete Processing</TooltipContent>
+    </Tooltip>
+  );
+};
+ProcessingDelete.page = "Processing";
+
 export default {
   InvoiceCreate,
   InvoiceEdit,
@@ -929,4 +1204,16 @@ export default {
   PreRecepitsEdit,
   BuyerRDownload,
   PaymentCreate,
+  PurchaseOrderCreate,
+  PurchaseOrderEdit,
+  PurchaseOrderView,
+  PurchaseCreate,
+  PurchaseEdit,
+  ProductionCreate,
+  ProductionEdit,
+  ProductionDelete,
+  ProductionremoveRow,
+  ProcessingCreate,
+  ProcessingEdit,
+  ProcessingDelete,
 };

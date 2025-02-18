@@ -593,8 +593,8 @@ const CreateMarketProcessing = () => {
             disabled={createProcessingMutation.isPending}
           >
             {createProcessingMutation.isPending
-              ? "Submitting..."
-              : "Submit Processing Order"}
+              ? "Creatting..."
+              : "Create Processing Order"}
           </Button>
         </div>
       </form>

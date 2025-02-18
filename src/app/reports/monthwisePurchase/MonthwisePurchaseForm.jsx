@@ -32,26 +32,33 @@ const createReport = async (data) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
 
-  const response = await fetch(`${BASE_URL}/api/panel-fetch-purchase-product-monthwise-report`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+  const response = await fetch(
+    `${BASE_URL}/api/panel-fetch-purchase-product-monthwise-report`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || "Failed to create monthwise purchase report");
+    throw new Error(
+      errorData.message || "Failed to create monthwise purchase report"
+    );
   }
   return response.json();
 };
 
 const BranchHeader = () => (
-  <div className={`flex sticky top-0 z-10 border border-gray-200 rounded-lg justify-between ${ButtonConfig.cardheaderColor} items-start gap-8 mb-2 p-4 shadow-sm`}>
+  <div
+    className={`flex sticky top-0 z-10 border border-gray-200 rounded-lg justify-between ${ButtonConfig.cardheaderColor} items-start gap-8 mb-2 p-4 shadow-sm`}
+  >
     <div className="flex-1">
-      <h1 className="text-3xl font-bold text-gray-800">Monthwise Purchase Form</h1>
+      <h1 className="text-3xl font-bold text-gray-800">Purchase Summary</h1>
       <p className="text-gray-600 mt-2">Add a purchase data to Visit Report</p>
     </div>
   </div>
@@ -92,12 +99,17 @@ const MonthwisePurchaseForm = () => {
   const branchReportMutation = useMutation({
     mutationFn: createReport,
     onSuccess: (data) => {
-      navigate("/report/monthwise-purchase-report", { state: { reportMoPurData: data, formFields: {
-        from_date: formData.from_date,
-        to_date: formData.to_date,
-        branch_name: formData.branch_name,
-        purchase_product_seller: formData.purchase_product_seller
-      } } });
+      navigate("/report/monthwise-purchase-report", {
+        state: {
+          reportMoPurData: data,
+          formFields: {
+            from_date: formData.from_date,
+            to_date: formData.to_date,
+            branch_name: formData.branch_name,
+            purchase_product_seller: formData.purchase_product_seller,
+          },
+        },
+      });
     },
     onError: (error) => {
       toast({
@@ -111,12 +123,17 @@ const MonthwisePurchaseForm = () => {
   const sellerReportMutation = useMutation({
     mutationFn: createReport,
     onSuccess: (data) => {
-      navigate("/report/monthwise-purchase-seller-report", { state: { reportMoPurData: data, formFields: {
-        from_date: formData.from_date,
-        to_date: formData.to_date,
-        branch_name: formData.branch_name,
-        purchase_product_seller: formData.purchase_product_seller
-      } } });
+      navigate("/report/monthwise-purchase-seller-report", {
+        state: {
+          reportMoPurData: data,
+          formFields: {
+            from_date: formData.from_date,
+            to_date: formData.to_date,
+            branch_name: formData.branch_name,
+            purchase_product_seller: formData.purchase_product_seller,
+          },
+        },
+      });
     },
     onError: (error) => {
       toast({
@@ -128,9 +145,10 @@ const MonthwisePurchaseForm = () => {
   });
 
   const handleInputChange = (field, valueOrEvent) => {
-    const value = typeof valueOrEvent === "object" && valueOrEvent.target
-      ? valueOrEvent.target.value
-      : valueOrEvent;
+    const value =
+      typeof valueOrEvent === "object" && valueOrEvent.target
+        ? valueOrEvent.target.value
+        : valueOrEvent;
 
     setFormData((prev) => ({
       ...prev,
@@ -195,7 +213,7 @@ const MonthwisePurchaseForm = () => {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        responseType: 'blob',
+        responseType: "blob",
       });
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -229,7 +247,9 @@ const MonthwisePurchaseForm = () => {
             <form>
               <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-6">
                 <div>
-                  <label className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}>
+                  <label
+                    className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
+                  >
                     Enter From Date <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -242,7 +262,9 @@ const MonthwisePurchaseForm = () => {
                 </div>
 
                 <div>
-                  <label className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}>
+                  <label
+                    className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
+                  >
                     Enter To Date <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -255,12 +277,16 @@ const MonthwisePurchaseForm = () => {
                 </div>
 
                 <div>
-                  <label className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}>
+                  <label
+                    className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
+                  >
                     Branch
                   </label>
                   <Select
                     value={formData.branch_name}
-                    onValueChange={(value) => handleInputChange("branch_name", value)}
+                    onValueChange={(value) =>
+                      handleInputChange("branch_name", value)
+                    }
                     disabled={isBranchesLoading}
                   >
                     <SelectTrigger className="bg-white">
@@ -268,10 +294,7 @@ const MonthwisePurchaseForm = () => {
                     </SelectTrigger>
                     <SelectContent className="bg-white">
                       {branchData?.branch?.map((branch, index) => (
-                        <SelectItem
-                          key={index}
-                          value={branch.branch_name}
-                        >
+                        <SelectItem key={index} value={branch.branch_name}>
                           {branch.branch_name}
                         </SelectItem>
                       ))}
@@ -280,12 +303,16 @@ const MonthwisePurchaseForm = () => {
                 </div>
 
                 <div>
-                  <label className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}>
+                  <label
+                    className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
+                  >
                     Seller
                   </label>
                   <Select
                     value={formData.purchase_product_seller}
-                    onValueChange={(value) => handleInputChange("purchase_product_seller", value)}
+                    onValueChange={(value) =>
+                      handleInputChange("purchase_product_seller", value)
+                    }
                     disabled={isBranchesLoading}
                   >
                     <SelectTrigger className="bg-white">
@@ -293,10 +320,7 @@ const MonthwisePurchaseForm = () => {
                     </SelectTrigger>
                     <SelectContent className="bg-white">
                       {vendorData?.vendor?.map((vendor, index) => (
-                        <SelectItem
-                          key={index}
-                          value={vendor.vendor_name}
-                        >
+                        <SelectItem key={index} value={vendor.vendor_name}>
                           {vendor.vendor_name}
                         </SelectItem>
                       ))}
@@ -321,7 +345,9 @@ const MonthwisePurchaseForm = () => {
                   onClick={handleSellerReport}
                   disabled={sellerReportMutation.isPending}
                 >
-                  {sellerReportMutation.isPending ? "Generating..." : "Seller Report"}
+                  {sellerReportMutation.isPending
+                    ? "Generating..."
+                    : "Vendor Wise"}
                 </Button>
 
                 <Button
@@ -330,7 +356,9 @@ const MonthwisePurchaseForm = () => {
                   onClick={handleBranchReport}
                   disabled={branchReportMutation.isPending}
                 >
-                  {branchReportMutation.isPending ? "Generating..." : "Branch Report"}
+                  {branchReportMutation.isPending
+                    ? "Generating..."
+                    : "Company Wise"}
                 </Button>
               </div>
             </form>

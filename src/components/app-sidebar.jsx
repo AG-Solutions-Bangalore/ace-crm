@@ -240,11 +240,16 @@ export function AppSidebar({ ...props }) {
             title: "Dispatch",
             url: "/purchase/market-dispatch",
           },
+          {
+            title: "Stock",
+            url: "/purchase/stock",
+          },
         ],
       },
       {
         title: "Payment",
         url: "#",
+        icon: Settings2,
         icon: BadgeIndianRupee,
         isActive: false,
         items: [
@@ -287,6 +292,10 @@ export function AppSidebar({ ...props }) {
           {
             title: "Monthwise Purchase",
             url: "/report/monthwise-purchase-form",
+          },
+          {
+            title: "Product Stock",
+            url: "/report/product-stock",
           },
         ],
       },

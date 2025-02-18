@@ -40,6 +40,7 @@ const productRowSchema = z.object({
   mpds_qnty: z.number().min(1, "Quantity is required"),
   mpds_rate: z.number().min(1, "Rate is required"),
   mpds_amount: z.number().min(1, "Amount price is required"),
+  mpd_godown: z.string().min(1, "Godown is required"),
 });
 
 const contractFormSchema = z.object({
@@ -52,7 +53,6 @@ const contractFormSchema = z.object({
   mpd_vendor_name: z.string().min(1, "Vendor is required"),
 
   mpd_bill_value: z.string().min(1, "Bill Value is required"),
-  mpd_godown: z.string().min(1, "Godown is required"),
   mpd_remark: z.string().min(1, "Remark is required"),
 
   dispatch_data: z
@@ -62,7 +62,7 @@ const contractFormSchema = z.object({
 const createDispatchOrder = async (data) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
- 
+
   const response = await fetch(`${BASE_URL}/api/panel-create-market-dispatch`, {
     method: "POST",
     headers: {
@@ -257,6 +257,7 @@ const CreateMarketDispatch = () => {
 
   const [contractData, setContractData] = useState([
     {
+      mpd_godown: "",
       mpds_product_name: "",
       mpds_product_description: "",
       mpds_bag: "",
@@ -276,7 +277,6 @@ const CreateMarketDispatch = () => {
     mpd_bill_ref: "",
     mpd_vendor_name: "",
     mpd_bill_value: "",
-    mpd_godown: "",
     mpd_remark: "",
   });
 
@@ -338,20 +338,13 @@ const CreateMarketDispatch = () => {
           (branch) => branch.branch_short === value
         );
         if (selectedCompanySort) {
-       
           setFormData((prev) => ({
             ...prev,
             branch_name: selectedCompanySort.branch_name,
             branch_address: selectedCompanySort.branch_address,
-       
           }));
         }
       }
-
-
-     
-
-      
     },
     [branchData, formData.branch_short]
   );
@@ -543,7 +536,6 @@ const CreateMarketDispatch = () => {
                     type="text"
                     placeholder="Enter dispatch order Ref"
                     value={formData.mpd_bill_ref}
-                 
                     className="bg-white"
                     onChange={(e) =>
                       handleInputChange("mpd_bill_ref", e.target.value)
@@ -619,13 +611,13 @@ const CreateMarketDispatch = () => {
                       handleInputChange("mpd_bill_value", e.target.value)
                     }
                     onKeyPress={(e) => {
-                        if (!/[0-9.]/.test(e.key) && e.key !== "Backspace") {
-                          e.preventDefault();
-                        }
-                      }}
+                      if (!/[0-9.]/.test(e.key) && e.key !== "Backspace") {
+                        e.preventDefault();
+                      }
+                    }}
                   />
                 </div>
-                <div>
+                {/* <div>
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
                   >
@@ -644,30 +636,30 @@ const CreateMarketDispatch = () => {
                     }
                     placeholder="Select Go Down"
                   />
-                </div>
+                </div> */}
               </div>
             </div>
 
             <div className="mb-2">
-                <div className="grid grid-cols-1 gap-6">
-                  <div>
-                    <label
-                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                    >
-                      Remarks
-                    </label>
-                    <Textarea
-                      type="text"
-                      className="bg-white"
-                      placeholder="Enter remarks"
-                      value={formData.mpd_remark}
-                      onChange={(e) =>
-                        handleInputChange("mpd_remark", e.target.value)
-                      }
-                    />
-                  </div>
+              <div className="grid grid-cols-1 gap-6">
+                <div>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
+                    Remarks
+                  </label>
+                  <Textarea
+                    type="text"
+                    className="bg-white"
+                    placeholder="Enter remarks"
+                    value={formData.mpd_remark}
+                    onChange={(e) =>
+                      handleInputChange("mpd_remark", e.target.value)
+                    }
+                  />
                 </div>
               </div>
+            </div>
 
             {/* Products Section */}
             <div className="mb-2">
@@ -682,7 +674,11 @@ const CreateMarketDispatch = () => {
                   <TableHeader>
                     <TableRow className="bg-gray-50">
                       <TableHead className="p-2 text-center border text-sm font-medium">
+                        Godown<span className="text-red-500">*</span>
+                      </TableHead>
+                      <TableHead className="p-2 text-center border text-sm font-medium">
                         Product /Description
+                        <span className="text-red-500">*</span>
                       </TableHead>
 
                       <TableHead className="p-2 text-center border text-sm font-medium">
@@ -700,6 +696,27 @@ const CreateMarketDispatch = () => {
                   <TableBody>
                     {contractData.map((row, rowIndex) => (
                       <TableRow key={rowIndex} className="hover:bg-gray-50">
+                        <TableCell className="p-2 border">
+                          <div className="flex flex-col gap-2">
+                            <MemoizedProductSelect
+                              value={row.mpd_godown}
+                              onChange={(value) =>
+                                handleRowDataChange(
+                                  rowIndex,
+                                  "mpd_godown",
+                                  value
+                                )
+                              }
+                              options={
+                                goDownData?.godown?.map((godown) => ({
+                                  value: godown.godown,
+                                  label: godown.godown,
+                                })) || []
+                              }
+                              placeholder="Select Godown"
+                            />
+                          </div>
+                        </TableCell>
                         <TableCell className="p-2 border">
                           <div className="flex flex-col gap-2">
                             <MemoizedProductSelect
@@ -836,8 +853,8 @@ const CreateMarketDispatch = () => {
             disabled={createDispatchMutation.isPending}
           >
             {createDispatchMutation.isPending
-              ? "Submitting..."
-              : "Submit Dispatch Order"}
+              ? "Creatting..."
+              : "Create Dispatch Order"}
           </Button>
         </div>
       </form>

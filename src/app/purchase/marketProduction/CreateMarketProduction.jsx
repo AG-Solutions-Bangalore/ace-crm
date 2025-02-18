@@ -499,8 +499,8 @@ const CreateMarketProduction = () => {
             disabled={createPurchaseMutation.isPending}
           >
             {createPurchaseMutation.isPending
-              ? "Submitting..."
-              : "Submit Production Order"}
+              ? "Creatting..."
+              : "Create Production Order"}
           </Button>
         </div>
       </form>
