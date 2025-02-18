@@ -1,22 +1,15 @@
 import * as React from "react";
 import {
   AudioWaveform,
-  BadgeIndianRupee,
-  BookOpen,
-  Bot,
   Command,
   Frame,
   GalleryVerticalEnd,
-  IndianRupee,
   Map,
-  PieChart,
   Settings,
   Settings2,
-  SquareTerminal,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
 import {
@@ -28,17 +21,16 @@ import {
 } from "@/components/ui/sidebar";
 import { NavMainUser } from "./nav-main-user";
 
-
 const isItemAllowed = (item, pageControl, userId) => {
   const itemUrl = item.url?.replace(/^\//, "");
-  return pageControl.some((control) => 
-    control.page === item.title && 
-    control.url === itemUrl && 
-    control.userIds.includes(userId) && 
-    control.status === "Active"
+  return pageControl.some(
+    (control) =>
+      control.page === item.title &&
+      control.url === itemUrl &&
+      control.userIds.includes(userId) &&
+      control.status === "Active"
   );
 };
-
 
 const filterMenuItems = (items, pageControl, userId) => {
   if (!items) return [];
@@ -67,276 +59,278 @@ export function AppSidebar({ ...props }) {
   const pageControl = JSON.parse(localStorage.getItem("pageControl")) || [];
 
   const initialData = {
-   user: {
-        name: `${nameL}`,
-        email: `${emailL}`,
-        avatar: "/avatars/shadcn.jpg",
+    user: {
+      name: `${nameL}`,
+      email: `${emailL}`,
+      avatar: "/avatars/shadcn.jpg",
+    },
+    teams: [
+      {
+        name: `${companyName}`,
+        logo: GalleryVerticalEnd,
+        plan: "",
       },
-      teams: [
-        {
-          name: `${companyName}`,
-          logo: GalleryVerticalEnd,
-          plan: "",
-        },
-        {
-          name: "Acme Corp.",
-          logo: AudioWaveform,
-          plan: "Startup",
-        },
-        {
-          name: "Evil Corp.",
-          logo: Command,
-          plan: "Free",
-        },
-      ],
-      navMain: [
-        {
-          title: "Dashboard",
-          url: "/home",
-          icon: Frame,
-          isActive: false,
-        },
-        {
-          title: "Master",
-          url: "#",
-          isActive: false,
-          icon: Settings2,
-          items: [
-            {
-              title: "Branch",
-              url: "/master/branch",
-            },
-            {
-              title: "State",
-              url: "/master/state",
-            },
-            {
-              title: "Bank",
-              url: "/master/bank",
-            },
-            {
-              title: "Buyer",
-              url: "/master/buyer",
-            },
-            {
-              title: "Scheme",
-              url: "/master/scheme",
-            },
-            {
-              title: "Country",
-              url: "/master/country",
-            },
-            {
-              title: "Container Size",
-              url: "/master/containersize",
-            },
-            {
-              title: "Payment TermsC",
-              url: "/master/paymentTermC",
-            },
-            {
-              title: "Description of Goods",
-              url: "/master/descriptionGoods",
-            },
-            {
-              title: "Bag Type",
-              url: "/master/bagType",
-            },
-            {
-              title: "Custom Description",
-              url: "/master/customdescription",
-            },
-            {
-              title: "Type",
-              url: "/master/type",
-            },
-            {
-              title: "Quality",
-              url: "/master/quality",
-            },
-            {
-              title: "Item",
-              url: "/master/item",
-            },
-            {
-              title: "Marking",
-              url: "/master/marking",
-            },
-            {
-              title: "Port of Loading",
-              url: "/master/portofloading",
-            },
-            {
-              title: "GR Code",
-              url: "/master/grcode",
-            },
-            {
-              title: "Product",
-              url: "/master/product",
-            },
-            {
-              title: "Product Description",
-              url: "/master/productdescription",
-            },
-            {
-              title: "Shipper",
-              url: "/master/shipper",
-            },
-            {
-              title: "Vessel",
-              url: "/master/vessel",
-            },
-            {
-              title: "Pre Recepits",
-              url: "/master/prerecepits",
-            },
-            {
-              title: "Vendor",
-              url: "/master/vendor",
-            },
-            {
-              title: "Purchase Product",
-              url: "/master/purchase-product",
-            },
-          ],
-        },
-        {
-          title: "Contract",
-          url: "/contract",
-          icon: Map,
-          isActive: false,
-        },
-        {
-          title: "Invoice",
-          url: "/invoice",
-          icon: Map,
-          isActive: false,
-        },
-        // {
-        //   title: "Purchase Order",
-        //   url: "/purchase-order",
-        //   icon: Map,
-        // },
-        {
-          title: "Purchase",
-          url: "#",
-          icon: Settings2,
-          isActive: false,
-          items: [
-            {
-              title: "Purchase Order",
-              url: "/purchase-order",
-            },
-            {
-              title: "Purchase",
-              url: "/purchase/market-purchase",
-            },
-            {
-              title: "Production",
-              url: "/purchase/market-production",
-            },
-            {
-              title: "Processing",
-              url: "/purchase/market-processing",
-            },
-            {
-              title: "Dispacth",
-              url: "/purchase/market-dispatch",
-            },
-          ],
-        },
-        {
-          title: "Payment",
-          url: "#",
-          icon: Settings2,
-          isActive: false,
-          items: [
-            {
-              title: "PaymentList",
-              url: "/payment-payment-list",
-            },
-            {
-              title: "PaymentPending",
-              url: "/payment-payment-pending",
-            },
-            {
-              title: "PaymentClose",
-              url: "/payment-payment-close",
-            },
-          ],
-        },
-        {
-          title: "Reports",
-          url: "#",
-          icon: Settings2,
-          isActive: false,
-          items: [
-            {
-              title: "BuyerR",
-              url: "/report/buyer-report",
-            },
-            {
-              title: "ContractR",
-              url: "/report/contract-form",
-            },
-            {
-              title: "Sales Accounts",
-              url: "/report/sales-account-form",
-            },
-            {
-              title: "Sales Data",
-              url: "/report/sales-data-form",
-            },
-            {
-              title: "Monthwise Purchase",
-              url: "/report/monthwise-purchase-form",
-            },
-          ],
-        },
-       
-      ],
-  
-      // projects: [
-      //   {
-      //     name: "Dashboard",
-      //     url: "/home",
-      //     icon: Frame,
-      //   },
-  
-      //   {
-      //     name: "Contract",
-      //     url: "/contract",
-      //     icon: Map,
-      //   },
-      //   {
-      //     name: "Invoice",
-      //     url: "/invoice",
-      //     icon: Map,
-      //   },
-      //   {
-      //     name: "Purchase Order",
-      //     url: "/purchase-order",
-      //     icon: Map,
-      //   },
-    
-      // ],
-      userManagement: [
-      
-        {
-          name: "User Management",
-          url: "/userManagement",
-          icon: Frame,
-        },
-        {
-          name: "UserType",
-          url: "/user-type",
-          icon: Settings,
-        },
-      ],
+      {
+        name: "Acme Corp.",
+        logo: AudioWaveform,
+        plan: "Startup",
+      },
+      {
+        name: "Evil Corp.",
+        logo: Command,
+        plan: "Free",
+      },
+    ],
+    navMain: [
+      {
+        title: "Dashboard",
+        url: "/home",
+        icon: Frame,
+        isActive: false,
+      },
+      {
+        title: "Master",
+        url: "#",
+        isActive: false,
+        icon: Settings2,
+        items: [
+          {
+            title: "Branch",
+            url: "/master/branch",
+          },
+          {
+            title: "State",
+            url: "/master/state",
+          },
+          {
+            title: "Bank",
+            url: "/master/bank",
+          },
+          {
+            title: "Buyer",
+            url: "/master/buyer",
+          },
+          {
+            title: "Scheme",
+            url: "/master/scheme",
+          },
+          {
+            title: "Country",
+            url: "/master/country",
+          },
+          {
+            title: "Container Size",
+            url: "/master/containersize",
+          },
+          {
+            title: "Payment TermsC",
+            url: "/master/paymentTermC",
+          },
+          {
+            title: "Description of Goods",
+            url: "/master/descriptionGoods",
+          },
+          {
+            title: "Bag Type",
+            url: "/master/bagType",
+          },
+          {
+            title: "Custom Description",
+            url: "/master/customdescription",
+          },
+          {
+            title: "Type",
+            url: "/master/type",
+          },
+          {
+            title: "Quality",
+            url: "/master/quality",
+          },
+          {
+            title: "Item",
+            url: "/master/item",
+          },
+          {
+            title: "Marking",
+            url: "/master/marking",
+          },
+          {
+            title: "Port of Loading",
+            url: "/master/portofloading",
+          },
+          {
+            title: "GR Code",
+            url: "/master/grcode",
+          },
+          {
+            title: "Product",
+            url: "/master/product",
+          },
+          {
+            title: "Product Description",
+            url: "/master/productdescription",
+          },
+          {
+            title: "Shipper",
+            url: "/master/shipper",
+          },
+          {
+            title: "Vessel",
+            url: "/master/vessel",
+          },
+          {
+            title: "Pre Recepits",
+            url: "/master/prerecepits",
+          },
+          {
+            title: "Vendor",
+            url: "/master/vendor",
+          },
+          {
+            title: "Purchase Product",
+            url: "/master/purchase-product",
+          },
+        ],
+      },
+      {
+        title: "Contract",
+        url: "/contract",
+        icon: Map,
+        isActive: false,
+      },
+      {
+        title: "Invoice",
+        url: "/invoice",
+        icon: Map,
+        isActive: false,
+      },
+      // {
+      //   title: "Purchase Order",
+      //   url: "/purchase-order",
+      //   icon: Map,
+      // },
+      {
+        title: "Purchase",
+        url: "#",
+        icon: Settings2,
+        isActive: false,
+        items: [
+          {
+            title: "Purchase Order",
+            url: "/purchase-order",
+          },
+          {
+            title: "Purchase",
+            url: "/purchase/market-purchase",
+          },
+          {
+            title: "Production",
+            url: "/purchase/market-production",
+          },
+          {
+            title: "Processing",
+            url: "/purchase/market-processing",
+          },
+          {
+            title: "Dispatch",
+            url: "/purchase/market-dispatch",
+          },
+        ],
+      },
+      {
+        title: "Payment",
+        url: "#",
+        icon: Settings2,
+        isActive: false,
+        items: [
+          {
+            title: "PaymentList",
+            url: "/payment-payment-list",
+          },
+          {
+            title: "PaymentPending",
+            url: "/payment-payment-pending",
+          },
+          {
+            title: "PaymentClose",
+            url: "/payment-payment-close",
+          },
+        ],
+      },
+      {
+        title: "Reports",
+        url: "#",
+        icon: Settings2,
+        isActive: false,
+        items: [
+          {
+            title: "BuyerR",
+            url: "/report/buyer-report",
+          },
+          {
+            title: "ContractR",
+            url: "/report/contract-form",
+          },
+          {
+            title: "Sales Accounts",
+            url: "/report/sales-account-form",
+          },
+          {
+            title: "Sales Data",
+            url: "/report/sales-data-form",
+          },
+          {
+            title: "Monthwise Purchase",
+            url: "/report/monthwise-purchase-form",
+          },
+        ],
+      },
+    ],
+
+    // projects: [
+    //   {
+    //     name: "Dashboard",
+    //     url: "/home",
+    //     icon: Frame,
+    //   },
+
+    //   {
+    //     name: "Contract",
+    //     url: "/contract",
+    //     icon: Map,
+    //   },
+    //   {
+    //     name: "Invoice",
+    //     url: "/invoice",
+    //     icon: Map,
+    //   },
+    //   {
+    //     name: "Purchase Order",
+    //     url: "/purchase-order",
+    //     icon: Map,
+    //   },
+
+    // ],
+    userManagement: [
+      {
+        name: "User Management",
+        url: "/userManagement",
+        icon: Frame,
+      },
+      {
+        name: "UserType",
+        url: "/user-type",
+        icon: Settings,
+      },
+    ],
   };
 
   // Filter menu items based on user permissions
-  const filteredNavMain = filterMenuItems(initialData.navMain, pageControl, userId);
+  const filteredNavMain = filterMenuItems(
+    initialData.navMain,
+    pageControl,
+    userId
+  );
   // const filteredProjects = filterMenuItems(initialData.projects.map(p => ({
   //   title: p.name,
   //   url: p.url
@@ -345,13 +339,19 @@ export function AppSidebar({ ...props }) {
   //   url: p.url,
   //   icon: initialData.projects.find(orig => orig.name === p.title)?.icon || Frame
   // }));
-  const filteredUserManagement = filterMenuItems(initialData.userManagement.map(p => ({
-    title: p.name,
-    url: p.url
-  })), pageControl, userId).map(p => ({
+  const filteredUserManagement = filterMenuItems(
+    initialData.userManagement.map((p) => ({
+      title: p.name,
+      url: p.url,
+    })),
+    pageControl,
+    userId
+  ).map((p) => ({
     name: p.title,
     url: p.url,
-    icon: initialData.userManagement.find(orig => orig.name === p.title)?.icon || Frame
+    icon:
+      initialData.userManagement.find((orig) => orig.name === p.title)?.icon ||
+      Frame,
   }));
 
   const data = {
@@ -379,5 +379,4 @@ export function AppSidebar({ ...props }) {
   );
 }
 
-
-//sajid 
+//sajid

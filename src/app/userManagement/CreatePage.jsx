@@ -89,7 +89,7 @@ const CreatePage = () => {
             { title: "Purchase", url: "/purchase/market-purchase" },
             { title: "Production", url: "/purchase/market-production" },
             { title: "Processing", url: "/purchase/market-processing" },
-            { title: "Dispacth", url: "/purchase/market-dispatch" }
+            { title: "Dispatch", url: "/purchase/market-dispatch" }
           ]
         },
         {

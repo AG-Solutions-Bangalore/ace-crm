@@ -263,6 +263,8 @@ const EditContract = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+    const [submitLoading, setSubmitLoading] = useState(false);
+    const [saveAndViewLoading, setSaveAndViewLoading] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
   const [formData, setFormData] = useState({
     branch_short: "",
@@ -655,8 +657,9 @@ const EditContract = () => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitLoading(true);
     try {
-      console.log("Before processing:", contractData);
+      
       const processedContractData = contractData.map((row) => ({
         ...row,
         contractSub_item_bag: parseFloat(row.contractSub_item_bag),
@@ -665,13 +668,12 @@ const EditContract = () => {
         contractSub_packing: parseFloat(row.contractSub_packing),
         contractSub_bagsize: parseFloat(row.contractSub_bagsize),
       }));
-      console.log("After processing:", processedContractData);
-      // i remove the create one and zod
+     
       const updateData = {
         ...formData,
         contract_data: processedContractData,
       };
-      updateContractMutation.mutate({ id, data: updateData });
+     const res = await updateContractMutation.mutateAsync({ id, data: updateData });
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {
@@ -710,6 +712,84 @@ const EditContract = () => {
         description: "An unexpected error occurred",
         variant: "destructive",
       });
+    }finally{
+      setSubmitLoading(false)
+    }
+  };
+  const handleSaveAndView = async (e) => {
+    e.preventDefault();
+    setSaveAndViewLoading(true);
+    try {
+    
+      const processedContractData = contractData.map((row) => ({
+        ...row,
+        contractSub_item_bag: parseFloat(row.contractSub_item_bag),
+        contractSub_qntyInMt: parseFloat(row.contractSub_qntyInMt),
+        contractSub_rateMT: parseFloat(row.contractSub_rateMT),
+        contractSub_packing: parseFloat(row.contractSub_packing),
+        contractSub_bagsize: parseFloat(row.contractSub_bagsize),
+      }));
+     
+      
+      const updateData = {
+        ...formData,
+        contract_data: processedContractData,
+      };
+
+    
+      const response = await updateContractMutation.mutateAsync({ id, data: updateData });
+
+  
+      if (response.code == 200) {
+      
+        navigate(`/view-contract/${id}`);
+      } else {
+        
+        toast({
+          title: "Error",
+          description: response.msg,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const groupedErrors = error.errors.reduce((acc, err) => {
+          const field = err.path.join(".");
+          if (!acc[field]) acc[field] = [];
+          acc[field].push(err.message);
+          return acc;
+        }, {});
+
+        const errorMessages = Object.entries(groupedErrors).map(
+          ([field, messages]) => {
+            const fieldKey = field.split(".").pop();
+            const label = fieldLabels[fieldKey] || field;
+            return `${label}: ${messages.join(", ")}`;
+          }
+        );
+
+        toast({
+          title: "Validation Error",
+          description: (
+            <div>
+              <ul className="list-disc pl-5">
+                {errorMessages.map((message, index) => (
+                  <li key={index}>{message}</li>
+                ))}
+              </ul>
+            </div>
+          ),
+          variant: "destructive",
+        });
+        return;
+      }
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaveAndViewLoading(false);
     }
   };
 
@@ -1473,16 +1553,26 @@ const EditContract = () => {
           </CardContent>
         </Card>
 
-        <div className="flex flex-col items-end">
+        <div className="flex  items-center justify-end  gap-2">
           {updateContractMutation.isPending && <ProgressBar progress={70} />}
           <Button
             type="submit"
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
-            disabled={updateContractMutation.isPending}
+            disabled={submitLoading}
           >
-            {updateContractMutation.isPending
-              ? "Submitting..."
-              : "Submit Enquiry"}
+            {submitLoading
+              ? "Updating..."
+              : "Update & Exit"}
+          </Button>
+          <Button
+            type="button" 
+            onClick={handleSaveAndView} 
+            className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
+            disabled={saveAndViewLoading}
+          >
+            {saveAndViewLoading
+              ? "Updating..."
+              : "Update & View"}
           </Button>
         </div>
       </form>
