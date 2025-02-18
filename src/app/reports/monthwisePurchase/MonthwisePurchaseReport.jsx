@@ -6,87 +6,88 @@ import { useReactToPrint } from "react-to-print";
 import BASE_URL from "@/config/BaseUrl";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import { Download, Printer } from "lucide-react";
+import axios from "axios";
 
 // branch report
 const MonthwisePurchaseReport = () => {
-  const { toast } = useToast();
-  const location = useLocation();
-  const containerRef = useRef(null);
-  const reportData = location.state?.reportMoPurData;
-  const formFields = location.state?.formFields;
-  console.log("form", formFields);
-  console.log("rpert branch ", reportData);
-  if (!reportData || !reportData.purchaseProduct) {
-    return (
-      <Page>
-        <p>No data available</p>
-      </Page>
-    );
-  }
-
-  const groupedData = reportData.purchaseProduct.reduce((acc, item) => {
-    acc[item.branch_name] = acc[item.branch_name] || [];
-    acc[item.branch_name].push(item);
-    return acc;
-  }, {});
-
-  const overallTotals = reportData.purchaseProduct.reduce(
-    (totals, item) => {
-      totals.packing += Number(item.purchase_productSub_packing || 0);
-      totals.marking += Number(item.purchase_productSub_marking || 0);
-      totals.quantity += Number(item.purchase_productSub_qntyInMt || 0);
-      totals.rate += Number(item.purchase_productSub_rateInMt || 0);
-
-      return totals;
-    },
-    { packing: 0, marking: 0, quantity: 0, rate: 0 }
-  );
-
-  const handleDownload = async () => {
-    try {
-      // Use the form fields passed through state for the download payload
-      const downloadPayload = {
-        from_date: formFields.from_date,
-        to_date: formFields.to_date,
-        branch_name: formFields.branch_name || "",
-        purchase_product_seller: formFields.purchase_product_seller || "",
-      };
-      console.table("downloadpayload", downloadPayload);
-      const response = await axios({
-        url: `${BASE_URL}/api/panel-download-purchase-product-monthwise-report`,
-        method: "POST",
-        data: downloadPayload,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+     const { toast } = useToast();
+      const location = useLocation();
+        const containerRef = useRef();
+      const reportData = location.state?.reportMoPurData;
+      const formFields = location.state?.formFields;
+      console.log("form",formFields)
+    console.log("rpert branch ",reportData)
+      if (!reportData || !reportData.purchaseProduct) {
+        return (
+          <Page>
+            <p>No data available</p>
+          </Page>
+        );
+      }
+    
+      const groupedData = reportData.purchaseProduct.reduce((acc, item) => {
+        acc[item.branch_name] = acc[item.branch_name] || [];
+        acc[item.branch_name].push(item);
+        return acc;
+      }, {});
+      
+      const overallTotals = reportData.purchaseProduct.reduce(
+        (totals, item) => {
+          totals.packing += Number(item.purchase_productSub_packing || 0);
+          totals.marking += Number(item.purchase_productSub_marking || 0);
+          totals.quantity += Number(item.purchase_productSub_qntyInMt || 0);
+          totals.rate += Number(item.purchase_productSub_rateInMt || 0);
+          
+          return totals;
         },
-        responseType: "blob",
-      });
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "monthwise_purchase_report.csv");
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-
-      toast({
-        title: "Success",
-        description: "Monthwise Purchase Report downloaded successfully",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to download report",
-        variant: "destructive",
-      });
-    }
-  };
-  const handlePrintPdf = useReactToPrint({
-    content: () => (containerRef.current ? containerRef.current : null),
-    documentTitle: "apta",
-    pageStyle: `
+        { packing: 0, marking: 0, quantity: 0, rate: 0 }
+      );
+    
+   
+        const handleDownload = async () => {
+          try {
+           
+            const downloadPayload = {
+              from_date: formFields.from_date,
+              to_date: formFields.to_date,
+              branch_name: formFields.branch_name || '',
+              purchase_product_seller: formFields.purchase_product_seller || ''
+            };
+            const response = await axios({
+              url: `${BASE_URL}/api/panel-download-purchase-product-monthwise-report`,
+              method: "POST",
+              data: downloadPayload,
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+              responseType: 'blob',
+            });
+      
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "monthwise_purchase_report.csv");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+      
+            toast({
+              title: "Success",
+              description: "Monthwise Purchase Report downloaded successfully",
+            });
+          } catch (error) {
+            toast({
+              title: "Error",
+              description: error.message || "Failed to download report",
+              variant: "destructive",
+            });
+          }
+        };
+        const handlPrintPdf = useReactToPrint({
+          content: () => containerRef.current,
+          documentTitle: "apta",
+          pageStyle: `
                   @page {
                      size: A4 landscape;
                   margin: 5mm;
@@ -109,30 +110,29 @@ const MonthwisePurchaseReport = () => {
                  
                 }
                 `,
-  });
+        });
   return (
-    <Page>
-      <div className="flex justify-between   items-center p-2 rounded-lg mb-5 bg-gray-200 ">
-        <h1 className="text-xl font-bold">Monthwise Purchase Report</h1>
-
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            variant="default"
-            className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+ 
+     <Page>
+          <div className="flex justify-between   items-center p-2 rounded-lg mb-5 bg-gray-200 ">
+          <h1 className="text-xl font-bold">Monthwise Purchase Report</h1>
+         <div className="flex flex-row items-center gap-4">
+         <button
+            className="bg-blue-500 text-white py-1 px-2 rounded"
+            onClick={handlPrintPdf}
+          >
+            Print
+          </button>
+          <button
+            className="bg-blue-500 text-white py-1 px-2 rounded"
             onClick={handleDownload}
           >
-            <Download className="h-4 w-4 mr-2" /> Download
-          </Button>
-          <Button
-            className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-            onClick={handlePrintPdf}
-          >
-            <Printer className="h-4 w-4 mr-2" /> Print
-          </Button>
+            Download
+          </button>
+         </div>
+        
         </div>
-      </div>
-      <div ref={containerRef}>
+        <div ref={containerRef}>
         {Object.entries(groupedData).map(([branchName, invoices]) => (
           <div
             key={branchName}
@@ -150,6 +150,7 @@ const MonthwisePurchaseReport = () => {
             >
               {/* Header */}
               {[
+              
                 "Po No",
                 "Po Date",
                 "Seller",
@@ -159,6 +160,7 @@ const MonthwisePurchaseReport = () => {
                 "Marking",
                 "Qnty in Mt",
                 "Rate",
+            
               ].map((header, idx) => (
                 <div
                   key={idx}
@@ -170,6 +172,7 @@ const MonthwisePurchaseReport = () => {
               {/* Data Rows */}
               {invoices.map((item, index) => (
                 <React.Fragment key={index}>
+                 
                   <div className="p-2 border-b border-r border-black">
                     {item.purchase_product_ref}
                   </div>
@@ -197,10 +200,11 @@ const MonthwisePurchaseReport = () => {
                   <div className="p-2 border-b border-r border-black text-right">
                     {item.purchase_productSub_rateInMt}
                   </div>
+                 
                 </React.Fragment>
               ))}
               {/* Branch Wise Total */}
-
+             
               <div className="p-2 border-b border-black"></div>
               <div className="p-2 border-b border-black"></div>
               <div className="p-2 border-b  border-black"></div>
@@ -210,66 +214,56 @@ const MonthwisePurchaseReport = () => {
               </div>
               <div className="p-2 border-b border-r border-black text-right">
                 {invoices.reduce(
-                  (sum, item) =>
-                    sum + Number(item.purchase_productSub_packing || 0),
+                  (sum, item) => sum + Number(item.purchase_productSub_packing || 0),
                   0
                 )}
               </div>
               <div className="p-2 border-b border-r border-black text-right">
-                {invoices.reduce(
-                  (sum, item) =>
-                    sum + Number(item.purchase_productSub_marking || 0),
+              {invoices.reduce(
+                  (sum, item) => sum + Number(item.purchase_productSub_marking || 0),
                   0
                 )}
               </div>
               <div className="p-2 border-b border-r border-black text-right">
-                {invoices.reduce(
-                  (sum, item) =>
-                    sum + Number(item.purchase_productSub_qntyInMt || 0),
+              {invoices.reduce(
+                  (sum, item) => sum + Number(item.purchase_productSub_qntyInMt || 0),
                   0
                 )}
               </div>
               <div className="p-2 border-b border-r border-black text-right">
-                {invoices.reduce(
-                  (sum, item) =>
-                    sum + Number(item.purchase_productSub_rateInMt || 0),
+              {invoices.reduce(
+                  (sum, item) => sum + Number(item.purchase_productSub_rateInMt || 0),
                   0
                 )}
               </div>
+            
             </div>
           </div>
         ))}
-        {/* Overall Grand Total */}
-        <div
+         {/* Overall Grand Total */}
+         <div
           className="grid bg-gray-100 border-t border-l border-r border-black font-bold text-[11px]"
           style={{
             gridTemplateColumns:
               " minmax(170px, auto) minmax(90px, auto) minmax(90px, auto) minmax(60px, auto) minmax(100px, auto) minmax(110px, auto) minmax(110px, auto) minmax(70px, auto) minmax(95px, auto)  ",
           }}
         >
+       
           <div className="p-2 border-b border-black"></div>
           <div className="p-2 border-b border-black"></div>
           <div className="p-2 border-b border-black"></div>
           <div className="p-2 border-b  border-black"></div>
-          <div className="p-2 border-b border-r border-black font-bold">
-            Grand Total
-          </div>
-          <div className="p-2 border-b border-r border-black text-right">
-            {overallTotals.packing}
-          </div>
-          <div className="p-2 border-b border-r border-black text-right">
-            {overallTotals.marking}
-          </div>
-          <div className="p-2 border-b border-r border-black text-right">
-            {overallTotals.quantity}
-          </div>
-          <div className="p-2 border-b border-r border-black text-right">
-            {overallTotals.rate}
-          </div>
+          <div className="p-2 border-b border-r border-black font-bold">Grand Total</div>
+          <div className="p-2 border-b border-r border-black text-right">{overallTotals.packing}</div>
+          <div className="p-2 border-b border-r border-black text-right">{overallTotals.marking}</div>
+          <div className="p-2 border-b border-r border-black text-right">{overallTotals.quantity}</div>
+          <div className="p-2 border-b border-r border-black text-right">{overallTotals.rate}</div>
+          
         </div>
-      </div>
-    </Page>
-  );
-};
+        </div>
+      </Page>
+ 
+  )
+}
 
-export default MonthwisePurchaseReport;
+export default MonthwisePurchaseReport
