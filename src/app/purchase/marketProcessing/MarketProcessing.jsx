@@ -61,6 +61,11 @@ import moment from "moment";
 import { useToast } from "@/hooks/use-toast";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import Page from "@/app/dashboard/page";
+import {
+  ProcessingCreate,
+  ProcessingDelete,
+  ProcessingEdit,
+} from "@/components/buttonIndex/ButtonComponents";
 
 const MarketProcessing = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -157,39 +162,20 @@ const MarketProcessing = () => {
 
         return (
           <div className="flex flex-row">
-          
-        <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => navigate(`/purchase/market-processing/editProcessing/${ProcessingId}`)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                 
-                </TooltipTrigger>
-                <TooltipContent>Edit Purchase</TooltipContent>
-              </Tooltip>
-            </TooltipProvider> 
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setDeleteContractId(ProcessingId);
-                      setDeleteConfirmOpen(true);
-                    }}
-                  >
-                    <Trash className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Delete Processing</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <ProcessingEdit
+              onClick={() =>
+                navigate(
+                  `/purchase/market-processing/editProcessing/${ProcessingId}`
+                )
+              }
+            ></ProcessingEdit>
+
+            <ProcessingDelete
+              onClick={() => {
+                setDeleteContractId(ProcessingId);
+                setDeleteConfirmOpen(true);
+              }}
+            ></ProcessingDelete>
           </div>
         );
       },
@@ -295,15 +281,12 @@ const MarketProcessing = () => {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
-            variant="default"
+          <ProcessingCreate
             className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             onClick={() =>
               navigate("/purchase/market-processing/createProcessing")
             }
-          >
-            <SquarePlus className="h-4 w-4" /> Processing
-          </Button>
+          ></ProcessingCreate>
         </div>
         {/* table  */}
         <div className="rounded-md border">
@@ -362,7 +345,7 @@ const MarketProcessing = () => {
         {/* row slection and pagintaion button  */}
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="flex-1 text-sm text-muted-foreground">
-            Total Processing  : &nbsp;
+            Total Processing : &nbsp;
             {table.getFilteredRowModel().rows.length}
           </div>
           <div className="space-x-2">

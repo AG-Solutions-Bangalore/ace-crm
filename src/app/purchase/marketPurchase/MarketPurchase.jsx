@@ -46,6 +46,10 @@ import moment from "moment";
 import { useToast } from "@/hooks/use-toast";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import Page from "@/app/dashboard/page";
+import {
+  PurchaseCreate,
+  PurchaseEdit,
+} from "@/components/buttonIndex/ButtonComponents";
 const MarketPurchase = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteContractId, setDeleteContractId] = useState(null);
@@ -124,11 +128,11 @@ const MarketPurchase = () => {
       header: "Bill Value",
       cell: ({ row }) => <div>{row.getValue("mp_bill_value")}</div>,
     },
-    {
-      accessorKey: "mp_godown",
-      header: "Go Down",
-      cell: ({ row }) => <div>{row.getValue("mp_godown")}</div>,
-    },
+    // {
+    //   accessorKey: "mp_godown",
+    //   header: "Go Down",
+    //   cell: ({ row }) => <div>{row.getValue("mp_godown")}</div>,
+    // },
 
     {
       id: "actions",
@@ -138,20 +142,11 @@ const MarketPurchase = () => {
 
         return (
           <div className="flex flex-row">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => navigate(`/edit-market-order/${purchaseId}`)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Edit Purchase</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <PurchaseEdit
+              onClick={() => navigate(`/edit-market-order/${purchaseId}`)}
+            >
+              <Edit className="h-4 w-4" />
+            </PurchaseEdit>
           </div>
         );
       },
@@ -257,13 +252,12 @@ const MarketPurchase = () => {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
-            variant="default"
+          <PurchaseCreate
             className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             onClick={() => navigate("/create-market-order")}
           >
             <SquarePlus className="h-4 w-4" /> Market Purchase
-          </Button>
+          </PurchaseCreate>
         </div>
         {/* table  */}
         <div className="rounded-md border">

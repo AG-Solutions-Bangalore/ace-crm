@@ -22,13 +22,13 @@ const CreatePage = () => {
 
   const getAllPages = () => {
     const pages = [];
-    
+
     const extractPages = (items) => {
-      items.forEach(item => {
+      items.forEach((item) => {
         if (item.url && item.url !== "#") {
           pages.push({
             title: item.title || item.name,
-            url: item.url
+            url: item.url,
           });
         }
         if (item.items) {
@@ -36,7 +36,6 @@ const CreatePage = () => {
         }
       });
     };
-
 
     const sidebarData = {
       navMain: [
@@ -67,8 +66,8 @@ const CreatePage = () => {
             { title: "Pre Recepits", url: "/master/prerecepits" },
             { title: "Purchase Product", url: "/master/purchase-product" },
             { title: "Vendor", url: "/master/vendor" },
-            { title: "Buyer", url: "/master/buyer" }
-          ]
+            { title: "Buyer", url: "/master/buyer" },
+          ],
         },
         {
           title: "Reports",
@@ -78,8 +77,15 @@ const CreatePage = () => {
             { title: "ContractR", url: "/report/contract-form" },
             { title: "Sales Accounts", url: "/report/sales-account-form" },
             { title: "Sales Data", url: "/report/sales-data-form" },
-            { title: "Monthwise Purchase", url: "/report/monthwise-purchase-form" }
-          ]
+            {
+              title: "Monthwise Purchase",
+              url: "/report/monthwise-purchase-form",
+            },
+            {
+              title: "Product Stock",
+              url: "/report/product-stock",
+            },
+          ],
         },
         {
           title: "Purchase",
@@ -89,8 +95,12 @@ const CreatePage = () => {
             { title: "Purchase", url: "/purchase/market-purchase" },
             { title: "Production", url: "/purchase/market-production" },
             { title: "Processing", url: "/purchase/market-processing" },
-            { title: "Dispacth", url: "/purchase/market-dispatch" }
-          ]
+            { title: "Dispatch", url: "/purchase/market-dispatch" },
+            {
+              title: "Stock",
+              url: "/purchase/stock",
+            },
+          ],
         },
         {
           title: "Payment",
@@ -98,42 +108,50 @@ const CreatePage = () => {
           items: [
             { title: "PaymentList", url: "/payment-payment-list" },
             { title: "PaymentPending", url: "/payment-payment-pending" },
-            { title: "PaymentClose", url: "/payment-payment-close" }
-          ]
-        }
+            { title: "PaymentClose", url: "/payment-payment-close" },
+          ],
+        },
       ],
       projects: [
         { name: "Dashboard", url: "/home" },
         { name: "Contract", url: "/contract" },
         { name: "Invoice", url: "/invoice" },
-        { name: "Purchase Order", url: "/purchase-order" }
+        { name: "Purchase Order", url: "/purchase-order" },
       ],
       userManagement: [
         { name: "User Management", url: "/userManagement" },
-        { name: "UserType", url: "/user-type" }
-      ]
+        { name: "UserType", url: "/user-type" },
+      ],
     };
 
     // Extract pages from all sections
     extractPages(sidebarData.navMain);
-    extractPages(sidebarData.projects.map(p => ({ title: p.name, url: p.url })));
-    extractPages(sidebarData.userManagement.map(p => ({ title: p.name, url: p.url })));
+    extractPages(
+      sidebarData.projects.map((p) => ({ title: p.name, url: p.url }))
+    );
+    extractPages(
+      sidebarData.userManagement.map((p) => ({ title: p.name, url: p.url }))
+    );
 
     return pages;
   };
 
   useEffect(() => {
-    const existingControls = JSON.parse(localStorage.getItem("pageControl") || "[]");
+    const existingControls = JSON.parse(
+      localStorage.getItem("pageControl") || "[]"
+    );
     const allPages = getAllPages();
 
-    const filteredPages = allPages.filter(page => 
-      !existingControls.some(control => 
-        control.page === page.title || 
-        control.url === page.url.replace("/", "")
-      )
+    const filteredPages = allPages.filter(
+      (page) =>
+        !existingControls.some(
+          (control) =>
+            control.page === page.title ||
+            control.url === page.url.replace("/", "")
+        )
     );
 
-    setAvailablePages(["All", ...filteredPages.map(page => page.title)]);
+    setAvailablePages(["All", ...filteredPages.map((page) => page.title)]);
   }, []);
 
   const handlePageChange = (e) => {
@@ -141,20 +159,24 @@ const CreatePage = () => {
     setSelectedPage(page);
 
     if (page === "All") {
-      const existingControls = JSON.parse(localStorage.getItem("pageControl") || "[]");
+      const existingControls = JSON.parse(
+        localStorage.getItem("pageControl") || "[]"
+      );
       const allPages = getAllPages();
 
-      const filteredPages = allPages.filter(menuItem => 
-        !existingControls.some(control => 
-          control.page === menuItem.title || 
-          control.url === menuItem.url.replace("/", "")
-        )
+      const filteredPages = allPages.filter(
+        (menuItem) =>
+          !existingControls.some(
+            (control) =>
+              control.page === menuItem.title ||
+              control.url === menuItem.url.replace("/", "")
+          )
       );
 
       setSelectedItems(filteredPages);
       setSelectedUrl("");
     } else {
-      const item = getAllPages().find(i => i.title === page);
+      const item = getAllPages().find((i) => i.title === page);
       if (item) {
         setSelectedUrl(item.url.replace("/", ""));
         setSelectedItems([item]);
@@ -165,14 +187,17 @@ const CreatePage = () => {
   const createMutation = useMutation({
     mutationFn: async (data) => {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${BASE_URL}/api/panel-create-usercontrol-new`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await fetch(
+        `${BASE_URL}/api/panel-create-usercontrol-new`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status} ${response.statusText}`);
@@ -201,19 +226,21 @@ const CreatePage = () => {
     let payloadData;
 
     if (selectedPage === "All") {
-      payloadData = selectedItems.map(item => ({
+      payloadData = selectedItems.map((item) => ({
         page: item.title,
         url: item.url.replace("/", ""),
         userIds,
         status,
       }));
     } else {
-      payloadData = [{
-        page: selectedPage,
-        url: selectedUrl,
-        userIds,
-        status,
-      }];
+      payloadData = [
+        {
+          page: selectedPage,
+          url: selectedUrl,
+          userIds,
+          status,
+        },
+      ];
     }
 
     createMutation.mutate({ usercontrol_data: payloadData });
@@ -236,7 +263,7 @@ const CreatePage = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Page</option>
-                {availablePages.map(page => (
+                {availablePages.map((page) => (
                   <option key={page} value={page}>
                     {page}
                   </option>

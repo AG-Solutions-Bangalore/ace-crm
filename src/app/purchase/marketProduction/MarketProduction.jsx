@@ -57,6 +57,12 @@ import moment from "moment";
 import { useToast } from "@/hooks/use-toast";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import Page from "@/app/dashboard/page";
+import {
+  ProductionCreate,
+  ProductionDelete,
+  ProductionEdit,
+  ProductionremoveRow,
+} from "@/components/buttonIndex/ButtonComponents";
 const MarketProduction = () => {
   const { toast } = useToast();
   const {
@@ -188,49 +194,25 @@ const MarketProduction = () => {
 
         return (
           <div className="flex flex-row">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() =>
-                      navigate(`/edit-market-production/${purchaseId}`)
-                    }
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Edit Purchase</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  {purchaseId ? (
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleDeleteRow(purchaseId)}
-                      className="text-red-500"
-                      type="button"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="ghost"
-                      onClick={() => removeRow(rowIndex)}
-                      disabled={marketProduction.length === 1}
-                      className="text-red-500 "
-                      type="button"
-                    >
-                      <MinusCircle className="h-4 w-4" />
-                    </Button>
-                  )}
-                </TooltipTrigger>
-                <TooltipContent>Edit Purchase</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <ProductionEdit
+              onClick={() => navigate(`/edit-market-production/${purchaseId}`)}
+            ></ProductionEdit>
+
+            {purchaseId ? (
+              <ProductionDelete
+                onClick={() => handleDeleteRow(purchaseId)}
+                type="button"
+              >
+                <Trash2 className="h-4 w-4" />
+              </ProductionDelete>
+            ) : (
+              <ProductionremoveRow
+                onClick={() => removeRow(rowIndex)}
+                disabled={marketProduction.length === 1}
+                className="text-red-500 "
+                type="button"
+              ></ProductionremoveRow>
+            )}
           </div>
         );
       },
@@ -336,13 +318,10 @@ const MarketProduction = () => {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
-            variant="default"
+          <ProductionCreate
             className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             onClick={() => navigate("/create-market-production")}
-          >
-            <SquarePlus className="h-4 w-4" /> Market Production
-          </Button>
+          ></ProductionCreate>
         </div>
         {/* table  */}
         <div className="rounded-md border">
