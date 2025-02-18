@@ -132,14 +132,10 @@ export const useFetchItemNames = () => {
   );
 };
 export const useFetchState = () => {
-  return useQuery(
-    createQueryConfig(["state"], "/api/panel-fetch-state")
-  );
+  return useQuery(createQueryConfig(["state"], "/api/panel-fetch-state"));
 };
 export const useFetchScheme = () => {
-  return useQuery(
-    createQueryConfig(["scheme"], "/api/panel-fetch-scheme")
-  );
+  return useQuery(createQueryConfig(["scheme"], "/api/panel-fetch-scheme"));
 };
 
 export const useFetchDescriptionofGoods = () => {
@@ -157,9 +153,10 @@ export const useFetchBagsTypes = () => {
 
 //invoice apis
 
-
 export const useFetchStatus = () => {
-  return useQuery(createQueryConfig(["status"], "/api/panel-fetch-invoice-status"));
+  return useQuery(
+    createQueryConfig(["status"], "/api/panel-fetch-invoice-status")
+  );
 };
 export const useFetchVessel = () => {
   return useQuery(createQueryConfig(["vessels"], "/api/panel-fetch-vessel"));
@@ -168,13 +165,16 @@ export const useFetchShipper = () => {
   return useQuery(createQueryConfig(["shippers"], "/api/panel-fetch-shipper"));
 };
 
-// payment edit invoice 
+// payment edit invoice
 
 export const useFetchPaymentAmount = () => {
-  return useQuery(createQueryConfig(["paymentamount"], "/api/panel-fetch-invoice-payment-amount"));
+  return useQuery(
+    createQueryConfig(
+      ["paymentamount"],
+      "/api/panel-fetch-invoice-payment-amount"
+    )
+  );
 };
-
-
 
 //create Team
 
@@ -182,9 +182,10 @@ export const useFetchCompanies = () => {
   return useQuery(createQueryConfig(["companies"], "/api/panel-fetch-company"));
 };
 export const useFetchUserType = () => {
-  return useQuery(createQueryConfig(["usertype"], "/api/panel-fetch-usertypes"));
+  return useQuery(
+    createQueryConfig(["usertype"], "/api/panel-fetch-usertypes")
+  );
 };
-
 
 // create purchase order
 
@@ -193,53 +194,29 @@ export const useFetchVendor = () => {
 };
 
 export const useFetchPurchaseProduct = () => {
-  return useQuery(createQueryConfig(["purchaseproduct"], "/api/panel-fetch-purchase-order-product"));
+  return useQuery(
+    createQueryConfig(
+      ["purchaseproduct"],
+      "/api/panel-fetch-purchase-order-product"
+    )
+  );
 };
 
+//create markting order
 
+export const useFetchGoDownMarketPurchase = () => {
+  return useQuery(
+    createQueryConfig(["godownmarket"], "/api/panel-fetch-godown")
+  );
+};
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//  purchase dorpdown 
-
+//  purchase dorpdown
 
 export const useFetchGoDown = () => {
   return useQuery(createQueryConfig(["godown"], "/api/panel-fetch-godown"));
 };
 export const useFetchDispatchDcNo = () => {
-  return useQuery(createQueryConfig(["dispatchDcNo"], "/api/panel-fetch-market-dispatch-dcno"));
+  return useQuery(
+    createQueryConfig(["dispatchDcNo"], "/api/panel-fetch-market-dispatch-dcno")
+  );
 };
