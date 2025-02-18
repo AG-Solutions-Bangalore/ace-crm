@@ -3,13 +3,15 @@ import Page from "@/app/dashboard/page";
 import { useToast } from "@/hooks/use-toast";
 import React, { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
+import BASE_URL from "@/config/BaseUrl";
+import axios from "axios";
 
 const MonthwisePurchaseSellerReport = () => {
   const { toast } = useToast();
   const location = useLocation();
   const containerRef = useRef();
   const reportData = location.state?.reportMoPurData;
-
+  const formFields = location.state?.formFields;
   if (!reportData || !reportData.purchaseProduct) {
     return (
       <Page>
@@ -18,13 +20,13 @@ const MonthwisePurchaseSellerReport = () => {
     );
   }
 
-  // First group by branch, then by seller
+
   const groupedData = reportData.purchaseProduct.reduce((acc, item) => {
-    // Initialize branch if not exists
+
     acc[item.branch_name] = acc[item.branch_name] || {};
-    // Initialize seller within branch if not exists
+   
     acc[item.branch_name][item.purchase_product_seller] = acc[item.branch_name][item.purchase_product_seller] || [];
-    // Add item to seller's array within branch
+   
     acc[item.branch_name][item.purchase_product_seller].push(item);
     return acc;
   }, {});
@@ -39,7 +41,46 @@ const MonthwisePurchaseSellerReport = () => {
     },
     { packing: 0, marking: 0, quantity: 0, rate: 0 }
   );
+  const handleDownload = async () => {
+    try {
+   
+      const downloadPayload = {
+        from_date: formFields.from_date,
+        to_date: formFields.to_date,
+        branch_name: formFields.branch_name || '',
+        purchase_product_seller: formFields.purchase_product_seller || ''
+      };
+      const response = await axios({
+        url: `${BASE_URL}/api/panel-download-purchase-product-monthwise-report`,
+        method: "POST",
+        data: downloadPayload,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        responseType: 'blob',
+      });
 
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "monthwise_purchase_report.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      toast({
+        title: "Success",
+        description: "Monthwise Purchase Report downloaded successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to download report",
+        variant: "destructive",
+      });
+    }
+  };
   const handlPrintPdf = useReactToPrint({
     content: () => containerRef.current,
     documentTitle: "apta",
@@ -70,12 +111,20 @@ const MonthwisePurchaseSellerReport = () => {
     <Page>
       <div className="flex justify-between items-center p-2 rounded-lg mb-5 bg-gray-200">
         <h1 className="text-xl font-bold">Monthwise Purchase Seller Report</h1>
-        <button
-          className="bg-blue-500 text-white py-1 px-2 rounded"
-          onClick={handlPrintPdf}
-        >
-          Print
-        </button>
+        <div className="flex flex-row items-center gap-4">
+         <button
+            className="bg-blue-500 text-white py-1 px-2 rounded"
+            onClick={handlPrintPdf}
+          >
+            Print
+          </button>
+          <button
+            className="bg-blue-500 text-white py-1 px-2 rounded"
+            onClick={handleDownload}
+          >
+            Download
+          </button>
+         </div>
       </div>
       <div ref={containerRef}>
         {Object.entries(groupedData).map(([branchName, sellers]) => (

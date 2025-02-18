@@ -6,12 +6,13 @@ import { useReactToPrint } from "react-to-print";
 import BASE_URL from "@/config/BaseUrl";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import { Download, Printer } from "lucide-react";
+import axios from "axios";
 
 // branch report
 const MonthwisePurchaseReport = () => {
      const { toast } = useToast();
       const location = useLocation();
-        const containerRef = useRef(null);
+        const containerRef = useRef();
       const reportData = location.state?.reportMoPurData;
       const formFields = location.state?.formFields;
       console.log("form",formFields)
@@ -45,14 +46,13 @@ const MonthwisePurchaseReport = () => {
    
         const handleDownload = async () => {
           try {
-            // Use the form fields passed through state for the download payload
+           
             const downloadPayload = {
               from_date: formFields.from_date,
               to_date: formFields.to_date,
               branch_name: formFields.branch_name || '',
               purchase_product_seller: formFields.purchase_product_seller || ''
             };
-            console.table("downloadpayload",downloadPayload)
             const response = await axios({
               url: `${BASE_URL}/api/panel-download-purchase-product-monthwise-report`,
               method: "POST",
@@ -84,16 +84,8 @@ const MonthwisePurchaseReport = () => {
             });
           }
         };
-        const handlePrintPdf = useReactToPrint({
-          if (!containerRef.current) {
-            toast({
-              title: "Error",
-              description: "Nothing to print",
-              variant: "destructive",
-            });
-            return;
-          }
-          content: () => (containerRef.current ? containerRef.current : null),
+        const handlPrintPdf = useReactToPrint({
+          content: () => containerRef.current,
           documentTitle: "apta",
           pageStyle: `
                   @page {
@@ -124,23 +116,21 @@ const MonthwisePurchaseReport = () => {
      <Page>
           <div className="flex justify-between   items-center p-2 rounded-lg mb-5 bg-gray-200 ">
           <h1 className="text-xl font-bold">Monthwise Purchase Report</h1>
-         
-          <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="default"
-                    className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-                    onClick={handleDownload}
-                  >
-                    <Download className="h-4 w-4 mr-2" /> Download
-                  </Button>
-                  <Button
-                    className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-                    onClick={handlePrintPdf}
-                  >
-                    <Printer className="h-4 w-4 mr-2" /> Print
-                  </Button>
-                </div>
+         <div className="flex flex-row items-center gap-4">
+         <button
+            className="bg-blue-500 text-white py-1 px-2 rounded"
+            onClick={handlPrintPdf}
+          >
+            Print
+          </button>
+          <button
+            className="bg-blue-500 text-white py-1 px-2 rounded"
+            onClick={handleDownload}
+          >
+            Download
+          </button>
+         </div>
+        
         </div>
         <div ref={containerRef}>
         {Object.entries(groupedData).map(([branchName, invoices]) => (

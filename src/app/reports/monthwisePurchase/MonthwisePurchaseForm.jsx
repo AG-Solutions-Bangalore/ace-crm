@@ -111,7 +111,12 @@ const MonthwisePurchaseForm = () => {
   const sellerReportMutation = useMutation({
     mutationFn: createReport,
     onSuccess: (data) => {
-      navigate("/report/monthwise-purchase-seller-report", { state: { reportMoPurData: data } });
+      navigate("/report/monthwise-purchase-seller-report", { state: { reportMoPurData: data, formFields: {
+        from_date: formData.from_date,
+        to_date: formData.to_date,
+        branch_name: formData.branch_name,
+        purchase_product_seller: formData.purchase_product_seller
+      } } });
     },
     onError: (error) => {
       toast({
@@ -133,7 +138,6 @@ const MonthwisePurchaseForm = () => {
     }));
   };
 
-  // Separate submit handlers for branch and seller reports
   const handleBranchReport = async (e) => {
     e.preventDefault();
     try {
