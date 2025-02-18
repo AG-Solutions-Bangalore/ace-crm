@@ -1,12 +1,17 @@
 import * as React from "react";
 import {
   AudioWaveform,
+  BadgeIndianRupee,
+  Blocks,
   Command,
   Frame,
   GalleryVerticalEnd,
   Map,
+  NotebookText,
+  ReceiptText,
   Settings,
   Settings2,
+  TicketPlus,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -195,13 +200,13 @@ export function AppSidebar({ ...props }) {
       {
         title: "Contract",
         url: "/contract",
-        icon: Map,
+        icon: Blocks,
         isActive: false,
       },
       {
         title: "Invoice",
         url: "/invoice",
-        icon: Map,
+        icon: NotebookText,
         isActive: false,
       },
       // {
@@ -209,10 +214,10 @@ export function AppSidebar({ ...props }) {
       //   url: "/purchase-order",
       //   icon: Map,
       // },
-      {
+      { 
         title: "Purchase",
         url: "#",
-        icon: Settings2,
+        icon: TicketPlus,
         isActive: false,
         items: [
           {
@@ -240,7 +245,7 @@ export function AppSidebar({ ...props }) {
       {
         title: "Payment",
         url: "#",
-        icon: Settings2,
+        icon: BadgeIndianRupee,
         isActive: false,
         items: [
           {
@@ -260,7 +265,7 @@ export function AppSidebar({ ...props }) {
       {
         title: "Reports",
         url: "#",
-        icon: Settings2,
+        icon: ReceiptText,
         isActive: false,
         items: [
           {

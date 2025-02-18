@@ -109,7 +109,7 @@ const CreateItem = () => {
             ></ItemCreate>
           </div>
         ) : pathname === "/create-contract" || pathname === "/create-invoice" ? (
-          <p className="text-sm text-yellow-700  hover:text-red-800 cursor-pointer">
+          <p className="text-sm text-blue-600  hover:text-red-800 cursor-pointer">
             Create Item
           </p>
         ) : null}

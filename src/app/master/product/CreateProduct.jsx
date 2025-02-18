@@ -88,7 +88,7 @@ const CreateProduct = () => {
             <SquarePlus className="h-4 w-4 " /> Product
           </Button>
         ) : pathname === "/create-contract" || pathname === "/create-invoice" ? (
-         <p className="text-xs text-yellow-700  hover:text-red-800 cursor-pointer">
+         <p className="text-xs text-blue-600  hover:text-red-800 cursor-pointer">
                    <span className="flex items-center flex-row gap-1">
                      <SquarePlus className="w-4 h-4" /> <span>Add</span>
                    </span>

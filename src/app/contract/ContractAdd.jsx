@@ -1450,8 +1450,8 @@ const ContractAdd = () => {
             disabled={submitLoading}
           >
             {submitLoading
-              ? "Submitting..."
-              : "Submit & Exit"}
+              ? "Creating..."
+              : "Create & Exit"}
           </Button>
           <Button
             type="button" 
@@ -1460,8 +1460,8 @@ const ContractAdd = () => {
             disabled={saveAndViewLoading}
           >
             {saveAndViewLoading
-              ? "Submitting..."
-              : "Submit & View"}
+              ? "Creating..."
+              : "Create & Print"}
           </Button>
         </div>
       </form>
