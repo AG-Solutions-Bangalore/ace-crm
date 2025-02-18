@@ -19,6 +19,10 @@ import { Download } from "lucide-react";
 import axios from "axios";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import { useState } from "react";
+import {
+  SalesAccountDownload,
+  SalesAccountView,
+} from "@/components/buttonIndex/ButtonComponents";
 
 // Form validation schema
 const salesAccountFormSchema = z.object({
@@ -32,14 +36,17 @@ const createContract = async (data) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
 
-  const response = await fetch(`${BASE_URL}/api/panel-fetch-sales-accounts-report`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+  const response = await fetch(
+    `${BASE_URL}/api/panel-fetch-sales-accounts-report`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
 
   if (!response.ok) {
     const errorData = await response.json();
@@ -50,10 +57,12 @@ const createContract = async (data) => {
 
 // Header component
 const BranchHeader = () => (
-  <div className={`flex sticky top-0 z-10 border border-gray-200 rounded-lg justify-between ${ButtonConfig.cardheaderColor} items-start gap-8 mb-2 p-4 shadow-sm`}>
+  <div
+    className={`flex sticky top-0 z-10 border border-gray-200 rounded-lg justify-between ${ButtonConfig.cardheaderColor} items-start gap-8 mb-2 p-4 shadow-sm`}
+  >
     <div className="flex-1">
-      <h1 className="text-3xl font-bold text-gray-800">Sales Account</h1>
-      <p className="text-gray-600 mt-2">Add a Contract to Visit Report</p>
+      <h1 className="text-3xl font-bold text-gray-800">Sales Account Summary</h1>
+      <p className="text-gray-600 mt-2">Add a Sales Account to Visit Report</p>
     </div>
   </div>
 );
@@ -61,7 +70,7 @@ const BranchHeader = () => (
 const SalesAccountForm = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  
+
   // Form state
   const [formData, setFormData] = useState({
     from_date: moment().startOf("month").format("YYYY-MM-DD"),
@@ -105,9 +114,10 @@ const SalesAccountForm = () => {
 
   // Handle form input changes
   const handleInputChange = (field, valueOrEvent) => {
-    const value = typeof valueOrEvent === "object" && valueOrEvent.target
-      ? valueOrEvent.target.value
-      : valueOrEvent;
+    const value =
+      typeof valueOrEvent === "object" && valueOrEvent.target
+        ? valueOrEvent.target.value
+        : valueOrEvent;
 
     setFormData((prev) => ({
       ...prev,
@@ -161,7 +171,7 @@ const SalesAccountForm = () => {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        responseType: 'blob',
+        responseType: "blob",
       });
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -195,7 +205,9 @@ const SalesAccountForm = () => {
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-6">
                 <div>
-                  <label className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}>
+                  <label
+                    className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
+                  >
                     Enter From Date <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -208,7 +220,9 @@ const SalesAccountForm = () => {
                 </div>
 
                 <div>
-                  <label className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}>
+                  <label
+                    className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
+                  >
                     Enter To Date <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -221,12 +235,16 @@ const SalesAccountForm = () => {
                 </div>
 
                 <div>
-                  <label className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}>
+                  <label
+                    className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
+                  >
                     Branch
                   </label>
                   <Select
                     value={formData.branch_name}
-                    onValueChange={(value) => handleInputChange("branch_name", value)}
+                    onValueChange={(value) =>
+                      handleInputChange("branch_name", value)
+                    }
                     disabled={isBranchesLoading}
                   >
                     <SelectTrigger className="bg-white">
@@ -235,12 +253,9 @@ const SalesAccountForm = () => {
                     <SelectContent className="bg-white">
                       {branchData?.branch?.map((branch, index) => {
                         // Create a unique key using both name and index
-                      
+
                         return (
-                          <SelectItem
-                            key={index}
-                            value={branch.branch_name}
-                          >
+                          <SelectItem key={index} value={branch.branch_name}>
                             {branch.branch_name}
                           </SelectItem>
                         );
@@ -251,21 +266,22 @@ const SalesAccountForm = () => {
               </div>
 
               <div className="flex flex-row items-end mt-3 justify-end w-full">
-                <Button
+                <SalesAccountDownload
                   type="button"
-                  variant="default"
                   className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
                   onClick={handleDownload}
                 >
                   <Download className="h-4 w-4 mr-2" /> Download
-                </Button>
-                <Button
+                </SalesAccountDownload>
+                <SalesAccountView
                   type="submit"
                   className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} ml-2 flex items-center`}
                   disabled={createSalesAccountMutation.isPending}
                 >
-                  {createSalesAccountMutation.isPending ? "Submitting..." : "Submit Sales Account"}
-                </Button>
+                  {createSalesAccountMutation.isPending
+                    ? "Submitting..."
+                    : "Submit Sales Account"}
+                </SalesAccountView>
               </div>
             </form>
           </div>

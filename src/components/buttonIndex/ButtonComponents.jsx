@@ -865,6 +865,102 @@ export const BuyerRDownload = ({ onClick, className }) => {
   );
 };
 BuyerRDownload.page = "BuyerR";
+////////REPORT-"ContractR"
+
+export const ContractRDownload = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "ContractRDownload", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      <Download className="h-4 w-4" /> Download
+    </Button>
+  );
+};
+ContractRDownload.page = "ContractR";
+export const ContractRView = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "ContractRView", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      Open Report
+    </Button>
+  );
+};
+ContractRView.page = "ContractR";
+////////REPORT-"SalesAccount"
+
+export const SalesAccountDownload = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "SalesAccountDownload", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      <Download className="h-4 w-4" /> Download
+    </Button>
+  );
+};
+SalesAccountDownload.page = "Sales Accounts";
+export const SalesAccountView = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "SalesAccountView", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      Open Report
+    </Button>
+  );
+};
+SalesAccountView.page = "Sales Accounts";
+////////REPORT-"Sales Data"
+
+export const SalesDataDownload = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "SalesDataDownload", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      <Download className="h-4 w-4" /> Download
+    </Button>
+  );
+};
+SalesDataDownload.page = "Sales Data";
+export const SalesDataView = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "SalesDataView", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      Open Report
+    </Button>
+  );
+};
+SalesDataView.page = "Sales Data";
 //PAYMENT
 ////////Payment
 export const PaymentCreate = ({ onClick, className }) => {
@@ -1203,6 +1299,12 @@ export default {
   PreRecepitsCreate,
   PreRecepitsEdit,
   BuyerRDownload,
+  ContractRDownload,
+  ContractRView,
+  SalesAccountDownload,
+  SalesAccountView,
+  SalesDataDownload,
+  SalesDataView,
   PaymentCreate,
   PurchaseOrderCreate,
   PurchaseOrderEdit,

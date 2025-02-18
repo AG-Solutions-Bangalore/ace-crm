@@ -75,7 +75,7 @@ const SalesDataReport = () => {
   return (
     <Page>
       <div className="flex justify-between   items-center p-2 rounded-lg mb-5 bg-gray-200 ">
-        <h1 className="text-xl font-bold">Sales Data Report</h1>
+        <h1 className="text-xl font-bold">Sales Summary</h1>
         <button
           className="bg-blue-500 text-white py-1 px-2 rounded"
           onClick={handlPrintPdf}

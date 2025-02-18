@@ -19,6 +19,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Download } from "lucide-react";
 import axios from "axios";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import {
+  ContractRDownload,
+  ContractRView,
+} from "@/components/buttonIndex/ButtonComponents";
 
 const contractFormSchema = z.object({
   from_date: z.string().min(1, "From date is required"),
@@ -79,8 +83,6 @@ const ContractForm = () => {
       });
     },
   });
-
- 
 
   const handleInputChange = (e, field) => {
     const value = e.target.value;
@@ -169,9 +171,11 @@ const ContractForm = () => {
 
   const BranchHeader = ({ progress }) => {
     return (
-      <div className={`flex sticky top-0 z-10 border border-gray-200 rounded-lg justify-between ${ButtonConfig.cardheaderColor} items-start gap-8 mb-2  p-4 shadow-sm`}>
+      <div
+        className={`flex sticky top-0 z-10 border border-gray-200 rounded-lg justify-between ${ButtonConfig.cardheaderColor} items-start gap-8 mb-2  p-4 shadow-sm`}
+      >
         <div className="flex-1">
-          <h1 className="text-3xl font-bold text-gray-800">Contract List</h1>
+          <h1 className="text-3xl font-bold text-gray-800">Contract Summary</h1>
           <p className="text-gray-600 mt-2">Add a Contract to Vist Repost</p>
         </div>
       </div>
@@ -263,7 +267,9 @@ const ContractForm = () => {
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  >
                     Enter From Date <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -278,7 +284,9 @@ const ContractForm = () => {
                 </div>
 
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  >
                     Enter To Date <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -293,7 +301,9 @@ const ContractForm = () => {
                 </div>
 
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  >
                     Branch <span className="text-red-500"></span>
                   </label>
                   <Select
@@ -323,7 +333,9 @@ const ContractForm = () => {
                 </div>
                 {/* //buyer */}
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  >
                     Buyer <span className="text-red-500"></span>
                   </label>
                   <Select
@@ -350,7 +362,9 @@ const ContractForm = () => {
                 {/* Consignee */}
 
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  >
                     Consignee <span className="text-red-500"></span>
                   </label>
                   <Select
@@ -376,7 +390,9 @@ const ContractForm = () => {
                 </div>
                 {/* Containers/Size  */}
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  >
                     Containers/Size <span className="text-red-500"></span>
                   </label>
                   <Select
@@ -404,7 +420,9 @@ const ContractForm = () => {
                 </div>
                 {/* Product */}
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  >
                     Product <span className="text-red-500"></span>
                   </label>
                   <Select
@@ -430,7 +448,9 @@ const ContractForm = () => {
                 </div>
 
                 <div>
-                     <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  >
                     Status <span className="text-red-500"></span>
                   </label>
                   <Select
@@ -452,21 +472,21 @@ const ContractForm = () => {
               <div className="flex flex-row items-end mt-3 justify-end w-full">
                 {createContractMutation.isPending}
 
-                <Button
-                  variant="default"
-                  className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}                  onClick={onSubmit}
+                <ContractRDownload
+                  className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+                  onClick={onSubmit}
                 >
                   <Download className="h-4 w-4" /> Download
-                </Button>
-                <Button
+                </ContractRDownload>
+                <ContractRView
                   type="submit"
                   className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} ml-2 flex items-center mt-2`}
                   disabled={createContractMutation.isPending}
                 >
                   {createContractMutation.isPending
-                    ? "Submitting..."
-                    : "Submit Invoice"}
-                </Button>
+                    ? "Openning..."
+                    : "Open Report"}
+                </ContractRView>
               </div>
             </form>
           </div>
