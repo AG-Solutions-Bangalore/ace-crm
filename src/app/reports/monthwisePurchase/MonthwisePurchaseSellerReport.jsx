@@ -5,6 +5,7 @@ import React, { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import BASE_URL from "@/config/BaseUrl";
 import axios from "axios";
+import moment from "moment";
 
 const MonthwisePurchaseSellerReport = () => {
   const { toast } = useToast();
@@ -20,13 +21,12 @@ const MonthwisePurchaseSellerReport = () => {
     );
   }
 
-
   const groupedData = reportData.purchaseProduct.reduce((acc, item) => {
-
     acc[item.branch_name] = acc[item.branch_name] || {};
-   
-    acc[item.branch_name][item.purchase_product_seller] = acc[item.branch_name][item.purchase_product_seller] || [];
-   
+
+    acc[item.branch_name][item.purchase_product_seller] =
+      acc[item.branch_name][item.purchase_product_seller] || [];
+
     acc[item.branch_name][item.purchase_product_seller].push(item);
     return acc;
   }, {});
@@ -43,12 +43,11 @@ const MonthwisePurchaseSellerReport = () => {
   );
   const handleDownload = async () => {
     try {
-   
       const downloadPayload = {
         from_date: formFields.from_date,
         to_date: formFields.to_date,
-        branch_name: formFields.branch_name || '',
-        purchase_product_seller: formFields.purchase_product_seller || ''
+        branch_name: formFields.branch_name || "",
+        purchase_product_seller: formFields.purchase_product_seller || "",
       };
       const response = await axios({
         url: `${BASE_URL}/api/panel-download-purchase-product-monthwise-report`,
@@ -57,7 +56,7 @@ const MonthwisePurchaseSellerReport = () => {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        responseType: 'blob',
+        responseType: "blob",
       });
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -112,7 +111,7 @@ const MonthwisePurchaseSellerReport = () => {
       <div className="flex justify-between items-center p-2 rounded-lg mb-5 bg-gray-200">
         <h1 className="text-xl font-bold">Monthwise Purchase Seller Report</h1>
         <div className="flex flex-row items-center gap-4">
-         <button
+          <button
             className="bg-blue-500 text-white py-1 px-2 rounded"
             onClick={handlPrintPdf}
           >
@@ -124,7 +123,7 @@ const MonthwisePurchaseSellerReport = () => {
           >
             Download
           </button>
-         </div>
+        </div>
       </div>
       <div ref={containerRef}>
         {Object.entries(groupedData).map(([branchName, sellers]) => (
@@ -137,8 +136,8 @@ const MonthwisePurchaseSellerReport = () => {
             </h2>
             {Object.entries(sellers).map(([sellerName, invoices]) => (
               <div key={sellerName} className="mb-4">
-                <h3 className="p-2 bg-gray-100 font-bold border-b border-r border-black">
-                  Seller: {sellerName}
+                <h3 className="p-2 px-5 bg-gray-100 font-bold border-b border-r border-black">
+                  {sellerName}
                 </h3>
                 <div
                   className="grid bg-white"
@@ -165,7 +164,7 @@ const MonthwisePurchaseSellerReport = () => {
                       {header}
                     </div>
                   ))}
-                  
+
                   {/* Data Rows */}
                   {invoices.map((item, index) => (
                     <React.Fragment key={index}>
@@ -173,10 +172,18 @@ const MonthwisePurchaseSellerReport = () => {
                         {item.purchase_product_ref}
                       </div>
                       <div className="p-2 border-b border-r border-black">
-                        {item.purchase_product_date}
+                        {item.purchase_product_date
+                          ? moment(item.purchase_product_date).format(
+                              "DD-MM-YYYY"
+                            )
+                          : ""}
                       </div>
                       <div className="p-2 border-b border-r border-black">
-                        {item.purchase_product_delivery_date}
+                        {item.purchase_product_delivery_date
+                          ? moment(item.purchase_product_delivery_date).format(
+                              "DD-MM-YYYY"
+                            )
+                          : ""}
                       </div>
                       <div className="p-2 border-b border-r border-black">
                         {item.purchase_productSub_name}
@@ -201,29 +208,33 @@ const MonthwisePurchaseSellerReport = () => {
                   <div className="p-2 border-b border-black"></div>
                   <div className="p-2 border-b border-black"></div>
                   <div className="p-2 border-b border-r border-black font-bold">
-                    Seller Total
+                    Sub Total
                   </div>
                   <div className="p-2 border-b border-r border-black text-right">
                     {invoices.reduce(
-                      (sum, item) => sum + Number(item.purchase_productSub_packing || 0),
+                      (sum, item) =>
+                        sum + Number(item.purchase_productSub_packing || 0),
                       0
                     )}
                   </div>
                   <div className="p-2 border-b border-r border-black text-right">
                     {invoices.reduce(
-                      (sum, item) => sum + Number(item.purchase_productSub_marking || 0),
+                      (sum, item) =>
+                        sum + Number(item.purchase_productSub_marking || 0),
                       0
                     )}
                   </div>
                   <div className="p-2 border-b border-r border-black text-right">
                     {invoices.reduce(
-                      (sum, item) => sum + Number(item.purchase_productSub_qntyInMt || 0),
+                      (sum, item) =>
+                        sum + Number(item.purchase_productSub_qntyInMt || 0),
                       0
                     )}
                   </div>
                   <div className="p-2 border-b border-r border-black text-right">
                     {invoices.reduce(
-                      (sum, item) => sum + Number(item.purchase_productSub_rateInMt || 0),
+                      (sum, item) =>
+                        sum + Number(item.purchase_productSub_rateInMt || 0),
                       0
                     )}
                   </div>
@@ -244,11 +255,21 @@ const MonthwisePurchaseSellerReport = () => {
           <div className="p-2 border-b border-black"></div>
           <div className="p-2 border-b border-black"></div>
           <div className="p-2 border-b border-black"></div>
-          <div className="p-2 border-b border-r border-black font-bold">Grand Total</div>
-          <div className="p-2 border-b border-r border-black text-right">{overallTotals.packing}</div>
-          <div className="p-2 border-b border-r border-black text-right">{overallTotals.marking}</div>
-          <div className="p-2 border-b border-r border-black text-right">{overallTotals.quantity}</div>
-          <div className="p-2 border-b border-r border-black text-right">{overallTotals.rate}</div>
+          <div className="p-2 border-b border-r border-black font-bold">
+            Grand Total
+          </div>
+          <div className="p-2 border-b border-r border-black text-right">
+            {overallTotals.packing}
+          </div>
+          <div className="p-2 border-b border-r border-black text-right">
+            {overallTotals.marking}
+          </div>
+          <div className="p-2 border-b border-r border-black text-right">
+            {overallTotals.quantity}
+          </div>
+          <div className="p-2 border-b border-r border-black text-right">
+            {overallTotals.rate}
+          </div>
         </div>
       </div>
     </Page>
