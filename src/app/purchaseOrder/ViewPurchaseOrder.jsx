@@ -54,7 +54,6 @@ const ViewPurchaseOrder = () => {
         const logoUrl = `/api/public/assets/images/letterHead/AceB.png`;
         const response = await fetch(logoUrl);
         const blob = await response.blob();
-        
 
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -448,7 +447,7 @@ const ViewPurchaseOrder = () => {
                           Authorised Signatory :
                         </p>
                         <img
-                          src={`https://exportbiz.in/public/assets/images/sign/sign.png`}
+                          src={`${SIGN_IN_PURCHASE}/sign.png`}
                           alt="logo"
                           className="w-[120px] h-auto relative "
                         />
