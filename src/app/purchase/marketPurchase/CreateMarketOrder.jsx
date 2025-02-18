@@ -33,12 +33,6 @@ import Page from "@/app/dashboard/page";
 
 // Validation Schemas
 const productRowSchema = z.object({
-  //   mpr_product_name: z.string().optional(),
-  //   mps_product_description: z.string().optional(),
-  //   mpr_bag: z.string().optional(),
-  //   mpr_qnty: z.string().optional(),
-  //   mps_rate: z.string().optional(),
-  //   mps_amount: z.string().optional(),
   mps_product_name: z.string().min(1, "Product Name is required"),
   mps_product_description: z.string().min(1, "Product Desc is required"),
   mps_bag: z.number().min(1, "Bag is required"),
@@ -398,8 +392,7 @@ const CreateMarketOrder = () => {
     try {
       const processedMarketData = MarketData.map((row) => ({
         ...row,
-        // mps_product_name: row.mps_product_name,
-        // mps_product_description: row.mps_product_description,
+
         mps_bag: parseFloat(row.mps_bag),
         mps_qnty: parseFloat(row.mps_qnty),
         mps_rate: parseFloat(row.mps_rate),
@@ -460,7 +453,7 @@ const CreateMarketOrder = () => {
           <CardContent className="p-6">
             {/* Basic Details Section */}
             <div className="mb-0">
-              <div className="grid grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div>
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
@@ -537,9 +530,7 @@ const CreateMarketOrder = () => {
                   </label>
                   <MemoizedSelect
                     value={formData.mp_godown}
-                    onChange={(value) =>
-                      handleSelectChange("mp_godown", value)
-                    }
+                    onChange={(value) => handleSelectChange("mp_godown", value)}
                     options={
                       godownPurchaseData?.godown?.map((godown) => ({
                         value: godown.godown,
@@ -576,7 +567,7 @@ const CreateMarketOrder = () => {
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
+              <div className="sm:overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-gray-50">

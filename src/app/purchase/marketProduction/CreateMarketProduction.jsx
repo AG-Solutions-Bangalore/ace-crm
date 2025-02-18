@@ -391,7 +391,7 @@ const CreateMarketProduction = () => {
           <CardContent className="p-6">
             {/* Basic Details Section */}
             <div className="mb-0">
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
@@ -430,7 +430,7 @@ const CreateMarketProduction = () => {
               </div>
               {contractData.map((row, rowIndex) => (
                 <div key={rowIndex}>
-                  <div className="grid grid-cols-3 gap-6 mt-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-3">
                     <div className="flex flex-col gap-2">
                       <MemoizedProductSelect
                         value={row.mpr_product_name}

@@ -18,16 +18,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getTodayDate } from "@/utils/currentDate";
 import { ProgressBar } from "@/components/spinner/ProgressBar";
 import BASE_URL from "@/config/BaseUrl";
-import { Textarea } from "@/components/ui/textarea";
 import Select from "react-select";
-import { useCurrentYear } from "@/hooks/useCurrentYear";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import {
-  useFetchCompanys,
   useFetchGoDownMarketPurchase,
-  useFetchProductNos,
   useFetchPurchaseProduct,
-  useFetchVendor,
 } from "@/hooks/useApi";
 import {
   AlertDialog,
@@ -49,6 +44,7 @@ const productRowSchema = z.object({
   mps_qnty: z.number().min(1, "Quantity is required"),
   mps_rate: z.number().min(1, "Rate is required"),
   mps_amount: z.number().min(1, "Amount is required"),
+  id: z.any().optional(),
 });
 
 const contractFormSchema = z.object({
@@ -275,6 +271,7 @@ const EditMarketOrder = () => {
       mps_qnty: "",
       mps_rate: "",
       mps_amount: "",
+      id: "",
     },
   ]);
 
@@ -461,6 +458,7 @@ const EditMarketOrder = () => {
     setMarketData((prev) => [
       ...prev,
       {
+        id: "",
         mps_product_name: "",
         mps_product_description: "",
         mps_bag: "",
@@ -494,85 +492,36 @@ const EditMarketOrder = () => {
     mps_amount: "Amount is Required",
   };
 
-  //   const handleSubmit = async (e) => {
-  //     e.preventDefault();
-  //     try {
-  //       const processedMarketData = MarketData.map((row) => ({
-  //         ...row,
-
-  //         mps_bag: parseFloat(row.mps_bag),
-  //         mps_qnty: parseFloat(row.mps_qnty),
-  //         mps_rate: parseFloat(row.mps_rate),
-  //         mps_amount: parseFloat(row.mps_amount),
-  //       }));
-  //       const validatedData = {
-  //         ...formData,
-  //         market_data: processedMarketData,
-  //       };
-  //       console.log("After processing:", validatedData);
-
-  //       updatePurchaseMutation.mutate({ id, data: validatedData });
-  //     } catch (error) {
-  //       if (error instanceof z.ZodError) {
-  //         const groupedErrors = error.errors.reduce((acc, err) => {
-  //           const field = err.path.join(".");
-  //           if (!acc[field]) acc[field] = [];
-  //           acc[field].push(err.message);
-  //           return acc;
-  //         }, {});
-
-  //         const errorMessages = Object.entries(groupedErrors).map(
-  //           ([field, messages]) => {
-  //             const fieldKey = field.split(".").pop();
-  //             const label = fieldLabels[fieldKey] || field;
-  //             return `${label}: ${messages.join(", ")}`;
-  //           }
-  //         );
-
-  //         toast({
-  //           title: "Validation Error",
-  //           description: (
-  //             <div>
-  //               <ul className="list-disc pl-5">
-  //                 {errorMessages.map((message, index) => (
-  //                   <li key={index}>{message}</li>
-  //                 ))}
-  //               </ul>
-  //             </div>
-  //           ),
-  //           variant: "destructive",
-  //         });
-  //         return;
-  //       }
-
-  //       toast({
-  //         title: "Error",
-  //         description: "An unexpected error occurred",
-  //         variant: "destructive",
-  //       });
-  //     }
-  //   };
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const processedMarketData = MarketData.map((row) => ({
         ...row,
+        id: parseFloat(row.id),
         mps_bag: parseFloat(row.mps_bag),
         mps_qnty: parseFloat(row.mps_qnty),
         mps_rate: parseFloat(row.mps_rate),
         mps_amount: parseFloat(row.mps_amount),
       }));
 
-      const validatedData = {
+      const validatedData = contractFormSchema.parse({
         ...formData,
+        mp_bill_value: parseFloat(formData.mp_bill_value),
+
         market_data: processedMarketData,
-      };
+      });
 
       console.log("Before processing:", validatedData);
 
       updatePurchaseMutation.mutate({ id, data: validatedData });
     } catch (error) {
+      console.error("Caught error:", error);
+      console.log("Error name:", error.name);
+      console.log("Instance of ZodError:", error instanceof z.ZodError);
+
       if (error instanceof z.ZodError) {
+        console.log("Handling ZodError...");
+
         const groupedErrors = error.errors.reduce((acc, err) => {
           const field = err.path.join(".");
           if (!acc[field]) acc[field] = [];
@@ -580,13 +529,16 @@ const EditMarketOrder = () => {
           return acc;
         }, {});
 
+        console.log("Grouped errors:", groupedErrors);
         const errorMessages = Object.entries(groupedErrors).map(
           ([field, messages]) => {
             const fieldKey = field.split(".").pop();
-            const label = fieldLabels[fieldKey] || field;
+            const label = fieldLabels?.[fieldKey] || field;
             return `${label}: ${messages.join(", ")}`;
           }
         );
+
+        console.log("Error messages:", errorMessages);
 
         toast({
           title: "Validation Error",
@@ -601,14 +553,18 @@ const EditMarketOrder = () => {
           ),
           variant: "destructive",
         });
+
         return;
       }
+
+      console.log("Unexpected error block executed");
+
+      toast({
+        title: "Validation Error",
+        description: errorMessages.join("\n"),
+        variant: "destructive",
+      });
     }
-    toast({
-      title: "Error",
-      description: "An unexpected error occurred",
-      variant: "destructive",
-    });
   };
 
   return (
@@ -621,7 +577,7 @@ const EditMarketOrder = () => {
           <CardContent className="p-6">
             {/* Basic Details Section */}
             <div className="mb-0">
-              <div className="grid grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div>
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
