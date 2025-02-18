@@ -1572,7 +1572,7 @@ const EditContract = () => {
           >
             {saveAndViewLoading
               ? "Updating..."
-              : "Update & View"}
+              : "Update & Print"}
           </Button>
         </div>
       </form>

@@ -1888,7 +1888,7 @@ const InvoiceEdit = () => {
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
             disabled={saveAndViewLoading}
           >
-            {saveAndViewLoading ? "Updating..." : "Update & View"}
+            {saveAndViewLoading ? "Updating..." : "Update & Print"}
           </Button>
         </div>
       </form>

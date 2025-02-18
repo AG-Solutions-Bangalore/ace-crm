@@ -1850,8 +1850,8 @@ const InvoiceAdd = () => {
             disabled={submitLoading}
           >
             {submitLoading 
-              ? "Submitting..."
-              : "Submit & Exit"}
+              ? "Creating..."
+              : "Create & Exit"}
           </Button>
           <Button
             type="button"
@@ -1859,7 +1859,7 @@ const InvoiceAdd = () => {
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
             disabled={saveAndViewLoading}
           >
-            {saveAndViewLoading ? "Submitting..." : "Submit & View"}
+            {saveAndViewLoading ? "Creating..." : "Create & Print"}
           </Button>
         </div>
       </form>
