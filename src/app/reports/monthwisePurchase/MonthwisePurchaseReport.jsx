@@ -3,14 +3,19 @@ import Page from "@/app/dashboard/page";
 import { useToast } from "@/hooks/use-toast";
 import React, { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
+import BASE_URL from "@/config/BaseUrl";
+import { ButtonConfig } from "@/config/ButtonConfig";
+import { Download, Printer } from "lucide-react";
 
-
+// branch report
 const MonthwisePurchaseReport = () => {
      const { toast } = useToast();
       const location = useLocation();
-        const containerRef = useRef();
+        const containerRef = useRef(null);
       const reportData = location.state?.reportMoPurData;
-    
+      const formFields = location.state?.formFields;
+      console.log("form",formFields)
+    console.log("rpert branch ",reportData)
       if (!reportData || !reportData.purchaseProduct) {
         return (
           <Page>
@@ -37,8 +42,58 @@ const MonthwisePurchaseReport = () => {
         { packing: 0, marking: 0, quantity: 0, rate: 0 }
       );
     
-       const handlPrintPdf = useReactToPrint({
-          content: () => containerRef.current,
+   
+        const handleDownload = async () => {
+          try {
+            // Use the form fields passed through state for the download payload
+            const downloadPayload = {
+              from_date: formFields.from_date,
+              to_date: formFields.to_date,
+              branch_name: formFields.branch_name || '',
+              purchase_product_seller: formFields.purchase_product_seller || ''
+            };
+            console.table("downloadpayload",downloadPayload)
+            const response = await axios({
+              url: `${BASE_URL}/api/panel-download-purchase-product-monthwise-report`,
+              method: "POST",
+              data: downloadPayload,
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+              responseType: 'blob',
+            });
+      
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "monthwise_purchase_report.csv");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+      
+            toast({
+              title: "Success",
+              description: "Monthwise Purchase Report downloaded successfully",
+            });
+          } catch (error) {
+            toast({
+              title: "Error",
+              description: error.message || "Failed to download report",
+              variant: "destructive",
+            });
+          }
+        };
+        const handlePrintPdf = useReactToPrint({
+          if (!containerRef.current) {
+            toast({
+              title: "Error",
+              description: "Nothing to print",
+              variant: "destructive",
+            });
+            return;
+          }
+          content: () => (containerRef.current ? containerRef.current : null),
           documentTitle: "apta",
           pageStyle: `
                   @page {
@@ -69,12 +124,23 @@ const MonthwisePurchaseReport = () => {
      <Page>
           <div className="flex justify-between   items-center p-2 rounded-lg mb-5 bg-gray-200 ">
           <h1 className="text-xl font-bold">Monthwise Purchase Report</h1>
-          <button
-            className="bg-blue-500 text-white py-1 px-2 rounded"
-            onClick={handlPrintPdf}
-          >
-            Print
-          </button>
+         
+          <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="default"
+                    className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+                    onClick={handleDownload}
+                  >
+                    <Download className="h-4 w-4 mr-2" /> Download
+                  </Button>
+                  <Button
+                    className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+                    onClick={handlePrintPdf}
+                  >
+                    <Printer className="h-4 w-4 mr-2" /> Print
+                  </Button>
+                </div>
         </div>
         <div ref={containerRef}>
         {Object.entries(groupedData).map(([branchName, invoices]) => (

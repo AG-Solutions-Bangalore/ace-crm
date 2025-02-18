@@ -79,6 +79,12 @@ import MarketDispatch from "./app/purchase/market-dispatch/MarketDispatch";
 import MarketProcessing from "./app/purchase/marketProcessing/MarketProcessing";
 import MarketProduction from "./app/purchase/marketProduction/MarketProduction";
 import MarketPurchase from "./app/purchase/marketPurchase/MarketPurchase";
+import EditPurchaseOrder from "./app/purchaseOrder/EditPurchaseOrder";
+import MonthwisePurchaseSellerReport from "./app/reports/monthwisePurchase/MonthwisePurchaseSellerReport";
+import CreateMarketProcessing from "./app/purchase/marketProcessing/CreateMarketProcessing";
+import CreateMarketDispatch from "./app/purchase/market-dispatch/CreateMarketDispatch";
+import EditMarketDispatch from "./app/purchase/market-dispatch/EditMarketDispatch";
+import EditMarketProcessing from "./app/purchase/marketProcessing/EditMarketProcessing";
 
 const queryClient = new QueryClient();
 
@@ -141,6 +147,7 @@ function App() {
             element={<CreatePurchaseOrder />}
           />
           <Route path="/view-purchase-order" element={<ViewPurchaseOrder />} />
+          <Route path="/edit-purchase-order/:id" element={<EditPurchaseOrder />} />
 
           {/* purchase -market purchase  */}
           <Route
@@ -157,8 +164,24 @@ function App() {
             path="/purchase/market-processing"
             element={<MarketProcessing />}
           />
+          <Route
+            path="/purchase/market-processing/createProcessing"
+            element={<CreateMarketProcessing />}
+          />
+          <Route
+            path="/purchase/market-processing/editProcessing/:id"
+            element={<EditMarketProcessing />}
+          />
           {/* purchase -market dispatch  */}
 
+          <Route
+            path="/purchase/market-dispatch/createDispatch"
+            element={<CreateMarketDispatch />}
+          />
+          <Route
+            path="/purchase/market-dispatch/editDispatch/:id"
+            element={<EditMarketDispatch />}
+          />
           <Route
             path="/purchase/market-dispatch"
             element={<MarketDispatch />}
@@ -269,6 +292,10 @@ function App() {
           <Route
             path="/report/monthwise-purchase-report"
             element={<MonthwisePurchaseReport />}
+          />
+          <Route
+            path="/report/monthwise-purchase-seller-report"
+            element={<MonthwisePurchaseSellerReport />}
           />
 
           {/* //payment */}

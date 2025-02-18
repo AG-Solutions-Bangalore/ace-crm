@@ -69,7 +69,7 @@ const ContractForm = () => {
       //   title: "Success",
       //   description: "Contract created successfully",
       // });
-      navigate("/contract-report");
+      navigate("/report/contract-report");
     },
     onError: (error) => {
       toast({

@@ -1,5 +1,11 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { useMutation } from "@tanstack/react-query";
+import React, {
+  useEffect,
+  useState,
+  useMemo,
+  useCallback,
+  useRef,
+} from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,10 +18,31 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { PlusCircle, MinusCircle, ChevronDown, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  PlusCircle,
+  MinusCircle,
+  ChevronDown,
+  Trash2,
+  ChevronUp,
+  FileText,
+  Package,
+  TestTubes,
+  Truck,
+  Clock,
+} from "lucide-react";
 import Page from "../dashboard/page";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getTodayDate } from "@/utils/currentDate";
 import { ProgressBar } from "@/components/spinner/ProgressBar";
 import BASE_URL from "@/config/BaseUrl";
@@ -29,67 +56,17 @@ import {
   useFetchPurchaseProduct,
   useFetchVendor,
 } from "@/hooks/useApi";
+import gsap from "gsap";
 
 // Validation Schemas
-const productRowSchema = z.object({
-  purchase_productSub_name: z.string().min(1, "Product name is required"),
-  purchase_productSub_name_hsn: z
-    .string()
-    .optional(),
-
-  purchase_productSub_description: z.string().min(1, "Description is required"),
-  purchase_productSub_rateInMt: z.number().min(1, "rate  is required"),
-  purchase_productSub_qntyInMt: z.number().min(1, "Quantity is required"),
-  purchase_productSub_packing: z.number().min(1, "Packing is required"),
-  purchase_productSub_marking: z.number().min(1, "Marking price is required"),
-});
-
-const contractFormSchema = z.object({
-  branch_short: z.string().min(1, "Company Sort is required"),
-  branch_name: z.string().min(1, "Company Name is required"),
-  branch_address: z.string().min(1, "Company Address is required"),
-  purchase_product_year: z.string().optional(),
-  purchase_product_date: z.string().min(1, "Product date is required"),
-  purchase_product_no: z.number().min(1, "Product No is required"),
-  purchase_product_ref: z.string().min(1, "Product Ref is required"),
-
-  purchase_product_seller: z.string().min(1, "Seller Name is required"),
-  purchase_product_seller_add: z.string().min(1, "Seller Address is required"),
-  purchase_product_seller_gst: z.string().min(1, "gst is required"),
-  purchase_product_seller_contact: z
-    .string()
-    .min(1, "contact is required"),
-
-  purchase_product_broker: z.string().min(1, "Broker Name is required"),
-  purchase_product_broker_add: z
-    .string()
-    .min(1, "Broker Address is required"),
-
-  purchase_product_delivery_date: z
-    .string()
-    .optional(),
-  purchase_product_delivery_at: z
-    .string()
-    .optional(),
-  purchase_product_payment_terms: z.string().optional(),
-  purchase_product_tc: z.string().optional(),
-  purchase_product_gst_notification: z
-    .string()
-    .optional(),
-  purchase_product_quality: z.string().optional(),
-
-  purchase_product_data: z
-    .array(productRowSchema)
-    .min(1, "At least one product is required"),
-});
-const createPurchaseOrder = async (data) => {
+const updatePurchaseOrder = async ({ id, data }) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
-    console.log("pur data",data)
+
   const response = await fetch(
-    `${BASE_URL}/api/panel-create-purchase-product`,
+    `${BASE_URL}/api/panel-update-purchase-product/${id}`,
     {
-      method: "POST",
+      method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -98,7 +75,7 @@ const createPurchaseOrder = async (data) => {
     }
   );
 
-  if (!response.ok) throw new Error("Failed to create purchase order");
+  if (!response.ok) throw new Error("Failed to update contract");
   return response.json();
 };
 
@@ -277,38 +254,18 @@ const MemoizedProductSelect = React.memo(
     );
   }
 );
-const CreatePurchaseOrder = () => {
+const EditPurchaseOrder = () => {
+  const { id } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
-
-  const [contractData, setContractData] = useState([
-    {
-      purchase_productSub_name: "",
-      purchase_productSub_name_hsn: "",
-      purchase_productSub_description: "",
-      purchase_productSub_rateInMt: "",
-      purchase_productSub_qntyInMt: "",
-      purchase_productSub_packing: "",
-      purchase_productSub_marking: "",
-    },
-  ]);
-
-  const { data: currentYear } = useCurrentYear();
-  useEffect(() => {
-    if (currentYear) {
-      setFormData((prev) => ({
-        ...prev,
-        purchase_product_year: currentYear,
-      }));
-    }
-  }, [currentYear]);
-
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleteItemId, setDeleteItemId] = useState(null);
   const [formData, setFormData] = useState({
     branch_short: "",
     branch_name: "",
     branch_address: "",
-    purchase_product_year: currentYear,
-    purchase_product_date: getTodayDate(),
+    purchase_product_year: "",
+    purchase_product_date: "",
     purchase_product_no: "",
     purchase_product_ref: "",
     purchase_product_seller: "",
@@ -320,19 +277,94 @@ const CreatePurchaseOrder = () => {
     purchase_product_delivery_date: "",
     purchase_product_delivery_at: "",
     purchase_product_payment_terms: "",
+    contract_destination_port: "",
     purchase_product_tc: "",
     purchase_product_gst_notification: "",
     purchase_product_quality: "",
+    purchase_product_status: "Pending",
   });
+  const [contractData, setContractData] = useState([]);
+
+  const {
+    data: purchaseProductDatas,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["purchaseProduct", id],
+    queryFn: async () => {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${BASE_URL}/api/panel-fetch-purchase-product-by-id/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to fetch Purchase order");
+      return response.json();
+    },
+  });
+  useEffect(() => {
+    if (purchaseProductDatas) {
+      setFormData({
+        branch_short: purchaseProductDatas.purchaseProduct.branch_short,
+        branch_name: purchaseProductDatas.purchaseProduct.branch_name,
+        branch_address: purchaseProductDatas.purchaseProduct.branch_address,
+        purchase_product_year:
+          purchaseProductDatas.purchaseProduct.purchase_product_year,
+
+        purchase_product_date:
+          purchaseProductDatas.purchaseProduct.purchase_product_date,
+        purchase_product_no:
+          purchaseProductDatas.purchaseProduct.purchase_product_no,
+        purchase_product_ref:
+          purchaseProductDatas.purchaseProduct.purchase_product_ref,
+
+        purchase_product_seller:
+          purchaseProductDatas.purchaseProduct.purchase_product_seller,
+        purchase_product_seller_add:
+          purchaseProductDatas.purchaseProduct.purchase_product_seller_add,
+        purchase_product_seller_gst:
+          purchaseProductDatas.purchaseProduct.purchase_product_seller_gst,
+        purchase_product_seller_contact:
+          purchaseProductDatas.purchaseProduct.purchase_product_seller_contact,
+
+        purchase_product_broker:
+          purchaseProductDatas.purchaseProduct.purchase_product_broker,
+        purchase_product_broker_add:
+          purchaseProductDatas.purchaseProduct.purchase_product_broker_add,
+
+        purchase_product_delivery_date:
+          purchaseProductDatas.purchaseProduct.purchase_product_delivery_date,
+        purchase_product_delivery_at:
+          purchaseProductDatas.purchaseProduct.purchase_product_delivery_at,
+        purchase_product_payment_terms:
+          purchaseProductDatas.purchaseProduct.purchase_product_payment_terms,
+
+        purchase_product_tc:
+          purchaseProductDatas.purchaseProduct.purchase_product_tc,
+        purchase_product_gst_notification:
+          purchaseProductDatas.purchaseProduct
+            .purchase_product_gst_notification,
+        purchase_product_quality:
+          purchaseProductDatas.purchaseProduct.purchase_product_quality,
+
+        purchase_product_status:
+          purchaseProductDatas.purchaseProduct.purchase_product_status,
+        purchase_product_data: purchaseProductDatas.purchaseProductSub,
+      });
+      setContractData(purchaseProductDatas.purchaseProductSub);
+    }
+  }, [purchaseProductDatas]);
 
   const { data: branchData } = useFetchCompanys();
   const { data: vendorData } = useFetchVendor();
   const { data: purchaseProductData } = useFetchPurchaseProduct();
-  const { data: productNoData } = useFetchProductNos(formData.branch_short);
 
-  const createPurchaseMutation = useMutation({
-    mutationFn: createPurchaseOrder,
-
+  const updatePOMutation = useMutation({
+    mutationFn: updatePurchaseOrder,
     onSuccess: (response) => {
       if (response.code == 200) {
         toast({
@@ -377,22 +409,20 @@ const CreatePurchaseOrder = () => {
         [field]: value,
       }));
 
-    
-
-      if (field === "branch_short") {
-        const selectedCompanySort = branchData?.branch?.find(
-          (branch) => branch.branch_short === value
-        );
-        if (selectedCompanySort) {
-          const productRef = `${selectedCompanySort.branch_name_short}/${selectedCompanySort.branch_state_short}/${formData?.purchase_product_no}/${formData.purchase_product_year}`;
-          setFormData((prev) => ({
-            ...prev,
-            branch_name: selectedCompanySort.branch_name,
-            branch_address: selectedCompanySort.branch_address,
-            purchase_product_ref: productRef,
-          }));
-        }
-      }
+    //   if (field === "branch_short") {
+    //     const selectedCompanySort = branchData?.branch?.find(
+    //       (branch) => branch.branch_short === value
+    //     );
+    //     if (selectedCompanySort) {
+    //       const productRef = `${selectedCompanySort.branch_name_short}/${selectedCompanySort.branch_state_short}/${formData?.purchase_product_no}/${formData.purchase_product_year}`;
+    //       setFormData((prev) => ({
+    //         ...prev,
+    //         branch_name: selectedCompanySort.branch_name,
+    //         branch_address: selectedCompanySort.branch_address,
+    //         purchase_product_ref: productRef,
+    //       }));
+    //     }
+    //   }
 
       if (field === "purchase_product_seller") {
         const selectedSeller = vendorData?.vendor?.find(
@@ -421,23 +451,20 @@ const CreatePurchaseOrder = () => {
         }
       }
 
-      if (field === "purchase_product_no") {
-        const selectedCompanySort = branchData?.branch?.find(
-          (branch) => branch.branch_short === formData.branch_short
-        );
-        if (selectedCompanySort) {
-          const productRef = `${selectedCompanySort.branch_name_short}/${selectedCompanySort.branch_state_short}/${value}/${formData.purchase_product_year}`;
-          setFormData((prev) => ({
-            ...prev,
-            purchase_product_ref: productRef,
-          }));
-        }
-      }
+    //   if (field === "purchase_product_no") {
+    //     const selectedCompanySort = branchData?.branch?.find(
+    //       (branch) => branch.branch_short === formData.branch_short
+    //     );
+    //     if (selectedCompanySort) {
+    //       const productRef = `${selectedCompanySort.branch_name_short}/${selectedCompanySort.branch_state_short}/${value}/${formData.purchase_product_year}`;
+    //       setFormData((prev) => ({
+    //         ...prev,
+    //         purchase_product_ref: productRef,
+    //       }));
+    //     }
+    //   }
     },
     [
-      branchData,
-      formData.branch_short,
-      formData.purchase_product_no,
       formData.purchase_product_year,
     ]
   );
@@ -509,23 +536,77 @@ const CreatePurchaseOrder = () => {
     purchase_product_no: "Contract No",
     purchase_product_ref: "Contract Ref",
   };
+  const deleteProductMutation = useMutation({
+    mutationFn: async (productId) => {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${BASE_URL}/api/panel-delete-purchase-product-sub/${productId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to delete contract Table");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Purchase Table deleted successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
+  const handleDeleteRow = (productId) => {
+    setDeleteItemId(productId);
+    setDeleteConfirmOpen(true);
+  };
+  const confirmDelete = async () => {
+    try {
+      await deleteProductMutation.mutateAsync(deleteItemId);
+      setContractData((prevData) =>
+        prevData.filter((row) => row.id !== deleteItemId)
+      );
+    } catch (error) {
+      console.error("Failed to delete product:", error);
+    } finally {
+      setDeleteConfirmOpen(false);
+      setDeleteItemId(null);
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const processedPurchaseData = contractData.map((row) => ({
         ...row,
-        purchase_productSub_rateInMt: parseFloat(row.purchase_productSub_rateInMt),
-        purchase_productSub_qntyInMt: parseFloat(row.purchase_productSub_qntyInMt),
-        purchase_productSub_packing: parseFloat(row.purchase_productSub_packing),
-        purchase_productSub_marking: parseFloat(row.purchase_productSub_marking),
+        purchase_productSub_rateInMt: parseFloat(
+          row.purchase_productSub_rateInMt
+        ),
+        purchase_productSub_qntyInMt: parseFloat(
+          row.purchase_productSub_qntyInMt
+        ),
+        purchase_productSub_packing: parseFloat(
+          row.purchase_productSub_packing
+        ),
+        purchase_productSub_marking: parseFloat(
+          row.purchase_productSub_marking
+        ),
       }));
 
-      const validatedData = contractFormSchema.parse({
+      const updateData = {
         ...formData,
         purchase_product_data: processedPurchaseData,
-      });
-      createPurchaseMutation.mutate(validatedData);
+      };
+      updatePOMutation.mutate({ id, data: updateData });
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {
@@ -566,37 +647,165 @@ const CreatePurchaseOrder = () => {
       });
     }
   };
+  const CompactViewSection = ({ purchaseProductDatas }) => {
+    const [isExpanded, setIsExpanded] = useState(true);
+    const containerRef = useRef(null);
+    const contentRef = useRef(null);
+    const InfoItem = ({ icon: Icon, label, value }) => (
+      <div className="flex items-center gap-2">
+        <Icon className="h-4 w-4 text-yellow-600 shrink-0" />
+        <span className="text-sm text-gray-600">{label}:</span>
+        <span className="text-sm font-medium">{value || "N/A"}</span>
+      </div>
+    );
+
+    const toggleView = () => {
+      const content = contentRef.current;
+
+      if (isExpanded) {
+        // Folding animation
+        gsap.to(content, {
+          height: 0,
+          opacity: 0,
+          duration: 0.5,
+          ease: "power2.inOut",
+          transformOrigin: "top",
+          transformStyle: "preserve-3d",
+          rotateX: -90,
+          onComplete: () => setIsExpanded(false),
+        });
+      } else {
+        // Unfolding animation
+        setIsExpanded(true);
+        gsap.fromTo(
+          content,
+          {
+            height: 0,
+            opacity: 0,
+            rotateX: -90,
+          },
+          {
+            height: "auto",
+            opacity: 1,
+            duration: 0.5,
+            ease: "power2.inOut",
+            transformOrigin: "top",
+            transformStyle: "preserve-3d",
+            rotateX: 0,
+          }
+        );
+      }
+    };
+
+    const TreatmentInfo = () =>
+      purchaseProductDatas?.purchaseProduct?.branch_short && (
+        <div className="mt-2 p-2 bg-blue-50 rounded-lg">
+          <div className="grid grid-cols-3 gap-4 text-sm">
+            <InfoItem
+              icon={TestTubes}
+              label="PO. Ref"
+              value={purchaseProductDatas.purchaseProduct.purchase_product_ref}
+            />
+            <div className=" col-span-2">
+              <InfoItem
+                icon={TestTubes}
+                label="Branch Add"
+                value={purchaseProductDatas.purchaseProduct.branch_address}
+              />
+            </div>
+          </div>
+        </div>
+      );
+
+    return (
+      <Card className="mb-2 " ref={containerRef}>
+        <div
+          className={`p-4 ${ButtonConfig.cardColor} flex items-center justify-between`}
+        >
+          <h2 className="text-lg font-semibold  flex items-center gap-2">
+            <p className="flex gap-1 relative items-center">
+              {" "}
+              <FileText className="h-5 w-5" />
+              {purchaseProductDatas?.purchaseProduct?.branch_short} -
+              <span className="text-sm uppercase">
+                {purchaseProductDatas?.purchaseProduct?.branch_name}
+              </span>
+            </p>
+          </h2>
+
+          <div className="flex items-center gap-2">
+            <span className=" flex items-center gap-2    text-xs font-medium  text-yellow-800 ">
+              <MemoizedSelect
+                value={formData.purchase_product_status}
+                onChange={(value) =>
+                  handleSelectChange("purchase_product_status", value)
+                }
+                options={[
+                  { value: "Pending", label: "Pending" },
+                  { value: "Cancel", label: "Cancel" },
+                  { value: "Close", label: "Close" },
+                ]}
+                placeholder="Select Status"
+              />
+            </span>
+
+            {isExpanded ? (
+              <ChevronUp
+                onClick={toggleView}
+                className="h-5 w-5 cursor-pointer  text-yellow-600"
+              />
+            ) : (
+              <ChevronDown
+                onClick={toggleView}
+                className="h-5 w-5 cursor-pointer  text-yellow-600"
+              />
+            )}
+          </div>
+        </div>
+        <div
+          ref={contentRef}
+          className="transform-gpu"
+          style={{ transformStyle: "preserve-3d" }}
+        >
+          <CardContent className="p-4">
+            {/* Basic Info */}
+
+            <div className="space-y-2 flex items-center justify-between">
+              <InfoItem
+                icon={Package}
+                label="PO.Year"
+                value={
+                  purchaseProductDatas?.purchaseProduct?.purchase_product_year
+                }
+              />
+
+              <InfoItem
+                icon={TestTubes}
+                label="PO. No "
+                value={
+                  purchaseProductDatas?.purchaseProduct?.purchase_product_no
+                }
+              />
+            </div>
+
+            <TreatmentInfo />
+          </CardContent>
+        </div>
+      </Card>
+    );
+  };
   return (
     <Page>
       <form
         onSubmit={handleSubmit}
         className="w-full p-4 bg-blue-50/30 rounded-lg"
       >
+        <CompactViewSection purchaseProductDatas={purchaseProductDatas} />
         <Card className={`mb-6 ${ButtonConfig.cardColor} `}>
           <CardContent className="p-6">
             {/* Basic Details Section */}
             <div className="mb-0">
-              <div className="grid grid-cols-4 gap-6">
-                <div>
-                  <label
-                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                  >
-                    Company <span className="text-red-500">*</span>
-                  </label>
-                  <MemoizedSelect
-                    value={formData.branch_short}
-                    onChange={(value) =>
-                      handleSelectChange("branch_short", value)
-                    }
-                    options={
-                      branchData?.branch?.map((branch) => ({
-                        value: branch.branch_short,
-                        label: branch.branch_short,
-                      })) || []
-                    }
-                    placeholder="Select Company"
-                  />
-                </div>
+              <div className="grid grid-cols-4 gap-2">
                 <div>
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
@@ -642,38 +851,39 @@ const CreatePurchaseOrder = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
                   >
-                    Purchase Order No <span className="text-red-500">*</span>
+                    Delivery Date
                   </label>
-                  <MemoizedSelect
-                    value={formData?.purchase_product_no}
-                    onChange={(value) =>
-                      handleSelectChange("purchase_product_no", value)
+                  <Input
+                    type="date"
+                    className="bg-white"
+                    value={formData.purchase_product_delivery_date}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "purchase_product_delivery_date",
+                        e.target.value
+                      )
                     }
-                    options={
-                      productNoData?.purchaseProductNo?.map((item) => ({
-                        value: item,
-                        label: item,
-                      })) || []
-                    }
-                    placeholder="Select purchase order No"
                   />
                 </div>
-              </div>
-            </div>
-
-            <div className="mb-2   mt-[2px]">
-              <div className="grid grid-cols-4 gap-6">
-                <div
-                  style={{ textAlign: "center" }}
-                  className="bg-white rounded-md"
-                >
-                  <span style={{ fontSize: "12px" }}>
-                    {formData.branch_name}
-                  </span>
-                  <br />
-                  <span style={{ fontSize: "9px", display: "block" }}>
-                    {formData.branch_address}
-                  </span>
+                <div className=" row-span-2  ">
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
+                    Delivery At
+                  </label>
+                  <Textarea
+                    type="text"
+                    rows={4}
+                    className="bg-white"
+                    placeholder="Enter Delivery At"
+                    value={formData.purchase_product_delivery_at}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "purchase_product_delivery_at",
+                        e.target.value
+                      )
+                    }
+                  />
                 </div>
                 <div>
                   <Textarea
@@ -710,11 +920,6 @@ const CreatePurchaseOrder = () => {
                       )
                     }
                   />
-                  <div className="flex flex-row justify-between">
-                    <p className="text-[10px]">
-                      year:{formData.purchase_product_year}
-                    </p>
-                  </div>
                 </div>
 
                 <div>
@@ -735,22 +940,24 @@ const CreatePurchaseOrder = () => {
               </div>
             </div>
 
-            <div className="mb-2 ">
+            <div className="mb-2">
               <div className="grid grid-cols-4 gap-6">
                 <div>
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
                   >
-                     Ref. <span className="text-red-500">*</span>
+                    Payment Terms
                   </label>
-                  <Input
+                  <Textarea
                     type="text"
-                    placeholder="Enter purchase order Ref"
-                    value={formData.purchase_product_ref}
-                    disabled
                     className="bg-white"
+                    placeholder="Enter Payment Terms"
+                    value={formData.purchase_product_payment_terms}
                     onChange={(e) =>
-                      handleInputChange("purchase_product_ref", e.target.value)
+                      handleInputChange(
+                        "purchase_product_payment_terms",
+                        e.target.value
+                      )
                     }
                   />
                 </div>
@@ -759,120 +966,56 @@ const CreatePurchaseOrder = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
                   >
-                    Delivery Date
+                    Other Term & Cond.
                   </label>
-                  <Input
-                    type="date"
+                  <Textarea
+                    type="text"
                     className="bg-white"
-                    value={formData.purchase_product_delivery_date}
+                    placeholder="Enter other term & condition"
+                    value={formData.purchase_product_tc}
+                    onChange={(e) =>
+                      handleInputChange("purchase_product_tc", e.target.value)
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
+                    GST Notification
+                  </label>
+                  <Textarea
+                    type="text"
+                    className="bg-white"
+                    placeholder="Enter GST Notification"
+                    value={formData.purchase_product_gst_notification}
                     onChange={(e) =>
                       handleInputChange(
-                        "purchase_product_delivery_date",
+                        "purchase_product_gst_notification",
                         e.target.value
                       )
                     }
                   />
                 </div>
-                <div className=" col-span-1 lg:col-span-2">
-                    <label
-                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                    >
-                      Delivery At
-                    </label>
-                    <Textarea
-                      type="text"
-                      className="bg-white"
-                      placeholder="Enter Delivery At"
-                      value={formData.purchase_product_delivery_at}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "purchase_product_delivery_at",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </div>
-              </div>
-         
-              <div className="mb-2">
-                <div className="grid grid-cols-4 gap-6">
-                
-
-                  <div>
-                    <label
-                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                    >
-                      Payment Terms
-                    </label>
-                    <Textarea
-                      type="text"
-                      className="bg-white"
-                      placeholder="Enter Payment Terms"
-                      value={formData.purchase_product_payment_terms}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "purchase_product_payment_terms",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                    >
-                      Other Term & Cond.
-                    </label>
-                    <Textarea
-                      type="text"
-                      className="bg-white"
-                      placeholder="Enter other term & condition"
-                      value={formData.purchase_product_tc}
-                      onChange={(e) =>
-                        handleInputChange("purchase_product_tc", e.target.value)
-                      }
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                    >
-                      GST Notification
-                    </label>
-                    <Textarea
-                      type="text"
-                      className="bg-white"
-                      placeholder="Enter GST Notification"
-                      value={formData.purchase_product_gst_notification}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "purchase_product_gst_notification",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label
-                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                    >
-                       Quality
-                    </label>
-                    <Textarea
-                      type="text"
-                      className="bg-white"
-                      placeholder="Enter purchase order Quality"
-                      value={formData.purchase_product_quality}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "purchase_product_quality",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </div>
+                <div>
+                  <label
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                  >
+                    Quality
+                  </label>
+                  <Textarea
+                    type="text"
+                    className="bg-white"
+                    placeholder="Enter purchase order Quality"
+                    value={formData.purchase_product_quality}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "purchase_product_quality",
+                        e.target.value
+                      )
+                    }
+                  />
                 </div>
               </div>
             </div>
@@ -893,8 +1036,6 @@ const CreatePurchaseOrder = () => {
                         Product /Description
                       </TableHead>
 
-
-
                       <TableHead className="p-2 text-center border text-sm font-medium">
                         Rate / Quantity <span className="text-red-500">*</span>
                       </TableHead>
@@ -912,27 +1053,27 @@ const CreatePurchaseOrder = () => {
                     {contractData.map((row, rowIndex) => (
                       <TableRow key={rowIndex} className="hover:bg-gray-50">
                         <TableCell className="p-2 border">
-                        <div className="flex flex-col gap-2">
-                          <MemoizedProductSelect
-                            value={row.purchase_productSub_name}
-                            onChange={(value) =>
-                              handleRowDataChange(
-                                rowIndex,
-                                "purchase_productSub_name",
-                                value
-                              )
-                            }
-                            options={
-                              purchaseProductData?.purchaseorderproduct?.map(
-                                (item) => ({
-                                  value: item.purchaseOrderProduct,
-                                  label: item.purchaseOrderProduct,
-                                })
-                              ) || []
-                            }
-                            placeholder="Select Product"
-                          />
-                           <Input
+                          <div className="flex flex-col gap-2">
+                            <MemoizedProductSelect
+                              value={row.purchase_productSub_name}
+                              onChange={(value) =>
+                                handleRowDataChange(
+                                  rowIndex,
+                                  "purchase_productSub_name",
+                                  value
+                                )
+                              }
+                              options={
+                                purchaseProductData?.purchaseorderproduct?.map(
+                                  (item) => ({
+                                    value: item.purchaseOrderProduct,
+                                    label: item.purchaseOrderProduct,
+                                  })
+                                ) || []
+                              }
+                              placeholder="Select Product"
+                            />
+                            <Input
                               value={row.purchase_productSub_description}
                               onChange={(e) =>
                                 handleRowDataChange(
@@ -945,40 +1086,37 @@ const CreatePurchaseOrder = () => {
                               placeholder="Enter Description"
                               type="text"
                             />
-                            </div>
+                          </div>
                         </TableCell>
-                      
-
-                      
 
                         <TableCell className="p-2 border ">
-                        <div className="flex flex-col gap-2">
-                          <Input
-                            className="bg-white"
-                            value={row.purchase_productSub_packing}
-                            onChange={(e) =>
-                              handleRowDataChange(
-                                rowIndex,
-                                "purchase_productSub_packing",
-                                e.target.value
-                              )
-                            }
-                            placeholder="Enter Packing"
-                            type="text"
-                          />
-                          <Input
-                            className="bg-white"
-                            value={row.purchase_productSub_marking}
-                            onChange={(e) =>
-                              handleRowDataChange(
-                                rowIndex,
-                                "purchase_productSub_marking",
-                                e.target.value
-                              )
-                            }
-                            placeholder="Enter Marking"
-                            type="text"
-                          />
+                          <div className="flex flex-col gap-2">
+                            <Input
+                              className="bg-white"
+                              value={row.purchase_productSub_packing}
+                              onChange={(e) =>
+                                handleRowDataChange(
+                                  rowIndex,
+                                  "purchase_productSub_packing",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Enter Packing"
+                              type="text"
+                            />
+                            <Input
+                              className="bg-white"
+                              value={row.purchase_productSub_marking}
+                              onChange={(e) =>
+                                handleRowDataChange(
+                                  rowIndex,
+                                  "purchase_productSub_marking",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Enter Marking"
+                              type="text"
+                            />
                           </div>
                         </TableCell>
                         <TableCell className="p-2 border w-40">
@@ -1012,15 +1150,26 @@ const CreatePurchaseOrder = () => {
                           </div>
                         </TableCell>
                         <TableCell className="p-2 border">
-                          <Button
-                            variant="ghost"
-                            onClick={() => removeRow(rowIndex)}
-                            disabled={contractData.length === 1}
-                            className="text-red-500 "
-                            type="button"
-                          >
-                            <MinusCircle className="h-4 w-4" />
-                          </Button>
+                          {row.id ? (
+                            <Button
+                              variant="ghost"
+                              onClick={() => handleDeleteRow(row.id)}
+                              className="text-red-500"
+                              type="button"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              onClick={() => removeRow(rowIndex)}
+                              disabled={contractData.length === 1}
+                              className="text-red-500 "
+                              type="button"
+                            >
+                              <MinusCircle className="h-4 w-4" />
+                            </Button>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -1043,20 +1192,40 @@ const CreatePurchaseOrder = () => {
         </Card>
 
         <div className="flex flex-col items-end">
-          {createPurchaseMutation.isPending && <ProgressBar progress={70} />}
+          {updatePOMutation.isPending && <ProgressBar progress={70} />}
           <Button
             type="submit"
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
-            disabled={createPurchaseMutation.isPending}
+            disabled={updatePOMutation.isPending}
           >
-            {createPurchaseMutation.isPending
-              ? "Submitting..."
-              : "Submit Purchase Order"}
+            {updatePOMutation.isPending
+              ? "Updating..."
+              : "Update Purchase Order"}
           </Button>
         </div>
       </form>
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              purchase order from this enquiry.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className={`${ButtonConfig.backgroundColor}  ${ButtonConfig.textColor} text-black hover:bg-red-600`}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Page>
   );
 };
 
-export default CreatePurchaseOrder;
+export default EditPurchaseOrder;
