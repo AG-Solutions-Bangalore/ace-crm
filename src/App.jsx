@@ -79,6 +79,10 @@ import MarketDispatch from "./app/purchase/market-dispatch/MarketDispatch";
 import MarketProcessing from "./app/purchase/marketProcessing/MarketProcessing";
 import MarketProduction from "./app/purchase/marketProduction/MarketProduction";
 import MarketPurchase from "./app/purchase/marketPurchase/MarketPurchase";
+import CreateMarketOrder from "./app/purchase/marketPurchase/CreateMarketOrder";
+import EditMarketOrder from "./app/purchase/marketPurchase/EditMarketOrder";
+import CreateMarketProduction from "./app/purchase/marketProduction/CreateMarketProduction";
+import EditMarketProduction from "./app/purchase/marketProduction/EditMarketProduction";
 
 const queryClient = new QueryClient();
 
@@ -147,11 +151,25 @@ function App() {
             path="/purchase/market-purchase"
             element={<MarketPurchase />}
           />
+          <Route path="/create-market-order" element={<CreateMarketOrder />} />
+          <Route path="/edit-market-order/:id" element={<EditMarketOrder />} />
+
           {/* purchase -market production */}
           <Route
             path="/purchase/market-production"
             element={<MarketProduction />}
           />
+
+          <Route
+            path="/create-market-production"
+            element={<CreateMarketProduction />}
+          />
+
+          <Route
+            path="/edit-market-production/:id"
+            element={<EditMarketProduction />}
+          />
+
           {/* purchase -market processing  */}
           <Route
             path="/purchase/market-processing"

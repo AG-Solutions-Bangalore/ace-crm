@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Printer, Mail, MessageCircle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 
-const ContractActions = ({ 
-  handlPrintPdf, 
-  handleSaveAsPdf, 
+const ContractActions = ({
+  handlPrintPdf,
+  handleSaveAsPdf,
   whatsappPdf,
   handleSaveAsWidthoutHeaderPdf,
-  whatsappWithoutHeaderPdf 
+  whatsappWithoutHeaderPdf,
 }) => {
   const [withHeader, setWithHeader] = useState(true);
   const [withoutHeader, setWithoutHeader] = useState(false);
@@ -53,7 +53,7 @@ const ContractActions = ({
         <div className="flex flex-col gap-4 mt-4">
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
-              <Checkbox 
+              <Checkbox
                 id="withHeader"
                 checked={withHeader}
                 onCheckedChange={handleHeaderChange}
@@ -61,7 +61,7 @@ const ContractActions = ({
               <Label htmlFor="withHeader">With Header</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <Checkbox 
+              <Checkbox
                 id="withoutHeader"
                 checked={withoutHeader}
                 onCheckedChange={handleWithoutHeaderChange}
@@ -69,7 +69,7 @@ const ContractActions = ({
               <Label htmlFor="withoutHeader">Without Header</Label>
             </div>
           </div>
-          
+
           <Button
             onClick={handlePrint}
             className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
@@ -77,7 +77,7 @@ const ContractActions = ({
             <Printer className="h-4 w-4" />
             <span>Print PDF</span>
           </Button>
-          
+
           <Button
             onClick={handleSave}
             className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
@@ -85,7 +85,7 @@ const ContractActions = ({
             <Printer className="h-4 w-4" />
             <span>Save as PDF</span>
           </Button>
-          
+
           <Button
             onClick={() => {}}
             className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
@@ -93,7 +93,7 @@ const ContractActions = ({
             <Mail className="h-4 w-4" />
             <span>Send Mail</span>
           </Button>
-          
+
           <Button
             onClick={handleWhatsapp}
             className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
