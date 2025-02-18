@@ -385,6 +385,8 @@ const InvoiceEdit = () => {
   const navigate = useNavigate();
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [saveAndViewLoading, setSaveAndViewLoading] = useState(false);
   const [showDischargeAndCIF, setShowDischargeAndCIF] = useState(false);
   const [formData, setFormData] = useState({
     branch_short: "",
@@ -869,7 +871,7 @@ const InvoiceEdit = () => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setSubmitLoading(true);
     try {
       const processedContractData = invoiceData.map((row) => ({
         ...row,
@@ -884,7 +886,10 @@ const InvoiceEdit = () => {
         ...formData,
         invoice_data: processedContractData,
       };
-      updateInvoiceMutation.mutate({ id, data: updateData });
+      const res = await updateInvoiceMutation.mutateAsync({
+        id,
+        data: updateData,
+      });
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {
@@ -925,9 +930,89 @@ const InvoiceEdit = () => {
         description: "An unexpected error occurred",
         variant: "destructive",
       });
+    } finally {
+      setSubmitLoading(false);
     }
   };
+  const handleSaveAndView = async (e) => {
+    e.preventDefault();
+    setSaveAndViewLoading(true);
+    try {
+    
+        const processedContractData = invoiceData.map((row) => ({
+            ...row,
+            invoiceSub_item_bag: parseFloat(row.invoiceSub_item_bag),
+            invoiceSub_qntyInMt: parseFloat(row.invoiceSub_qntyInMt),
+            invoiceSub_rateMT: parseFloat(row.invoiceSub_rateMT),
+            invoiceSub_packing: parseFloat(row.invoiceSub_packing),
+            invoiceSub_bagsize: parseFloat(row.invoiceSub_bagsize),
+          }));
+     
+      
+      const updateData = {
+        ...formData,
+        invoice_data: processedContractData,
+      };
 
+    
+      const response = await updateInvoiceMutation.mutateAsync({ id, data: updateData });
+
+  
+      if (response.code == 200) {
+      
+        navigate(`/view-invoice/${id}`);
+      } else {
+        
+        toast({
+          title: "Error",
+          description: response.msg,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+    if (error instanceof z.ZodError) {
+            const groupedErrors = error.errors.reduce((acc, err) => {
+              const field = err.path.join(".");
+              if (!acc[field]) {
+                acc[field] = [];
+              }
+              acc[field].push(err.message);
+              return acc;
+            }, {});
+    
+            const errorMessages = Object.entries(groupedErrors).map(
+              ([field, messages]) => {
+                const fieldKey = field.split(".").pop();
+                const label = fieldLabels[fieldKey] || field;
+                return `${label}: ${messages.join(", ")}`;
+              }
+            );
+    
+            toast({
+              title: "Validation Error",
+              description: (
+                <div>
+                  <ul className="list-disc pl-5">
+                    {errorMessages.map((message, index) => (
+                      <li key={index}>{message}</li>
+                    ))}
+                  </ul>
+                </div>
+              ),
+              variant: "destructive",
+            });
+            return;
+          }
+    
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaveAndViewLoading(false);
+    }
+  };
   if (isLoading) {
     return (
       <Page>
@@ -1788,14 +1873,22 @@ const InvoiceEdit = () => {
           </CardContent>
         </Card>
 
-        <div className="flex flex-col items-end">
+        <div className="flex items-center justify-end  gap-2">
           {updateInvoiceMutation.isPending && <ProgressBar progress={70} />}
           <Button
             type="submit"
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
-            disabled={updateInvoiceMutation.isPending}
+            disabled={submitLoading}
           >
-            {updateInvoiceMutation.isPending ? "Updating..." : "Update Invoice"}
+            {submitLoading ? "Updating..." : "Update & Exit"}
+          </Button>
+          <Button
+            type="button"
+            onClick={handleSaveAndView}
+            className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
+            disabled={saveAndViewLoading}
+          >
+            {saveAndViewLoading ? "Updating..." : "Update & View"}
           </Button>
         </div>
       </form>

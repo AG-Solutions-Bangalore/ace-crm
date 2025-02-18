@@ -19,6 +19,7 @@ import {
   Search,
   SquarePlus,
   Trash,
+  Trash2,
   UserPen,
   View,
 } from "lucide-react";
@@ -184,7 +185,7 @@ const MarketProcessing = () => {
                       setDeleteConfirmOpen(true);
                     }}
                   >
-                    <Trash className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4 text-red-500" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Delete Processing</TooltipContent>

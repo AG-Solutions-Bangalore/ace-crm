@@ -277,7 +277,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  BL No <span className="text-red-500">*</span>
+                  BL No 
                 </label>
                 <Input
                   className="bg-white"
@@ -290,7 +290,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Bl Date <span className="text-red-500">*</span>
+                  Bl Date 
                 </label>
                 <Input
                   type="date"
@@ -305,7 +305,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Shipping Bill No <span className="text-red-500">*</span>
+                  Shipping Bill No 
                 </label>
                 <Input
                   className="bg-white"
@@ -318,7 +318,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Shipping Bill Date <span className="text-red-500">*</span>
+                  Shipping Bill Date 
                 </label>
                 <Input
                   type="date"
@@ -333,7 +333,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Container <span className="text-red-500">*</span>
+                  Container 
                 </label>
                 <Input
                   className="bg-white"
@@ -347,7 +347,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Voyage <span className="text-red-500">*</span>
+                  Voyage 
                 </label>
                 <Input
                   className="bg-white"
@@ -361,7 +361,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Vessel <span className="text-red-500">*</span>
+                  Vessel 
                 </label>
 
                 <Select
@@ -386,7 +386,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Seal <span className="text-red-500">*</span>
+                  Seal 
                 </label>
                 <Input
                   className="bg-white"
@@ -400,7 +400,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Shipper <span className="text-red-500">*</span>
+                  Shipper 
                 </label>
 
                 <Select
@@ -426,7 +426,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  USD Value <span className="text-red-500">*</span>
+                  USD Value 
                 </label>
                 <Input
                   className="bg-white"
@@ -441,7 +441,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2  font-medium `}
                 >
-                  Invoice Exchange rate <span className="text-red-500">*</span>
+                  Invoice Exchange rate 
                 </label>
                 <Input
                   className="bg-white"
@@ -457,7 +457,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Insurance <span className="text-red-500">*</span>
+                  Insurance 
                 </label>
                 <Input
                   className="bg-white"
@@ -473,7 +473,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Freight <span className="text-red-500">*</span>
+                  Freight 
                 </label>
                 <Input
                   className="bg-white"
@@ -490,7 +490,7 @@ const InvoiceDocumentEdit = () => {
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 flex items-center justify-between font-medium `}
                 >
                   <span>
-                    Invoice Value <span className="text-red-500">*</span>
+                    Invoice Value 
                   </span>
                   <span>{expectedINRValue}</span>
                 </label>
@@ -510,7 +510,7 @@ const InvoiceDocumentEdit = () => {
                 >
                   <span>
                     {" "}
-                    FOB USD <span className="text-red-500">*</span>
+                    FOB USD 
                   </span>
                   <span>{expectedFobValue}</span>
                 </label>
@@ -530,7 +530,7 @@ const InvoiceDocumentEdit = () => {
                 >
                   <span>
                     {" "}
-                    FOB INR <span className="text-red-500">*</span>
+                    FOB INR 
                   </span>
                   <span>{expectedFobInrVALUE}</span>
                 </label>
@@ -549,7 +549,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Let Export date <span className="text-red-500">*</span>
+                  Let Export date 
                 </label>
                 <Input
                   type="date"
@@ -566,7 +566,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Etd Date <span className="text-red-500">*</span>
+                  Etd Date 
                 </label>
                 <Input
                   type="date"
@@ -581,7 +581,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Eta Date <span className="text-red-500">*</span>
+                  Eta Date 
                 </label>
                 <Input
                   type="date"
@@ -594,7 +594,7 @@ const InvoiceDocumentEdit = () => {
 
               {/* <div>
                           <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
-                         Branch Status <span className="text-red-500">*</span>
+                         Branch Status 
                        </label>
                        <Select
                        
