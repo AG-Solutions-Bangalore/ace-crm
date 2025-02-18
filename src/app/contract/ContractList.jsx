@@ -189,7 +189,7 @@ const ContractList = () => {
 
         return (
           <div className="flex flex-row">
-            <TooltipProvider>
+            {/* <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
@@ -202,7 +202,7 @@ const ContractList = () => {
                 </TooltipTrigger>
                 <TooltipContent>Test View Contract</TooltipContent>
               </Tooltip>
-            </TooltipProvider>
+            </TooltipProvider> */}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>

@@ -192,6 +192,7 @@ export const useFetchUserType = () => {
 export const useFetchVendor = () => {
   return useQuery(createQueryConfig(["vendor"], "/api/panel-fetch-vendor"));
 };
+
 export const useFetchPurchaseProduct = () => {
   return useQuery(
     createQueryConfig(
@@ -206,5 +207,16 @@ export const useFetchPurchaseProduct = () => {
 export const useFetchGoDownMarketPurchase = () => {
   return useQuery(
     createQueryConfig(["godownmarket"], "/api/panel-fetch-godown")
+  );
+};
+
+//  purchase dorpdown
+
+export const useFetchGoDown = () => {
+  return useQuery(createQueryConfig(["godown"], "/api/panel-fetch-godown"));
+};
+export const useFetchDispatchDcNo = () => {
+  return useQuery(
+    createQueryConfig(["dispatchDcNo"], "/api/panel-fetch-market-dispatch-dcno")
   );
 };
