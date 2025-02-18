@@ -108,8 +108,8 @@ const CreateItem = () => {
               className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             ></ItemCreate>
           </div>
-        ) : pathname === "/create-contract" ? (
-          <p className="text-xs text-yellow-700 ml-2 mt-1 w-32 hover:text-red-800 cursor-pointer">
+        ) : pathname === "/create-contract" || pathname === "/create-invoice" ? (
+          <p className="text-sm text-blue-600  hover:text-red-800 cursor-pointer">
             Create Item
           </p>
         ) : null}

@@ -853,8 +853,8 @@ const CreateMarketDispatch = () => {
             disabled={createDispatchMutation.isPending}
           >
             {createDispatchMutation.isPending
-              ? "Submitting..."
-              : "Submit Dispatch Order"}
+              ? "Creatting..."
+              : "Create Dispatch Order"}
           </Button>
         </div>
       </form>

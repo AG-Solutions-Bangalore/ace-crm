@@ -38,6 +38,13 @@ import {
   useFetchProduct,
 } from "@/hooks/useApi";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import CreateBuyer from "../master/buyer/CreateBuyer";
+import CreateProduct from "../master/product/CreateProduct";
+import CreatePortofLoading from "../master/portofLoading/CreatePortofLoading";
+import CreateCountry from "../master/country/CreateCountry";
+import CreatePaymentTermC from "../master/paymentTermC/CreatePaymentTermC";
+import CreateItem from "../master/item/CreateItem";
+import CreateDescriptionGoods from "../master/descriptionGoods/CreateDescriptionGoods";
 
 // Validation Schemas
 const productRowSchema = z.object({
@@ -281,7 +288,8 @@ const MemoizedProductSelect = React.memo(
 const ContractAdd = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-
+ const [submitLoading, setSubmitLoading] = useState(false);
+    const [saveAndViewLoading, setSaveAndViewLoading] = useState(false);
   const [contractData, setContractData] = useState([
     {
       contractSub_marking: "",
@@ -596,6 +604,7 @@ const ContractAdd = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitLoading(true);
     try {
       const processedContractData = contractData.map((row) => ({
         ...row,
@@ -610,7 +619,7 @@ const ContractAdd = () => {
         ...formData,
         contract_data: processedContractData,
       });
-      createContractMutation.mutate(validatedData);
+      const res = await  createContractMutation.mutateAsync(validatedData);
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {
@@ -649,9 +658,86 @@ const ContractAdd = () => {
         description: "An unexpected error occurred",
         variant: "destructive",
       });
+    }finally{
+      setSubmitLoading(false)
     }
   };
+  const handleSaveAndView = async (e) => {
+    e.preventDefault();
+    setSaveAndViewLoading(true);
+    try {
+    
+        const processedContractData = contractData.map((row) => ({
+            ...row,
+            contractSub_item_bag: parseFloat(row.contractSub_item_bag),
+            contractSub_qntyInMt: parseFloat(row.contractSub_qntyInMt),
+            contractSub_rateMT: parseFloat(row.contractSub_rateMT),
+            contractSub_packing: parseFloat(row.contractSub_packing),
+            contractSub_bagsize: parseFloat(row.contractSub_bagsize),
+          }));
+     
+      
+          const validatedData = contractFormSchema.parse({
+            ...formData,
+            contract_data: processedContractData,
+          });
 
+    
+      const response = await createContractMutation.mutateAsync(validatedData);
+
+  
+      if (response.code == 200) {
+      
+        navigate(`/view-contract/${response.latestid}`);
+      } else {
+        
+        toast({
+          title: "Error",
+          description: response.msg,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const groupedErrors = error.errors.reduce((acc, err) => {
+          const field = err.path.join(".");
+          if (!acc[field]) acc[field] = [];
+          acc[field].push(err.message);
+          return acc;
+        }, {});
+
+        const errorMessages = Object.entries(groupedErrors).map(
+          ([field, messages]) => {
+            const fieldKey = field.split(".").pop();
+            const label = fieldLabels[fieldKey] || field;
+            return `${label}: ${messages.join(", ")}`;
+          }
+        );
+
+        toast({
+          title: "Validation Error",
+          description: (
+            <div>
+              <ul className="list-disc pl-5">
+                {errorMessages.map((message, index) => (
+                  <li key={index}>{message}</li>
+                ))}
+              </ul>
+            </div>
+          ),
+          variant: "destructive",
+        });
+        return;
+      }
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaveAndViewLoading(false);
+    }
+  };
   return (
     <Page>
       <form
@@ -665,9 +751,10 @@ const ContractAdd = () => {
               <div className="grid grid-cols-4 gap-6">
                 <div>
                   <label
-                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between`}
                   >
-                    Buyer <span className="text-red-500">*</span>
+                    <span>Buyer <span className="text-red-500">*</span></span>
+                    <span><CreateBuyer/></span>
                   </label>
                   <MemoizedSelect
                     value={formData.contract_buyer}
@@ -685,9 +772,10 @@ const ContractAdd = () => {
                 </div>
                 <div>
                   <label
-                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between `}
                   >
-                    Consignee <span className="text-red-500">*</span>
+                  <span>  Consignee <span className="text-red-500">*</span></span>
+                  <span><CreateBuyer/></span>
                   </label>
                   <MemoizedSelect
                     value={formData.contract_consignee}
@@ -840,9 +928,10 @@ const ContractAdd = () => {
                 </div>
                 <div>
                   <label
-                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between `}
                   >
-                    Product <span className="text-red-500">*</span>
+                    <span>Product <span className="text-red-500">*</span></span>
+                    <span><CreateProduct/></span>
                   </label>
                   <MemoizedSelect
                     value={formData.contract_product}
@@ -860,9 +949,10 @@ const ContractAdd = () => {
                 </div>
                 <div>
                   <label
-                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between`}
                   >
-                    Port of Loading <span className="text-red-500">*</span>
+                  <span>  Port of Loading <span className="text-red-500">*</span></span>
+                    <span><CreatePortofLoading/></span>
                   </label>
                   <MemoizedSelect
                     value={formData.contract_loading}
@@ -882,9 +972,10 @@ const ContractAdd = () => {
                 </div>
                 <div>
                   <label
-                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between`}
                   >
-                    Destination Port <span className="text-red-500">*</span>
+                  <span>  Destination Port <span className="text-red-500">*</span></span>
+                    <span><CreateCountry/></span>
                   </label>
                   <MemoizedSelect
                     value={formData.contract_destination_port}
@@ -946,9 +1037,10 @@ const ContractAdd = () => {
                 </div>
                 <div>
                   <label
-                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between `}
                   >
-                    Dest. Country <span className="text-red-500">*</span>
+                   <span> Dest. Country <span className="text-red-500">*</span></span>
+                    <span><CreateCountry/></span>
                   </label>
                   <MemoizedSelect
                     value={formData.contract_destination_country}
@@ -1067,9 +1159,10 @@ const ContractAdd = () => {
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <label
-                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium  flex items-center justify-between`}
                   >
-                    Payment Terms
+                    <span>Payment Terms</span>
+                    <span><CreatePaymentTermC/></span>
                   </label>
                   <MemoizedSelect
                     className="bg-white"
@@ -1107,8 +1200,10 @@ const ContractAdd = () => {
             {/* Products Section */}
             <div className="mb-2">
               <div className="flex justify-between items-center mb-4">
-                <div className="flex flex-row items-center">
+                <div className="flex flex-row items-center gap-8">
                   <h2 className="text-xl font-semibold">Products</h2>
+                  <span ><CreateItem/></span>
+                  <span><CreateDescriptionGoods/></span>
                 </div>
               </div>
 
@@ -1347,16 +1442,26 @@ const ContractAdd = () => {
           </CardContent>
         </Card>
 
-        <div className="flex flex-col items-end">
+        <div className="flex items-center justify-end  gap-2">
           {createContractMutation.isPending && <ProgressBar progress={70} />}
           <Button
             type="submit"
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
-            disabled={createContractMutation.isPending}
+            disabled={submitLoading}
           >
-            {createContractMutation.isPending
-              ? "Submitting..."
-              : "Submit Enquiry"}
+            {submitLoading
+              ? "Creating..."
+              : "Create & Exit"}
+          </Button>
+          <Button
+            type="button" 
+            onClick={handleSaveAndView} 
+            className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
+            disabled={saveAndViewLoading}
+          >
+            {saveAndViewLoading
+              ? "Creating..."
+              : "Create & Print"}
           </Button>
         </div>
       </form>

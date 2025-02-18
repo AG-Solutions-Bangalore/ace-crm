@@ -19,6 +19,7 @@ import {
   Search,
   SquarePlus,
   Trash,
+  Trash2,
   UserPen,
   View,
 } from "lucide-react";
@@ -168,14 +169,14 @@ const MarketProcessing = () => {
                   `/purchase/market-processing/editProcessing/${ProcessingId}`
                 )
               }
-            ></ProcessingEdit>
+            />
 
             <ProcessingDelete
               onClick={() => {
                 setDeleteContractId(ProcessingId);
                 setDeleteConfirmOpen(true);
               }}
-            ></ProcessingDelete>
+            />
           </div>
         );
       },

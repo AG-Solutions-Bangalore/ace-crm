@@ -120,10 +120,12 @@ const CreateCountry = () => {
               className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             ></CountryCreate>
           </div>
-        ) : pathname === "/create-contract" ? (
-          <p className="text-xs text-yellow-700 ml-2 mt-1 w-32 hover:text-red-800 cursor-pointer">
-            Create Country
-          </p>
+        ) : pathname === "/create-contract" || pathname === "/create-invoice" ? (
+            <p className="text-xs text-blue-600  hover:text-red-800 cursor-pointer">
+                               <span className="flex items-center flex-row gap-1">
+                                 <SquarePlus className="w-4 h-4" /> <span>Add</span>
+                               </span>
+                             </p>
         ) : null}
       </DialogTrigger>
 
