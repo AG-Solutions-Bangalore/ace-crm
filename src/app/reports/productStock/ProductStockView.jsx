@@ -111,10 +111,6 @@ const ProductStockView = () => {
       </Page>
     );
   }
-  const handleSaveAsPdf = () => {
-    const element = containerRef.current;
-    generatePdf(element);
-  };
 
   const generatePdf = (element) => {
     const options = {
@@ -153,44 +149,32 @@ const ProductStockView = () => {
 
   return (
     <Page>
-      <div className="p-4">
+      <div className="p-4" ref={containerRef}>
         <div className="flex justify-between items-center p-2 rounded-lg mb-5 bg-gray-200">
           <h1 className="text-xl font-bold">Stock Summary</h1>
           <div className="flex flex-row items-center gap-4 font-bold">
             From - {moment(from_date).format("DD-MMM-YYYY")} To -{" "}
             {moment(to_date).format("DD-MMM-YYYY")}
-            <Button
-              className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-              onClick={handlePrintPdf}
-            >
-              <Printer className="h-4 w-4" /> Print
-            </Button>
-            <Button
-              className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-              onClick={handleSaveAsPdf}
-            >
-              <Printer className="h-4 w-4" /> Pdf
-            </Button>
+            <div className="print-hide">
+              {" "}
+              <Button
+                className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+                onClick={handlePrintPdf}
+              >
+                <Printer className="h-4 w-4" /> Print
+              </Button>
+            </div>
           </div>
         </div>
-        <div className="overflow-x-auto" ref={containerRef}>
+        <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-black text-[12px]">
             <thead className="bg-gray-100 text-[12px]">
-              <tr>
-                <th
-                  className="border border-black px-2 py-2 text-left"
-                  colSpan="7"
-                >
-                  Product Stock-{stockDatas.godown}
-                </th>
-              </tr>
-
               <tr>
                 <th className="border border-black px-2 py-2 text-left">
                   Product Name
                 </th>
                 <th className="border border-black px-2 py-2 text-left">
-                  Opening Stock
+                  Opening
                 </th>
                 <th className="border border-black px-2 py-2 text-left">
                   Purchase
@@ -205,7 +189,7 @@ const ProductStockView = () => {
                   Dispatch
                 </th>
                 <th className="border border-black px-2 py-2 text-left">
-                  Closing Stock
+                  Closing
                 </th>
               </tr>
             </thead>

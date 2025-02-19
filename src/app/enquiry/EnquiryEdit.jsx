@@ -355,16 +355,7 @@ const EnquiryEdit = () => {
     }
   };
 
-  //   const handleDeleteRow = async (productId) => {
-  //     try {
-  //       await deleteProductMutation.mutateAsync(productId);
-  //       setEnquiryData((prevData) =>
-  //         prevData.filter((row) => row.id !== productId)
-  //       );
-  //     } catch (error) {
-  //       console.error("Failed to delete product:", error);
-  //     }
-  //   };
+
   const handleDeleteRow = (productId) => {
     setDeleteItemId(productId);
     setDeleteConfirmOpen(true);

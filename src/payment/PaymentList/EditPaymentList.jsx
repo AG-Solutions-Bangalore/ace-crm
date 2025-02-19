@@ -915,7 +915,7 @@ const EditPaymentList = () => {
                   ))}
                 </TableBody>
               </Table>
-              <p>Total of tables: {calculateTotalInvoiceSubAmount()}</p>
+              <p>Total : {calculateTotalInvoiceSubAmount()}</p>
               <div className="mt-4 flex justify-end">
                 <Button
                   type="button"

@@ -224,14 +224,9 @@ const EditMarketProduction = () => {
     }));
   }, []);
 
-  // const handleSelectChange = useCallback((field, value) => {
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     [field]: value,
-  //   }));
-  // }, []);
+
   const handleSelectChange = useCallback((field, value) => {
-    console.log("Field:", field, "Value:", value, "Type:", typeof value);
+    // console.log("Field:", field, "Value:", value, "Type:", typeof value);
     setFormData((prev) => ({
       ...prev,
       [field]: value,

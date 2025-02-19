@@ -43,7 +43,7 @@ const ViewContract = () => {
           setError("Letter head data is missing");
           return;
         }
-        
+
         setContractData(data);
         setLoading(false);
       } catch (error) {
@@ -54,13 +54,13 @@ const ViewContract = () => {
 
     fetchContractData();
   }, [id]);
- 
+
   useEffect(() => {
     if (!contractData?.branch?.branch_letter_head) {
       setLoading(false);
       return;
     }
-    const fetchAndConvertImage = async () => { 
+    const fetchAndConvertImage = async () => {
       try {
         const logoUrl = `/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`;
 
@@ -612,7 +612,6 @@ const ViewContract = () => {
       }}
     >
       <img
-       
         src={getImageUrl(contractData?.branch?.branch_letter_head)}
         alt="logo"
         className="w-full max-h-[120px] object-contain"
@@ -639,7 +638,6 @@ const ViewContract = () => {
         <div className="w-[85%]">
           <div className="      ">
             <img
-
               src={getImageUrl(contractData?.branch?.branch_letter_head)}
               alt="logo"
               className="w-full"
@@ -857,13 +855,6 @@ const ViewContract = () => {
                         {contractData?.contract?.contract_remarks}
                       </p>
                     </div>
-
-                    {/* Documents */}
-                    {/* <div className="flex items-center gap-4 w-full">
-                  <span className="w-1/4 text-left">Documents</span>
-                  <span className="w-1 text-center">:</span>
-                  <p className="w-3/4">Lorem ipsum</p>
-                </div> */}
                   </div>
 
                   <div className="border-b w-fit mt-5 text-[12px] ml-[2%]   font-semibold border-black pt-4 mb-1">
@@ -885,7 +876,7 @@ const ViewContract = () => {
                       </div>
                       <div className=" mr-[7%] flex flex-col border-t-2 w-[18rem]  border-black items-center">
                         <p>Accepted with Co Seal </p>
-                        <p>{getTodayDate()}</p>
+                        <p>{moment(getTodayDate()).format("DD-MM-YYYY")}</p>
                       </div>
                     </div>
                   </div>
@@ -895,80 +886,13 @@ const ViewContract = () => {
           </div>
         </div>
         <div className=" w-[15%] flex flex-col  border border-gray-200  h-screen rounded-lg  p-2 ">
-          {/* <Tabs defaultValue="header" className="w-full ">
-            <TabsList className="grid w-full grid-cols-1">
-              <TabsTrigger value="header">Actions</TabsTrigger>
-            </TabsList>
-            <TabsContent value="header">
-              <div className="flex flex-col gap-2 mt-4">
-                <Button
-                  onClick={handlPrintPdf}
-                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
-                >
-                  <Printer className="h-4 w-4" />
-                  <span>Print PDF</span>
-                </Button>
-                <Button
-                  onClick={handleSaveAsPdf}
-                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
-                >
-                  <Printer className="h-4 w-4" />
-                  <span>Save as PDF</span>
-                </Button>
-                <Button
-                  onClick={() => {}}
-                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
-                >
-                  <Mail className="h-4 w-4" />
-                  <span>Send Mail</span>
-                </Button>
-                <Button
-                  onClick={whatsappPdf}
-                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  <span> Whatsapp</span>
-                </Button>
-                <Button
-                  onClick={() => {}}
-                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
-                >
-                  <Printer className="h-4 w-4" />
-                  <span>Print Wo-PDF</span>
-                </Button>
-                <Button
-                  onClick={handleSaveAsWidthoutHeaderPdf}
-                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
-                >
-                  <Printer className="h-4 w-4" />
-                  <span>Save as Wo-PDF</span>
-                </Button>
-                <Button
-                  onClick={() => {}}
-                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
-                >
-                  <Mail className="h-4 w-4" />
-                  <span>Send Wo-Mail</span>
-                </Button>
-                <Button
-                  onClick={whatsappWithoutHeaderPdf}
-                  className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  <span>Wo-Whatsapp</span>
-                </Button>
-              </div>
-            </TabsContent>
-          </Tabs> */}
-        
-  <ContractActions 
-    handlPrintPdf={handlPrintPdf}
-    handleSaveAsPdf={handleSaveAsPdf}
-    whatsappPdf={whatsappPdf}
-    handleSaveAsWidthoutHeaderPdf={handleSaveAsWidthoutHeaderPdf}
-    whatsappWithoutHeaderPdf={whatsappWithoutHeaderPdf}
-  />
-
+          <ContractActions
+            handlPrintPdf={handlPrintPdf}
+            handleSaveAsPdf={handleSaveAsPdf}
+            whatsappPdf={whatsappPdf}
+            handleSaveAsWidthoutHeaderPdf={handleSaveAsWidthoutHeaderPdf}
+            whatsappWithoutHeaderPdf={whatsappWithoutHeaderPdf}
+          />
         </div>
       </div>
     </Page>

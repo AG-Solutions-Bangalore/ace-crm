@@ -87,25 +87,49 @@ const ContractReport = () => {
   const handlePrintPdf = useReactToPrint({
     content: () => containerRef.current,
     documentTitle: "Product_Stock",
+    //   pageStyle: `
+    //     @page {
+    //       size: A4 landscape;
+    //       margin: 5mm;
+    //     }
+    //     @media print {
+    //       body {
+    //         font-size: 10px;
+    //         margin: 0mm;
+    //         padding: 0mm;
+    //       }
+    //       table {
+    //         font-size: 11px;
+    //       }
+    //       .print-hide {
+    //         display: none;
+    //       }
+    //     }
+    //   `,
+    // });
     pageStyle: `
-      @page {
-        size: A4 landscape;
-        margin: 5mm;
-      }
-      @media print {
-        body {
-          font-size: 10px; 
-          margin: 0mm;
-          padding: 0mm;
-        }
-        table {
-          font-size: 11px;
-        }
-        .print-hide {
-          display: none;
-        }
-      }
-    `,
+  @page {
+     size: A4 landscape;
+  margin: 5mm;
+  
+}
+@media print {
+  body {
+    border: 0px solid #000;
+        font-size: 10px; 
+    margin: 0mm;
+    padding: 0mm;
+    min-height: 100vh;
+  }
+     table {
+     font-size: 11px;
+   }
+  .print-hide {
+    display: none;
+  }
+ 
+}
+`,
   });
 
   if (isLoading) {
@@ -141,7 +165,7 @@ const ContractReport = () => {
   }
   return (
     <Page>
-      <div className="p-4 ">
+      <div className="p-4 " ref={containerRef}>
         <div className="flex justify-between items-center p-2 rounded-lg mb-5 bg-gray-200">
           <h1 className="text-xl font-bold">Contract Summary</h1>
           <div className="flex flex-row items-center gap-4 font-bold">
@@ -150,18 +174,18 @@ const ContractReport = () => {
               From -{moment(postData.from_date).format("DD-MMM-YYYY")}
             </span>
             To -{moment(postData.to_date).format("DD-MMM-YYYY")}
-            <div>
+            <div className="print-hide">
               {" "}
               <Button
                 variant="default"
-                className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+                className={`ml-2  ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
                 onClick={handlePrintPdf}
               >
                 <Printer className="h-4 w-4" /> Print
               </Button>
               <Button
                 variant="default"
-                className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+                className={`ml-2   ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
                 onClick={onSubmit}
               >
                 <Download className="h-4 w-4" /> Download
@@ -169,17 +193,9 @@ const ContractReport = () => {
             </div>
           </div>
         </div>
-        <div className="overflow-x-auto text-[10px]" ref={containerRef}>
+        <div className="overflow-x-auto text-[10px]">
           <table className="w-full border-collapse border border-black">
             <thead className="bg-gray-100">
-              <tr>
-                <th
-                  className="border border-black px-2 py-2 text-left"
-                  colSpan={11}
-                >
-                  Contract Summary
-                </th>
-              </tr>
               <tr>
                 <th className="border border-black px-2 py-2 ">Company</th>
                 <th className="border border-black px-2 py-2 ">

@@ -87,51 +87,7 @@ const InvoicePacking = () => {
     });
   };
 
-  //   const generatePdf = (element) => {
-  //     const options = {
-  //       margin: [0, 0, 15, 0],
-  //       filename: "Invoice_Packing.pdf",
-  //       image: { type: "jpeg", quality: 0.98 },
-  //       html2canvas: {
-  //         scale: 2,
-  //         useCORS: true,
-  //         windowHeight: element.scrollHeight,
-  //       },
-  //       jsPDF: {
-  //         unit: "mm",
-  //         format: "a4",
-  //         orientation: "portrait",
-  //       },
-  //       pagebreak: { mode: "avoid" },
-  //     };
-
-  //     html2pdf()
-  //       .from(element)
-  //       .set(options)
-  //       .toPdf()
-  //       .get("pdf")
-  //       .then((pdf) => {
-  //         const totalPages = pdf.internal.getNumberOfPages();
-  //         const pageWidth = pdf.internal.pageSize.getWidth();
-  //         const pageHeight = pdf.internal.pageSize.getHeight();
-
-  //         console.log(`Element Height: ${element.scrollHeight}`);
-  //         console.log(`Page Width: ${pageWidth}, Page Height: ${pageHeight}`);
-
-  //         for (let i = 1; i <= totalPages; i++) {
-  //           pdf.setPage(i);
-  //           pdf.setFontSize(10);
-  //           pdf.setTextColor(0, 0, 0);
-  //           const text = `Page ${i} of ${totalPages}`;
-  //           const textWidth =
-  //             (pdf.getStringUnitWidth(text) * 10) / pdf.internal.scaleFactor;
-  //           const x = pageWidth - textWidth - 10;
-  //           const y = pageHeight - 10;
-  //           pdf.text(text, x, y);
-  //         }
-  //       })
-  //       .save();
-  //   };
+  
   const generatePdf = (element) => {
     const options = {
       margin: [0, 0, 15, 0],
