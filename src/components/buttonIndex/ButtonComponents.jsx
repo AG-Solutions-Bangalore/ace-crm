@@ -4,6 +4,7 @@ import {
   Eye,
   FilePlus2,
   MinusCircle,
+  Printer,
   SquarePlus,
   Trash,
 } from "lucide-react";
@@ -865,6 +866,21 @@ export const BuyerRDownload = ({ onClick, className }) => {
   );
 };
 BuyerRDownload.page = "BuyerR";
+export const BuyerRPrint = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "BuyerRPrint", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      <Printer className="h-4 w-4" /> Print
+    </Button>
+  );
+};
+BuyerRPrint.page = "BuyerR";
 ////////REPORT-"ContractR"
 
 export const ContractRDownload = ({ onClick, className }) => {
@@ -945,7 +961,7 @@ export const SalesDataDownload = ({ onClick, className }) => {
     </Button>
   );
 };
-SalesDataDownload.page = "Sales Data";
+SalesDataDownload.page = "Sales Summary";
 export const SalesDataView = ({ onClick, className }) => {
   const navigate = useNavigate();
   const userId = localStorage.getItem("id") || "";
@@ -960,7 +976,74 @@ export const SalesDataView = ({ onClick, className }) => {
     </Button>
   );
 };
-SalesDataView.page = "Sales Data";
+SalesDataView.page = "Sales Summary";
+//PAYMENT
+////////REPORT-"PurchaseSummary"
+
+export const PurchaseSummaryDownload = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "PurchaseSummaryDownload", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      <Download className="h-4 w-4" /> Download
+    </Button>
+  );
+};
+PurchaseSummaryDownload.page = "Purchase Summary";
+export const PurchaseSummaryVendorView = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (
+    !checkPermission(userId, "PurchaseSummaryVendorView", staticPermissions)
+  ) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      Vendor Wise
+    </Button>
+  );
+};
+PurchaseSummaryVendorView.page = "Purchase Summary";
+export const PurchaseSummaryCompanyView = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (
+    !checkPermission(userId, "PurchaseSummaryCompanyView", staticPermissions)
+  ) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      Company Wise
+    </Button>
+  );
+};
+PurchaseSummaryCompanyView.page = "Purchase Summary";
+export const ProductStockView = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "ProductStockView", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      Stock Report
+    </Button>
+  );
+};
+ProductStockView.page = "Product Stock";
 //PAYMENT
 ////////Payment
 export const PaymentCreate = ({ onClick, className }) => {
@@ -1299,12 +1382,17 @@ export default {
   PreRecepitsCreate,
   PreRecepitsEdit,
   BuyerRDownload,
+  BuyerRPrint,
   ContractRDownload,
   ContractRView,
   SalesAccountDownload,
   SalesAccountView,
   SalesDataDownload,
   SalesDataView,
+  PurchaseSummaryDownload,
+  PurchaseSummaryVendorView,
+  PurchaseSummaryCompanyView,
+  ProductStockView,
   PaymentCreate,
   PurchaseOrderCreate,
   PurchaseOrderEdit,

@@ -1,4 +1,10 @@
 import Page from "@/app/dashboard/page";
+import { Button } from "@/components/ui/button";
+import BASE_URL from "@/config/BaseUrl";
+import { ButtonConfig } from "@/config/ButtonConfig";
+import axios from "axios";
+import { Download, Printer } from "lucide-react";
+import moment from "moment";
 import React, { useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
@@ -7,8 +13,7 @@ const SalesDataReport = () => {
   const location = useLocation();
   const containerRef = useRef();
   const reportData = location.state?.reportsalesData;
-  console.log("dsd", reportData);
-
+  const formData = location.state?.formData;
   if (!reportData || !reportData.sales_data) {
     return (
       <Page>
@@ -72,16 +77,61 @@ const SalesDataReport = () => {
           }
           `,
   });
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+
+    axios({
+      url: BASE_URL + "/api/panel-download-sales-data-report",
+      method: "POST",
+      data: formData,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((res) => {
+        const url = window.URL.createObjectURL(new Blob([res.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "sales_data.csv");
+        document.body.appendChild(link);
+        link.click();
+        toast({
+          title: "Success",
+          description: "Sales Data download successfully",
+        });
+      })
+      .catch((error) => {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      });
+  };
   return (
     <Page>
       <div className="flex justify-between   items-center p-2 rounded-lg mb-5 bg-gray-200 ">
         <h1 className="text-xl font-bold">Sales Summary</h1>
-        <button
-          className="bg-blue-500 text-white py-1 px-2 rounded"
-          onClick={handlPrintPdf}
-        >
-          Print
-        </button>
+        <div className="flex flex-row items-center gap-4 font-bold">
+          <span className="mr-2">
+            {" "}
+            From -{moment(formData.from_date).format("DD-MMM-YYYY")}
+          </span>
+          To -{moment(formData.to_date).format("DD-MMM-YYYY")}
+          <Button
+            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+            onClick={onSubmit}
+          >
+            <Download className="h-4 w-4" /> Download
+          </Button>
+          <Button
+            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+            onClick={handlPrintPdf}
+          >
+            <Printer className="h-4 w-4" /> Print
+          </Button>
+        </div>
       </div>
       <div ref={containerRef}>
         {Object.entries(groupedData).map(([branchName, invoices]) => (

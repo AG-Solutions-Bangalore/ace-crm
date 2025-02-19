@@ -91,7 +91,17 @@ const ContractForm = () => {
       [field]: value,
     }));
   };
+  // const handleInputChange1 = (field, valueOrEvent) => {
+  //   const value =
+  //     typeof valueOrEvent === "object" && valueOrEvent.target
+  //       ? valueOrEvent.target.value
+  //       : valueOrEvent;
 
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     [field]: value,
+  //   }));
+  // };
   const fetchCompanys = async () => {
     const token = localStorage.getItem("token");
     if (!token) throw new Error("No authentication token found");
@@ -257,6 +267,7 @@ const ContractForm = () => {
       });
     }
   };
+
   return (
     <Page>
       <BranchHeader />
@@ -276,9 +287,7 @@ const ContractForm = () => {
                     type="date"
                     value={formData.from_date}
                     className="bg-white"
-                    onChange={(e) =>
-                      handleInputChange("from_date", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange(e, "from_date")}
                     placeholder="Enter From Date"
                   />
                 </div>
@@ -293,9 +302,7 @@ const ContractForm = () => {
                     type="date"
                     className="bg-white"
                     value={formData.to_date}
-                    onChange={(e) =>
-                      handleInputChange("to_date", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange(e, "to_date")}
                     placeholder="Enter To Date"
                   />
                 </div>
