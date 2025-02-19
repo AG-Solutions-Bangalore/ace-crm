@@ -176,7 +176,7 @@ const PurchaseOrderList = () => {
         return (
           <div className="flex flex-row">
             <PurchaseOrderView
-              onClick={() => navigate(`/view-purchase-order`)}
+              onClick={() => navigate(`/view-purchase-order/${purchaseId}`)}
             ></PurchaseOrderView>
 
             <TooltipProvider>

@@ -153,7 +153,10 @@ function App() {
             path="/create-purchase-order"
             element={<CreatePurchaseOrder />}
           />
-          <Route path="/view-purchase-order" element={<ViewPurchaseOrder />} />
+          <Route
+            path="/view-purchase-order/:id"
+            element={<ViewPurchaseOrder />}
+          />
           <Route
             path="/edit-purchase-order/:id"
             element={<EditPurchaseOrder />}

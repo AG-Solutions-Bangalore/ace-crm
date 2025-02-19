@@ -236,7 +236,7 @@ const PreshipmentDetails = () => {
 
                     <div className="col-span-1 p-1 flex items-center">
                       {moment(invoicePackingData.invoice_date).format(
-                        "DD-MM-YYY"
+                        "DD-MM-YYYY"
                       )}
                     </div>
                   </div>

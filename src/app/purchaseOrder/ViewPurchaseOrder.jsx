@@ -10,21 +10,24 @@ import { getTodayDate } from "@/utils/currentDate";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ReactToPrint, { useReactToPrint } from "react-to-print";
 import moment from "moment";
+import { toWords } from "number-to-words";
 
 const ViewPurchaseOrder = () => {
   const containerRef = useRef();
   const { id } = useParams();
-  const [contractData, setContractData] = useState(null);
+  const [purchaseProductData, setPurchaseProductData] = useState({});
+  const [purchaseProductSubData, setPurchaseProductSubData] = useState([]);
+  const [branchData, setBranchData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [logoBase64, setLogoBase64] = useState("");
 
   useEffect(() => {
-    const fetchContractData = async () => {
+    const fetchPurchaseData = async () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${BASE_URL}/api/panel-fetch-contract-by-id/4`,
+          `${BASE_URL}/api/panel-fetch-purchase-product-view-by-id/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -37,7 +40,9 @@ const ViewPurchaseOrder = () => {
         }
 
         const data = await response.json();
-        setContractData(data);
+        setPurchaseProductData(data.purchaseProduct);
+        setPurchaseProductSubData(data.purchaseProductSub);
+        setBranchData(data.branch);
         setLoading(false);
       } catch (error) {
         setError(error.message);
@@ -45,9 +50,31 @@ const ViewPurchaseOrder = () => {
       }
     };
 
-    fetchContractData();
+    fetchPurchaseData();
   }, [id]);
+  const formatToPascalCase = (str) => {
+    return str
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join("");
+  };
 
+  const totalAmount = purchaseProductSubData
+    .reduce((total, item) => {
+      return (
+        total +
+        (item.purchase_productSub_qntyInMt *
+          item.purchase_productSub_rateInMt || 0)
+      );
+    }, 0)
+    .toFixed(2);
+
+  const totalInWords = toWords(Math.floor(totalAmount));
+  const cents = Math.round((totalAmount - Math.floor(totalAmount)) * 100);
+  const formattedAmount =
+    formatToPascalCase(totalInWords) +
+    (cents > 0 ? `And${toWords(cents)}Cents` : "") +
+    " Dollars";
   useEffect(() => {
     const fetchAndConvertImage = async () => {
       try {
@@ -107,7 +134,7 @@ const ViewPurchaseOrder = () => {
     }
 
     const options = {
-      margin: [55, 3, 15, 3], // top , left , bottom , right
+      margin: [55, 3, 15, 3],
       filename: "Sales_Contract.pdf",
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: {
@@ -136,11 +163,9 @@ const ViewPurchaseOrder = () => {
         for (let i = 1; i <= totalPages; i++) {
           pdf.setPage(i);
 
-          // for logo
           const imgData = logoBase64.split(",")[1];
           pdf.addImage(imgData, "JPEG", 0, 10, pageWidth, 30);
 
-          // Add contract title
           pdf.setFontSize(12);
           pdf.setFont(undefined, "normal");
           const title = "PURCHASE ORDER";
@@ -148,10 +173,7 @@ const ViewPurchaseOrder = () => {
             (pdf.getStringUnitWidth(title) * 16) / pdf.internal.scaleFactor;
           pdf.text(title, (pageWidth - titleWidth) / 2, 45);
 
-          // Add contract details
           pdf.setFontSize(9);
-
-          // Add page no at the Bottom
 
           pdf.setFontSize(10);
           pdf.setTextColor(0, 0, 0);
@@ -198,35 +220,6 @@ const ViewPurchaseOrder = () => {
     }
     `,
   });
-  //   if (loading) {
-  //     return (
-  //       <Page>
-  //         <div className="flex justify-center items-center h-full">
-  //           <Button disabled>
-  //             <Loader2 className=" h-4 w-4 animate-spin" />
-  //             Loading contract Data
-  //           </Button>
-  //         </div>
-  //       </Page>
-  //     );
-  //   }
-
-  //   if (error) {
-  //     return (
-  //       <Page>
-  //         <Card className="w-full max-w-md mx-auto mt-10">
-  //           <CardHeader>
-  //             <CardTitle className="text-destructive">
-  //               Error Fetching contract Data
-  //             </CardTitle>
-  //           </CardHeader>
-  //           <CardContent>
-  //             <Button variant="outline">Try Again</Button>
-  //           </CardContent>
-  //         </Card>
-  //       </Page>
-  //     );
-  //   }
 
   const PrintHeader = () => (
     <div
@@ -242,7 +235,7 @@ const ViewPurchaseOrder = () => {
       }}
     >
       <img
-        src={`/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`}
+        src={`/api/public/assets/images/letterHead/${branchData?.branch_letter_head}`}
         alt="logo"
         className="w-full max-h-[120px] object-contain"
       />
@@ -251,7 +244,6 @@ const ViewPurchaseOrder = () => {
       </h1>
     </div>
   );
-
   return (
     <Page>
       <div className=" flex w-full p-2 gap-2 relative ">
@@ -259,7 +251,7 @@ const ViewPurchaseOrder = () => {
           <div>
             {" "}
             <img
-              src="/api/public/assets/images/letterHead/AceB.png"
+              src={`/api/public/assets/images/letterHead/${branchData?.branch_letter_head}`}
               alt="logo"
               className="w-full  block print:hidden"
             />
@@ -273,21 +265,43 @@ const ViewPurchaseOrder = () => {
             <div>
               <div className="border border-black">
                 <div className="mx-4 ">
-                  <div className="w-full mx-auto flex justify-between ">
+                  <div className="w-full mx-auto grid grid-cols-2 gap-4 ">
                     <div>
-                      <p className="font-bold">FATAH INDUSTRIES</p>
-                      <p>#12-7-129/256/2, Mansalapur Road</p>
-                      <p>Raichur-584101</p>
-                      <p>GSTIN : 29APCPM4557M1ZB</p>
-                      <p>Kind Attn. : Mr. Siddesh</p>
+                      <p className="font-bold">
+                        {purchaseProductData.purchase_product_seller}
+                      </p>
+
+                      <p> {purchaseProductData.purchase_product_seller_add}</p>
+                      <p>
+                        GSTIN :{" "}
+                        {purchaseProductData.purchase_product_seller_gst}{" "}
+                      </p>
+                      <p>
+                        Kind Attn. :{" "}
+                        {purchaseProductData.purchase_product_seller_contact}
+                      </p>
                     </div>
-                    <div className="text-right">
-                      <p>PO DATE: May 14, 2024</p>
+                    <div className="text-right ">
+                      <p>
+                        PO DATE:{" "}
+                        {moment(
+                          purchaseProductData.purchase_product_date
+                        ).format("DD-MM-YYYY")}
+                      </p>
                       <p>
                         PO. NO.:
-                        <span className="font-semibold"> AE/KAR/4/202425 </span>
+                        <span className="font-semibold">
+                          {" "}
+                          {purchaseProductData.purchase_product_ref}
+                        </span>
                       </p>
-                      <p>DELIVERY DATE:21 Feb 2026</p>
+                      <p>
+                        DELIVERY DATE:{" "}
+                        {purchaseProductData.purchase_product_delivery_date &&
+                          moment(
+                            purchaseProductData.purchase_product_delivery_date
+                          ).format("DD-MM-YYYY")}
+                      </p>
                     </div>
                   </div>
                   <div className=" w-full mx-auto mt-6">
@@ -336,33 +350,32 @@ const ViewPurchaseOrder = () => {
                       </thead>
 
                       <tbody>
-                        {/* {invoiceSubData.map((item, index) => ( */}
-                        <>
-                          <tr>
-                            <td className="border-r border-black p-2">
-                              Indian Groundnuts 80/90, Summer Crop
-                            </td>
+                        {purchaseProductSubData.map((item, index) => (
+                          <>
+                            <tr key={index}>
+                              <td className="border-r border-black p-2">
+                                {item.purchase_productSub_name}
+                              </td>
 
-                            <td className="border-r border-black p-2">
-                              BYADAGI STEMLESS CHILLIES
-                            </td>
-                            <td className="border-r border-black p-2 text-center">
-                              {/* {item.invoiceSub_qntyInMt} */}20.000 MTS
-                            </td>
-                            <td className="border-r border-black p-2 text-center">
-                              {/* {item.invoiceSub_rateMT} */}23.000 MTS
-                            </td>
-                            <td className="p-2 text-right">
-                              $
-                              {/* {(
-                                item.invoiceSub_qntyInMt *
-                                item.invoiceSub_rateMT
-                              ).toFixed(2)} */}
-                              12377.00
-                            </td>
-                          </tr>
-                        </>
-                        {/* ))} */}
+                              <td className="border-r border-black p-2">
+                                {item.purchase_productSub_description}
+                              </td>
+                              <td className="border-r border-black p-2 text-center">
+                                {item.purchase_productSub_qntyInMt} MTS
+                              </td>
+                              <td className="border-r border-black p-2 text-center">
+                                {item.purchase_productSub_rateInMt} MTS
+                              </td>
+                              <td className="p-2 text-right">
+                                $
+                                {(
+                                  item.purchase_productSub_qntyInMt *
+                                  item.purchase_productSub_rateInMt
+                                ).toFixed(2)}
+                              </td>
+                            </tr>
+                          </>
+                        ))}
 
                         <tr>
                           <td className="border-r border-black p-2"></td>
@@ -372,16 +385,15 @@ const ViewPurchaseOrder = () => {
                           <td className="border-r border-black p-2"></td>
                           <td className="border-t border-black p-2 text-right font-bold">
                             $
-                            {/* {invoiceSubData
-                            .reduce((total, item) => {
-                              return (
-                                total +
-                                (item.invoiceSub_qntyInMt *
-                                  item.invoiceSub_rateMT || 0)
-                              );
-                            }, 0)
-                            .toFixed(2)} */}
-                            2399.00
+                            {purchaseProductSubData
+                              .reduce((total, item) => {
+                                return (
+                                  total +
+                                  (item.purchase_productSub_qntyInMt *
+                                    item.purchase_productSub_rateInMt || 0)
+                                );
+                              }, 0)
+                              .toFixed(2)}
                           </td>
                         </tr>
                       </tbody>
@@ -391,26 +403,26 @@ const ViewPurchaseOrder = () => {
                       <p>
                         AMOUNT CHARGEABLE IN WORDS -{" "}
                         <span className=" font-semibold ml-3">
-                          Twenty two THousand
+                          {formattedAmount}{" "}
                         </span>
                       </p>
                       <p>
                         GST NOTIFICATION :
                         <span className="font-bold">
                           {" "}
-                          CGST-2.5% AND SGST-2.5%
+                          {
+                            purchaseProductData.purchase_product_gst_notification
+                          }
                         </span>{" "}
                       </p>
                     </div>
 
                     <div>
-                      QUALITY JL JAVA Mix Type- As per Export Parameter. Free
-                      from Foreign particles, with Pinkish Colour, No Broken
-                      Particles, & No skin outs, Counts 80/90-. Avg 85.
-                      Moisture:Below 8%.{" "}
+                      QUALITY {purchaseProductData.purchase_product_quality}
                     </div>
                     <div>
-                      PAYMENT : 21 Days from the receipt of cargo at Chennai
+                      PAYMENT :{" "}
+                      {purchaseProductData.purchase_product_payment_terms}
                     </div>
                   </div>
                 </div>
@@ -421,33 +433,23 @@ const ViewPurchaseOrder = () => {
                       <p className="font-bold"> DELIVERY AT </p>
 
                       <p className="my-2">
-                        Sri Lakshmi Godown. Door No.7/178,Edapalyam,Gojan
-                        College Road,Red hills Chennai600052
+                        {purchaseProductData.purchase_product_delivery_at}
                       </p>
                     </div>
                   </div>
 
                   <div className="col-span-1 border-t border-l border-black w-full h-full">
-                    {/* <div className="p-4 h-full">
-                      <p className="font-bold leading-none">For ACE EXPORTS</p>
-                      <img
-                        src={`${SIGN_IN_PURCHASE}/sign1.png`}
-                        alt="logo"
-                        className="w-[200px] h-auto"
-                      />
-                      <p className="font-bold leading-none mt-12">
-                        Authorised Signatory :
-                      </p>
-                    </div> */}
                     <div className="p-4 h-full relative">
-                      <p className="font-bold leading-none">For ACE EXPORTS</p>
+                      <p className="font-bold leading-none">
+                        For {purchaseProductData.branch_name}
+                      </p>
 
                       <div className="relative w-[200px] h-auto">
                         <p className="font-bold leading-none absolute bottom-0 right-0 -translate-x-1/2 text-black opacity-50 z-10">
                           Authorised Signatory :
                         </p>
                         <img
-                          src={`${SIGN_IN_PURCHASE}/sign.png`}
+                          src={`${SIGN_IN_PURCHASE}/${branchData.branch_sign}`}
                           alt="logo"
                           className="w-[120px] h-auto relative "
                         />

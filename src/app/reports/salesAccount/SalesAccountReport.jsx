@@ -109,7 +109,10 @@ const SalesAccountReport = () => {
   };
   return (
     <Page>
-      <div className="flex justify-between   items-center p-2 rounded-lg mb-5 bg-gray-200 ">
+      <div ref={containerRef}>
+
+      
+      <div  className="flex justify-between   items-center p-2 rounded-lg mb-5 bg-gray-200 ">
         <h1 className="text-xl font-bold">Sales Account Summary</h1>
         <div className="flex flex-row items-center gap-4 font-bold">
           <span className="mr-2">
@@ -118,20 +121,20 @@ const SalesAccountReport = () => {
           </span>
           To -{moment(formData.to_date).format("DD-MMM-YYYY")}
           <Button
-            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+            className={`ml-2 print:hidden ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             onClick={handleDownload}
           >
             <Download className="h-4 w-4" /> Download
           </Button>
           <Button
-            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+            className={`ml-2 print:hidden ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             onClick={handlPrintPdf}
           >
             <Printer className="h-4 w-4" /> Print
           </Button>
         </div>
       </div>
-      <div ref={containerRef}>
+      <div  >
         {Object.entries(groupedData).map(([branchName, invoices]) => (
           <div
             key={branchName}
@@ -185,7 +188,8 @@ const SalesAccountReport = () => {
                     {item.invoice_bl_no}
                   </div>
                   <div className="p-2 border-b border-r border-black">
-                    {item.invoice_bl_date}
+                    {/* {item.invoice_bl_date} */}
+                    {moment(item.invoice_bl_date).format("DD-MM-YYYY")}
                   </div>
                   <div className="p-2 border-b border-r border-black">
                     {item.invoice_product}
@@ -217,39 +221,39 @@ const SalesAccountReport = () => {
               <div className="p-2 border-b  border-black"></div>
               <div className="p-2 border-b  border-black"></div>
               <div className="p-2 border-b border-r border-black font-bold">
-                Total
+              Sub Total
               </div>
-              <div className="p-2 border-b border-r border-black text-right">
+              <div className="p-2 border-b border-r font-bold border-black text-right">
                 {invoices.reduce(
                   (sum, item) => sum + Number(item.invoice_i_value_usd || 0),
                   0
                 )}
               </div>
-              <div className="p-2 border-b border-r border-black text-right">
+              <div className="p-2 border-b border-r font-bold border-black text-right">
                 {invoices.reduce(
                   (sum, item) => sum + Number(item.invoice_i_value_inr || 0),
                   0
                 )}
               </div>
-              <div className="p-2 border-b border-r border-black text-right">
+              <div className="p-2 border-b border-r font-bold border-black text-right">
                 {invoices.reduce(
                   (sum, item) => sum + Number(item.invoice_i_value_fob || 0),
                   0
                 )}
               </div>
-              <div className="p-2 border-b border-r border-black text-right">
+              <div className="p-2 border-b border-r font-bold border-black text-right">
                 {invoices.reduce(
                   (sum, item) => sum + Number(item.meis || 0),
                   0
                 )}
               </div>
-              <div className="p-2 border-b border-r border-black text-right">
+              <div className="p-2 border-b border-r font-bold border-black text-right">
                 {invoices.reduce(
                   (sum, item) => sum + Number(item.drawback || 0),
                   0
                 )}
               </div>
-              <div className="p-2 border-b border-r border-black text-right">
+              <div className="p-2 border-b border-r font-bold border-black text-right">
                 {invoices.reduce(
                   (sum, item) => sum + Number(item.stax || 0),
                   0
@@ -293,6 +297,7 @@ const SalesAccountReport = () => {
             {overallTotals.stax}
           </div>
         </div>
+      </div>
       </div>
     </Page>
   );

@@ -123,7 +123,7 @@ export default function ForgotPassword() {
               Forgot Password
             </CardTitle>
             <CardDescription className="text-center">
-              Enter your username and password to access your account
+              Enter your username and Email Id to Reset Password
             </CardDescription>
           </CardHeader>
           <CardContent>

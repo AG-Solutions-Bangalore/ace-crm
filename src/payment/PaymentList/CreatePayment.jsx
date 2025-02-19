@@ -113,7 +113,6 @@ const CreatePayment = () => {
     invoiceP_irtt_no: "",
     invoiceP_status: "",
   });
-  console.log(formData, "formda");
   const [invoiceData, setInvoiceData] = useState([
     {
       invoicePSub_inv_ref: "",

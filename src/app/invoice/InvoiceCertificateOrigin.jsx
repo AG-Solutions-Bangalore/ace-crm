@@ -122,7 +122,7 @@ const InvoiceCertificateOrigin = () => {
       </Card>
     );
   }
-  
+
   if (error) {
     return (
       <Card className="w-full">
@@ -136,17 +136,17 @@ const InvoiceCertificateOrigin = () => {
   return (
     <div>
       <div>
-          <button
-                onClick={handleSaveAsWord}
-                className="fixed top-5 right-24 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
-              >
-                <FaRegFileWord className="w-4 h-4" />
-              </button>
-      <button
+        <button
+          onClick={handleSaveAsWord}
+          className="fixed top-5 right-24 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
+        >
+          <FaRegFileWord className="w-4 h-4" />
+        </button>
+        <button
           onClick={handlPrintPdf}
           className="fixed top-5 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
         >
-         <Printer className="h-4 w-4"/>
+          <Printer className="h-4 w-4" />
         </button>
       </div>
 
@@ -221,7 +221,7 @@ const InvoiceCertificateOrigin = () => {
                     <td className="w-[15%] text-[12px] p-2 text-sm text-gray-900 break-words">
                       {spiceBoard?.invoice_ref}
                       <br />
-                      DT.{spiceBoard?.invoice_date}
+                      DT.{moment(spiceBoard?.invoice_date).format("DD-MM-YYYY")}
                       <br />$
                       {invoiceSubData
                         ?.reduce(
