@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Printer, Mail, MessageCircle } from "lucide-react";
 import html2pdf from "html2pdf.js";
-import BASE_URL, { SIGN_IN_PURCHASE } from "@/config/BaseUrl";
+import BASE_URL, { LetterHead, SIGN_IN_PURCHASE } from "@/config/BaseUrl";
 import { useParams } from "react-router-dom";
 import { getTodayDate } from "@/utils/currentDate";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -40,6 +40,11 @@ const ViewPurchaseOrder = () => {
         }
 
         const data = await response.json();
+        if (!data?.branch?.branch_letter_head) {
+          setLoading(true);
+          setError("Letter head data is missing");
+          return;
+        }
         setPurchaseProductData(data.purchaseProduct);
         setPurchaseProductSubData(data.purchaseProductSub);
         setBranchData(data.branch);
@@ -76,9 +81,13 @@ const ViewPurchaseOrder = () => {
     (cents > 0 ? `And${toWords(cents)}Cents` : "") +
     " Dollars";
   useEffect(() => {
+    if (!branchData?.branch_letter_head) {
+      setLoading(false);
+      return;
+    }
     const fetchAndConvertImage = async () => {
       try {
-        const logoUrl = `/api/public/assets/images/letterHead/AceB.png`;
+        const logoUrl = `${LetterHead}/${branchData?.branch_letter_head}`;
         const response = await fetch(logoUrl);
         const blob = await response.blob();
 
@@ -93,7 +102,7 @@ const ViewPurchaseOrder = () => {
     };
 
     fetchAndConvertImage();
-  }, []);
+  }, [branchData?.branch_letter_head]);
 
   const handleSaveAsPdf = () => {
     if (!logoBase64) {
@@ -235,7 +244,7 @@ const ViewPurchaseOrder = () => {
       }}
     >
       <img
-        src={`/api/public/assets/images/letterHead/${branchData?.branch_letter_head}`}
+        src={`${LetterHead}/${branchData?.branch_letter_head}`}
         alt="logo"
         className="w-full max-h-[120px] object-contain"
       />
@@ -251,7 +260,7 @@ const ViewPurchaseOrder = () => {
           <div>
             {" "}
             <img
-              src={`/api/public/assets/images/letterHead/${branchData?.branch_letter_head}`}
+              src={`${LetterHead}/${branchData?.branch_letter_head}`}
               alt="logo"
               className="w-full  block print:hidden"
             />

@@ -62,7 +62,7 @@ const ViewContract = () => {
     }
     const fetchAndConvertImage = async () => {
       try {
-        const logoUrl = `/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`;
+        const logoUrl = `${LetterHead}/${contractData?.branch?.branch_letter_head}`;
 
         const response = await fetch(logoUrl);
         const blob = await response.blob();
