@@ -12,6 +12,7 @@ import BASE_URL from "@/config/BaseUrl";
 import { useFetchGoDownMarketPurchase } from "@/hooks/useApi";
 import { ChevronDown } from "lucide-react";
 import Select from "react-select";
+import { ProductStockView } from "@/components/buttonIndex/ButtonComponents";
 
 const createReport = async (data) => {
   const token = localStorage.getItem("token");
@@ -234,7 +235,7 @@ const ProductStock = () => {
 
                 <div>
                   <label
-                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                    className={`block  ${ButtonConfig.cardLabel} text-xs mb-[10px] font-medium `}
                   >
                     Go Down
                   </label>
@@ -253,13 +254,13 @@ const ProductStock = () => {
               </div>
 
               <div className="flex flex-row items-end mt-3 justify-end w-full">
-                <Button
+                <ProductStockView
                   type="submit"
                   className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} ml-2 flex items-center`}
                   disabled={stockReportMutation.isPending}
                 >
                   {stockReportMutation.isPending ? "Stock..." : "Stock Report"}
-                </Button>
+                </ProductStockView>
               </div>
             </form>
           </div>

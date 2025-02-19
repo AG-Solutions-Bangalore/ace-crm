@@ -164,7 +164,11 @@ const SalesDataForm = () => {
     mutationFn: createContract,
     onSuccess: (data) => {
       navigate("/report/sales-data-report", {
-        state: { reportsalesData: data },
+        // state: { reportsalesData: data },
+        state: {
+          reportsalesData: data,
+          formData: formData,
+        },
       });
     },
     onError: (error) => {

@@ -285,11 +285,11 @@ export function AppSidebar({ ...props }) {
             url: "/report/sales-account-form",
           },
           {
-            title: "Sales Data",
+            title: "Sales Summary",
             url: "/report/sales-data-form",
           },
           {
-            title: "Monthwise Purchase",
+            title: "Purchase Summary",
             url: "/report/monthwise-purchase-form",
           },
           {

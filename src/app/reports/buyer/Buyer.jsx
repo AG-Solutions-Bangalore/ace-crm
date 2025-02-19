@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import Page from "@/app/dashboard/page";
@@ -8,9 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { ButtonConfig } from "@/config/ButtonConfig";
-import { BuyerRDownload } from "@/components/buttonIndex/ButtonComponents";
+import {
+  BuyerRDownload,
+  BuyerRPrint,
+} from "@/components/buttonIndex/ButtonComponents";
+import { useReactToPrint } from "react-to-print";
 
 const Buyer = () => {
+  const containerRef = useRef();
+
   const { toast } = useToast();
 
   const fetchBuyerData = async () => {
@@ -34,7 +40,65 @@ const Buyer = () => {
   } = useQuery({
     queryKey: ["buyerData"],
     queryFn: fetchBuyerData,
-    staleTime: Infinity,
+    // staleTime: Infinity,
+  });
+
+ 
+  //excel download
+  const onSubmit = (e) => {
+    e.preventDefault();
+
+    axios({
+      url: BASE_URL + "/api/panel-download-buyer-details-report",
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((res) => {
+        console.log("data : ", res.data);
+        const url = window.URL.createObjectURL(new Blob([res.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "buyer.csv");
+        document.body.appendChild(link);
+        link.click();
+        toast({
+          title: "Success",
+          description: "Buyer created successfully",
+        });
+      })
+      .catch((error) => {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      });
+  };
+
+  const handlePrintPdf = useReactToPrint({
+    content: () => containerRef.current,
+    documentTitle: "Product_Stock",
+    pageStyle: `
+      @page {
+        size: A4 landscape;
+        margin: 5mm;
+      }
+      @media print {
+        body {
+          font-size: 10px; 
+          margin: 0mm;
+          padding: 0mm;
+        }
+        table {
+          font-size: 11px;
+        }
+        .print-hide {
+          display: none;
+        }
+      }
+    `,
   });
 
   if (isLoading) {
@@ -69,111 +133,88 @@ const Buyer = () => {
     );
   }
 
-  //excel download
-  const onSubmit = (e) => {
-    e.preventDefault();
-
-    axios({
-      url: BASE_URL + "/api/panel-download-buyer-details-report",
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    })
-      .then((res) => {
-        console.log("data : ", res.data);
-        const url = window.URL.createObjectURL(new Blob([res.data]));
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", "buyer.csv");
-        document.body.appendChild(link);
-        link.click();
-        toast({
-          title: "Success",
-          description: "Buyer created successfully",
-        });
-      })
-      .catch((error) => {
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive",
-        });
-      });
-  };
   return (
     <Page>
       <div className="p-4">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-semibold">Buyer Summary</h1>
-          <div className="flex gap-2">
-            {/* <Button
-              variant="default"
-              className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-              onClick={onSubmit}
-            >
-              <Download className="h-4 w-4" /> Download
-            </Button> */}
+        <div className="flex justify-between items-center p-2 rounded-lg mb-5 bg-gray-200">
+          <h1 className="text-xl font-bold">Buyer Summary</h1>
+          <div className="flex flex-row items-center gap-4">
             <div>
+              {" "}
+              <BuyerRPrint
+                className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+                onClick={handlePrintPdf}
+              />
               <BuyerRDownload
                 className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
                 onClick={onSubmit}
-              ></BuyerRDownload>
+              />
+              
             </div>
           </div>
-        </div>{" "}
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-300">
+        </div>
+        <div className="overflow-x-auto text-[11px]" ref={containerRef}>
+          <table className="w-full border-collapse border border-black">
             <thead className="bg-gray-100">
               <tr>
-                <th className="border border-gray-300 px-4 py-2 text-left">
+                <th
+                  className="border border-black px-2 py-2 text-left"
+                  colSpan={7}
+                >
+                  Buyer Summary{" "}
+                </th>
+              </tr>
+              <tr>
+                <th className="border border-black px-2 py-2 text-center">
                   Sort
                 </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
+                <th className="border border-black px-2 py-2 text-center">
                   Group
                 </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
+                <th className="border border-black px-2 py-2 text-center">
                   Buyer Name
                 </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
+                <th className="border border-black px-2 py-2 text-center">
                   Address
                 </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
+                <th className="border border-black px-2 py-2 text-center">
                   Port
                 </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
+                <th className="border border-black px-2 py-2 text-center">
                   Country
                 </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
+                <th className="border border-black px-2 py-2 text-center">
                   Status
                 </th>
               </tr>
             </thead>
             <tbody>
               {buyerData.map((buyer, index) => (
-                <tr key={index} className="hover:bg-gray-50">
-                  <td className="border border-gray-300 px-4 py-2 text-sm">
-                    {buyer.buyer_sort}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm">
-                    {buyer.buyer_group}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm">
-                    {buyer.buyer_name}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm">
-                    {buyer.buyer_address}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm">
-                    {buyer.buyer_port}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm">
-                    {buyer.buyer_country}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm">
-                    {buyer.buyer_status}
-                  </td>
-                </tr>
+                <>
+                  <tr key={index} className="hover:bg-gray-50">
+                    <td className="border border-black px-2 py-2 ">
+                      {buyer.buyer_sort}
+                    </td>
+                    <td className="border border-black px-2 py-2 ">
+                      {buyer.buyer_group}
+                    </td>
+                    <td className="border border-black px-2 py-2 ">
+                      {buyer.buyer_name}
+                    </td>
+                    <td className="border border-black px-2 py-2 ">
+                      {buyer.buyer_address}
+                    </td>
+                    <td className="border border-black px-2 py-2 ">
+                      {buyer.buyer_port}
+                    </td>
+                    <td className="border border-black px-2 py-2 ">
+                      {buyer.buyer_country}
+                    </td>
+                    <td className="border border-black px-2 py-2 ">
+                      {buyer.buyer_status}
+                    </td>
+                  </tr>
+                </>
               ))}
             </tbody>
           </table>

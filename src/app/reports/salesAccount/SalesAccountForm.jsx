@@ -61,7 +61,9 @@ const BranchHeader = () => (
     className={`flex sticky top-0 z-10 border border-gray-200 rounded-lg justify-between ${ButtonConfig.cardheaderColor} items-start gap-8 mb-2 p-4 shadow-sm`}
   >
     <div className="flex-1">
-      <h1 className="text-3xl font-bold text-gray-800">Sales Account Summary</h1>
+      <h1 className="text-3xl font-bold text-gray-800">
+        Sales Account Summary
+      </h1>
       <p className="text-gray-600 mt-2">Add a Sales Account to Visit Report</p>
     </div>
   </div>
@@ -100,9 +102,18 @@ const SalesAccountForm = () => {
   // Create sales account mutation
   const createSalesAccountMutation = useMutation({
     mutationFn: createContract,
+    // onSuccess: (data) => {
+    //   navigate("/report/sales-account-report", { state: { reportData: data } });
+    // },
     onSuccess: (data) => {
-      navigate("/report/sales-account-report", { state: { reportData: data } });
+      navigate("/report/sales-account-report", {
+        state: {
+          reportData: data,
+          formData: formData,
+        },
+      });
     },
+
     onError: (error) => {
       toast({
         title: "Error",

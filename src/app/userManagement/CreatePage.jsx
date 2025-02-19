@@ -76,9 +76,9 @@ const CreatePage = () => {
             { title: "BuyerR", url: "/report/buyer-report" },
             { title: "ContractR", url: "/report/contract-form" },
             { title: "Sales Accounts", url: "/report/sales-account-form" },
-            { title: "Sales Data", url: "/report/sales-data-form" },
+            { title: "Sales Summary", url: "/report/sales-data-form" },
             {
-              title: "Monthwise Purchase",
+              title: "Purchase Summary",
               url: "/report/monthwise-purchase-form",
             },
             {

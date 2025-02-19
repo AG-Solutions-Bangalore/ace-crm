@@ -8,6 +8,7 @@ import { ButtonConfig } from "@/config/ButtonConfig";
 import { Download, Printer } from "lucide-react";
 import axios from "axios";
 import moment from "moment";
+import { Button } from "@/components/ui/button";
 
 // branch report
 const MonthwisePurchaseReport = () => {
@@ -16,8 +17,6 @@ const MonthwisePurchaseReport = () => {
   const containerRef = useRef();
   const reportData = location.state?.reportMoPurData;
   const formFields = location.state?.formFields;
-  console.log("form", formFields);
-  console.log("rpert branch ", reportData);
   if (!reportData || !reportData.purchaseProduct) {
     return (
       <Page>
@@ -111,23 +110,27 @@ const MonthwisePurchaseReport = () => {
                 `,
   });
   return (
- 
-     <Page>
-          <div className="flex justify-between   items-center p-2 rounded-lg mb-5 bg-gray-200 ">
-          <h1 className="text-xl font-bold">Company Wise</h1>
-         <div className="flex flex-row items-center gap-4">
-         <button
-            className="bg-blue-500 text-white py-1 px-2 rounded"
+    <Page>
+      <div className="flex justify-between   items-center p-2 rounded-lg mb-5 bg-gray-200 ">
+        <h1 className="text-xl font-bold">Company Wise</h1>
+        <div className="flex flex-row items-center gap-4 font-bold">
+          <span className="mr-2">
+            {" "}
+            From -{moment(formFields.from_date).format("DD-MMM-YYYY")}
+          </span>
+          To -{moment(formFields.to_date).format("DD-MMM-YYYY")}
+          <Button
+            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             onClick={handlPrintPdf}
           >
-            Print
-          </button>
-          <button
-            className="bg-blue-500 text-white py-1 px-2 rounded"
+            <Printer className="h-4 w-4" /> Print
+          </Button>
+          <Button
+            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             onClick={handleDownload}
           >
-            Download
-          </button>
+            <Download className="h-4 w-4" /> Download
+          </Button>
         </div>
       </div>
       <div ref={containerRef}>

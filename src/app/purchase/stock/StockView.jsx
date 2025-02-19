@@ -10,7 +10,7 @@ import { ButtonConfig } from "@/config/ButtonConfig";
 import React, { useState, useEffect } from "react";
 import BASE_URL from "@/config/BaseUrl";
 import { useFetchGoDownMarketPurchase } from "@/hooks/useApi";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 import Select from "react-select";
 
 const createReport = async (data) => {
@@ -41,11 +41,13 @@ const StockView = () => {
     godown: null,
   });
   const [stockData, setStockData] = useState([]);
-
+  const [isLoading, setIsLoading] = useState(false);
   const stockReportMutation = useMutation({
     mutationFn: createReport,
+    onMutate: () => setIsLoading(true),
     onSuccess: (data) => {
       setStockData(data.stock);
+      setIsLoading(false);
     },
     onError: (error) => {
       toast({
@@ -73,7 +75,6 @@ const StockView = () => {
     if (formData.godown !== null) {
       stockReportMutation.mutate({ godown: formData.godown });
     } else {
-      // Optionally, you can trigger API to fetch all data when godown is null
       stockReportMutation.mutate({ godown: "" });
     }
   }, []);
@@ -95,8 +96,8 @@ const StockView = () => {
           ...provided,
           minHeight: "36px",
           borderRadius: "6px",
-          borderColor: state.isFocused ? "black" : "#e5e7eb",
-          boxShadow: state.isFocused ? "black" : "none",
+          borderColor: state.isFocused ? "black" : "black",
+          boxShadow: state.isFocused ? "black" : "black",
           "&:hover": {
             borderColor: "none",
             cursor: "text",
@@ -164,6 +165,18 @@ const StockView = () => {
       );
     }
   );
+  if (isLoading) {
+    return (
+      <Page>
+        <div className="flex justify-center items-center h-full">
+          <Button disabled>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading Stock Summary
+          </Button>
+        </div>
+      </Page>
+    );
+  }
 
   return (
     <Page>
@@ -178,44 +191,62 @@ const StockView = () => {
           <MemoizedSelect
             value={formData.godown}
             onChange={(value) => handleInputChange("godown", value)}
-            options={
-              godownPurchaseData?.godown?.map((godown) => ({
+            // options={
+            //   godownPurchaseData?.godown?.map((godown) => ({
+            //     value: godown.godown,
+            //     label: godown.godown,
+            //   })) || []
+            // }
+            options={[
+              { value: "", label: "All" },
+              ...(godownPurchaseData?.godown?.map((godown) => ({
                 value: godown.godown,
                 label: godown.godown,
-              })) || []
-            }
+              })) || []),
+            ]}
             placeholder="Select Go Down"
           />
         </div>
         <div className="flex justify-center font-bold">
-          <span className="mr-2"> From - {moment().startOf("month").format("DD-MM-YYYY")}</span>
+          <span className="mr-2">
+            {" "}
+            From - {moment().startOf("month").format("DD-MM-YYYY")}
+          </span>
           To - {moment().format("DD-MM-YYYY")}
         </div>
       </form>
 
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300">
-          <thead className="bg-gray-100">
+        <table className="w-full border-collapse border border-black text-[12px]">
+          <thead className="bg-gray-100 ">
             <tr>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th
+                className="border border-black px-2 py-2 text-left"
+                colSpan="7"
+              >
+                Stock
+              </th>
+            </tr>
+            <tr>
+              <th className="border border-black px-2 py-2 text-left">
                 Product Name
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-black px-2 py-2 text-left">
                 Opening Stock
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-black px-2 py-2 text-left">
                 Purchase
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-black px-2 py-2 text-left">
                 Production
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-black px-2 py-2 text-left">
                 Processing
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-black px-2 py-2 text-left">
                 Dispatch
               </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
+              <th className="border border-black px-2 py-2 text-left">
                 Closing Stock
               </th>
             </tr>
@@ -223,25 +254,25 @@ const StockView = () => {
           <tbody>
             {stockData?.map((stock, index) => (
               <tr key={index} className="hover:bg-gray-50">
-                <td className="border border-gray-300 px-4 py-2 text-sm">
+                <td className="border border-black px-2 py-2 ">
                   {stock.purchaseOrderProduct}
                 </td>
-                <td className="border border-gray-300 px-4 py-2 text-sm">
+                <td className="border border-black px-2 py-2 ">
                   {stock.openpurch_qnty} ({stock.openpurch_bag} Bags)
                 </td>
-                <td className="border border-gray-300 px-4 py-2 text-sm">
+                <td className="border border-black px-2 py-2 ">
                   {stock.purch_qnty} ({stock.purch_bag} Bags)
                 </td>
-                <td className="border border-gray-300 px-4 py-2 text-sm">
+                <td className="border border-black px-2 py-2 ">
                   {stock.production_qnty} ({stock.production_bag} Bags)
                 </td>
-                <td className="border border-gray-300 px-4 py-2 text-sm">
+                <td className="border border-black px-2 py-2 ">
                   {stock.processing_qnty} ({stock.processing_bag} Bags)
                 </td>
-                <td className="border border-gray-300 px-4 py-2 text-sm">
+                <td className="border border-black px-2 py-2 ">
                   {stock.dispatch_qnty} ({stock.dispatch_bag} Bags)
                 </td>
-                <td className="border border-gray-300 px-4 py-2 text-sm">
+                <td className="border border-black px-2 py-2 ">
                   {stock.openpurch_qnty +
                     stock.purch_qnty +
                     stock.production_qnty +
@@ -258,6 +289,101 @@ const StockView = () => {
               </tr>
             ))}
           </tbody>
+          <tfoot>
+            <tr className="font-bold bg-gray-100">
+              <td className="border border-black px-2 py-2 text-right">
+                Total:
+              </td>
+              <td className="border border-black text-left px-2 py-2">
+                {stockData?.reduce(
+                  (sum, stock) => sum + Number(stock.openpurch_qnty || 0),
+                  0
+                )}
+                ({" "}
+                {stockData?.reduce(
+                  (sum, stock) => sum + Number(stock.openpurch_bag || 0),
+                  0
+                )}
+                Bags)
+              </td>
+              <td className="border border-black text-left px-2 py-2">
+                {stockData?.reduce(
+                  (sum, stock) => sum + Number(stock.purch_qnty || 0),
+                  0
+                )}
+                ({" "}
+                {stockData?.reduce(
+                  (sum, stock) => sum + Number(stock.purch_bag || 0),
+                  0
+                )}
+                Bags)
+              </td>
+              <td className="border border-black text-left px-2 py-2">
+                {stockData?.reduce(
+                  (sum, stock) => sum + Number(stock.production_qnty || 0),
+                  0
+                )}
+                ({" "}
+                {stockData?.reduce(
+                  (sum, stock) => sum + Number(stock.production_bag || 0),
+                  0
+                )}
+                Bags)
+              </td>
+              <td className="border border-black text-left px-2 py-2">
+                {stockData?.reduce(
+                  (sum, stock) => sum + Number(stock.processing_qnty || 0),
+                  0
+                )}
+                ({" "}
+                {stockData?.reduce(
+                  (sum, stock) => sum + Number(stock.processing_bag || 0),
+                  0
+                )}
+                Bags)
+              </td>
+              <td className="border border-black text-left px-2 py-2">
+                {stockData?.reduce(
+                  (sum, stock) => sum + Number(stock.dispatch_qnty || 0),
+                  0
+                )}
+                ({" "}
+                {stockData?.reduce(
+                  (sum, stock) => sum + Number(stock.dispatch_bag || 0),
+                  0
+                )}
+                Bags)
+              </td>
+              <td className="border border-black text-left px-2 py-2">
+                {stockData?.reduce(
+                  (sum, stock) =>
+                    sum +
+                    Number(
+                      stock.openpurch_qnty +
+                        stock.purch_qnty +
+                        stock.production_qnty +
+                        stock.processing_qnty -
+                        stock.dispatch_qnty || 0
+                    ),
+                  0
+                )}
+                ({" "}
+                {stockData?.reduce(
+                  (sum, stock) =>
+                    sum +
+                    Number(
+                      stock.openpurch_bag +
+                        stock.purch_bag +
+                        stock.production_bag +
+                        stock.processing_bag -
+                        stock.dispatch_bag || 0
+                    ),
+                  0
+                )}
+                Bags)
+              </td>
+            </tr>{" "}
+          </tfoot>
         </table>
       </div>
     </Page>

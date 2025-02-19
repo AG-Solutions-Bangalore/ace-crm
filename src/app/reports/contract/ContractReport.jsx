@@ -1,16 +1,20 @@
-import React from "react";
+import React, { useRef } from "react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import Page from "@/app/dashboard/page";
 import BASE_URL from "@/config/BaseUrl";
-import { Download, Loader2 } from "lucide-react";
+import { Download, Loader2, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import moment from "moment";
+import { useReactToPrint } from "react-to-print";
 
 const ContractReport = () => {
   const { toast } = useToast();
+  const containerRef = useRef();
+
   var postData = {
     from_date: localStorage.getItem("from_date") || "",
     to_date: localStorage.getItem("to_date") || "",
@@ -47,38 +51,6 @@ const ContractReport = () => {
     staleTime: Infinity,
   });
 
-  if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Loading Contract 
-          </Button>
-        </div>
-      </Page>
-    );
-  }
-
-  if (isError) {
-    return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching Contract
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
-    );
-  }
-
   // excel download
   const onSubmit = (e) => {
     e.preventDefault();
@@ -111,139 +83,186 @@ const ContractReport = () => {
         });
       });
   };
-  //details DOwnload
-  // const onSubmitDetails = (e) => {
-  //   e.preventDefault();
 
-  //   axios({
-  //     url: BASE_URL + "/api/panel-download-contract-details-report",
-  //     method: "POST",
-  //     data: postData,
-  //     headers: {
-  //       Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //     },
-  //   })
-  //     .then((res) => {
-  //       const url = window.URL.createObjectURL(new Blob([res.data]));
-  //       const link = document.createElement("a");
-  //       link.href = url;
-  //       link.setAttribute("download", "contractdetails.csv");
-  //       document.body.appendChild(link);
-  //       link.click();
-  //       toast({
-  //         title: "Success",
-  //         description: "Contract Details download successfully",
-  //       });
-  //     })
-  //     .catch((error) => {
-  //       toast({
-  //         title: "Error",
-  //         description: error.message,
-  //         variant: "destructive",
-  //       });
-  //     });
-  // };
+  const handlePrintPdf = useReactToPrint({
+    content: () => containerRef.current,
+    documentTitle: "Product_Stock",
+    pageStyle: `
+      @page {
+        size: A4 landscape;
+        margin: 5mm;
+      }
+      @media print {
+        body {
+          font-size: 10px; 
+          margin: 0mm;
+          padding: 0mm;
+        }
+        table {
+          font-size: 11px;
+        }
+        .print-hide {
+          display: none;
+        }
+      }
+    `,
+  });
 
+  if (isLoading) {
+    return (
+      <Page>
+        <div className="flex justify-center items-center h-full">
+          <Button disabled>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading Contract
+          </Button>
+        </div>
+      </Page>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Page>
+        <Card className="w-full max-w-md mx-auto mt-10">
+          <CardHeader>
+            <CardTitle className="text-destructive">
+              Error Fetching Contract
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => refetch()} variant="outline">
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </Page>
+    );
+  }
   return (
     <Page>
       <div className="p-4 ">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-semibold">Contract Details</h1>
-          <div className="flex gap-2">
-            <Button
-              variant="default"
-              className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-              onClick={onSubmit}
-            >
-              <Download className="h-4 w-4" /> Download
-            </Button>
-            {/* <Button
-              variant="default"
-              className="ml-2 bg-yellow-500 text-black hover:bg-yellow-100"
-              onClick={onSubmitDetails}
-            >
-              <Download className="h-4 w-4" /> Details Download
-            </Button> */}
+        <div className="flex justify-between items-center p-2 rounded-lg mb-5 bg-gray-200">
+          <h1 className="text-xl font-bold">Contract Summary</h1>
+          <div className="flex flex-row items-center gap-4 font-bold">
+            <span className="mr-2">
+              {" "}
+              From -{moment(postData.from_date).format("DD-MMM-YYYY")}
+            </span>
+            To -{moment(postData.to_date).format("DD-MMM-YYYY")}
+            <div>
+              {" "}
+              <Button
+                variant="default"
+                className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+                onClick={handlePrintPdf}
+              >
+                <Printer className="h-4 w-4" /> Print
+              </Button>
+              <Button
+                variant="default"
+                className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+                onClick={onSubmit}
+              >
+                <Download className="h-4 w-4" /> Download
+              </Button>
+            </div>
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-300">
+        <div className="overflow-x-auto text-[10px]" ref={containerRef}>
+          <table className="w-full border-collapse border border-black">
             <thead className="bg-gray-100">
               <tr>
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                  Branch Short
+                <th
+                  className="border border-black px-2 py-2 text-left"
+                  colSpan={11}
+                >
+                  Contract Summary
                 </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
+              </tr>
+              <tr>
+                <th className="border border-black px-2 py-2 ">Company</th>
+                <th className="border border-black px-2 py-2 ">
                   Contract Date
                 </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                  Contract No
-                </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                  Contract Buyer
-                </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                  Contract Consignee
-                </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
+                <th className="border border-black px-2 py-2 ">Contract No</th>
+                <th className="border border-black px-2 py-2 ">Buyer</th>
+                <th className="border border-black px-2 py-2 ">Consignee</th>
+                <th className="border border-black px-2 py-2 ">
                   Container Size
                 </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                  Product
-                </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                  Loading Port
-                </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
+                <th className="border border-black px-2 py-2 ">Product</th>
+                <th className="border border-black px-2 py-2 ">Loading Port</th>
+                <th className="border border-black px-2 py-2 ">
                   Destination Port
                 </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                  Status
-                </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
+                <th className="border border-black px-2 py-2 ">
                   Quantity (MT)
                 </th>
+                <th className="border border-black px-2 py-2 ">Status</th>
               </tr>
             </thead>
             <tbody>
               {contractData.map((contract, index) => (
                 <tr key={index} className="hover:bg-gray-50">
-                  <td className="border border-gray-300 px-4 py-2 text-sm">
+                  <td className="border border-black px-2 py-2 ">
                     {contract.branch_short}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm">
-                    {contract.contract_date}
+                  <td className="border border-black px-2 py-2 ">
+                    {moment(contract.contract_date).format("DD-MM-YYYY")}{" "}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm">
+                  <td className="border border-black px-2 py-2 ">
                     {contract.contract_no}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm">
+                  <td className="border border-black px-2 py-2 ">
                     {contract.contract_buyer}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm">
+                  <td className="border border-black px-2 py-2 ">
                     {contract.contract_consignee}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm">
+                  <td className="border border-black px-2 py-2 ">
                     {contract.contract_container_size}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm">
+                  <td className="border border-black px-2 py-2 ">
                     {contract.contract_product}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm">
+                  <td className="border border-black px-2 py-2 ">
                     {contract.contract_loading}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm">
+                  <td className="border border-black px-2 py-2 ">
                     {contract.contract_destination_port}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm">
-                    {contract.contract_status}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm">
+                  <td className="border border-black  text-right px-2 py-2 ">
                     {contract.total_qntyInMt}
+                  </td>
+                  <td className="border border-black px-2 py-2 ">
+                    {contract.contract_status}
                   </td>
                 </tr>
               ))}
             </tbody>
+            <tfoot>
+              <tr className="font-bold bg-gray-200">
+                <td
+                  colSpan="9"
+                  className="border border-black px-2 py-2 text-right"
+                >
+                  Total:
+                </td>
+                <td className="border border-black text-right px-2 py-2">
+                  {/* {contractData.reduce(
+                    (sum, contract) =>
+                      sum + Number(contract.total_qntyInMt || 0),
+                    0
+                  )} */}
+                  {contractData.reduce(
+                    (sum, contract) => sum + (contract.total_qntyInMt || 0),
+                    0
+                  )}
+                </td>
+                <td className="border border-black px-2 py-2"></td>
+              </tr>
+            </tfoot>
           </table>
         </div>
       </div>

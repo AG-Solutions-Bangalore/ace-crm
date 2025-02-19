@@ -20,6 +20,11 @@ import axios from "axios";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import { useState } from "react";
 import { useFetchVendor } from "@/hooks/useApi";
+import {
+  PurchaseSummaryCompanyView,
+  PurchaseSummaryDownload,
+  PurchaseSummaryVendorView,
+} from "@/components/buttonIndex/ButtonComponents";
 
 const monthwisePurchaseFormSchema = z.object({
   from_date: z.string().min(1, "From date is required"),
@@ -330,16 +335,13 @@ const MonthwisePurchaseForm = () => {
               </div>
 
               <div className="flex flex-row items-end mt-3 justify-end w-full">
-                <Button
+                <PurchaseSummaryDownload
                   type="button"
-                  variant="default"
                   className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
                   onClick={handleDownload}
-                >
-                  <Download className="h-4 w-4 mr-2" /> Download
-                </Button>
+                ></PurchaseSummaryDownload>
 
-                <Button
+                <PurchaseSummaryVendorView
                   type="button"
                   className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} ml-2 flex items-center`}
                   onClick={handleSellerReport}
@@ -348,9 +350,9 @@ const MonthwisePurchaseForm = () => {
                   {sellerReportMutation.isPending
                     ? "Generating..."
                     : "Vendor Wise"}
-                </Button>
+                </PurchaseSummaryVendorView>
 
-                <Button
+                <PurchaseSummaryCompanyView
                   type="button"
                   className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} ml-2 flex items-center`}
                   onClick={handleBranchReport}
@@ -359,7 +361,7 @@ const MonthwisePurchaseForm = () => {
                   {branchReportMutation.isPending
                     ? "Generating..."
                     : "Company Wise"}
-                </Button>
+                </PurchaseSummaryCompanyView>
               </div>
             </form>
           </div>

@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import Page from "@/app/dashboard/page";
 import BASE_URL from "@/config/BaseUrl";
-import { Loader2 } from "lucide-react";
+import { Loader2, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -156,29 +156,29 @@ const ProductStockView = () => {
       <div className="p-4">
         <div className="flex justify-between items-center p-2 rounded-lg mb-5 bg-gray-200">
           <h1 className="text-xl font-bold">Stock Summary</h1>
-          <div className="flex flex-row items-center gap-4">
+          <div className="flex flex-row items-center gap-4 font-bold">
             From - {moment(from_date).format("DD-MMM-YYYY")} To -{" "}
             {moment(to_date).format("DD-MMM-YYYY")}
-            <button
-              className="bg-blue-500 text-white py-1 px-2 rounded"
+            <Button
+              className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
               onClick={handlePrintPdf}
             >
-              Print
-            </button>
-            <button
-              className="bg-blue-500 text-white py-1 px-2 rounded"
+              <Printer className="h-4 w-4" /> Print
+            </Button>
+            <Button
+              className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
               onClick={handleSaveAsPdf}
             >
-              Pdf
-            </button>
+              <Printer className="h-4 w-4" /> Pdf
+            </Button>
           </div>
         </div>
         <div className="overflow-x-auto" ref={containerRef}>
-          <table className="w-full border-collapse border border-gray-300 text-[12px]">
+          <table className="w-full border-collapse border border-black text-[12px]">
             <thead className="bg-gray-100 text-[12px]">
               <tr>
                 <th
-                  className="border border-gray-300 px-4 py-2 text-center"
+                  className="border border-black px-2 py-2 text-left"
                   colSpan="7"
                 >
                   Product Stock-{stockDatas.godown}
@@ -186,25 +186,25 @@ const ProductStockView = () => {
               </tr>
 
               <tr>
-                <th className="border border-gray-300 px-4 py-2 text-left">
+                <th className="border border-black px-2 py-2 text-left">
                   Product Name
                 </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
+                <th className="border border-black px-2 py-2 text-left">
                   Opening Stock
                 </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
+                <th className="border border-black px-2 py-2 text-left">
                   Purchase
                 </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
+                <th className="border border-black px-2 py-2 text-left">
                   Production
                 </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
+                <th className="border border-black px-2 py-2 text-left">
                   Processing
                 </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
+                <th className="border border-black px-2 py-2 text-left">
                   Dispatch
                 </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
+                <th className="border border-black px-2 py-2 text-left">
                   Closing Stock
                 </th>
               </tr>
@@ -212,25 +212,25 @@ const ProductStockView = () => {
             <tbody>
               {stockDatas?.stock?.map((stock, index) => (
                 <tr key={index} className="hover:bg-gray-50">
-                  <td className="border border-gray-300 px-4 py-2 ">
+                  <td className="border border-black px-2 py-2 ">
                     {stock.purchaseOrderProduct}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 ">
+                  <td className="border border-black px-2 py-2 ">
                     {stock.openpurch_qnty} ({stock.openpurch_bag} Bags)
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 ">
+                  <td className="border border-black px-2 py-2 ">
                     {stock.purch_qnty} ({stock.purch_bag} Bags)
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 ">
+                  <td className="border border-black px-2 py-2 ">
                     {stock.production_qnty} ({stock.production_bag} Bags)
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 ">
+                  <td className="border border-black px-2 py-2 ">
                     {stock.processing_qnty} ({stock.processing_bag} Bags)
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 ">
+                  <td className="border border-black px-2 py-2 ">
                     {stock.dispatch_qnty} ({stock.dispatch_bag} Bags)
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 ">
+                  <td className="border border-black px-2 py-2 ">
                     {stock.openpurch_qnty +
                       stock.purch_qnty +
                       stock.production_qnty +
@@ -247,6 +247,101 @@ const ProductStockView = () => {
                 </tr>
               ))}
             </tbody>
+            <tfoot>
+              <tr className="font-bold bg-gray-100">
+                <td className="border border-black px-2 py-2 text-right">
+                  Total:
+                </td>
+                <td className="border border-black text-left px-2 py-2">
+                  {stockDatas?.stock?.reduce(
+                    (sum, stock) => sum + Number(stock.openpurch_qnty || 0),
+                    0
+                  )}
+                  ({" "}
+                  {stockDatas?.stock?.reduce(
+                    (sum, stock) => sum + Number(stock.openpurch_bag || 0),
+                    0
+                  )}
+                  Bags)
+                </td>
+                <td className="border border-black text-left px-2 py-2">
+                  {stockDatas?.stock?.reduce(
+                    (sum, stock) => sum + Number(stock.purch_qnty || 0),
+                    0
+                  )}
+                  ({" "}
+                  {stockDatas?.stock?.reduce(
+                    (sum, stock) => sum + Number(stock.purch_bag || 0),
+                    0
+                  )}
+                  Bags)
+                </td>
+                <td className="border border-black text-left px-2 py-2">
+                  {stockDatas?.stock?.reduce(
+                    (sum, stock) => sum + Number(stock.production_qnty || 0),
+                    0
+                  )}
+                  ({" "}
+                  {stockDatas?.stock?.reduce(
+                    (sum, stock) => sum + Number(stock.production_bag || 0),
+                    0
+                  )}
+                  Bags)
+                </td>
+                <td className="border border-black text-left px-2 py-2">
+                  {stockDatas?.stock?.reduce(
+                    (sum, stock) => sum + Number(stock.processing_qnty || 0),
+                    0
+                  )}
+                  ({" "}
+                  {stockDatas?.stock?.reduce(
+                    (sum, stock) => sum + Number(stock.processing_bag || 0),
+                    0
+                  )}
+                  Bags)
+                </td>
+                <td className="border border-black text-left px-2 py-2">
+                  {stockDatas?.stock?.reduce(
+                    (sum, stock) => sum + Number(stock.dispatch_qnty || 0),
+                    0
+                  )}
+                  ({" "}
+                  {stockDatas?.stock?.reduce(
+                    (sum, stock) => sum + Number(stock.dispatch_bag || 0),
+                    0
+                  )}
+                  Bags)
+                </td>
+                <td className="border border-black text-left px-2 py-2">
+                  {stockDatas?.stock?.reduce(
+                    (sum, stock) =>
+                      sum +
+                      Number(
+                        stock.openpurch_qnty +
+                          stock.purch_qnty +
+                          stock.production_qnty +
+                          stock.processing_qnty -
+                          stock.dispatch_qnty || 0
+                      ),
+                    0
+                  )}
+                  ({" "}
+                  {stockDatas?.stock?.reduce(
+                    (sum, stock) =>
+                      sum +
+                      Number(
+                        stock.openpurch_bag +
+                          stock.purch_bag +
+                          stock.production_bag +
+                          stock.processing_bag -
+                          stock.dispatch_bag || 0
+                      ),
+                    0
+                  )}
+                  Bags)
+                </td>
+              </tr>{" "}
+            </tfoot>
           </table>
         </div>
       </div>
