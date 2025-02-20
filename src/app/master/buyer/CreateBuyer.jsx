@@ -26,6 +26,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import { useFetchCountrys, useFetchPorts } from "@/hooks/useApi";
+import { Textarea } from "@/components/ui/textarea";
 
 const CreateBuyer = () => {
   const [open, setOpen] = useState(false);
@@ -160,7 +161,7 @@ const CreateBuyer = () => {
               placeholder="Enter buyer name"
             />
           </div>
-
+          <div className=" flex items-center justify-between gap-2 ">
           <div className="grid gap-2">
             <Label htmlFor="buyer_sort"> Short Name</Label>
             <Input
@@ -181,12 +182,13 @@ const CreateBuyer = () => {
               placeholder="Enter buyer group name"
             />
           </div>
-
+          </div>
           <div className="grid gap-2">
             <Label htmlFor="buyer_address"> Address</Label>
-            <Input
+            <Textarea
               id="buyer_address"
               name="buyer_address"
+              rows={3}
               value={formData.buyer_address}
               onChange={handleInputChange}
               placeholder="Enter buyer address"
@@ -236,7 +238,7 @@ const CreateBuyer = () => {
             </div>
           </div>
 
-          <div className="grid gap-2">
+          {/* <div className="grid gap-2">
             <Label htmlFor="buyer_ecgc_ref">ECGC Ref</Label>
             <Input
               id="buyer_ecgc_ref"
@@ -245,7 +247,7 @@ const CreateBuyer = () => {
               onChange={handleInputChange}
               placeholder="Enter buyer ecgc ref "
             />
-          </div>
+          </div> */}
         </div>
 
         <DialogFooter>

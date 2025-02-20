@@ -31,6 +31,7 @@ import { Edit, Loader2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import { useFetchCountrys, useFetchPorts } from "@/hooks/useApi";
+import { Textarea } from "@/components/ui/textarea";
 const EditBuyer = ({buyerId}) => {
     const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -205,7 +206,7 @@ const { data: portsData } = useFetchPorts();
  
        <DialogContent className="sm:max-w-md">
          <DialogHeader>
-           <DialogTitle>Edit Buyer - <span className="text-xl">{formData.buyer_name}</span></DialogTitle>
+           <DialogTitle>Edit Buyer - <span className="text-xl text-blue-500">{formData.buyer_name}</span></DialogTitle>
          </DialogHeader>
  
          {isFetching ? (
@@ -215,7 +216,7 @@ const { data: portsData } = useFetchPorts();
          ) : (
            <div className="grid gap-4 py-4">
         
-          
+        <div className=" flex items-center justify-between gap-2 ">
                     <div className="grid gap-2">
                       <Label htmlFor="buyer_sort"> Short Name</Label>
                       <Input
@@ -236,12 +237,13 @@ const { data: portsData } = useFetchPorts();
                         placeholder="Enter buyer group name"
                       />
                     </div>
-          
+                    </div>
                     <div className="grid gap-2">
                       <Label htmlFor="buyer_address"> Address</Label>
-                      <Input
+                      <Textarea
                         id="buyer_address"
                         name="buyer_address"
+                        rows={3}
                         value={formData.buyer_address}
                         onChange={handleInputChange}
                         placeholder="Enter buyer address"
@@ -291,7 +293,7 @@ const { data: portsData } = useFetchPorts();
                       </div>
                     </div>
           
-                    <div className="grid gap-2">
+                    {/* <div className="grid gap-2">
                       <Label htmlFor="buyer_ecgc_ref">ECGC Ref</Label>
                       <Input
                         id="buyer_ecgc_ref"
@@ -300,7 +302,7 @@ const { data: portsData } = useFetchPorts();
                         onChange={handleInputChange}
                         placeholder="Enter buyer ecgc ref "
                       />
-                    </div>
+                    </div> */}
  
              <div className="grid gap-2">
                <Label htmlFor="buyer_status">Status</Label>
@@ -332,7 +334,7 @@ const { data: portsData } = useFetchPorts();
                  Updating...
                </>
              ) : (
-               "Update Bank"
+               "Update Buyer"
              )}
            </Button>
          </DialogFooter>

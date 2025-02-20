@@ -91,7 +91,7 @@ const BranchList = () => {
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Branch Name
+           Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -221,7 +221,7 @@ const BranchList = () => {
     <Page>
       <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
-          Branch List
+        Company List
         </div>
 
         {/* searching and column filter  */}
@@ -341,7 +341,7 @@ const BranchList = () => {
         {/* row slection and pagintaion button  */}
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="flex-1 text-sm text-muted-foreground">
-            Total Branch : &nbsp;
+            Total Companies : &nbsp;
             {table.getFilteredRowModel().rows.length}
           </div>
           <div className="space-x-2">
