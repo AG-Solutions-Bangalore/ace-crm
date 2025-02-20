@@ -100,7 +100,7 @@ export function AppSidebar({ ...props }) {
         icon: Settings2,
         items: [
           {
-            title: "Branch",
+            title: "Company",
             url: "/master/branch",
           },
           {
