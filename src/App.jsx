@@ -97,6 +97,7 @@ const queryClient = new QueryClient();
 
 function App() {
   const navigate = useNavigate();
+  const time = localStorage.getItem("token-expire-time");
   const handleLogout = async () => {
     try {
       const response = await fetch(`${BASE_URL}/api/panel-logout`, {
@@ -120,10 +121,7 @@ function App() {
     <>
       <QueryClientProvider client={queryClient}>
         <Toaster />
-        <SessionTimeoutTracker
-          expiryTime="2026-02-18 11:55:47"
-          onLogout={handleLogout}
-        />
+        <SessionTimeoutTracker expiryTime={time} onLogout={handleLogout} />
         <Routes>
           {/* Login Page        */}
           <Route path="/" element={<Login />} />
