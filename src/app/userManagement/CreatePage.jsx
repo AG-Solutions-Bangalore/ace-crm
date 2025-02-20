@@ -43,7 +43,7 @@ const CreatePage = () => {
           title: "Master",
           url: "#",
           items: [
-            { title: "Branch", url: "/master/branch" },
+            { title: "Company", url: "/master/branch" },
             { title: "State", url: "/master/state" },
             { title: "Bank", url: "/master/bank" },
             { title: "Scheme", url: "/master/scheme" },

@@ -337,7 +337,7 @@ const ManagementDashboard = () => {
                                   >
                                     <td className="py-3 w-96">
                                       {permission.button}
-                                      {permission.id}
+                                  
                                     </td>
                                     <td className="py-3">
                                       <Checkbox
