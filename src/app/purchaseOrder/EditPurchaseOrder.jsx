@@ -409,20 +409,20 @@ const EditPurchaseOrder = () => {
         [field]: value,
       }));
 
-    //   if (field === "branch_short") {
-    //     const selectedCompanySort = branchData?.branch?.find(
-    //       (branch) => branch.branch_short === value
-    //     );
-    //     if (selectedCompanySort) {
-    //       const productRef = `${selectedCompanySort.branch_name_short}/${selectedCompanySort.branch_state_short}/${formData?.purchase_product_no}/${formData.purchase_product_year}`;
-    //       setFormData((prev) => ({
-    //         ...prev,
-    //         branch_name: selectedCompanySort.branch_name,
-    //         branch_address: selectedCompanySort.branch_address,
-    //         purchase_product_ref: productRef,
-    //       }));
-    //     }
-    //   }
+      //   if (field === "branch_short") {
+      //     const selectedCompanySort = branchData?.branch?.find(
+      //       (branch) => branch.branch_short === value
+      //     );
+      //     if (selectedCompanySort) {
+      //       const productRef = `${selectedCompanySort.branch_name_short}/${selectedCompanySort.branch_state_short}/${formData?.purchase_product_no}/${formData.purchase_product_year}`;
+      //       setFormData((prev) => ({
+      //         ...prev,
+      //         branch_name: selectedCompanySort.branch_name,
+      //         branch_address: selectedCompanySort.branch_address,
+      //         purchase_product_ref: productRef,
+      //       }));
+      //     }
+      //   }
 
       if (field === "purchase_product_seller") {
         const selectedSeller = vendorData?.vendor?.find(
@@ -451,22 +451,20 @@ const EditPurchaseOrder = () => {
         }
       }
 
-    //   if (field === "purchase_product_no") {
-    //     const selectedCompanySort = branchData?.branch?.find(
-    //       (branch) => branch.branch_short === formData.branch_short
-    //     );
-    //     if (selectedCompanySort) {
-    //       const productRef = `${selectedCompanySort.branch_name_short}/${selectedCompanySort.branch_state_short}/${value}/${formData.purchase_product_year}`;
-    //       setFormData((prev) => ({
-    //         ...prev,
-    //         purchase_product_ref: productRef,
-    //       }));
-    //     }
-    //   }
+      //   if (field === "purchase_product_no") {
+      //     const selectedCompanySort = branchData?.branch?.find(
+      //       (branch) => branch.branch_short === formData.branch_short
+      //     );
+      //     if (selectedCompanySort) {
+      //       const productRef = `${selectedCompanySort.branch_name_short}/${selectedCompanySort.branch_state_short}/${value}/${formData.purchase_product_year}`;
+      //       setFormData((prev) => ({
+      //         ...prev,
+      //         purchase_product_ref: productRef,
+      //       }));
+      //     }
+      //   }
     },
-    [
-      formData.purchase_product_year,
-    ]
+    [formData.purchase_product_year]
   );
 
   const handleRowDataChange = useCallback((rowIndex, field, value) => {
@@ -535,6 +533,7 @@ const EditPurchaseOrder = () => {
     purchase_product_date: "Contract Date",
     purchase_product_no: "Contract No",
     purchase_product_ref: "Contract Ref",
+    purchase_productSub_packing: "hfhvhjv",
   };
   const deleteProductMutation = useMutation({
     mutationFn: async (productId) => {
@@ -585,6 +584,40 @@ const EditPurchaseOrder = () => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const missingFields = [];
+    if (!formData.purchase_product_seller) missingFields.push("Seller");
+    if (!formData.purchase_product_broker) missingFields.push("Broker");
+    if (!formData.purchase_product_date) missingFields.push("P.O Date");
+    contractData.forEach((row, index) => {
+      if (!row.purchase_productSub_name)
+        missingFields.push(`Row ${index + 1}: Product Name`);
+      if (!row.purchase_productSub_packing)
+        missingFields.push(`Row ${index + 1}: Packing`);
+      if (!row.purchase_productSub_marking)
+        missingFields.push(`Row ${index + 1}: Marking`);
+      if (!row.purchase_productSub_rateInMt)
+        missingFields.push(`Row ${index + 1}: Rate in MT`);
+      if (!row.purchase_productSub_qntyInMt)
+        missingFields.push(`Row ${index + 1}: Quantity in MT`);
+    });
+
+    if (missingFields.length > 0) {
+      toast({
+        title: "Validation Error",
+        description: (
+          <div>
+            <p>Please fill in the following fields:</p>
+            <ul className="list-disc pl-5">
+              {missingFields.map((field, index) => (
+                <li key={index}>{field}</li>
+              ))}
+            </ul>
+          </div>
+        ),
+        variant: "destructive",
+      });
+      return;
+    }
     try {
       const processedPurchaseData = contractData.map((row) => ({
         ...row,
@@ -1035,13 +1068,12 @@ const EditPurchaseOrder = () => {
                       <TableHead className="p-2 text-center border text-sm font-medium">
                         Product /Description
                       </TableHead>
-
-                      <TableHead className="p-2 text-center border text-sm font-medium">
-                        Rate / Quantity <span className="text-red-500">*</span>
-                      </TableHead>
                       <TableHead className="p-2 text-center border text-sm font-medium">
                         Packing / Marking{" "}
                         <span className="text-red-500">*</span>
+                      </TableHead>
+                      <TableHead className="p-2 text-center border text-sm font-medium">
+                        Rate / Quantity <span className="text-red-500">*</span>
                       </TableHead>
 
                       <TableHead className="p-2 text-left border w-16">
