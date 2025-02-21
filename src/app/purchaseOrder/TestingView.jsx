@@ -7,8 +7,8 @@ import { useParams } from "react-router-dom";
 import moment from "moment";
 import { toWords } from "number-to-words";
 import { useReactToPrint } from "react-to-print";
-import logo from "../../../public/letterHead/AceB.png";
-import sign from "../../../public/sign/AceB_sign.png";
+// import logo from "../../../public/letterHead/AceB.png";
+// import sign from "../../../public/sign/AceB_sign.png";
 
 const PrintContent = React.forwardRef(
   (
@@ -18,7 +18,7 @@ const PrintContent = React.forwardRef(
       purchaseProductSubData,
       formattedAmount,
       includeSign,
-      sign,
+      // sign,
     },
     ref
   ) => {
@@ -29,7 +29,7 @@ const PrintContent = React.forwardRef(
             <thead>
               <tr>
                 <td colSpan="2">
-                  <img src={logo} alt="logo" className="w-full" />
+                  {/* <img src={logo} alt="logo" className="w-full" /> */}
                   <h1 className="text-center text-[15px] font-bold">
                     PURCHASE ORDER
                   </h1>
@@ -237,7 +237,7 @@ const PrintContent = React.forwardRef(
                               {includeSign && (
                                 <>
                                   <img
-                                    src={sign}
+                                    // src={sign}
                                     alt="logo MISSING"
                                     className="w-[120px] h-auto relative"
                                   />
@@ -363,7 +363,7 @@ const TestingView = () => {
         purchaseProductSubData={purchaseProductSubData}
         formattedAmount={formattedAmount}
         includeSign={includeSign}
-        sign={sign}
+        // sign={sign}
       />
     </div>
   );

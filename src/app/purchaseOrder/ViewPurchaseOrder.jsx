@@ -277,7 +277,7 @@ const ViewPurchaseOrder = () => {
                         {!includeHeader && (
                           <div>
                             {" "}
-                            <img src={white} alt="logo" className="w-full" />
+                            <img src={white} className="w-full" />
                             <h1 className="text-center text-[15px] font-bold ">
                               PURCHASE ORDER
                             </h1>
@@ -1001,7 +1001,7 @@ const ViewPurchaseOrder = () => {
                               For {purchaseProductData.branch_name}
                             </p>
 
-                            <div className="relative w-[200px] h-auto min-h-36 block print:hidden">
+                            <div className="relative w-[200px] h-auto min-h-36  hidden print:block">
                               {!includeSign && (
                                 <p className="font-bold leading-none absolute bottom-0 right-0 -translate-x-1/2 text-black opacity-50 z-10 ">
                                   Authorised Signatory :
@@ -1021,7 +1021,7 @@ const ViewPurchaseOrder = () => {
                                 </>
                               )}
                             </div>
-                            <div className="relative w-[200px] h-auto min-h-36 hidden print:block">
+                            <div className="relative w-[200px] h-auto min-h-36 block print:hidden">
                               {!includeSign && (
                                 <p className="font-bold leading-none absolute bottom-0 right-0 -translate-x-1/2 text-black opacity-50 z-10 ">
                                   Authorised Signatory :
@@ -1053,11 +1053,9 @@ const ViewPurchaseOrder = () => {
             </table>
           </div>
         </div>
-        <div className=" w-[15%] flex flex-col  border border-gray-200  h-screen rounded-lg  p-2 ">
+        <div className="fixed w-[15%] flex flex-col right-0 bottom-10 h-[30vh] border border-gray-200   rounded-lg  p-2 ">
+          {/* <div className=" w-[15%] flex flex-col  border border-gray-200  h-screen rounded-lg  p-2 "> */}
           <Tabs defaultValue="header" className="w-full ">
-            <TabsList className="grid w-full grid-cols-1">
-              <TabsTrigger value="header">Actions</TabsTrigger>
-            </TabsList>
             <TabsContent value="header">
               <div className="flex flex-col gap-2 mt-4">
                 <Button
@@ -1091,24 +1089,26 @@ const ViewPurchaseOrder = () => {
                 />
               </div>
 
-              <div className="mb-2">
-                <input
-                  type="checkbox"
-                  checked={includeHeader}
-                  onChange={(e) => setIncludeHeader(e.target.checked)}
-                  className="mr-2"
-                />
-                <label className="font-semibold mr-2 text-sm">With LH</label>
-              </div>
+              <div className="flex ">
+                <div className="mb-2">
+                  <input
+                    type="checkbox"
+                    checked={includeHeader}
+                    onChange={(e) => setIncludeHeader(e.target.checked)}
+                    className="mr-2"
+                  />
+                  <label className="font-semibold mr-2 text-sm">With LH</label>
+                </div>
 
-              <div className="mb-2">
-                <input
-                  type="checkbox"
-                  checked={includeSign}
-                  onChange={(e) => setIncludeSign(e.target.checked)}
-                  className="mr-2"
-                />
-                <label className="font-semibold mr-2 text-sm">Sign</label>
+                <div className="mb-2">
+                  <input
+                    type="checkbox"
+                    checked={includeSign}
+                    onChange={(e) => setIncludeSign(e.target.checked)}
+                    className="mr-2"
+                  />
+                  <label className="font-semibold mr-2 text-sm">Sign</label>
+                </div>
               </div>
             </TabsContent>
           </Tabs>

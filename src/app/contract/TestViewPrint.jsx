@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Printer, Mail, MessageCircle } from "lucide-react";
 import html2pdf from "html2pdf.js";
-import logo from "../../../public/assets/AceB.png";
+// import logo from "../../../public/assets/AceB.png";
 import BASE_URL from "@/config/BaseUrl";
 import { useParams } from "react-router-dom";
 import { getTodayDate } from "@/utils/currentDate";
