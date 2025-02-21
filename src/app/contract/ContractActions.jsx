@@ -14,12 +14,11 @@ const ContractActions = ({
   handleWithoutHeaderPrint,
   handleSignWithoutHeader,
   handleSignWithHeaderPrint,
-
-
   handleSignWithoutHeaderPdf,
   handleWithHeaderPdf,
   handleWithoutHeaderPdf,
   handleHeaderWithSignPdf,
+  handleHeaderWithSignMailPdf
 
 }) => {
   const [withHeader, setWithHeader] = useState(false); // Default is without header
@@ -81,13 +80,9 @@ const ContractActions = ({
             <span>Save as PDF</span>
           </Button> 
 
-          <Button
-            onClick={() => {}}
-            className="w-full bg-yellow-200 cursor-not-allowed text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
-          >
-            <Mail className="h-4 w-4" />
-            <span>Send Mail</span>
-          </Button>
+           {/* <SendEmailDialog
+                    handleHeaderWithSignMailPdf={handleHeaderWithSignMailPdf}
+                   /> */}
 
           {/* <Button
             onClick={handleWhatsapp}

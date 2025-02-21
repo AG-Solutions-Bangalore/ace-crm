@@ -6,18 +6,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2} from "lucide-react";
 import html2pdf from "html2pdf.js";
-import BASE_URL, { getImageUrl, LetterHead, SIGN_IN_PURCHASE } from "@/config/BaseUrl";
+import BASE_URL, { getImageUrl, LetterHeadPdf, SIGN_IN_PURCHASE, signPdf} from "@/config/BaseUrl";
 import { useParams } from "react-router-dom";
 import  { useReactToPrint } from "react-to-print";
 import moment from "moment";
-import LetterHeadPDFImage from "../../assets/letterHead/AceB.png"
 import ContractActions from "./ContractActions";
-import SignHeadImage from "../../assets/sign/AceB_sign.png"
 
 import ContractViewPdf from "./contractView/ContractViewPdf";
 import ContractViewPrintHeader from "./contractView/ContractViewPrintHeader";
 import ContractViewPntWthHeader from "./contractView/ContractViewPntWthHeader";
-import { getLetterheadImage } from "@/assets/letterHead";
 
 const ViewContract = () => {
   const withoutHeaderSignRef = useRef()
@@ -73,7 +70,10 @@ const ViewContract = () => {
   }
           const convertLocalImageToBase64 = async () => {
             try {
-              const logoUrl = `${LetterHead}/${contractData?.branch?.branch_letter_head}`;
+              // for production 
+              // const logoUrl = `${LetterHeadPdf}/${contractData?.branch?.branch_letter_head}`;
+              // for devlopement
+              const logoUrl = `/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`;
 
         const response = await fetch(logoUrl);
         const blob = await response.blob();
@@ -201,6 +201,14 @@ const ViewContract = () => {
       })
       .save();
   }; 
+
+
+
+
+
+
+
+
 
 
  
@@ -564,31 +572,31 @@ for (let i = 1; i <= totalPages; i++) {
   });
   
 
-  const PdfHeader = () => (
-    <div
-      className="print-header hidden print:block"
+  // const PdfHeader = () => (
+  //   <div
+  //     className="print-header hidden print:block"
      
-    >
-      <img
-        src={LetterHeadPDFImage}
-        alt="logo"
-        className="w-full max-h-[120px] object-contain"
-      />
-      <h1 className="text-center text-[15px] underline font-bold mt-4">
-        SALES CONTRACT
-      </h1>
-      <div className="p-4 flex items-center justify-between">
-        <p>
-          <span className="font-semibold text-[12px]">Cont No.:</span>
-          {contractData?.contract?.contract_ref}
-        </p>
-        <p>
-          <span className="font-semibold text-[12px]">DATE:</span>
-          {moment(contractData?.contract?.contract_date).format("DD-MMM-YYYY")}
-        </p>
-      </div>
-    </div>
-  );
+  //   >
+  //     <img
+  //       src={LetterHeadPDFImage}
+  //       alt="logo"
+  //       className="w-full max-h-[120px] object-contain"
+  //     />
+  //     <h1 className="text-center text-[15px] underline font-bold mt-4">
+  //       SALES CONTRACT
+  //     </h1>
+  //     <div className="p-4 flex items-center justify-between">
+  //       <p>
+  //         <span className="font-semibold text-[12px]">Cont No.:</span>
+  //         {contractData?.contract?.contract_ref}
+  //       </p>
+  //       <p>
+  //         <span className="font-semibold text-[12px]">DATE:</span>
+  //         {moment(contractData?.contract?.contract_date).format("DD-MMM-YYYY")}
+  //       </p>
+  //     </div>
+  //   </div>
+  // );
   const PrintHeader = () => (
     <div
       className="print-header hidden print:block"
@@ -723,7 +731,7 @@ for (let i = 1; i <= totalPages; i++) {
             <ContractViewPdf
             contractData={contractData}
             showSignature={showSignature}
-            SignHeadImage={SignHeadImage}
+            signPdf={signPdf}
             
             />
              </>
@@ -767,6 +775,9 @@ for (let i = 1; i <= totalPages; i++) {
             handleSignWithoutHeaderPdf={handleSignWithoutHeaderPdf}
             handleWithoutHeaderPdf={handleWithoutHeaderPdf}
             // whatsappWithoutHeaderPdf={whatsappWithoutHeaderPdf}
+            // email 
+         
+        
           />
         </div>
       </div>
