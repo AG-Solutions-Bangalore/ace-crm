@@ -60,7 +60,7 @@ const ContractActions = ({
   // };
 
   return (
-    <Tabs defaultValue="header" className="w-full ">
+    <Tabs defaultValue="header" className=" ">
      
       <TabsContent value="header">
         <div className="flex flex-col gap-4 mt-4">
