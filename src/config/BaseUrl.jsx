@@ -6,6 +6,9 @@ export const SIGN_IN_PURCHASE =
 export const LetterHead =
   "https://exportbiz.in/public/assets/images/letterHead";
 
+
+  export const LetterHeadPdf ='https://test.exportbiz.in/letterHead'
+  export const signPdf ='https://test.exportbiz.in/sign'
 export const getImageUrl = (imagePath) => {
   if (!imagePath) return "";
   return `${API_URL}/public/assets/images/letterHead/${imagePath}`;

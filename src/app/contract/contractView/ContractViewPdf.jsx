@@ -2,7 +2,7 @@ import { getTodayDate } from '@/utils/currentDate'
 import moment from 'moment'
 import React from 'react'
 
-const ContractViewPdf = ({contractData,showSignature,SignHeadImage}) => {
+const ContractViewPdf = ({contractData,showSignature,signPdf}) => {
   return (
       <div className="max-w-4xl mx-auto    p-4">
                     <div className=" mb-6 flex items-center   justify-between   w-full gap-5">
@@ -219,7 +219,8 @@ const ContractViewPdf = ({contractData,showSignature,SignHeadImage}) => {
                           <p>{contractData?.branch?.branch_sign_name}</p>
                           {showSignature && (
                        <img
-                                                    src={SignHeadImage}
+                      //  src={`${signPdf}/${contractData.branch.branch_sign}`}
+                       src={`/api/public/assets/images/sign/${contractData.branch.branch_sign}`}
                                                     alt="logo"
                                                     className="w-[120px] h-auto absolute print-hide -top-10 "
                                                   /> 
