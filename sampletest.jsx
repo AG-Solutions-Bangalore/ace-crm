@@ -4,7 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Printer, Mail, MessageCircle, File } from "lucide-react";
 import html2pdf from "html2pdf.js";
-import BASE_URL, { LetterHead, SIGN_IN_PURCHASE } from "@/config/BaseUrl";
+import BASE_URL, {
+  getImageUrl,
+  LetterHead,
+  SIGN_IN_PURCHASE,
+} from "@/config/BaseUrl";
 import { useParams } from "react-router-dom";
 import { getTodayDate } from "@/utils/currentDate";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,6 +19,8 @@ import EmailDialog from "./EmailDialog";
 import logo from "../../../public/letterHead/AceB.png";
 import sign from "../../../public/sign/AceB_sign.png";
 import white from "../../../public/letterHead/white.png";
+// import { saveAs } from "file-saver";
+
 const ViewPurchaseOrder = () => {
   const containerRef = useRef();
   const [includeHeader, setIncludeHeader] = useState(true);
@@ -100,17 +106,17 @@ const ViewPurchaseOrder = () => {
   //   };
 
   //   try {
-  //     const pdfBlob = await html2pdf()
+  //     const pdfArrayBuffer = await html2pdf()
   //       .from(containerRef.current)
   //       .set(opt)
-  //       .outputPdf("blob");
+  //       .outputPdf("arraybuffer");
+  //     // .save();
 
-  //     const pdfFile = new File([pdfBlob], "purchase_order.pdf", {
-  //       type: "application/pdf",
-  //     });
+  //     const pdfBlob = new Blob([pdfArrayBuffer], { type: "application/pdf" });
+  //     console.log("Generated PDF Blob for file name:", pdfBlob);
+  //     setPdfFile(pdfBlob);
 
-  //     setPdfFile(pdfFile);
-  //     if (pdfFile !== null) {
+  //     if (pdfBlob) {
   //       setIsDialogOpen(true);
   //     }
   //   } catch (error) {
@@ -122,119 +128,101 @@ const ViewPurchaseOrder = () => {
 
     const opt = {
       margin: 10,
-      filename: "purchase_order.pdf",
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
     };
 
     try {
-      // Generate PDF as an ArrayBuffer
-      const pdfArrayBuffer = await html2pdf()
+      // Generate PDF as a Blob
+      const pdfBlob = await html2pdf()
         .from(containerRef.current)
         .set(opt)
-        .outputPdf("arraybuffer");
+        .outputPdf("blob");
 
-      // Convert ArrayBuffer to Blob
-      const pdfBlob = new Blob([pdfArrayBuffer], { type: "application/pdf" });
+      // Create a File-like Object (Blob)
+      const pdfFile = new Blob([pdfBlob], { type: "application/pdf" });
 
-      // Create a download URL
-      const pdfUrl = URL.createObjectURL(pdfBlob);
+      // Create a downloadable link (optional for debugging)
+      const pdfUrl = URL.createObjectURL(pdfFile);
+      console.log("Generated PDF URL:", pdfUrl);
 
-      // Store Blob instead of File
-      setPdfFile(pdfBlob);
+      // Save in state for later use
+      setPdfFile(pdfFile);
 
-      // Open dialog if PDF is generated successfully
-      if (pdfBlob) {
+      if (pdfFile) {
         setIsDialogOpen(true);
       }
-
-      // Optional: Auto-download the PDF
-      const link = document.createElement("a");
-      link.href = pdfUrl;
-      link.download = "purchase_order.pdf";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      // Clean up the object URL
-      URL.revokeObjectURL(pdfUrl);
     } catch (error) {
       console.error("Error generating PDF:", error);
     }
   };
 
-  const handlPrintPdf = useReactToPrint({
+  const handlePrint = useReactToPrint({
     content: () => containerRef.current,
-    documentTitle: "contract-view",
-    bodyClass: "print-container",
+    documentTitle: "Printable Document",
     pageStyle: `
-      @page {
-      size: auto;
-      margin: 0mm;
-      
-    }
-      
     @media print {
-      body {
-        border: 0px solid #000;
-        margin: 1mm;
-        // padding: 40mm 2mm 2mm 2mm;
-        min-height: 100vh;
-         
-       }
-.print-container{
-margin: 40mm 2mm 2mm 2mm;
-}
-      .print-hide {
-        display: none;
-      }
+      /* Ensure header repeats */
+      thead { display: table-header-group; }
+      
       .print-header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        background-color: white;
-        z-index: 1000;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        padding: 10px 0;
+        background: white;
+        border-bottom: 2px solid black;
       }
 
+      /* Push content down to avoid overlap */
+      .print-container {
+        margin-top: 20px;
+      }
+
+      .print-body {
+        margin-top: 10px;
+        page-break-inside: avoid;
+      }
+
+      .print-section {
+        margin-bottom: 20px;
+      }
+
+      /* Ensure second page starts with margin-top: 100px */
+      .page-margin {
+        margin-top: 100px !important;
+      }
+
+      .page-break {
+        page-break-before: always;
+      }
+
+      @page {
+        size: A4;
+        margin: 5mm;
+      }
     }
-    `,
+  `,
   });
+
   const PrintHeader = ({ includeHeader }) => {
     return (
-      <div
-        className="print-header hidden print:block"
-        // style={{
-        //   position: "fixed",
-        //   top: 0,
-        //   left: 0,
-        //   right: 0,
-        //   backgroundColor: "white",
-        //   zIndex: 1000,
-        //   height: "150px",
-        // }}
-      >
+      <div className="print-header hidden print:block">
         {includeHeader && (
           <>
-            <img
-              src={`${LetterHead}/${branchData?.branch_letter_head}`}
-              alt="logo"
-              className="w-full max-h-[120px] object-contain"
-            />
+            <div className="hidden print:block">
+              <img
+                src={getImageUrl(branchData?.branch_letter_head)}
+                alt="logo"
+                className="w-full max-h-[120px] object-contain"
+              />
 
-            <h1 className="text-center text-[15px] font-bold mt-2 ">
-              PURCHASE ORDER
-            </h1>
+              <h1 className="text-center text-[15px] font-bold mt-2 ">
+                PURCHASE ORDER
+              </h1>
+            </div>
           </>
-        )}
-        {!includeHeader && (
-          <h1
-            className="text-center text-[15px] font-bold mt-2"
-            style={{ marginTop: "120px" }}
-          >
-            PURCHASE ORDER
-          </h1>
         )}
       </div>
     );
@@ -257,589 +245,793 @@ margin: 40mm 2mm 2mm 2mm;
     <Page>
       <div className=" flex w-full p-2 gap-2 relative ">
         <div className="w-[85%]">
-          <div ref={containerRef}>
-            <PrintHeader includeHeader={includeHeader} />
-            <div className="block print:hidden">
-              <div>
-                {includeHeader && (
-                  <>
-                    <img src={logo} alt="logo" className="w-full" />
-
-                    <h1 className="text-center text-[15px] font-bold ">
-                      PURCHASE ORDER
-                    </h1>
-                  </>
-                )}
-              </div>
-              <div>
-                {!includeHeader && (
-                  <div>
-                    {" "}
-                    <img src={white} alt="logo" className="w-full" />
-                    <h1 className="text-center text-[15px] font-bold ">
-                      PURCHASE ORDER
-                    </h1>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="print-container">
-              <div className="border border-black ">
-                <div className="mx-4 ">
-                  <div className="w-full mx-auto grid grid-cols-2 gap-4 ">
+          <div ref={containerRef} className="print-container">
+            <table>
+              <thead>
+                <tr>
+                  <td colSpan="2">
                     <div>
-                      <p className="font-bold">
-                        {purchaseProductData.purchase_product_seller}
-                      </p>
-
-                      <p> {purchaseProductData.purchase_product_seller_add}</p>
-                      <p>
-                        GSTIN :{" "}
-                        {purchaseProductData.purchase_product_seller_gst}{" "}
-                      </p>
-                      <p>
-                        Kind Attn. :{" "}
-                        {purchaseProductData.purchase_product_seller_contact}
-                      </p>
+                      <div className="print:hidden">
+                        {includeHeader && (
+                          <>
+                            {/* <img src={logo} alt="logo" className="w-full" /> */}
+                            {/* src=
+                            {getImageUrl(
+                              branchData?.branch?.branch_letter_head
+                            )} */}
+                            <img
+                              src={getImageUrl(branchData?.branch_letter_head)}
+                              alt="logo"
+                              // className="w-full max-h-[120px] object-contain"
+                            />
+                            <h1 className="text-center text-[15px] font-bold ">
+                              PURCHASE ORDER
+                            </h1>
+                          </>
+                        )}
+                      </div>
+                      <div>
+                        {!includeHeader && (
+                          <div>
+                            {" "}
+                            <img src={white} alt="logo" className="w-full" />
+                            <h1 className="text-center text-[15px] font-bold ">
+                              PURCHASE ORDER
+                            </h1>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-right ">
-                      <p>
-                        PO DATE:{" "}
-                        {moment(
-                          purchaseProductData.purchase_product_date
-                        ).format("DD-MM-YYYY")}
-                      </p>
-                      <p>
-                        PO. NO.:
-                        <span className="font-semibold">
+                    <PrintHeader includeHeader={includeHeader} />
+                  </td>
+                </tr>
+              </thead>
+
+              <tbody>
+                {/* {data.map((item, index) => ( */}
+                <tr className={`print-section`}>
+                  <td className="print-body">
+                    <div className="border border-black">
+                      <div className="mx-4">
+                        <div className="w-full mx-auto grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="font-bold">
+                              {purchaseProductData?.purchase_product_seller}
+                            </p>
+                            <p>
+                              {purchaseProductData?.purchase_product_seller_add}
+                            </p>
+                            <p>
+                              GSTIN:{" "}
+                              {purchaseProductData?.purchase_product_seller_gst}
+                            </p>
+                            <p>
+                              Kind Attn.:{" "}
+                              {
+                                purchaseProductData?.purchase_product_seller_contact
+                              }
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p>
+                              PO DATE:{" "}
+                              {purchaseProductData?.purchase_product_date
+                                ? moment(
+                                    purchaseProductData.purchase_product_date
+                                  ).format("DD-MM-YYYY")
+                                : ""}
+                            </p>
+                            <p>
+                              PO NO.:{" "}
+                              <span className="font-semibold">
+                                {purchaseProductData?.purchase_product_ref}
+                              </span>
+                            </p>
+                            <p>
+                              DELIVERY DATE:{" "}
+                              {purchaseProductData?.purchase_product_delivery_date
+                                ? moment(
+                                    purchaseProductData.purchase_product_delivery_date
+                                  ).format("DD-MM-YYYY")
+                                : ""}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="w-full mx-auto mt-6">
+                          <p>Dear Sir,</p>
+                        </div>
+                      </div>
+
+                      <div className="text-[12px]">
+                        <div className="mx-4">
                           {" "}
-                          {purchaseProductData.purchase_product_ref}
-                        </span>
-                      </p>
-                      <p>
-                        DELIVERY DATE:{" "}
-                        {purchaseProductData.purchase_product_delivery_date &&
-                          moment(
-                            purchaseProductData.purchase_product_delivery_date
-                          ).format("DD-MM-YYYY")}
-                      </p>
-                    </div>
-                  </div>
-                  <div className=" w-full mx-auto mt-6">
-                    {" "}
-                    <div className="">
-                      <p>Dear Sir,</p>
-                    </div>
-                  </div>
+                          <table className="w-full border-collapse table-auto border border-black my-2">
+                            <thead>
+                              <tr className="border-b border-black">
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "30%" }}
+                                >
+                                  Product
+                                </th>
 
-                  <div className="text-[12px]">
-                    <table className="w-full border-collapse table-auto border border-black my-2">
-                      <thead>
-                        <tr className="border-b border-black">
-                          <th
-                            className="border-r border-black p-2 text-center text-[11px]"
-                            style={{ width: "30%" }}
-                          >
-                            Product
-                          </th>
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "35%" }}
+                                >
+                                  <p> DESCRIPTION OF EXPORT GOODS</p>{" "}
+                                </th>
+                                <th
+                                  className="border-r border-black p-2 px-3 text-center text-[11px]"
+                                  style={{ width: "10%" }}
+                                >
+                                  QUANTITY IN MT
+                                </th>
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "10%" }}
+                                >
+                                  RATE PER MT IN USD
+                                </th>
+                                <th
+                                  className="p-2 text-center text-[11px]"
+                                  style={{ width: "15%" }}
+                                >
+                                  AMOUNT (USD)
+                                </th>
+                              </tr>
+                            </thead>
 
-                          <th
-                            className="border-r border-black p-2 text-center text-[11px]"
-                            style={{ width: "35%" }}
-                          >
-                            <p> DESCRIPTION OF EXPORT GOODS</p>{" "}
-                          </th>
-                          <th
-                            className="border-r border-black p-2 px-3 text-center text-[11px]"
-                            style={{ width: "10%" }}
-                          >
-                            QUANTITY IN MT
-                          </th>
-                          <th
-                            className="border-r border-black p-2 text-center text-[11px]"
-                            style={{ width: "10%" }}
-                          >
-                            RATE PER MT IN USD
-                          </th>
-                          <th
-                            className="p-2 text-center text-[11px]"
-                            style={{ width: "15%" }}
-                          >
-                            AMOUNT (USD)
-                          </th>
-                        </tr>
-                      </thead>
+                            <tbody>
+                              {purchaseProductSubData.map((item, index) => (
+                                <>
+                                  <tr key={item.id}>
+                                    <td className="border-r border-black p-2">
+                                      {item.purchase_productSub_name}
+                                    </td>
 
-                      <tbody>
-                        {purchaseProductSubData.map((item, index) => (
-                          <>
-                            <tr key={index}>
-                              <td className="border-r border-black p-2">
-                                {item.purchase_productSub_name}
-                              </td>
+                                    <td className="border-r border-black p-2">
+                                      {item.purchase_productSub_description}
+                                    </td>
+                                    <td className="border-r border-black p-2 text-center">
+                                      {item.purchase_productSub_qntyInMt} MTS
+                                    </td>
+                                    <td className="border-r border-black p-2 text-center">
+                                      {item.purchase_productSub_rateInMt} MTS
+                                    </td>
+                                    <td className="p-2 text-right">
+                                      $
+                                      {(
+                                        item.purchase_productSub_qntyInMt *
+                                        item.purchase_productSub_rateInMt
+                                      ).toFixed(2)}
+                                    </td>
+                                  </tr>
+                                </>
+                              ))}
 
-                              <td className="border-r border-black p-2">
-                                {item.purchase_productSub_description}
-                              </td>
-                              <td className="border-r border-black p-2 text-center">
-                                {item.purchase_productSub_qntyInMt} MTS
-                              </td>
-                              <td className="border-r border-black p-2 text-center">
-                                {item.purchase_productSub_rateInMt} MTS
-                              </td>
-                              <td className="p-2 text-right">
-                                $
-                                {(
-                                  item.purchase_productSub_qntyInMt *
-                                  item.purchase_productSub_rateInMt
-                                ).toFixed(2)}
-                              </td>
-                            </tr>
-                          </>
-                        ))}
+                              <tr>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-t border-black p-2 text-right font-bold">
+                                  $
+                                  {purchaseProductSubData
+                                    .reduce((total, item) => {
+                                      return (
+                                        total +
+                                        (item.purchase_productSub_qntyInMt *
+                                          item.purchase_productSub_rateInMt ||
+                                          0)
+                                      );
+                                    }, 0)
+                                    .toFixed(2)}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                          <table className="w-full border-collapse table-auto border border-black my-2">
+                            <thead>
+                              <tr className="border-b border-black">
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "30%" }}
+                                >
+                                  Product
+                                </th>
 
-                        <tr>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-t border-black p-2 text-right font-bold">
-                            $
-                            {purchaseProductSubData
-                              .reduce((total, item) => {
-                                return (
-                                  total +
-                                  (item.purchase_productSub_qntyInMt *
-                                    item.purchase_productSub_rateInMt || 0)
-                                );
-                              }, 0)
-                              .toFixed(2)}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "35%" }}
+                                >
+                                  <p> DESCRIPTION OF EXPORT GOODS</p>{" "}
+                                </th>
+                                <th
+                                  className="border-r border-black p-2 px-3 text-center text-[11px]"
+                                  style={{ width: "10%" }}
+                                >
+                                  QUANTITY IN MT
+                                </th>
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "10%" }}
+                                >
+                                  RATE PER MT IN USD
+                                </th>
+                                <th
+                                  className="p-2 text-center text-[11px]"
+                                  style={{ width: "15%" }}
+                                >
+                                  AMOUNT (USD)
+                                </th>
+                              </tr>
+                            </thead>
 
-                    <table className="w-full border-collapse table-auto border border-black my-2">
-                      <thead>
-                        <tr className="border-b border-black">
-                          <th
-                            className="border-r border-black p-2 text-center text-[11px]"
-                            style={{ width: "30%" }}
-                          >
-                            Product
-                          </th>
+                            <tbody>
+                              {purchaseProductSubData.map((item, index) => (
+                                <>
+                                  <tr key={index}>
+                                    <td className="border-r border-black p-2">
+                                      {item.purchase_productSub_name}
+                                    </td>
 
-                          <th
-                            className="border-r border-black p-2 text-center text-[11px]"
-                            style={{ width: "35%" }}
-                          >
-                            <p> DESCRIPTION OF EXPORT GOODS</p>{" "}
-                          </th>
-                          <th
-                            className="border-r border-black p-2 px-3 text-center text-[11px]"
-                            style={{ width: "10%" }}
-                          >
-                            QUANTITY IN MT
-                          </th>
-                          <th
-                            className="border-r border-black p-2 text-center text-[11px]"
-                            style={{ width: "10%" }}
-                          >
-                            RATE PER MT IN USD
-                          </th>
-                          <th
-                            className="p-2 text-center text-[11px]"
-                            style={{ width: "15%" }}
-                          >
-                            AMOUNT (USD)
-                          </th>
-                        </tr>
-                      </thead>
+                                    <td className="border-r border-black p-2">
+                                      {item.purchase_productSub_description}
+                                    </td>
+                                    <td className="border-r border-black p-2 text-center">
+                                      {item.purchase_productSub_qntyInMt} MTS
+                                    </td>
+                                    <td className="border-r border-black p-2 text-center">
+                                      {item.purchase_productSub_rateInMt} MTS
+                                    </td>
+                                    <td className="p-2 text-right">
+                                      $
+                                      {(
+                                        item.purchase_productSub_qntyInMt *
+                                        item.purchase_productSub_rateInMt
+                                      ).toFixed(2)}
+                                    </td>
+                                  </tr>
+                                </>
+                              ))}
 
-                      <tbody>
-                        {purchaseProductSubData.map((item, index) => (
-                          <>
-                            <tr key={index}>
-                              <td className="border-r border-black p-2">
-                                {item.purchase_productSub_name}
-                              </td>
+                              <tr>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-t border-black p-2 text-right font-bold">
+                                  $
+                                  {purchaseProductSubData
+                                    .reduce((total, item) => {
+                                      return (
+                                        total +
+                                        (item.purchase_productSub_qntyInMt *
+                                          item.purchase_productSub_rateInMt ||
+                                          0)
+                                      );
+                                    }, 0)
+                                    .toFixed(2)}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                          <table className="w-full border-collapse table-auto border border-black my-2">
+                            <thead>
+                              <tr className="border-b border-black">
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "30%" }}
+                                >
+                                  Product
+                                </th>
 
-                              <td className="border-r border-black p-2">
-                                {item.purchase_productSub_description}
-                              </td>
-                              <td className="border-r border-black p-2 text-center">
-                                {item.purchase_productSub_qntyInMt} MTS
-                              </td>
-                              <td className="border-r border-black p-2 text-center">
-                                {item.purchase_productSub_rateInMt} MTS
-                              </td>
-                              <td className="p-2 text-right">
-                                $
-                                {(
-                                  item.purchase_productSub_qntyInMt *
-                                  item.purchase_productSub_rateInMt
-                                ).toFixed(2)}
-                              </td>
-                            </tr>
-                          </>
-                        ))}
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "35%" }}
+                                >
+                                  <p> DESCRIPTION OF EXPORT GOODS</p>{" "}
+                                </th>
+                                <th
+                                  className="border-r border-black p-2 px-3 text-center text-[11px]"
+                                  style={{ width: "10%" }}
+                                >
+                                  QUANTITY IN MT
+                                </th>
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "10%" }}
+                                >
+                                  RATE PER MT IN USD
+                                </th>
+                                <th
+                                  className="p-2 text-center text-[11px]"
+                                  style={{ width: "15%" }}
+                                >
+                                  AMOUNT (USD)
+                                </th>
+                              </tr>
+                            </thead>
 
-                        <tr>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-t border-black p-2 text-right font-bold">
-                            $
-                            {purchaseProductSubData
-                              .reduce((total, item) => {
-                                return (
-                                  total +
-                                  (item.purchase_productSub_qntyInMt *
-                                    item.purchase_productSub_rateInMt || 0)
-                                );
-                              }, 0)
-                              .toFixed(2)}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <table className="w-full border-collapse table-auto border border-black my-2">
-                      <thead>
-                        <tr className="border-b border-black">
-                          <th
-                            className="border-r border-black p-2 text-center text-[11px]"
-                            style={{ width: "30%" }}
-                          >
-                            Product
-                          </th>
+                            <tbody>
+                              {purchaseProductSubData.map((item, index) => (
+                                <>
+                                  <tr key={index}>
+                                    <td className="border-r border-black p-2">
+                                      {item.purchase_productSub_name}
+                                    </td>
 
-                          <th
-                            className="border-r border-black p-2 text-center text-[11px]"
-                            style={{ width: "35%" }}
-                          >
-                            <p> DESCRIPTION OF EXPORT GOODS</p>{" "}
-                          </th>
-                          <th
-                            className="border-r border-black p-2 px-3 text-center text-[11px]"
-                            style={{ width: "10%" }}
-                          >
-                            QUANTITY IN MT
-                          </th>
-                          <th
-                            className="border-r border-black p-2 text-center text-[11px]"
-                            style={{ width: "10%" }}
-                          >
-                            RATE PER MT IN USD
-                          </th>
-                          <th
-                            className="p-2 text-center text-[11px]"
-                            style={{ width: "15%" }}
-                          >
-                            AMOUNT (USD)
-                          </th>
-                        </tr>
-                      </thead>
+                                    <td className="border-r border-black p-2">
+                                      {item.purchase_productSub_description}
+                                    </td>
+                                    <td className="border-r border-black p-2 text-center">
+                                      {item.purchase_productSub_qntyInMt} MTS
+                                    </td>
+                                    <td className="border-r border-black p-2 text-center">
+                                      {item.purchase_productSub_rateInMt} MTS
+                                    </td>
+                                    <td className="p-2 text-right">
+                                      $
+                                      {(
+                                        item.purchase_productSub_qntyInMt *
+                                        item.purchase_productSub_rateInMt
+                                      ).toFixed(2)}
+                                    </td>
+                                  </tr>
+                                </>
+                              ))}
 
-                      <tbody>
-                        {purchaseProductSubData.map((item, index) => (
-                          <>
-                            <tr key={index}>
-                              <td className="border-r border-black p-2">
-                                {item.purchase_productSub_name}
-                              </td>
+                              <tr>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-t border-black p-2 text-right font-bold">
+                                  $
+                                  {purchaseProductSubData
+                                    .reduce((total, item) => {
+                                      return (
+                                        total +
+                                        (item.purchase_productSub_qntyInMt *
+                                          item.purchase_productSub_rateInMt ||
+                                          0)
+                                      );
+                                    }, 0)
+                                    .toFixed(2)}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                          <table className="w-full border-collapse table-auto border border-black my-2">
+                            <thead>
+                              <tr className="border-b border-black">
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "30%" }}
+                                >
+                                  Product
+                                </th>
 
-                              <td className="border-r border-black p-2">
-                                {item.purchase_productSub_description}
-                              </td>
-                              <td className="border-r border-black p-2 text-center">
-                                {item.purchase_productSub_qntyInMt} MTS
-                              </td>
-                              <td className="border-r border-black p-2 text-center">
-                                {item.purchase_productSub_rateInMt} MTS
-                              </td>
-                              <td className="p-2 text-right">
-                                $
-                                {(
-                                  item.purchase_productSub_qntyInMt *
-                                  item.purchase_productSub_rateInMt
-                                ).toFixed(2)}
-                              </td>
-                            </tr>
-                          </>
-                        ))}
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "35%" }}
+                                >
+                                  <p> DESCRIPTION OF EXPORT GOODS</p>{" "}
+                                </th>
+                                <th
+                                  className="border-r border-black p-2 px-3 text-center text-[11px]"
+                                  style={{ width: "10%" }}
+                                >
+                                  QUANTITY IN MT
+                                </th>
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "10%" }}
+                                >
+                                  RATE PER MT IN USD
+                                </th>
+                                <th
+                                  className="p-2 text-center text-[11px]"
+                                  style={{ width: "15%" }}
+                                >
+                                  AMOUNT (USD)
+                                </th>
+                              </tr>
+                            </thead>
 
-                        <tr>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-t border-black p-2 text-right font-bold">
-                            $
-                            {purchaseProductSubData
-                              .reduce((total, item) => {
-                                return (
-                                  total +
-                                  (item.purchase_productSub_qntyInMt *
-                                    item.purchase_productSub_rateInMt || 0)
-                                );
-                              }, 0)
-                              .toFixed(2)}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <table className="w-full border-collapse table-auto border border-black my-2">
-                      <thead>
-                        <tr className="border-b border-black">
-                          <th
-                            className="border-r border-black p-2 text-center text-[11px]"
-                            style={{ width: "30%" }}
-                          >
-                            Product
-                          </th>
+                            <tbody>
+                              {purchaseProductSubData.map((item, index) => (
+                                <>
+                                  <tr key={index}>
+                                    <td className="border-r border-black p-2">
+                                      {item.purchase_productSub_name}
+                                    </td>
 
-                          <th
-                            className="border-r border-black p-2 text-center text-[11px]"
-                            style={{ width: "35%" }}
-                          >
-                            <p> DESCRIPTION OF EXPORT GOODS</p>{" "}
-                          </th>
-                          <th
-                            className="border-r border-black p-2 px-3 text-center text-[11px]"
-                            style={{ width: "10%" }}
-                          >
-                            QUANTITY IN MT
-                          </th>
-                          <th
-                            className="border-r border-black p-2 text-center text-[11px]"
-                            style={{ width: "10%" }}
-                          >
-                            RATE PER MT IN USD
-                          </th>
-                          <th
-                            className="p-2 text-center text-[11px]"
-                            style={{ width: "15%" }}
-                          >
-                            AMOUNT (USD)
-                          </th>
-                        </tr>
-                      </thead>
+                                    <td className="border-r border-black p-2">
+                                      {item.purchase_productSub_description}
+                                    </td>
+                                    <td className="border-r border-black p-2 text-center">
+                                      {item.purchase_productSub_qntyInMt} MTS
+                                    </td>
+                                    <td className="border-r border-black p-2 text-center">
+                                      {item.purchase_productSub_rateInMt} MTS
+                                    </td>
+                                    <td className="p-2 text-right">
+                                      $
+                                      {(
+                                        item.purchase_productSub_qntyInMt *
+                                        item.purchase_productSub_rateInMt
+                                      ).toFixed(2)}
+                                    </td>
+                                  </tr>
+                                </>
+                              ))}
 
-                      <tbody>
-                        {purchaseProductSubData.map((item, index) => (
-                          <>
-                            <tr key={index}>
-                              <td className="border-r border-black p-2">
-                                {item.purchase_productSub_name}
-                              </td>
+                              <tr>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-t border-black p-2 text-right font-bold">
+                                  $
+                                  {purchaseProductSubData
+                                    .reduce((total, item) => {
+                                      return (
+                                        total +
+                                        (item.purchase_productSub_qntyInMt *
+                                          item.purchase_productSub_rateInMt ||
+                                          0)
+                                      );
+                                    }, 0)
+                                    .toFixed(2)}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                          <table className="w-full border-collapse table-auto border border-black my-2">
+                            <thead>
+                              <tr className="border-b border-black">
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "30%" }}
+                                >
+                                  Product
+                                </th>
 
-                              <td className="border-r border-black p-2">
-                                {item.purchase_productSub_description}
-                              </td>
-                              <td className="border-r border-black p-2 text-center">
-                                {item.purchase_productSub_qntyInMt} MTS
-                              </td>
-                              <td className="border-r border-black p-2 text-center">
-                                {item.purchase_productSub_rateInMt} MTS
-                              </td>
-                              <td className="p-2 text-right">
-                                $
-                                {(
-                                  item.purchase_productSub_qntyInMt *
-                                  item.purchase_productSub_rateInMt
-                                ).toFixed(2)}
-                              </td>
-                            </tr>
-                          </>
-                        ))}
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "35%" }}
+                                >
+                                  <p> DESCRIPTION OF EXPORT GOODS</p>{" "}
+                                </th>
+                                <th
+                                  className="border-r border-black p-2 px-3 text-center text-[11px]"
+                                  style={{ width: "10%" }}
+                                >
+                                  QUANTITY IN MT
+                                </th>
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "10%" }}
+                                >
+                                  RATE PER MT IN USD
+                                </th>
+                                <th
+                                  className="p-2 text-center text-[11px]"
+                                  style={{ width: "15%" }}
+                                >
+                                  AMOUNT (USD)
+                                </th>
+                              </tr>
+                            </thead>
 
-                        <tr>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-t border-black p-2 text-right font-bold">
-                            $
-                            {purchaseProductSubData
-                              .reduce((total, item) => {
-                                return (
-                                  total +
-                                  (item.purchase_productSub_qntyInMt *
-                                    item.purchase_productSub_rateInMt || 0)
-                                );
-                              }, 0)
-                              .toFixed(2)}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <table className="w-full border-collapse table-auto border border-black my-2">
-                      <thead>
-                        <tr className="border-b border-black">
-                          <th
-                            className="border-r border-black p-2 text-center text-[11px]"
-                            style={{ width: "30%" }}
-                          >
-                            Product
-                          </th>
+                            <tbody>
+                              {purchaseProductSubData.map((item, index) => (
+                                <>
+                                  <tr key={index}>
+                                    <td className="border-r border-black p-2">
+                                      {item.purchase_productSub_name}
+                                    </td>
 
-                          <th
-                            className="border-r border-black p-2 text-center text-[11px]"
-                            style={{ width: "35%" }}
-                          >
-                            <p> DESCRIPTION OF EXPORT GOODS</p>{" "}
-                          </th>
-                          <th
-                            className="border-r border-black p-2 px-3 text-center text-[11px]"
-                            style={{ width: "10%" }}
-                          >
-                            QUANTITY IN MT
-                          </th>
-                          <th
-                            className="border-r border-black p-2 text-center text-[11px]"
-                            style={{ width: "10%" }}
-                          >
-                            RATE PER MT IN USD
-                          </th>
-                          <th
-                            className="p-2 text-center text-[11px]"
-                            style={{ width: "15%" }}
-                          >
-                            AMOUNT (USD)
-                          </th>
-                        </tr>
-                      </thead>
+                                    <td className="border-r border-black p-2">
+                                      {item.purchase_productSub_description}
+                                    </td>
+                                    <td className="border-r border-black p-2 text-center">
+                                      {item.purchase_productSub_qntyInMt} MTS
+                                    </td>
+                                    <td className="border-r border-black p-2 text-center">
+                                      {item.purchase_productSub_rateInMt} MTS
+                                    </td>
+                                    <td className="p-2 text-right">
+                                      $
+                                      {(
+                                        item.purchase_productSub_qntyInMt *
+                                        item.purchase_productSub_rateInMt
+                                      ).toFixed(2)}
+                                    </td>
+                                  </tr>
+                                </>
+                              ))}
 
-                      <tbody>
-                        {purchaseProductSubData.map((item, index) => (
-                          <>
-                            <tr key={index}>
-                              <td className="border-r border-black p-2">
-                                {item.purchase_productSub_name}
-                              </td>
+                              <tr>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-t border-black p-2 text-right font-bold">
+                                  $
+                                  {purchaseProductSubData
+                                    .reduce((total, item) => {
+                                      return (
+                                        total +
+                                        (item.purchase_productSub_qntyInMt *
+                                          item.purchase_productSub_rateInMt ||
+                                          0)
+                                      );
+                                    }, 0)
+                                    .toFixed(2)}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                          <table className="w-full border-collapse table-auto border border-black my-2">
+                            <thead>
+                              <tr className="border-b border-black">
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "30%" }}
+                                >
+                                  Product
+                                </th>
 
-                              <td className="border-r border-black p-2">
-                                {item.purchase_productSub_description}
-                              </td>
-                              <td className="border-r border-black p-2 text-center">
-                                {item.purchase_productSub_qntyInMt} MTS
-                              </td>
-                              <td className="border-r border-black p-2 text-center">
-                                {item.purchase_productSub_rateInMt} MTS
-                              </td>
-                              <td className="p-2 text-right">
-                                $
-                                {(
-                                  item.purchase_productSub_qntyInMt *
-                                  item.purchase_productSub_rateInMt
-                                ).toFixed(2)}
-                              </td>
-                            </tr>
-                          </>
-                        ))}
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "35%" }}
+                                >
+                                  <p> DESCRIPTION OF EXPORT GOODS</p>{" "}
+                                </th>
+                                <th
+                                  className="border-r border-black p-2 px-3 text-center text-[11px]"
+                                  style={{ width: "10%" }}
+                                >
+                                  QUANTITY IN MT
+                                </th>
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "10%" }}
+                                >
+                                  RATE PER MT IN USD
+                                </th>
+                                <th
+                                  className="p-2 text-center text-[11px]"
+                                  style={{ width: "15%" }}
+                                >
+                                  AMOUNT (USD)
+                                </th>
+                              </tr>
+                            </thead>
 
-                        <tr>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-r border-black p-2"></td>
-                          <td className="border-t border-black p-2 text-right font-bold">
-                            $
-                            {purchaseProductSubData
-                              .reduce((total, item) => {
-                                return (
-                                  total +
-                                  (item.purchase_productSub_qntyInMt *
-                                    item.purchase_productSub_rateInMt || 0)
-                                );
-                              }, 0)
-                              .toFixed(2)}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                            <tbody>
+                              {purchaseProductSubData.map((item, index) => (
+                                <>
+                                  <tr key={index}>
+                                    <td className="border-r border-black p-2">
+                                      {item.purchase_productSub_name}
+                                    </td>
 
-                    <div>
-                      <p>
-                        AMOUNT CHARGEABLE IN WORDS -{" "}
-                        <span className=" font-semibold ml-3">
-                          {formattedAmount}{" "}
-                        </span>
-                      </p>
-                      <p>
-                        GST NOTIFICATION :
-                        <span className="font-bold">
-                          {" "}
-                          {
-                            purchaseProductData.purchase_product_gst_notification
-                          }
-                        </span>{" "}
-                      </p>
-                    </div>
+                                    <td className="border-r border-black p-2">
+                                      {item.purchase_productSub_description}
+                                    </td>
+                                    <td className="border-r border-black p-2 text-center">
+                                      {item.purchase_productSub_qntyInMt} MTS
+                                    </td>
+                                    <td className="border-r border-black p-2 text-center">
+                                      {item.purchase_productSub_rateInMt} MTS
+                                    </td>
+                                    <td className="p-2 text-right">
+                                      $
+                                      {(
+                                        item.purchase_productSub_qntyInMt *
+                                        item.purchase_productSub_rateInMt
+                                      ).toFixed(2)}
+                                    </td>
+                                  </tr>
+                                </>
+                              ))}
 
-                    <div>
-                      QUALITY {purchaseProductData.purchase_product_quality}
-                    </div>
-                    <div>
-                      PAYMENT :{" "}
-                      {purchaseProductData.purchase_product_payment_terms}
-                    </div>
-                  </div>
-                </div>
+                              <tr>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-t border-black p-2 text-right font-bold">
+                                  $
+                                  {purchaseProductSubData
+                                    .reduce((total, item) => {
+                                      return (
+                                        total +
+                                        (item.purchase_productSub_qntyInMt *
+                                          item.purchase_productSub_rateInMt ||
+                                          0)
+                                      );
+                                    }, 0)
+                                    .toFixed(2)}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                          <table className="w-full border-collapse table-auto border border-black my-2">
+                            <thead>
+                              <tr className="border-b border-black">
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "30%" }}
+                                >
+                                  Product
+                                </th>
 
-                <div className="grid grid-cols-2 mt-3 text-[12px]">
-                  <div className="col-span-1 pl-4">
-                    <div className="leading-none">
-                      <p className="font-bold"> DELIVERY AT </p>
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "35%" }}
+                                >
+                                  <p> DESCRIPTION OF EXPORT GOODS</p>{" "}
+                                </th>
+                                <th
+                                  className="border-r border-black p-2 px-3 text-center text-[11px]"
+                                  style={{ width: "10%" }}
+                                >
+                                  QUANTITY IN MT
+                                </th>
+                                <th
+                                  className="border-r border-black p-2 text-center text-[11px]"
+                                  style={{ width: "10%" }}
+                                >
+                                  RATE PER MT IN USD
+                                </th>
+                                <th
+                                  className="p-2 text-center text-[11px]"
+                                  style={{ width: "15%" }}
+                                >
+                                  AMOUNT (USD)
+                                </th>
+                              </tr>
+                            </thead>
 
-                      <p className="my-2">
-                        {purchaseProductData.purchase_product_delivery_at}
-                      </p>
-                    </div>
-                  </div>
+                            <tbody>
+                              {purchaseProductSubData.map((item, index) => (
+                                <>
+                                  <tr key={index}>
+                                    <td className="border-r border-black p-2">
+                                      {item.purchase_productSub_name}
+                                    </td>
 
-                  <div className="col-span-1 border-t border-l border-black w-full h-full">
-                    <div className="p-4 h-full relative">
-                      <p className="font-bold leading-none">
-                        For {purchaseProductData.branch_name}
-                      </p>
+                                    <td className="border-r border-black p-2">
+                                      {item.purchase_productSub_description}
+                                    </td>
+                                    <td className="border-r border-black p-2 text-center">
+                                      {item.purchase_productSub_qntyInMt} MTS
+                                    </td>
+                                    <td className="border-r border-black p-2 text-center">
+                                      {item.purchase_productSub_rateInMt} MTS
+                                    </td>
+                                    <td className="p-2 text-right">
+                                      $
+                                      {(
+                                        item.purchase_productSub_qntyInMt *
+                                        item.purchase_productSub_rateInMt
+                                      ).toFixed(2)}
+                                    </td>
+                                  </tr>
+                                </>
+                              ))}
 
-                      <div className="relative w-[200px] h-auto min-h-36">
-                        {/* {includeSign && (
+                              <tr>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-r border-black p-2"></td>
+                                <td className="border-t border-black p-2 text-right font-bold">
+                                  $
+                                  {purchaseProductSubData
+                                    .reduce((total, item) => {
+                                      return (
+                                        total +
+                                        (item.purchase_productSub_qntyInMt *
+                                          item.purchase_productSub_rateInMt ||
+                                          0)
+                                      );
+                                    }, 0)
+                                    .toFixed(2)}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                          <div>
+                            <p>
+                              AMOUNT CHARGEABLE IN WORDS -{" "}
+                              <span className=" font-semibold ml-3">
+                                {formattedAmount}{" "}
+                              </span>
+                            </p>
+                            <p>
+                              GST NOTIFICATION :
+                              <span className="font-bold">
+                                {" "}
+                                {
+                                  purchaseProductData.purchase_product_gst_notification
+                                }
+                              </span>{" "}
+                            </p>
+                          </div>
+                          <div>
+                            QUALITY{" "}
+                            {purchaseProductData.purchase_product_quality}
+                          </div>
+                          <div>
+                            PAYMENT :{" "}
+                            {purchaseProductData.purchase_product_payment_terms}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 mt-3 text-[12px]">
+                        <div className="col-span-1 pl-4">
+                          <div className="leading-none">
+                            <p className="font-bold"> DELIVERY AT </p>
+
+                            <p className="my-2">
+                              {purchaseProductData.purchase_product_delivery_at}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="col-span-1 border-t border-l border-black w-full h-full">
+                          <div className="p-4 h-full relative">
+                            <p className="font-bold leading-none">
+                              For {purchaseProductData.branch_name}
+                            </p>
+
+                            <div className="relative w-[200px] h-auto min-h-36">
+                              {/* {includeSign && (
                           <p className="font-bold leading-none absolute bottom-0 right-0 -translate-x-1/2 text-black opacity-50 z-10">
                             Authorised Signatory :
                           </p>
                         )} */}
-                        {!includeSign && (
-                          <p className="font-bold leading-none absolute bottom-0 right-0 -translate-x-1/2 text-black opacity-50 z-10 ">
-                            Authorised Signatory :
-                          </p>
-                        )}
-                        {includeSign && (
-                          <>
-                            <img
-                              src={sign}
-                              alt="logo MISSING"
-                              className="w-[120px] h-auto relative"
-                            />
+                              {!includeSign && (
+                                <p className="font-bold leading-none absolute bottom-0 right-0 -translate-x-1/2 text-black opacity-50 z-10 ">
+                                  Authorised Signatory :
+                                </p>
+                              )}
+                              {includeSign && (
+                                <>
+                                  <img
+                                    src={sign}
+                                    alt="logo MISSING"
+                                    className="w-[120px] h-auto relative"
+                                  />
 
-                            <p className="font-bold leading-none absolute bottom-0 right-0 -translate-x-1/2 text-black opacity-50 z-10 ">
-                              Authorised Signatory :
-                            </p>
-                          </>
-                        )}
+                                  <p className="font-bold leading-none absolute bottom-0 right-0 -translate-x-1/2 text-black opacity-50 z-10 ">
+                                    Authorised Signatory :
+                                  </p>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+                  </td>
+                </tr>
+                {/* ))} */}
+              </tbody>
+            </table>
           </div>
         </div>
         <div className=" w-[15%] flex flex-col  border border-gray-200  h-screen rounded-lg  p-2 ">
@@ -850,7 +1042,7 @@ margin: 40mm 2mm 2mm 2mm;
             <TabsContent value="header">
               <div className="flex flex-col gap-2 mt-4">
                 <Button
-                  onClick={handlPrintPdf}
+                  onClick={handlePrint}
                   className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
                 >
                   <Printer className="h-4 w-4" />
@@ -876,6 +1068,7 @@ margin: 40mm 2mm 2mm 2mm;
                   onClose={() => setIsDialogOpen(false)}
                   handleSaveAsPdf={pdfFile}
                   Subject={Subject}
+                  purchaseProductData={purchaseProductData}
                 />
               </div>
 

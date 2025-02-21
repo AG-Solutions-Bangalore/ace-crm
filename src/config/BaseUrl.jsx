@@ -11,7 +11,11 @@ export const LetterHead =
   export const signPdf ='https://test.exportbiz.in/sign'
 export const getImageUrl = (imagePath) => {
   if (!imagePath) return "";
-  return `${API_URL}/public/assets/images/letterHead/${imagePath}`;
+  return `https://test.exportbiz.in/letterHead/${imagePath}`;
+};
+export const getSignUrl = (imagePath) => {
+  if (!imagePath) return "";
+  return `https://test.exportbiz.in/sign/${imagePath}`;
 };
 
 export default BASE_URL;
@@ -27,4 +31,3 @@ export default BASE_URL;
 // };
 
 // export default BASE_URL;
-
