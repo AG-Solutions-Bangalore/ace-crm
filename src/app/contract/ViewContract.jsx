@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2} from "lucide-react";
 import html2pdf from "html2pdf.js";
-import BASE_URL, { getImageUrl, SIGN_IN_PURCHASE } from "@/config/BaseUrl";
+import BASE_URL, { getImageUrl, LetterHead, SIGN_IN_PURCHASE } from "@/config/BaseUrl";
 import { useParams } from "react-router-dom";
 import  { useReactToPrint } from "react-to-print";
 import moment from "moment";
@@ -73,7 +73,7 @@ const ViewContract = () => {
   }
           const convertLocalImageToBase64 = async () => {
             try {
-              const logoUrl = `/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`;
+              const logoUrl = `${LetterHead}/${contractData?.branch?.branch_letter_head}`;
 
         const response = await fetch(logoUrl);
         const blob = await response.blob();
