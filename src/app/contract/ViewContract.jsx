@@ -475,7 +475,310 @@ for (let i = 1; i <= totalPages; i++) {
   };
 
 
+// email function
 
+// 1. without header without sign 
+
+const mailWoheaderWoSign = async (element) => {
+ 
+  const options = {
+    margin: [55, 0, 15, 0],
+    filename: "Sales_Contract.pdf",
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      windowHeight: element.scrollHeight,
+    },
+    jsPDF: {
+      unit: "mm",
+      format: "a4",
+      orientation: "portrait",
+    },
+    pagebreak: { mode: "avoid-all" },
+  };
+
+  return new Promise((resolve) => {
+    html2pdf()
+      .from(element)
+      .set(options)
+      .toPdf()
+      .get("pdf")
+      .then((pdf) => {
+        const totalPages = pdf.internal.getNumberOfPages();
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        
+        for (let i = 1; i <= totalPages; i++) {
+          pdf.setPage(i);
+          
+          // Add contract title
+          pdf.setFontSize(12);
+          pdf.setFont(undefined, "normal");
+          const title = "SALES CONTRACT";
+          const titleWidth = (pdf.getStringUnitWidth(title) * 16) / pdf.internal.scaleFactor;
+          pdf.text(title, (pageWidth - titleWidth) / 2, 45);
+
+          // Add contract details
+          pdf.setFontSize(9);
+          pdf.text(`Cont No.: ${contractData?.contract?.contract_ref || ""}`, 4, 55);
+          pdf.text(`DATE: ${contractData?.contract?.contract_date || ""}`, pageWidth - 31, 55);
+
+          // Add page number
+          pdf.setFontSize(10);
+          pdf.setTextColor(0, 0, 0);
+          const text = `Page ${i} of ${totalPages}`;
+          const textWidth = (pdf.getStringUnitWidth(text) * 10) / pdf.internal.scaleFactor;
+          const x = pageWidth - textWidth - 10;
+          const y = pageHeight - 10;
+          pdf.text(text, x, y);
+        }
+
+        // Convert PDF to blob
+        const pdfBlob = pdf.output('blob');
+        resolve(pdfBlob);
+      });
+  });
+};
+
+// 2. with header with isgn 
+
+const mailheadersign = () => {
+  return new Promise((resolve, reject) => {
+    if (!logoBase64) {
+      reject(new Error("Logo not yet loaded"));
+      return;
+    }
+    setShowSignature(true);
+    const element = pdfRef.current;
+    const images = element.getElementsByTagName("img");
+    let loadedImages = 0;
+
+    if (images.length === 0) {
+      mailgenerateHS(element)
+        .then(resolve)
+        .catch(reject);
+      return;
+    }
+
+    Array.from(images).forEach((img) => {
+      if (img.complete) {
+        loadedImages++;
+        if (loadedImages === images.length) {
+          mailgenerateHS(element)
+            .then(resolve)
+            .catch(reject);
+        }
+      } else {
+        img.onload = () => {
+          loadedImages++;
+          if (loadedImages === images.length) {
+            mailgenerateHS(element)
+              .then(resolve)
+              .catch(reject);
+          }
+        };
+        img.onerror = () => {
+          reject(new Error("Failed to load image"));
+        };
+      }
+    });
+  });
+};
+
+// 3. with header without sign
+
+const mailHeaderWOSign = () => {
+  return new Promise((resolve, reject) => {
+    if (!logoBase64) {
+      reject(new Error("Logo not yet loaded"));
+      return;
+    }
+    
+    const element = pdfRef.current;
+    const images = element.getElementsByTagName("img");
+    let loadedImages = 0;
+
+    if (images.length === 0) {
+      mailgenerateHS(element)
+        .then(resolve)
+        .catch(reject);
+      return;
+    }
+
+    Array.from(images).forEach((img) => {
+      if (img.complete) {
+        loadedImages++;
+        if (loadedImages === images.length) {
+          mailgenerateHS(element)
+            .then(resolve)
+            .catch(reject);
+        }
+      } else {
+        img.onload = () => {
+          loadedImages++;
+          if (loadedImages === images.length) {
+            mailgenerateHS(element)
+              .then(resolve)
+              .catch(reject);
+          }
+        };
+        img.onerror = () => {
+          reject(new Error("Failed to load image"));
+        };
+      }
+    });
+  });
+};
+
+const mailgenerateHS = (element) => {
+  return new Promise((resolve, reject) => {
+    if (!logoBase64) {
+      reject(new Error("Logo not yet converted to base64"));
+      return;
+    }
+
+    const options = {
+      margin: [55, 0, 15, 0], // top, left, bottom, right
+      filename: "Sales_Contract.pdf",
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        windowHeight: element.scrollHeight,
+      },
+      jsPDF: {
+        unit: "mm",
+        format: "a4",
+        orientation: "portrait",
+      },
+      pagebreak: { mode: "avoid-all" },
+    };
+
+    html2pdf()
+      .from(element)
+      .set(options)
+      .toPdf()
+      .get("pdf")
+      .then((pdf) => {
+        try {
+          const totalPages = pdf.internal.getNumberOfPages();
+          const pageWidth = pdf.internal.pageSize.getWidth();
+          const pageHeight = pdf.internal.pageSize.getHeight();
+          
+          for (let i = 1; i <= totalPages; i++) {
+            pdf.setPage(i);
+
+            // Add logo
+            pdf.addImage(logoBase64, "JPEG", 0, 10, pageWidth, 30);
+
+            // Add contract title
+            pdf.setFontSize(12);
+            pdf.setFont(undefined, "normal");
+            const title = "SALES CONTRACT";
+            const titleWidth = (pdf.getStringUnitWidth(title) * 16) / pdf.internal.scaleFactor;
+            pdf.text(title, (pageWidth - titleWidth) / 2, 45);
+
+            // Add contract details
+            pdf.setFontSize(9);
+            pdf.text(
+              `Cont No.: ${contractData?.contract?.contract_ref || ""}`,
+              4,
+              55
+            );
+            pdf.text(
+              `DATE: ${contractData?.contract?.contract_date || ""}`,
+              pageWidth - 31,
+              55
+            );
+
+            // Add page number
+            pdf.setFontSize(10);
+            pdf.setTextColor(0, 0, 0);
+            const text = `Page ${i} of ${totalPages}`;
+            const textWidth = (pdf.getStringUnitWidth(text) * 10) / pdf.internal.scaleFactor;
+            const x = pageWidth - textWidth - 10;
+            const y = pageHeight - 10;
+            pdf.text(text, x, y);
+          }
+
+          // Convert PDF to blob and resolve
+          const pdfBlob = pdf.output('blob');
+          resolve(pdfBlob);
+        } catch (error) {
+          reject(error);
+        }
+      })
+      .catch(reject);
+  });
+};
+
+// without header with sign
+
+
+const mailWOheadersign = async (element) => {
+  setShowSignature(true);
+  const options = {
+    margin: [55, 0, 15, 0],
+    filename: "Sales_Contract.pdf",
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      windowHeight: element.scrollHeight,
+    },
+    jsPDF: {
+      unit: "mm",
+      format: "a4",
+      orientation: "portrait",
+    },
+    pagebreak: { mode: "avoid-all" },
+  };
+
+  return new Promise((resolve) => {
+    html2pdf()
+      .from(element)
+      .set(options)
+      .toPdf()
+      .get("pdf")
+      .then((pdf) => {
+        const totalPages = pdf.internal.getNumberOfPages();
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        
+        for (let i = 1; i <= totalPages; i++) {
+          pdf.setPage(i);
+          
+          // Add contract title
+          pdf.setFontSize(12);
+          pdf.setFont(undefined, "normal");
+          const title = "SALES CONTRACT";
+          const titleWidth = (pdf.getStringUnitWidth(title) * 16) / pdf.internal.scaleFactor;
+          pdf.text(title, (pageWidth - titleWidth) / 2, 45);
+
+          // Add contract details
+          pdf.setFontSize(9);
+          pdf.text(`Cont No.: ${contractData?.contract?.contract_ref || ""}`, 4, 55);
+          pdf.text(`DATE: ${contractData?.contract?.contract_date || ""}`, pageWidth - 31, 55);
+
+          // Add page number
+          pdf.setFontSize(10);
+          pdf.setTextColor(0, 0, 0);
+          const text = `Page ${i} of ${totalPages}`;
+          const textWidth = (pdf.getStringUnitWidth(text) * 10) / pdf.internal.scaleFactor;
+          const x = pageWidth - textWidth - 10;
+          const y = pageHeight - 10;
+          pdf.text(text, x, y);
+        }
+
+        // Convert PDF to blob
+        const pdfBlob = pdf.output('blob');
+        resolve(pdfBlob);
+      });
+  });
+};
+
+// print functions
   const handleWithHeaderPrint = useReactToPrint({
     content: () => HeaderWithSignRef.current,
     documentTitle: "contract-view",
@@ -776,7 +1079,11 @@ for (let i = 1; i <= totalPages; i++) {
             handleWithoutHeaderPdf={handleWithoutHeaderPdf}
             // whatsappWithoutHeaderPdf={whatsappWithoutHeaderPdf}
             // email 
-         
+            pdfRef={pdfRef} 
+            mailWoheaderWoSign={mailWoheaderWoSign}
+            mailheadersign={mailheadersign}
+            mailHeaderWOSign={mailHeaderWOSign}
+            mailWOheadersign={mailWOheadersign}
         
           />
         </div>
