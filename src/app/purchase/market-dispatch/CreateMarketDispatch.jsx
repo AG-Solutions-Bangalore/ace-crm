@@ -52,8 +52,8 @@ const contractFormSchema = z.object({
   mpd_bill_ref: z.string().min(1, "Bill Ref is required"),
   mpd_vendor_name: z.string().min(1, "Vendor is required"),
 
-  mpd_bill_value: z.string().min(1, "Bill Value is required"),
-  mpd_remark: z.string().min(1, "Remark is required"),
+  mpd_bill_value: z.string().optional(),
+  mpd_remark: z.string().optional(),
 
   dispatch_data: z
     .array(productRowSchema)

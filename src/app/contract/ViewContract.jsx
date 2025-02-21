@@ -71,9 +71,9 @@ const ViewContract = () => {
           const convertLocalImageToBase64 = async () => {
             try {
               // for production 
-              // const logoUrl = `${LetterHeadPdf}/${contractData?.branch?.branch_letter_head}`;
+              const logoUrl = `${LetterHeadPdf}/${contractData?.branch?.branch_letter_head}`;
               // for devlopement
-              const logoUrl = `/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`;
+              // const logoUrl = `/api/public/assets/images/letterHead/${contractData?.branch?.branch_letter_head}`;
 
         const response = await fetch(logoUrl);
         const blob = await response.blob();

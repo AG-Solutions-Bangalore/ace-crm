@@ -114,7 +114,7 @@ const EmailDialog = ({
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
+      console.log(response);
       if (response?.data.code == 200) {
         toast({
           title: "Success",

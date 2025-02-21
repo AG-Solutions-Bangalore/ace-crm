@@ -1,7 +1,4 @@
-
-
-
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,66 +10,72 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, Loader2 } from "lucide-react";
-import html2pdf from 'html2pdf.js';
+import html2pdf from "html2pdf.js";
+import { useToast } from "@/hooks/use-toast";
+import axios from "axios";
+import BASE_URL from "@/config/BaseUrl";
 
-const SendEmailDialog = ({
-  pdfRef,
-  handleEmail
-
-}) => {
+const SendEmailDialog = ({ pdfRef, handleEmail }) => {
+  const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    to_email: '',
-    subject_email: '',
-    description_email: '',
-    attachment_email: null
+    to_email: "",
+    subject_email: "",
+    description_email: "",
+    attachment_email: null,
   });
-
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Generate PDF
-      // without header without sign 
-      // const pdfBlob = await mailWoheaderWoSign(pdfRef.current);
-      // with header without sign
       const pdfBlob = await handleEmail(pdfRef.current);
-      
+      const token = localStorage.getItem("token");
+
       // Create FormData
       const formDataToSend = new FormData();
-      formDataToSend.append('to_email', formData.to_email);
-      formDataToSend.append('subject_email', formData.subject_email);
-      formDataToSend.append('description_email', formData.description_email);
-      formDataToSend.append('attachment_email', pdfBlob, 'Sales_Contract.pdf');
+      formDataToSend.append("to_email", formData.to_email);
+      formDataToSend.append("subject_email", formData.subject_email);
+      formDataToSend.append("description_email", formData.description_email);
+      formDataToSend.append("attachment_email", pdfBlob, "Sales_Contract.pdf");
+      const response = await axios.post(
+        `${BASE_URL}/api/panel-send-document-email`,
+        formDataToSend,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (response?.data.code == 200) {
+        toast({
+          title: "Success",
+          description: response.data.msg,
+        });
 
-      // Send email
-      const token = localStorage.getItem('token');
-      const response = await fetch('https://exportbiz.in/public/api/panel-send-document-email', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formDataToSend
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send email');
+        setIsOpen(false);
+        setFormData({
+          to_email: "",
+          subject_email: "",
+          description_email: "",
+          attachment_email: null,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
       }
-
-      // Close dialog and reset form
-      setIsOpen(false);
-      setFormData({
-        to_email: '',
-        subject_email: '',
-        description_email: '',
-        attachment_email: null
-      });
     } catch (error) {
-      console.error('Error sending email:', error);
+      console.error("Error response:", error);
+      console.error("Error details:", error.response?.data);
+
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to send email",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -83,7 +86,7 @@ const SendEmailDialog = ({
       <DialogTrigger asChild>
         <Button className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2">
           <Mail className="h-4 w-4" />
-          <span>Send Mail</span>
+          <span>Email</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
@@ -97,7 +100,9 @@ const SendEmailDialog = ({
               type="email"
               required
               value={formData.to_email}
-              onChange={(e) => setFormData(prev => ({ ...prev, to_email: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, to_email: e.target.value }))
+              }
             />
           </div>
           <div>
@@ -105,7 +110,12 @@ const SendEmailDialog = ({
               placeholder="Subject"
               required
               value={formData.subject_email}
-              onChange={(e) => setFormData(prev => ({ ...prev, subject_email: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  subject_email: e.target.value,
+                }))
+              }
             />
           </div>
           <div>
@@ -113,7 +123,12 @@ const SendEmailDialog = ({
               placeholder="Email Description"
               required
               value={formData.description_email}
-              onChange={(e) => setFormData(prev => ({ ...prev, description_email: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  description_email: e.target.value,
+                }))
+              }
             />
           </div>
           <div className="flex justify-end">
@@ -124,7 +139,7 @@ const SendEmailDialog = ({
                   Sending...
                 </>
               ) : (
-                'Send Email'
+                "Send Email"
               )}
             </Button>
           </div>

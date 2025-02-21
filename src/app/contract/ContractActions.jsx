@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Printer, Mail, MessageCircle } from "lucide-react";
+import { Printer, Mail, MessageCircle, File } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import SendEmailDialog from "./emailContract/SendEmailDialog";
@@ -25,10 +25,9 @@ const ContractActions = ({
   mailheadersign,
   mailHeaderWOSign,
   mailWOheadersign,
-
 }) => {
   const [withHeader, setWithHeader] = useState(false); // Default is without header
- const [withSign, setWithSign] = useState(false);
+  const [withSign, setWithSign] = useState(false);
   const handleHeaderChange = (checked) => {
     setShowLetterhead(checked);
   };
@@ -76,10 +75,8 @@ const ContractActions = ({
 
   return (
     <Tabs defaultValue="header" className=" ">
-     
       <TabsContent value="header">
         <div className="flex flex-col gap-4 mt-4">
-
           <Button
             onClick={handlePrint}
             className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
@@ -88,43 +85,31 @@ const ContractActions = ({
             <span>Print </span>
           </Button>
 
-       <Button
+          <Button
             onClick={handleSave}
             className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
           >
-            <Printer className="h-4 w-4" />
-            <span>Save as PDF</span>
-          </Button> 
+            <File className="h-4 w-4" />
+            <span>PDF</span>
+          </Button>
 
-          <SendEmailDialog
-       pdfRef={pdfRef}
-       handleEmail={handleEmail}
-      />
+          <SendEmailDialog pdfRef={pdfRef} handleEmail={handleEmail} />
 
-          {/* <Button
-            onClick={handleWhatsapp}
-            className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
-          >
-            <MessageCircle className="h-4 w-4" />
-            <span>WhatsApp</span>
-          </Button> */}
-
-<div className="flex items-center flex-row space-x-2">
+          <div className="flex items-center flex-row space-x-2">
             <Checkbox
               id="withHeader"
               checked={showLetterhead}
               onCheckedChange={handleHeaderChange}
             />
             <Label htmlFor="withHeader">With LH</Label>
-         
-                      <Checkbox
-                        id="withSign"
-                        checked={showSignature}
-                        onCheckedChange={handleSignChange}
-                      />
-                      <Label htmlFor="withSign">Sign</Label>
-                    </div>
 
+            <Checkbox
+              id="withSign"
+              checked={showSignature}
+              onCheckedChange={handleSignChange}
+            />
+            <Label htmlFor="withSign">Sign</Label>
+          </div>
         </div>
       </TabsContent>
     </Tabs>
