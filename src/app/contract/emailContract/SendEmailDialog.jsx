@@ -1,3 +1,6 @@
+
+
+
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -10,15 +13,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, Loader2 } from "lucide-react";
+import html2pdf from 'html2pdf.js';
 
 const SendEmailDialog = ({
-   pdfRef,
-   mailWoheaderWoSign,
-   mailheadersign,
-   mailHeaderWOSign,
-   mailWOheadersign,
-   showLetterhead,
-   showSignature
+  pdfRef,
+  handleEmail
+
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -29,24 +29,17 @@ const SendEmailDialog = ({
     attachment_email: null
   });
 
-  const handleEmail = async (ref) => {
-    if (showLetterhead && showSignature) {
-      return await mailheadersign(ref);
-    } else if (showLetterhead) {
-      return await mailHeaderWOSign(ref);
-    } else if (showSignature) {
-      return await mailWOheadersign(ref);
-    } else {
-      return await mailWoheaderWoSign(ref);
-    }
-  };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Generate PDF based on checkbox states
+      // Generate PDF
+      // without header without sign 
+      // const pdfBlob = await mailWoheaderWoSign(pdfRef.current);
+      // with header without sign
       const pdfBlob = await handleEmail(pdfRef.current);
       
       // Create FormData

@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Printer, Mail, MessageCircle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import SendEmailDialog from "./emailContract/SendEmailDialog";
 
 const ContractActions = ({
   showLetterhead,
@@ -18,7 +19,12 @@ const ContractActions = ({
   handleWithHeaderPdf,
   handleWithoutHeaderPdf,
   handleHeaderWithSignPdf,
-  handleHeaderWithSignMailPdf
+  //email
+  pdfRef,
+  mailWoheaderWoSign,
+  mailheadersign,
+  mailHeaderWOSign,
+  mailWOheadersign,
 
 }) => {
   const [withHeader, setWithHeader] = useState(false); // Default is without header
@@ -52,7 +58,17 @@ const ContractActions = ({
       handleWithoutHeaderPdf();
     }
   };
-
+  const handleEmail = async (ref) => {
+    if (showLetterhead && showSignature) {
+      return await mailheadersign(ref);
+    } else if (showLetterhead) {
+      return await mailHeaderWOSign(ref);
+    } else if (showSignature) {
+      return await mailWOheadersign(ref);
+    } else {
+      return await mailWoheaderWoSign(ref);
+    }
+  };
 
   // const handleWhatsapp = () => {
   //   withHeader ? whatsappPdf() : whatsappWithoutHeaderPdf();
@@ -80,9 +96,10 @@ const ContractActions = ({
             <span>Save as PDF</span>
           </Button> 
 
-           {/* <SendEmailDialog
-                    handleHeaderWithSignMailPdf={handleHeaderWithSignMailPdf}
-                   /> */}
+          <SendEmailDialog
+       pdfRef={pdfRef}
+       handleEmail={handleEmail}
+      />
 
           {/* <Button
             onClick={handleWhatsapp}
