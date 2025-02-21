@@ -4,7 +4,7 @@ export const API_URL = "https://exportbiz.in";
 export const SIGN_IN_PURCHASE =
   "https://exportbiz.in/public/assets/images/sign";
 export const LetterHead =
-  "https://ace-crm.vercel.app/public/assets/images/letterHead";
+  "https://exportbiz.in/public/assets/images/letterHead";
 
 export const getImageUrl = (imagePath) => {
   if (!imagePath) return "";
