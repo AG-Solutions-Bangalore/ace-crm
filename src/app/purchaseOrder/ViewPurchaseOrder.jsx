@@ -4,23 +4,26 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Printer, Mail, MessageCircle, File } from "lucide-react";
 import html2pdf from "html2pdf.js";
-import BASE_URL, { LetterHead, SIGN_IN_PURCHASE } from "@/config/BaseUrl";
+import BASE_URL, {
+  getImageUrl,
+  getSignUrl,
+  LetterHead,
+  SIGN_IN_PURCHASE,
+} from "@/config/BaseUrl";
 import { useParams } from "react-router-dom";
 import { getTodayDate } from "@/utils/currentDate";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ReactToPrint, { useReactToPrint } from "react-to-print";
+import { useReactToPrint } from "react-to-print";
 import moment from "moment";
 import { toWords } from "number-to-words";
 import EmailDialog from "./EmailDialog";
-import logo from "../../../public/letterHead/AceB.png";
-import sign from "../../../public/sign/AceB_sign.png";
 import white from "../../../public/letterHead/white.png";
 // import { saveAs } from "file-saver";
 
 const ViewPurchaseOrder = () => {
   const containerRef = useRef();
-  const [includeHeader, setIncludeHeader] = useState(true);
-  const [includeSign, setIncludeSign] = useState(true);
+  const [includeHeader, setIncludeHeader] = useState(false);
+  const [includeSign, setIncludeSign] = useState(false);
   const { id } = useParams();
   const [purchaseProductData, setPurchaseProductData] = useState({});
   const [purchaseProductSubData, setPurchaseProductSubData] = useState([]);
@@ -210,6 +213,7 @@ const ViewPurchaseOrder = () => {
             <div className="hidden print:block">
               <img
                 src={`${LetterHead}/${branchData?.branch_letter_head}`}
+                // src={getImageUrl(branchData?.branch_letter_head)}
                 alt="logo"
                 className="w-full max-h-[120px] object-contain"
               />
@@ -219,6 +223,15 @@ const ViewPurchaseOrder = () => {
               </h1>
             </div>
           </>
+        )}
+        {!includeHeader && (
+          <div>
+            {" "}
+            <img src={white} alt="logo" className="w-full" />
+            <h1 className="text-center text-[15px] font-bold ">
+              PURCHASE ORDER
+            </h1>
+          </div>
         )}
       </div>
     );
@@ -246,12 +259,14 @@ const ViewPurchaseOrder = () => {
               <thead>
                 <tr>
                   <td colSpan="2">
-                    <div>
-                      <div className="print:hidden">
+                    <div className="print:hidden">
+                      <div>
                         {includeHeader && (
                           <>
-                            <img src={logo} alt="logo" className="w-full" />
-
+                            <img
+                              src={getImageUrl(branchData?.branch_letter_head)}
+                              alt="logo"
+                            />
                             <h1 className="text-center text-[15px] font-bold ">
                               PURCHASE ORDER
                             </h1>
@@ -986,12 +1001,7 @@ const ViewPurchaseOrder = () => {
                               For {purchaseProductData.branch_name}
                             </p>
 
-                            <div className="relative w-[200px] h-auto min-h-36">
-                              {/* {includeSign && (
-                          <p className="font-bold leading-none absolute bottom-0 right-0 -translate-x-1/2 text-black opacity-50 z-10">
-                            Authorised Signatory :
-                          </p>
-                        )} */}
+                            <div className="relative w-[200px] h-auto min-h-36 block print:hidden">
                               {!includeSign && (
                                 <p className="font-bold leading-none absolute bottom-0 right-0 -translate-x-1/2 text-black opacity-50 z-10 ">
                                   Authorised Signatory :
@@ -1000,7 +1010,28 @@ const ViewPurchaseOrder = () => {
                               {includeSign && (
                                 <>
                                   <img
-                                    src={sign}
+                                    src={`${SIGN_IN_PURCHASE}/${branchData?.branch_sign}`}
+                                    alt="logo MISSING"
+                                    className="w-[120px] h-auto relative"
+                                  />
+
+                                  <p className="font-bold leading-none absolute bottom-0 right-0 -translate-x-1/2 text-black opacity-50 z-10 ">
+                                    Authorised Signatory :
+                                  </p>
+                                </>
+                              )}
+                            </div>
+                            <div className="relative w-[200px] h-auto min-h-36 hidden print:block">
+                              {!includeSign && (
+                                <p className="font-bold leading-none absolute bottom-0 right-0 -translate-x-1/2 text-black opacity-50 z-10 ">
+                                  Authorised Signatory :
+                                </p>
+                              )}
+                              {includeSign && (
+                                <>
+                                  <img
+                                    // src={`${SIGN_IN_PURCHASE}/${branchData?.branch_sign}`}
+                                    src={getSignUrl(branchData?.branch_sign)}
                                     alt="logo MISSING"
                                     className="w-[120px] h-auto relative"
                                   />
@@ -1057,34 +1088,27 @@ const ViewPurchaseOrder = () => {
                   handleSaveAsPdf={pdfFile}
                   Subject={Subject}
                   purchaseProductData={purchaseProductData}
-                  
                 />
               </div>
 
               <div className="mb-2">
-                <label className="font-semibold mr-2 text-sm">Print:</label>
                 <input
                   type="checkbox"
                   checked={includeHeader}
                   onChange={(e) => setIncludeHeader(e.target.checked)}
                   className="mr-2"
                 />
-                <span className="text-sm">
-                  {includeHeader ? "With Header" : "Without Header"}
-                </span>
+                <label className="font-semibold mr-2 text-sm">With LH</label>
               </div>
 
               <div className="mb-2">
-                <label className="font-semibold mr-2 text-sm">Sign:</label>
                 <input
                   type="checkbox"
                   checked={includeSign}
                   onChange={(e) => setIncludeSign(e.target.checked)}
                   className="mr-2"
                 />
-                <span className="text-sm">
-                  {includeSign ? "With Sign" : "Without Sign"}
-                </span>
+                <label className="font-semibold mr-2 text-sm">Sign</label>
               </div>
             </TabsContent>
           </Tabs>
