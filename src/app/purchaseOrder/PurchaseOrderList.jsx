@@ -178,7 +178,9 @@ const PurchaseOrderList = () => {
             <PurchaseOrderView
               onClick={() => navigate(`/view-purchase-order/${purchaseId}`)}
             ></PurchaseOrderView>
-
+            <button onClick={() => navigate(`/test-view/${purchaseId}`)}>
+              View
+            </button>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>

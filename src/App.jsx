@@ -92,7 +92,7 @@ import EditMarketProcessing from "./app/purchase/marketProcessing/EditMarketProc
 import StockView from "./app/purchase/stock/StockView";
 import ProductStock from "./app/reports/productStock/ProductStock";
 import ProductStockView from "./app/reports/productStock/ProductStockView";
-
+import TestingView from "./app/purchaseOrder/TestingView";
 const queryClient = new QueryClient();
 
 function App() {
@@ -348,7 +348,7 @@ function App() {
           <Route path="/button-management" element={<CreateButton />} />
           {/* //usertype */}
           <Route path="/user-type" element={<UserTypeList />} />
-          <Route path="/edit-user-type/:id" element={<EditUserType />} />
+          <Route path="/test-view/:id" element={<TestingView />} />
         </Routes>
       </QueryClientProvider>
     </>

@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogFooter,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +15,13 @@ import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 import BASE_URL from "@/config/BaseUrl";
 
-const EmailDialog = ({ open, onClose, handleSaveAsPdf, Subject }) => {
+const EmailDialog = ({
+  open,
+  onClose,
+  handleSaveAsPdf,
+  Subject,
+  purchaseProductData,
+}) => {
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -79,8 +86,6 @@ const EmailDialog = ({ open, onClose, handleSaveAsPdf, Subject }) => {
       return;
     }
 
-  
-
     const token = localStorage.getItem("token");
 
     setIsLoading(true);
@@ -97,7 +102,11 @@ const EmailDialog = ({ open, onClose, handleSaveAsPdf, Subject }) => {
       data.append("to_email", formData.to_email);
       data.append("subject_email", formData.subject_email);
       data.append("description_email", formData.description_email);
-      data.append("attachment_email", formData.attachment_email);
+      data.append(
+        "attachment_email",
+        formData.attachment_email,
+        `${Subject}-${purchaseProductData.purchase_product_no}`
+      );
       const response = await axios.post(
         `${BASE_URL}/api/panel-send-document-email`,
         data,
@@ -136,7 +145,8 @@ const EmailDialog = ({ open, onClose, handleSaveAsPdf, Subject }) => {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md p-6">
+      <DialogTitle></DialogTitle>
+      <DialogContent className="max-w-md p-6" aria-describedby={undefined}>
         <DialogHeader>
           <h2 className="text-lg font-semibold">Send Email</h2>
         </DialogHeader>
@@ -178,8 +188,8 @@ const EmailDialog = ({ open, onClose, handleSaveAsPdf, Subject }) => {
               required
             />
           </div>
-
-          {/* <div>
+          {/* 
+          <div>
             <Label htmlFor="attachment_email">Attachment</Label>
             <Input
               type="file"

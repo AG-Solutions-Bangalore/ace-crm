@@ -100,75 +100,85 @@ const ViewPurchaseOrder = () => {
     };
 
     try {
-      const pdfBlob = await html2pdf()
+      const pdfArrayBuffer = await html2pdf()
         .from(containerRef.current)
         .set(opt)
-        .outputPdf("blob");
+        .outputPdf("arraybuffer");
 
-      const pdfFile = new File([pdfBlob], "purchase_order.pdf", {
-        type: "application/pdf",
-      });
+      const pdfBlob = new Blob([pdfArrayBuffer], { type: "application/pdf" });
 
-      setPdfFile(pdfFile);
-      if (pdfFile !== null) {
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+
+      setPdfFile(pdfBlob);
+
+      if (pdfBlob) {
         setIsDialogOpen(true);
       }
+
+      const link = document.createElement("a");
+      link.href = pdfUrl;
+      link.download = "purchase_order.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      URL.revokeObjectURL(pdfUrl);
     } catch (error) {
       console.error("Error generating PDF:", error);
     }
   };
 
-  const handlPrintPdf = useReactToPrint({
-    content: () => containerRef.current,
-    documentTitle: "contract-view",
-    bodyClass: "print-container",
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+    documentTitle: "Printable Document",
     pageStyle: `
-      @page {
-      size: auto;
-      margin: 0mm;
-      
-    }
-      
     @media print {
-      body {
-        border: 0px solid #000;
-        margin: 1mm;
-        // padding: 40mm 2mm 2mm 2mm;
-        min-height: 100vh;
-         
-       }
-.print-container{
-margin: 40mm 2mm 2mm 2mm;
-}
-      .print-hide {
-        display: none;
-      }
+      /* Ensure header repeats */
+      thead { display: table-header-group; }
+      
       .print-header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        background-color: white;
-        z-index: 1000;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        padding: 10px 0;
+        background: white;
+        border-bottom: 2px solid black;
       }
 
+      /* Push content down to avoid overlap */
+      .print-container {
+        margin-top: 20px;
+      }
+
+      .print-body {
+        margin-top: 10px;
+        page-break-inside: avoid;
+      }
+
+      .print-section {
+        margin-bottom: 20px;
+      }
+
+      /* Ensure second page starts with margin-top: 100px */
+      .page-margin {
+        margin-top: 100px !important;
+      }
+
+      .page-break {
+        page-break-before: always;
+      }
+
+      @page {
+        size: A4;
+        margin: 20mm;
+      }
     }
-    `,
+  `,
   });
+
   const PrintHeader = ({ includeHeader }) => {
     return (
-      <div
-        className="print-header hidden print:block"
-        // style={{
-        //   position: "fixed",
-        //   top: 0,
-        //   left: 0,
-        //   right: 0,
-        //   backgroundColor: "white",
-        //   zIndex: 1000,
-        //   height: "150px",
-        // }}
-      >
+      <div className="print-header hidden print:block">
         {includeHeader && (
           <>
             <img
@@ -211,7 +221,7 @@ margin: 40mm 2mm 2mm 2mm;
     <Page>
       <div className=" flex w-full p-2 gap-2 relative ">
         <div className="w-[85%]">
-          <div ref={containerRef}>
+          <div ref={containerRef} className="print-container">
             <PrintHeader includeHeader={includeHeader} />
             <div className="block print:hidden">
               <div>
