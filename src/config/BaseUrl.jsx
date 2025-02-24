@@ -21,19 +21,21 @@ export default BASE_URL;
 
 //adithya
 // const BASE_URL = "https://adityaspice.com/public";
+// export default BASE_URL;
+
 // export const API_URL = "https://adityaspice.com";
 // export const SIGN_IN_PURCHASE =
 //   "https://adityaspice.com/public/assets/images/sign/";
 // export const LetterHead =
 //   "https://adityaspice.com/public/assets/images/letterHead";
 
-// export const LetterHeadPdf = "https://invpack.adityaspice.com/letterHead";
-// export const signPdf = "https://invpack.adityaspice.com/sign";
+// export const LetterHeadPdf = "https://doc.adityaspice.com/letterHead";
+// export const signPdf = "https://doc.adityaspice.com/sign";
 // export const getImageUrl = (imagePath) => {
 //   if (!imagePath) return "";
 //   return `${API_URL}/public/assets/images/letterHead/${imagePath}`;
 // };
 // export const getSignUrl = (imagePath) => {
 //   if (!imagePath) return "";
-//   return `https://invpack.adityaspice.com/sign/${imagePath}`;
+//   return `https://doc.adityaspice.com/sign/${imagePath}`;
 // };
