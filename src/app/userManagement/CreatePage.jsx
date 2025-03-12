@@ -111,6 +111,14 @@ const CreatePage = () => {
             { title: "PaymentClose", url: "/payment-payment-close" },
           ],
         },
+        {
+          title: "Duty Drawback",
+          url: "#",
+          items: [
+            { title: "Pending", url: "/dutydrawback/pending" },
+            { title: "Received", url: "/dutydrawback/received" },
+          ],
+        },
       ],
       projects: [
         { name: "Dashboard", url: "/home" },

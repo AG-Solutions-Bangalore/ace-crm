@@ -38,7 +38,6 @@ const EditPortofLoading = ({ portId }) => {
     portofLoading_status: "Active",
   });
   const [originalData, setOriginalData] = useState(null);
-  console.log(originalData);
   // Fetch state data
   const fetchPortofLoadingData = async () => {
     setIsFetching(true);
@@ -51,10 +50,8 @@ const EditPortofLoading = ({ portId }) => {
         }
       );
 
-      console.log(response);
       const qualityData = response?.data?.portofLoading;
 
-      console.log(qualityData, "qualitydata");
       setFormData({
         portofLoading_status: qualityData.portofLoading_status || "Active",
       });

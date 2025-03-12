@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Download,
   Edit,
@@ -8,10 +9,6 @@ import {
   SquarePlus,
   Trash,
 } from "lucide-react";
-import React from "react";
-import { checkPermission } from "./checkPermission";
-import { Button } from "@/components/ui/button";
-import { ButtonConfig } from "@/config/ButtonConfig";
 import { useNavigate } from "react-router-dom";
 import {
   Tooltip,
@@ -19,6 +16,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import { checkPermission } from "./checkPermission";
+import React, { forwardRef } from "react";
 
 const getStaticPermissions = () => {
   const buttonPermissions = localStorage.getItem("buttonControl");
@@ -49,29 +48,114 @@ export const InvoiceCreate = ({ onClick, className }) => {
 };
 InvoiceCreate.page = "Invoice";
 
-export const InvoiceEdit = ({ onClick, className }) => {
+// export const InvoiceEdit = ({ onClick, className }) => {
+//   const userId = localStorage.getItem("id") || "";
+//   const staticPermissions = getStaticPermissions();
+//   if (!checkPermission(userId, "InvoiceEdit", staticPermissions)) {
+//     return null;
+//   }
+
+//   return (
+//     <Button onClick={onClick} className={className} variant="ghost" size="icon">
+//       <Edit className="h-4 w-4 text-black" />
+//     </Button>
+//   );
+// };
+// InvoiceEdit.page = "Invoice";
+// export const InvoiceView = ({ onClick, className }) => {
+//   const userId = localStorage.getItem("id") || "";
+//   const staticPermissions = getStaticPermissions();
+//   if (!checkPermission(userId, "InvoiceView", staticPermissions)) {
+//     return null;
+//   }
+
+//   return (
+//     <Button
+//       onClick={onClick}
+//       className={className}
+//       title="View"
+//       variant="ghost"
+//       size="icon"
+//     >
+//       <Eye className="h-4 w-4 text-black" />
+//     </Button>
+//   );
+// };
+// InvoiceView.page = "Invoice";
+// export const InvoiceDocument = ({ onClick, className }) => {
+//   const userId = localStorage.getItem("id") || "";
+//   const staticPermissions = getStaticPermissions();
+//   if (!checkPermission(userId, "InvoiceDocument", staticPermissions)) {
+//     return null;
+//   }
+
+//   return (
+//     <Button
+//       onClick={onClick}
+//       className={className}
+//       title="Invoice Document"
+//       variant="ghost"
+//       size="icon"
+//     >
+//       <FilePlus2 className="h-4 w-4 text-black" />
+//     </Button>
+//   );
+// };
+// InvoiceDocument.page = "Invoice";
+// export const InvoiceDelete = ({ onClick, className }) => {
+//   const userId = localStorage.getItem("id") || "";
+//   const staticPermissions = getStaticPermissions();
+//   if (!checkPermission(userId, "InvoiceDelete", staticPermissions)) {
+//     return null;
+//   }
+
+//   return (
+//     <Button
+//       onClick={onClick}
+//       className={className}
+//       title="Invoice Delete"
+//       variant="ghost"
+//       size="icon"
+//     >
+//       <Trash className="h-4 w-4 text-red-500" />
+//     </Button>
+//   );
+// };
+// InvoiceDelete.page = "Invoice";
+export const InvoiceEdit = forwardRef(({ onClick, className }, ref) => {
   const userId = localStorage.getItem("id") || "";
   const staticPermissions = getStaticPermissions();
+
   if (!checkPermission(userId, "InvoiceEdit", staticPermissions)) {
     return null;
   }
 
   return (
-    <Button onClick={onClick} className={className} variant="ghost" size="icon">
+    <Button
+      ref={ref}
+      onClick={onClick}
+      className={className}
+      variant="ghost"
+      size="icon"
+    >
       <Edit className="h-4 w-4 text-black" />
     </Button>
   );
-};
+});
 InvoiceEdit.page = "Invoice";
-export const InvoiceView = ({ onClick, className }) => {
+
+// ===================== InvoiceView =====================
+export const InvoiceView = forwardRef(({ onClick, className }, ref) => {
   const userId = localStorage.getItem("id") || "";
   const staticPermissions = getStaticPermissions();
+
   if (!checkPermission(userId, "InvoiceView", staticPermissions)) {
     return null;
   }
 
   return (
     <Button
+      ref={ref}
       onClick={onClick}
       className={className}
       title="View"
@@ -81,17 +165,21 @@ export const InvoiceView = ({ onClick, className }) => {
       <Eye className="h-4 w-4 text-black" />
     </Button>
   );
-};
+});
 InvoiceView.page = "Invoice";
-export const InvoiceDocument = ({ onClick, className }) => {
+
+// ===================== InvoiceDocument =====================
+export const InvoiceDocument = forwardRef(({ onClick, className }, ref) => {
   const userId = localStorage.getItem("id") || "";
   const staticPermissions = getStaticPermissions();
+
   if (!checkPermission(userId, "InvoiceDocument", staticPermissions)) {
     return null;
   }
 
   return (
     <Button
+      ref={ref}
       onClick={onClick}
       className={className}
       title="Invoice Document"
@@ -101,17 +189,21 @@ export const InvoiceDocument = ({ onClick, className }) => {
       <FilePlus2 className="h-4 w-4 text-black" />
     </Button>
   );
-};
+});
 InvoiceDocument.page = "Invoice";
-export const InvoiceDelete = ({ onClick, className }) => {
+
+// ===================== InvoiceDelete =====================
+export const InvoiceDelete = forwardRef(({ onClick, className }, ref) => {
   const userId = localStorage.getItem("id") || "";
   const staticPermissions = getStaticPermissions();
+
   if (!checkPermission(userId, "InvoiceDelete", staticPermissions)) {
     return null;
   }
 
   return (
     <Button
+      ref={ref}
       onClick={onClick}
       className={className}
       title="Invoice Delete"
@@ -121,7 +213,7 @@ export const InvoiceDelete = ({ onClick, className }) => {
       <Trash className="h-4 w-4 text-red-500" />
     </Button>
   );
-};
+});
 InvoiceDelete.page = "Invoice";
 ////////contract
 export const ContractCreate = ({ onClick, className }) => {
@@ -140,29 +232,96 @@ export const ContractCreate = ({ onClick, className }) => {
 };
 ContractCreate.page = "Contract";
 
-export const ContractEdit = ({ onClick, className }) => {
+// export const ContractEdit = ({ onClick, className }) => {
+//   const userId = localStorage.getItem("id") || "";
+//   const staticPermissions = getStaticPermissions();
+//   if (!checkPermission(userId, "ContractEdit", staticPermissions)) {
+//     return null;
+//   }
+
+//   return (
+//     <Button onClick={onClick} className={className} variant="ghost" size="icon">
+//       <Edit className="h-4 w-4 text-black" />
+//     </Button>
+//   );
+// };
+// ContractEdit.page = "Contract";
+// export const ContractView = ({ onClick, className }) => {
+//   const userId = localStorage.getItem("id") || "";
+//   const staticPermissions = getStaticPermissions();
+//   if (!checkPermission(userId, "ContractView", staticPermissions)) {
+//     return null;
+//   }
+
+//   return (
+//     <Button
+//       onClick={onClick}
+//       className={className}
+//       title="View"
+//       variant="ghost"
+//       size="icon"
+//     >
+//       <Eye className="h-4 w-4 text-black" />
+//     </Button>
+//   );
+// };
+// ContractView.page = "Contract";
+
+// export const ContractDelete = ({ onClick, className }) => {
+//   const userId = localStorage.getItem("id") || "";
+//   const staticPermissions = getStaticPermissions();
+//   if (!checkPermission(userId, "ContractDelete", staticPermissions)) {
+//     return null;
+//   }
+
+//   return (
+//     <Button
+//       onClick={onClick}
+//       className={className}
+//       title="Invoice Delete"
+//       variant="ghost"
+//       size="icon"
+//     >
+//       <Trash className="h-4 w-4 text-red-500" />
+//     </Button>
+//   );
+// };
+// ContractDelete.page = "Contract";
+// ===================== ContractEdit =====================
+export const ContractEdit = forwardRef(({ onClick, className }, ref) => {
   const userId = localStorage.getItem("id") || "";
   const staticPermissions = getStaticPermissions();
+
   if (!checkPermission(userId, "ContractEdit", staticPermissions)) {
     return null;
   }
 
   return (
-    <Button onClick={onClick} className={className} variant="ghost" size="icon">
+    <Button
+      ref={ref}
+      onClick={onClick}
+      className={className}
+      variant="ghost"
+      size="icon"
+    >
       <Edit className="h-4 w-4 text-black" />
     </Button>
   );
-};
+});
 ContractEdit.page = "Contract";
-export const ContractView = ({ onClick, className }) => {
+
+// ===================== ContractView =====================
+export const ContractView = forwardRef(({ onClick, className }, ref) => {
   const userId = localStorage.getItem("id") || "";
   const staticPermissions = getStaticPermissions();
+
   if (!checkPermission(userId, "ContractView", staticPermissions)) {
     return null;
   }
 
   return (
     <Button
+      ref={ref}
       onClick={onClick}
       className={className}
       title="View"
@@ -172,30 +331,32 @@ export const ContractView = ({ onClick, className }) => {
       <Eye className="h-4 w-4 text-black" />
     </Button>
   );
-};
+});
 ContractView.page = "Contract";
 
-export const ContractDelete = ({ onClick, className }) => {
+// ===================== ContractDelete =====================
+export const ContractDelete = forwardRef(({ onClick, className }, ref) => {
   const userId = localStorage.getItem("id") || "";
   const staticPermissions = getStaticPermissions();
+
   if (!checkPermission(userId, "ContractDelete", staticPermissions)) {
     return null;
   }
 
   return (
     <Button
+      ref={ref}
       onClick={onClick}
       className={className}
-      title="Invoice Delete"
+      title="Contract Delete"
       variant="ghost"
       size="icon"
     >
       <Trash className="h-4 w-4 text-red-500" />
     </Button>
   );
-};
+});
 ContractDelete.page = "Contract";
-
 ////////MASTER-BRANCH
 export const BranchCreate = ({ onClick, className }) => {
   const navigate = useNavigate();
@@ -213,20 +374,44 @@ export const BranchCreate = ({ onClick, className }) => {
 };
 BranchCreate.page = "Branch";
 
-export const BranchEdit = ({ onClick, className }) => {
+// export const BranchEdit = ({ onClick, className }) => {
+//   const userId = localStorage.getItem("id") || "";
+//   const staticPermissions = getStaticPermissions();
+//   if (!checkPermission(userId, "BranchEdit", staticPermissions)) {
+//     return null;
+//   }
+
+//   return (
+//     <Button onClick={onClick} className={className} variant="ghost" size="icon">
+//       <Edit className="h-4 w-4 text-black" />
+//     </Button>
+//   );
+// };
+// BranchEdit.page = "Branch";
+
+export const BranchEdit = forwardRef(({ onClick, className }, ref) => {
   const userId = localStorage.getItem("id") || "";
   const staticPermissions = getStaticPermissions();
+
   if (!checkPermission(userId, "BranchEdit", staticPermissions)) {
     return null;
   }
 
   return (
-    <Button onClick={onClick} className={className} variant="ghost" size="icon">
+    <Button
+      ref={ref}
+      onClick={onClick}
+      className={className}
+      variant="ghost"
+      size="icon"
+    >
       <Edit className="h-4 w-4 text-black" />
     </Button>
   );
-};
+});
+
 BranchEdit.page = "Branch";
+
 ////////MASTER-State
 export const StateCreate = ({ onClick, className }) => {
   const navigate = useNavigate();
@@ -275,19 +460,41 @@ export const BankCreate = ({ onClick, className }) => {
 };
 BankCreate.page = "Bank";
 
-export const BankEdit = ({ onClick, className }) => {
+// export const BankEdit = ({ onClick, className }) => {
+//   const userId = localStorage.getItem("id") || "";
+//   const staticPermissions = getStaticPermissions();
+//   if (!checkPermission(userId, "BankEdit", staticPermissions)) {
+//     return null;
+//   }
+
+//   return (
+//     <Button onClick={onClick} className={className} variant="ghost" size="icon">
+//       <Edit className="h-4 w-4 text-black" />
+//     </Button>
+//   );
+// };
+// BankEdit.page = "Bank";
+export const BankEdit = forwardRef(({ onClick, className }, ref) => {
   const userId = localStorage.getItem("id") || "";
   const staticPermissions = getStaticPermissions();
+
   if (!checkPermission(userId, "BankEdit", staticPermissions)) {
     return null;
   }
 
   return (
-    <Button onClick={onClick} className={className} variant="ghost" size="icon">
+    <Button
+      ref={ref}
+      onClick={onClick}
+      className={className}
+      variant="ghost"
+      size="icon"
+    >
       <Edit className="h-4 w-4 text-black" />
     </Button>
   );
-};
+});
+
 BankEdit.page = "Bank";
 ////////MASTER-Scheme
 export const SchemeCreate = ({ onClick, className }) => {
@@ -306,19 +513,41 @@ export const SchemeCreate = ({ onClick, className }) => {
 };
 SchemeCreate.page = "Scheme";
 
-export const SchemeEdit = ({ onClick, className }) => {
+// export const SchemeEdit = ({ onClick, className }) => {
+//   const userId = localStorage.getItem("id") || "";
+//   const staticPermissions = getStaticPermissions();
+//   if (!checkPermission(userId, "SchemeEdit", staticPermissions)) {
+//     return null;
+//   }
+
+//   return (
+//     <Button onClick={onClick} className={className} variant="ghost" size="icon">
+//       <Edit className="h-4 w-4 text-black" />
+//     </Button>
+//   );
+// };
+// SchemeEdit.page = "Scheme";
+export const SchemeEdit = forwardRef(({ onClick, className }, ref) => {
   const userId = localStorage.getItem("id") || "";
   const staticPermissions = getStaticPermissions();
+
   if (!checkPermission(userId, "SchemeEdit", staticPermissions)) {
     return null;
   }
 
   return (
-    <Button onClick={onClick} className={className} variant="ghost" size="icon">
+    <Button
+      ref={ref}
+      onClick={onClick}
+      className={className}
+      variant="ghost"
+      size="icon"
+    >
       <Edit className="h-4 w-4 text-black" />
     </Button>
   );
-};
+});
+
 SchemeEdit.page = "Scheme";
 ////////MASTER-Country
 export const CountryCreate = ({ onClick, className }) => {
@@ -337,19 +566,41 @@ export const CountryCreate = ({ onClick, className }) => {
 };
 CountryCreate.page = "Country";
 
-export const CountryEdit = ({ onClick, className }) => {
+// export const CountryEdit = ({ onClick, className }) => {
+//   const userId = localStorage.getItem("id") || "";
+//   const staticPermissions = getStaticPermissions();
+//   if (!checkPermission(userId, "CountryEdit", staticPermissions)) {
+//     return null;
+//   }
+
+//   return (
+//     <Button onClick={onClick} className={className} variant="ghost" size="icon">
+//       <Edit className="h-4 w-4 text-black" />
+//     </Button>
+//   );
+// };
+// CountryEdit.page = "Country";
+export const CountryEdit = forwardRef(({ onClick, className }, ref) => {
   const userId = localStorage.getItem("id") || "";
   const staticPermissions = getStaticPermissions();
+
   if (!checkPermission(userId, "CountryEdit", staticPermissions)) {
     return null;
   }
 
   return (
-    <Button onClick={onClick} className={className} variant="ghost" size="icon">
+    <Button
+      ref={ref}
+      onClick={onClick}
+      className={className}
+      variant="ghost"
+      size="icon"
+    >
       <Edit className="h-4 w-4 text-black" />
     </Button>
   );
-};
+});
+
 CountryEdit.page = "Country";
 ////////MASTER-Container Size
 export const ContainerSizeCreate = ({ onClick, className }) => {
@@ -1080,9 +1331,34 @@ export const PurchaseOrderCreate = ({ onClick, className }) => {
 };
 PurchaseOrderCreate.page = "Purchase Order";
 
-export const PurchaseOrderEdit = ({ onClick, className }) => {
+// export const PurchaseOrderEdit = ({ onClick, className }) => {
+//   const userId = localStorage.getItem("id") || "";
+//   const staticPermissions = getStaticPermissions();
+//   if (!checkPermission(userId, "PurchaseOrderEdit", staticPermissions)) {
+//     return null;
+//   }
+
+//   return (
+//     <Tooltip>
+//       <TooltipTrigger asChild>
+//         <Button
+//           onClick={onClick}
+//           className={className}
+//           variant="ghost"
+//           size="icon"
+//         >
+//           <Edit className="h-4 w-4 text-black" />
+//         </Button>
+//       </TooltipTrigger>
+//       <TooltipContent>Edit Purchase Order</TooltipContent>
+//     </Tooltip>
+//   );
+// };
+// PurchaseOrderEdit.page = "Purchase Order";
+export const PurchaseOrderEdit = forwardRef(({ onClick, className }, ref) => {
   const userId = localStorage.getItem("id") || "";
   const staticPermissions = getStaticPermissions();
+
   if (!checkPermission(userId, "PurchaseOrderEdit", staticPermissions)) {
     return null;
   }
@@ -1091,6 +1367,7 @@ export const PurchaseOrderEdit = ({ onClick, className }) => {
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
+          ref={ref}
           onClick={onClick}
           className={className}
           variant="ghost"
@@ -1102,9 +1379,8 @@ export const PurchaseOrderEdit = ({ onClick, className }) => {
       <TooltipContent>Edit Purchase Order</TooltipContent>
     </Tooltip>
   );
-};
+});
 PurchaseOrderEdit.page = "Purchase Order";
-
 export const PurchaseOrderView = ({ onClick, className }) => {
   const userId = localStorage.getItem("id") || "";
   const staticPermissions = getStaticPermissions();
@@ -1328,7 +1604,36 @@ export const ProcessingDelete = ({ onClick, className }) => {
   );
 };
 ProcessingDelete.page = "Processing";
+//DutyDrawBackPending
+export const DutyDrawBackPendingEdit = ({ onClick, className }) => {
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "DutyDrawBackPendingEdit", staticPermissions)) {
+    return null;
+  }
 
+  return (
+    <Button onClick={onClick} className={className} variant="ghost" size="icon">
+      <Edit className="h-4 w-4 text-black" />
+    </Button>
+  );
+};
+DutyDrawBackPendingEdit.page = "Pending";
+//DutyDrawBackReceived
+export const DutyDrawBackReceivedEdit = ({ onClick, className }) => {
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "DutyDrawBackReceivedEdit", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button onClick={onClick} className={className} variant="ghost" size="icon">
+      <Edit className="h-4 w-4 text-black" />
+    </Button>
+  );
+};
+DutyDrawBackReceivedEdit.page = "Received";
 export default {
   InvoiceCreate,
   InvoiceEdit,
@@ -1406,4 +1711,6 @@ export default {
   ProcessingCreate,
   ProcessingEdit,
   ProcessingDelete,
+  DutyDrawBackPendingEdit,
+  DutyDrawBackReceivedEdit,
 };
