@@ -299,7 +299,7 @@ const StockView = () => {
                   (sum, stock) => sum + Number(stock.openpurch_qnty || 0),
                   0
                 )}
-                ({" "}
+                (
                 {stockData?.reduce(
                   (sum, stock) => sum + Number(stock.openpurch_bag || 0),
                   0
@@ -311,7 +311,7 @@ const StockView = () => {
                   (sum, stock) => sum + Number(stock.purch_qnty || 0),
                   0
                 )}
-                ({" "}
+                (
                 {stockData?.reduce(
                   (sum, stock) => sum + Number(stock.purch_bag || 0),
                   0
@@ -323,7 +323,7 @@ const StockView = () => {
                   (sum, stock) => sum + Number(stock.production_qnty || 0),
                   0
                 )}
-                ({" "}
+                (
                 {stockData?.reduce(
                   (sum, stock) => sum + Number(stock.production_bag || 0),
                   0
@@ -335,7 +335,7 @@ const StockView = () => {
                   (sum, stock) => sum + Number(stock.processing_qnty || 0),
                   0
                 )}
-                ({" "}
+                (
                 {stockData?.reduce(
                   (sum, stock) => sum + Number(stock.processing_bag || 0),
                   0
@@ -367,7 +367,7 @@ const StockView = () => {
                     ),
                   0
                 )}
-                ({" "}
+                (
                 {stockData?.reduce(
                   (sum, stock) =>
                     sum +
@@ -382,7 +382,7 @@ const StockView = () => {
                 )}
                 Bags)
               </td>
-            </tr>{" "}
+            </tr>
           </tfoot>
         </table>
       </div>

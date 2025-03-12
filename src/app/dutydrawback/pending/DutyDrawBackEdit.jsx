@@ -26,8 +26,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ButtonConfig } from "@/config/ButtonConfig";
-import { DutyDrawBackPendingEdit } from "@/components/buttonIndex/ButtonComponents";
-const EditState = ({ stateId }) => {
+import {
+  DutyDrawBackPendingEdit,
+  DutyDrawBackReceivedEdit,
+} from "@/components/buttonIndex/ButtonComponents";
+import { useLocation } from "react-router-dom";
+const DutyDrawBackEdit = ({ pendingId }) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -35,35 +39,40 @@ const EditState = ({ stateId }) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
-    state_no: "",
-    state_status: "Active",
+    invoice_dd_scroll_no: "",
+    invoice_dd_date: "",
+    invoice_dd_status: "",
   });
   const [originalData, setOriginalData] = useState(null);
+  const location = useLocation();
+  const isReceived = location.pathname == "/dutydrawback/received";
+  const displayName = isReceived ? "Received" : "Pending";
 
-  // Fetch state data
-  const fetchStateData = async () => {
+  const fetchPendingData = async () => {
     setIsFetching(true);
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `${BASE_URL}/api/panel-fetch-state-by-id/${stateId}`,
+        `${BASE_URL}/api/panel-fetch-invoice-by-id/${pendingId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      const stateData = response?.data?.state;
+      const pendingData = response?.data?.invoice;
       setFormData({
-        state_no: stateData.state_no || "",
-        state_status: stateData.state_status || "Active",
+        invoice_dd_scroll_no: pendingData.invoice_dd_scroll_no || "",
+        invoice_dd_date: pendingData.invoice_dd_date || "",
+        invoice_dd_status: pendingData.invoice_dd_status || "",
       });
       setOriginalData({
-        state_no: stateData.state_no || "",
-        state_status: stateData.state_status || "Active",
+        invoice_dd_scroll_no: pendingData.invoice_dd_scroll_no || "",
+        invoice_dd_date: pendingData.invoice_dd_date || "",
+        invoice_dd_status: pendingData.invoice_dd_status || "",
       });
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to fetch state data",
+        description: "Failed to fetch pending data",
         variant: "destructive",
       });
       setOpen(false);
@@ -74,16 +83,15 @@ const EditState = ({ stateId }) => {
 
   useEffect(() => {
     if (open) {
-      fetchStateData();
+      fetchPendingData();
     }
   }, [open]);
 
-  // Handle form submission
   const handleSubmit = async () => {
-    if (!formData.state_no.trim()) {
+    if (!formData.invoice_dd_status.trim()) {
       toast({
         title: "Error",
-        description: "State number is required",
+        description: "Invoice DD Status is required",
         variant: "destructive",
       });
       return;
@@ -93,32 +101,34 @@ const EditState = ({ stateId }) => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.put(
-        `${BASE_URL}/api/panel-update-state/${stateId}`,
+        `${BASE_URL}/api/panel-update-duty-drawback/${pendingId}`,
         formData,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      if (response?.data.code == 200) {
+      if (response?.data?.code === 200) {
         toast({
           title: "Success",
           description: response.data.msg,
         });
 
-        await queryClient.invalidateQueries(["customers"]);
+        await queryClient.invalidateQueries(["pending"]);
         setOpen(false);
       } else {
         toast({
           title: "Error",
-          description: response.data.msg,
+          description: response.data.msg || "Something went wrong!",
           variant: "destructive",
         });
       }
     } catch (error) {
+      console.error("API Error:", error.response); // Debug API error response
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to update state",
+        description:
+          error.response?.data?.message || `Failed to update  ${displayName}`,
         variant: "destructive",
       });
     } finally {
@@ -129,36 +139,38 @@ const EditState = ({ stateId }) => {
   // Check if there are changes
   const hasChanges =
     originalData &&
-    (formData.state_no !== originalData.state_no ||
-      formData.state_status !== originalData.state_status);
+    (formData.invoice_dd_scroll_no !== originalData.invoice_dd_scroll_no ||
+      formData.invoice_dd_date !== originalData.invoice_dd_date ||
+      formData.invoice_dd_status !== originalData.invoice_dd_status);
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
             <PopoverTrigger asChild>
-              {/* <Button
-                 variant="ghost"
-                 size="icon"
-                 className={`transition-all duration-200 ${isHovered ? 'bg-blue-50' : ''}`}
-                 onMouseEnter={() => setIsHovered(true)}
-                 onMouseLeave={() => setIsHovered(false)}
-               >
-                 <Edit className={`h-4 w-4 transition-all duration-200 ${isHovered ? 'text-blue-500' : ''}`} />
-               </Button> */}
               <div>
-                <DutyDrawBackPendingEdit
-                  className={`transition-all duration-200 ${
-                    isHovered ? "bg-blue-50" : ""
-                  }`}
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
-                ></DutyDrawBackPendingEdit>
+                {displayName === "Pending" ? (
+                  <DutyDrawBackPendingEdit
+                    className={`transition-all duration-200 ${
+                      isHovered ? "bg-blue-50" : ""
+                    }`}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                  />
+                ) : (
+                  <DutyDrawBackReceivedEdit
+                    className={`transition-all duration-200 ${
+                      isHovered ? "bg-blue-50" : ""
+                    }`}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                  />
+                )}
               </div>
             </PopoverTrigger>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Edit State</p>
+            <p>Edit {displayName}</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -170,38 +182,43 @@ const EditState = ({ stateId }) => {
         ) : (
           <div className="grid gap-4">
             <div className="space-y-2">
-              <h4 className="font-medium leading-none">Edit State</h4>
+              <h4 className="font-medium leading-none">Edit {displayName}</h4>
               <p className="text-sm text-muted-foreground">
-                Update state details
+                Update {displayName} details
               </p>
             </div>
             <div className="grid gap-2">
               <div className="grid gap-1">
-                <label htmlFor="state_no" className="text-sm font-medium">
-                  State Number
+                <label
+                  htmlFor="invoice_dd_scroll_no"
+                  className="text-sm font-medium"
+                >
+                  Scrool Number
                 </label>
                 <div className="relative">
                   <Input
-                    id="state_no"
-                    placeholder="Enter state number"
-                    value={formData.state_no}
+                    id="invoice_dd_scroll_no"
+                    placeholder="Enter scroll number"
+                    value={formData.invoice_dd_scroll_no}
                     onChange={(e) =>
                       setFormData((prev) => ({
                         ...prev,
-                        state_no: e.target.value,
+                        invoice_dd_scroll_no: e.target.value,
                       }))
                     }
                     className={hasChanges ? "pr-8 border-blue-200" : ""}
                   />
                   {hasChanges &&
-                    formData.state_no !== originalData.state_no && (
+                    formData.invoice_dd_scroll_no !==
+                      originalData.invoice_dd_scroll_no && (
                       <div className="absolute right-2 top-1/2 -translate-y-1/2">
                         <RefreshCcw
                           className="h-4 w-4 text-blue-500 cursor-pointer hover:rotate-180 transition-all duration-300"
                           onClick={() =>
                             setFormData((prev) => ({
                               ...prev,
-                              state_no: originalData.state_no,
+                              invoice_dd_scroll_no:
+                                originalData.invoice_dd_scroll_no,
                             }))
                           }
                         />
@@ -210,13 +227,57 @@ const EditState = ({ stateId }) => {
                 </div>
               </div>
               <div className="grid gap-1">
-                <label htmlFor="state_status" className="text-sm font-medium">
+                <label
+                  htmlFor="invoice_dd_date"
+                  className="text-sm font-medium"
+                >
+                  DD Date
+                </label>
+                <div className="relative">
+                  <Input
+                    type="date"
+                    id="invoice_dd_date"
+                    placeholder="Enter date"
+                    value={formData.invoice_dd_date}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        invoice_dd_date: e.target.value,
+                      }))
+                    }
+                    className={hasChanges ? "pr-8 border-blue-200" : ""}
+                  />
+                  {hasChanges &&
+                    formData.invoice_dd_date !==
+                      originalData.invoice_dd_date && (
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                        <RefreshCcw
+                          className="h-4 w-4 text-blue-500 cursor-pointer hover:rotate-180 transition-all duration-300"
+                          onClick={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              invoice_dd_date: originalData.invoice_dd_date,
+                            }))
+                          }
+                        />
+                      </div>
+                    )}
+                </div>
+              </div>
+              <div className="grid gap-1">
+                <label
+                  htmlFor="invoice_dd_status"
+                  className="text-sm font-medium"
+                >
                   Status
                 </label>
                 <Select
-                  value={formData.state_status}
+                  value={formData.invoice_dd_status}
                   onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, state_status: value }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      invoice_dd_status: value,
+                    }))
                   }
                 >
                   <SelectTrigger
@@ -225,16 +286,16 @@ const EditState = ({ stateId }) => {
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Active">
+                    <SelectItem value="Pending">
                       <div className="flex items-center">
                         <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />
-                        Active
+                        Pending
                       </div>
                     </SelectItem>
-                    <SelectItem value="Inactive">
+                    <SelectItem value="Received">
                       <div className="flex items-center">
                         <div className="w-2 h-2 rounded-full bg-gray-400 mr-2" />
-                        Inactive
+                        Received
                       </div>
                     </SelectItem>
                   </SelectContent>
@@ -265,7 +326,7 @@ const EditState = ({ stateId }) => {
                     Updating...
                   </>
                 ) : (
-                  "Update State"
+                  `Update  ${displayName}`
                 )}
                 {hasChanges && !isLoading && (
                   <div className="absolute inset-0 bg-blue-500/10 animate-pulse" />
@@ -279,4 +340,4 @@ const EditState = ({ stateId }) => {
   );
 };
 
-export default EditState;
+export default DutyDrawBackEdit;

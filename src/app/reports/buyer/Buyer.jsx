@@ -190,7 +190,6 @@ const Buyer = () => {
             </thead>
             <tbody>
               {buyerData.map((buyer, index) => (
-                <>
                   <tr key={index} className="hover:bg-gray-50">
                     <td className="border border-black px-2 py-2 ">
                       {buyer.buyer_sort}
@@ -214,7 +213,6 @@ const Buyer = () => {
                       {buyer.buyer_status}
                     </td>
                   </tr>
-                </>
               ))}
             </tbody>
           </table>

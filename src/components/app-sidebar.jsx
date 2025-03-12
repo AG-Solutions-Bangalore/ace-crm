@@ -209,11 +209,7 @@ export function AppSidebar({ ...props }) {
         icon: NotebookText,
         isActive: false,
       },
-      // {
-      //   title: "Purchase Order",
-      //   url: "/purchase-order",
-      //   icon: Map,
-      // },
+
       {
         title: "Purchase",
         url: "#",
@@ -267,6 +263,22 @@ export function AppSidebar({ ...props }) {
         ],
       },
       {
+        title: "Duty DrawBack",
+        url: "#",
+        icon: ReceiptText,
+        isActive: false,
+        items: [
+          {
+            title: "Pending",
+            url: "/dutydrawback/pending",
+          },
+          {
+            title: "Received",
+            url: "/dutydrawback/received",
+          },
+        ],
+      },
+      {
         title: "Reports",
         url: "#",
         icon: ReceiptText,
@@ -300,30 +312,6 @@ export function AppSidebar({ ...props }) {
       },
     ],
 
-    // projects: [
-    //   {
-    //     name: "Dashboard",
-    //     url: "/home",
-    //     icon: Frame,
-    //   },
-
-    //   {
-    //     name: "Contract",
-    //     url: "/contract",
-    //     icon: Map,
-    //   },
-    //   {
-    //     name: "Invoice",
-    //     url: "/invoice",
-    //     icon: Map,
-    //   },
-    //   {
-    //     name: "Purchase Order",
-    //     url: "/purchase-order",
-    //     icon: Map,
-    //   },
-
-    // ],
     userManagement: [
       {
         name: "User Management",
@@ -391,4 +379,3 @@ export function AppSidebar({ ...props }) {
     </Sidebar>
   );
 }
-

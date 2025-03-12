@@ -129,7 +129,7 @@ const MarketProcessing = () => {
       accessorKey: "mpro_date",
       header: "Date",
       cell: ({ row }) => {
-        const date = row.getValue("purchase_product_date");
+        const date = row.getValue("mpro_date");
         return moment(date).format("DD-MMM-YYYY");
       },
     },
@@ -243,8 +243,8 @@ const MarketProcessing = () => {
     <Page>
       <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
-          Processing List
-        </div>
+          Processing Liste
+        </div> 
         {/* searching and column filter  */}
         <div className="flex items-center py-4">
           <div className="relative w-72">

@@ -99,12 +99,9 @@ const SalesAccountForm = () => {
     },
   });
 
-  // Create sales account mutation
   const createSalesAccountMutation = useMutation({
     mutationFn: createContract,
-    // onSuccess: (data) => {
-    //   navigate("/report/sales-account-report", { state: { reportData: data } });
-    // },
+
     onSuccess: (data) => {
       navigate("/report/sales-account-report", {
         state: {
@@ -262,15 +259,22 @@ const SalesAccountForm = () => {
                       <SelectValue placeholder="Select Branch" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
-                      {branchData?.branch?.map((branch, index) => {
-                        // Create a unique key using both name and index
-
-                        return (
-                          <SelectItem key={index} value={branch.branch_name}>
-                            {branch.branch_name}
-                          </SelectItem>
-                        );
-                      })}
+                      {/* {branchData?.branch?.map((branch, index) => (
+                        <SelectItem
+                          key={`${branch.branch_name}-${index}`} // Ensures uniqueness
+                          value={branch.branch_name}
+                        >
+                          {branch.branch_name}
+                        </SelectItem>
+                      ))} */}
+                      {branchData?.branch?.map((branch, index) => (
+                        <SelectItem
+                          key={`${branch.branch_name}-${index}`} // Adding index ensures uniqueness
+                          value={branch.branch_name}
+                        >
+                          {branch.branch_name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>

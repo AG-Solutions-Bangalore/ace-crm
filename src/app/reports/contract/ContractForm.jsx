@@ -91,17 +91,7 @@ const ContractForm = () => {
       [field]: value,
     }));
   };
-  // const handleInputChange1 = (field, valueOrEvent) => {
-  //   const value =
-  //     typeof valueOrEvent === "object" && valueOrEvent.target
-  //       ? valueOrEvent.target.value
-  //       : valueOrEvent;
 
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     [field]: value,
-  //   }));
-  // };
   const fetchCompanys = async () => {
     const token = localStorage.getItem("token");
     if (!token) throw new Error("No authentication token found");
@@ -324,11 +314,8 @@ const ContractForm = () => {
                     </SelectTrigger>
                     <SelectContent className="bg-white">
                       <SelectContent>
-                        {branchData?.branch?.map((branch) => (
-                          <SelectItem
-                            key={branch.branch_short}
-                            value={branch.branch_short}
-                          >
+                        {branchData?.branch?.map((branch, index) => (
+                          <SelectItem key={index} value={branch.branch_short}>
                             {branch.branch_short}
                           </SelectItem>
                         ))}
@@ -355,11 +342,8 @@ const ContractForm = () => {
                       <SelectValue placeholder="Select buyer" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
-                      {buyerData?.buyer?.map((buyer) => (
-                        <SelectItem
-                          key={buyer.buyer_name}
-                          value={buyer.buyer_name}
-                        >
+                      {buyerData?.buyer?.map((buyer, index) => (
+                        <SelectItem key={index} value={buyer.buyer_name}>
                           {buyer.buyer_name}
                         </SelectItem>
                       ))}
@@ -384,11 +368,8 @@ const ContractForm = () => {
                       <SelectValue placeholder="Select Consignee" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
-                      {buyerData?.buyer?.map((buyer) => (
-                        <SelectItem
-                          key={buyer.buyer_name}
-                          value={buyer.buyer_name}
-                        >
+                      {buyerData?.buyer?.map((buyer, index) => (
+                        <SelectItem key={index} value={buyer.buyer_name}>
                           {buyer.buyer_name}
                         </SelectItem>
                       ))}
@@ -413,9 +394,9 @@ const ContractForm = () => {
                     </SelectTrigger>
                     <SelectContent className="bg-white">
                       {containerSizeData?.containerSize?.map(
-                        (containerSize) => (
+                        (containerSize, index) => (
                           <SelectItem
-                            key={containerSize.containerSize}
+                            key={index}
                             value={containerSize.containerSize}
                           >
                             {containerSize.containerSize}
@@ -442,11 +423,8 @@ const ContractForm = () => {
                       <SelectValue placeholder="Select Product" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
-                      {productData?.product?.map((product) => (
-                        <SelectItem
-                          key={product.product_name}
-                          value={product.product_name}
-                        >
+                      {productData?.product?.map((product, index) => (
+                        <SelectItem key={index} value={product.product_name}>
                           {product.product_name}
                         </SelectItem>
                       ))}
