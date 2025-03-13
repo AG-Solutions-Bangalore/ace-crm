@@ -297,6 +297,10 @@ export function AppSidebar({ ...props }) {
             url: "/report/sales-account-form",
           },
           {
+            title: "DutyDrawBack",
+            url: "/report/duty-drawback",
+          },
+          {
             title: "Sales Summary",
             url: "/report/sales-data-form",
           },

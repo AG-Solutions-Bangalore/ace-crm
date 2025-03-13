@@ -1196,6 +1196,39 @@ export const SalesAccountView = ({ onClick, className }) => {
   );
 };
 SalesAccountView.page = "Sales Accounts";
+
+////////REPORT-"DutuDrawBack"
+
+export const DutyDrawBackDownload = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "DutyDrawBackDownload", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      <Download className="h-4 w-4" /> Download
+    </Button>
+  );
+};
+DutyDrawBackDownload.page = "DutyDrawBack";
+export const DutyDrawBackView = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "DutyDrawBackView", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      Open Report
+    </Button>
+  );
+};
+DutyDrawBackView.page = "DutyDrawBack";
 ////////REPORT-"Sales Data"
 
 export const SalesDataDownload = ({ onClick, className }) => {
@@ -1691,7 +1724,10 @@ export default {
   ContractRDownload,
   ContractRView,
   SalesAccountDownload,
+
   SalesAccountView,
+  DutyDrawBackDownload,
+  DutyDrawBackView,
   SalesDataDownload,
   SalesDataView,
   PurchaseSummaryDownload,

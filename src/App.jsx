@@ -43,9 +43,6 @@ import CreatePage from "./app/userManagement/CreatePage";
 import ManagementDashboard from "./app/userManagement/ManagementDashboard";
 import UserPage from "./app/userManagement/UserPage";
 import UserTypeList from "./app/UserType/UserTypeList";
-// import PaymentView from "./app/payment/PaymentView";
-// import PaymentList from "./app/payment/PaymentList";
-// import CreatePayment from "./app/payment/CreatePayment";
 import PurchaseProductList from "./app/master/purchaseProduct/PurchaseProductList";
 import CreateVendor from "./app/master/vendor/CreateVendor";
 import VendorEdit from "./app/master/vendor/VendorEdit";
@@ -91,6 +88,8 @@ import DutyDrawBackPending from "./app/dutydrawback/pending/DutyDrawBackPending"
 import DutyDrawBackReceived from "./app/dutydrawback/received/DutyDrawBackReceived";
 import EditUserType from "./app/UserType/EditUserType";
 import DisableRightClick from "./components/DisableRightClick/DisableRightClick";
+import DrawBackForm from "./app/reports/drawBack/DrawBackForm";
+import DrawBackReport from "./app/reports/drawBack/DrawBackReport";
 
 function App() {
   const navigate = useNavigate();
@@ -311,6 +310,9 @@ function App() {
           path="/report/product-stock/view"
           element={<ProductStockView />}
         />
+        {/* //drawback */}
+        <Route path="/report/duty-drawback" element={<DrawBackForm />} />
+        <Route path="/report/duty-drawback/view" element={<DrawBackReport />} />
 
         {/* //payment */}
         <Route path="/payment-payment-list" element={<PaymentList />} />
