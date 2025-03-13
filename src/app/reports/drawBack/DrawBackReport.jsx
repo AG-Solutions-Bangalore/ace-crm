@@ -10,14 +10,14 @@ import BASE_URL from "@/config/BaseUrl";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 
-const SalesAccountReport = () => {
+const DrawBackReport = () => {
   const { toast } = useToast();
   const location = useLocation();
   const containerRef = useRef();
   const reportData = location.state?.reportData;
   const formData = location.state?.formData;
   console.log(formData);
-  if (!reportData || !reportData.sales_account) {
+  if (!reportData || !reportData.drawback) {
     return (
       <Page>
         <p>No data available</p>
@@ -25,22 +25,24 @@ const SalesAccountReport = () => {
     );
   }
 
-  const groupedData = reportData.sales_account.reduce((acc, item) => {
+  const groupedData = reportData.drawback.reduce((acc, item) => {
     acc[item.branch_name] = acc[item.branch_name] || [];
     acc[item.branch_name].push(item);
     return acc;
   }, {});
 
-  const overallTotals = reportData.sales_account.reduce(
+  const overallTotals = reportData.drawback.reduce(
     (totals, item) => {
-      totals.usd += Number(item.invoice_i_value_usd || 0);
+      totals.usd += Number(item.invoice_i_value_usd || 0); // Remove .toFixed(2) here
       totals.inr += Number(item.invoice_i_value_inr || 0);
       totals.fob += Number(item.invoice_fob_usd || 0);
       totals.inrs += Number(item.invoice_fob_inr || 0);
-
+      totals.meis += Number(item.meis || 0);
+      totals.drawback += Number(item.drawback || 0);
+      totals.stax += Number(item.stax || 0);
       return totals;
     },
-    { usd: 0, inr: 0, fob: 0, inrs: 0 }
+    { usd: 0, inr: 0, fob: 0, meis: 0, drawback: 0, stax: 0, inrs: 0 }
   );
 
   const handlPrintPdf = useReactToPrint({
@@ -76,7 +78,7 @@ const SalesAccountReport = () => {
 
     try {
       const response = await axios({
-        url: `${BASE_URL}/api/panel-download-sales-accounts-report`,
+        url: `${BASE_URL}/api/panel-download-drawback-report`,
         method: "POST",
         data: formData,
         headers: {
@@ -88,7 +90,7 @@ const SalesAccountReport = () => {
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", "sales_account.csv");
+      link.setAttribute("download", "dutydrawback_account.csv");
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -96,7 +98,7 @@ const SalesAccountReport = () => {
 
       toast({
         title: "Success",
-        description: "Sales Account downloaded successfully",
+        description: "Dutydrawback Account downloaded successfully",
       });
     } catch (error) {
       toast({
@@ -110,7 +112,7 @@ const SalesAccountReport = () => {
     <Page>
       <div ref={containerRef} className="md:overflow-x-auto">
         <div className="flex justify-between   items-center p-2 rounded-lg mb-5 bg-gray-200 ">
-          <h1 className="text-xl font-bold">Sales Account Summary</h1>
+          <h1 className="text-xl font-bold">RODTEP/ROSCTL</h1>
           <div className="flex flex-row items-center gap-4 font-bold">
             <span className="mr-2">
               {" "}
@@ -138,11 +140,12 @@ const SalesAccountReport = () => {
               className="mb-6 border-t mt-6  border-l border-r border-black text-[10px]"
             >
               <h2 className="p-2 bg-gray-200 font-bold ">{branchName}</h2>
+
               <div
                 className="grid bg-white"
                 style={{
                   gridTemplateColumns:
-                    "minmax(30px, auto) minmax(150px, auto) minmax(110px, auto) minmax(90px, auto) minmax(60px, auto) minmax(100px, auto) minmax(110px, auto) minmax(110px, auto) minmax(70px, auto) minmax(100px, auto) ",
+                    "minmax(30px, auto) minmax(90px, auto) minmax(90px, auto)   minmax(120px, auto) minmax(80px, auto) minmax(70px, auto) minmax(80px, auto) minmax(70px, auto) minmax(100px, auto) minmax(50px, auto) minmax(50px, auto) minmax(50px, auto) minmax(50px, auto)",
                 }}
               >
                 {/* Header */}
@@ -158,14 +161,19 @@ const SalesAccountReport = () => {
                   "FOB USD",
 
                   "FOB INR",
+                  "MEIS",
+                  "Drawback",
+                  "S.Tax",
                 ].map((header, idx) => (
                   <div
                     key={idx}
                     className="p-2 font-bold border-b border-r border-t border-black text-gray-900 text-center"
+                    style={{ whiteSpace: "nowrap" }}
                   >
                     {header}
                   </div>
                 ))}
+
                 {/* Data Rows */}
                 {invoices.map((item, index) => (
                   <React.Fragment key={index}>
@@ -182,32 +190,41 @@ const SalesAccountReport = () => {
                       {item.invoice_bl_no}
                     </div>
                     <div className="p-2 border-b border-r border-black">
-                      {/* {item.invoice_bl_date} */}
                       {moment(item.invoice_bl_date).format("DD-MM-YYYY")}
                     </div>
                     <div className="p-2 border-b border-r border-black">
                       {item.invoice_product}
                     </div>
                     <div className="p-2 border-b border-r border-black text-right">
-                      {item.invoice_i_value_usd}
+                      {Number(item.invoice_i_value_usd || 0).toFixed(2)}
                     </div>
                     <div className="p-2 border-b border-r border-black text-right">
-                      {item.invoice_i_value_inr}
+                      {Number(item.invoice_i_value_inr || 0).toFixed(2)}
                     </div>
                     <div className="p-2 border-b border-r border-black text-right">
-                      {item.invoice_fob_usd}
+                      {Number(item.invoice_fob_usd || 0).toFixed(2)}
+                    </div>
+                    <div className="p-2 border-b border-r border-black text-right">
+                      {Number(item.invoice_fob_inr || 0).toFixed(2)}
+                    </div>
+                    <div className="p-2 border-b border-r border-black text-right">
+                      {Number(item.meis || 0).toFixed(2)}
+                    </div>
+                    <div className="p-2 border-b border-r border-black text-right">
+                      {Number(item.drawback || 0).toFixed(2)}
                     </div>
                     <div className="p-2 border-b  border-black text-right">
-                      {item.invoice_fob_inr}
+                      {Number(item.stax || 0).toFixed(2)}
                     </div>
                   </React.Fragment>
                 ))}
+
                 {/* Branch Wise Total */}
-                <div className="p-2 border-b  border-black font-bold"></div>
+                <div className="p-2 border-b border-black font-bold"></div>
                 <div className="p-2 border-b border-black"></div>
                 <div className="p-2 border-b border-black"></div>
-                <div className="p-2 border-b  border-black"></div>
-                <div className="p-2 border-b  border-black"></div>
+                <div className="p-2 border-b border-black"></div>
+                <div className="p-2 border-b border-black"></div>
                 <div className="p-2 border-b border-r border-black font-bold">
                   Sub Total
                 </div>
@@ -237,12 +254,28 @@ const SalesAccountReport = () => {
                     )
                     .toFixed(2)}
                 </div>
-                <div className="p-2 border-b  font-bold border-black text-right">
+
+                <div className="p-2 border-b border-r font-bold border-black text-right">
                   {invoices
                     .reduce(
                       (sum, item) => sum + Number(item.invoice_fob_inr || 0),
                       0
                     )
+                    .toFixed(2)}
+                </div>
+                <div className="p-2 border-b border-r font-bold border-black text-right">
+                  {invoices
+                    .reduce((sum, item) => sum + Number(item.meis || 0), 0)
+                    .toFixed(2)}
+                </div>
+                <div className="p-2 border-b border-r font-bold border-black text-right">
+                  {invoices
+                    .reduce((sum, item) => sum + Number(item.drawback || 0), 0)
+                    .toFixed(2)}
+                </div>
+                <div className="p-2 border-b  font-bold border-black text-right">
+                  {invoices
+                    .reduce((sum, item) => sum + Number(item.stax || 0), 0)
                     .toFixed(2)}
                 </div>
               </div>
@@ -253,7 +286,7 @@ const SalesAccountReport = () => {
             className="grid bg-gray-100 border-t border-l border-r border-black font-bold text-[10px]"
             style={{
               gridTemplateColumns:
-                "minmax(110px, auto) minmax(150px, auto) minmax(150px, auto) minmax(90px, auto) minmax(60px, auto) minmax(100px, auto) minmax(110px, auto) minmax(110px, auto) minmax(70px, auto) minmax(80px, auto) ",
+                "minmax(110px, auto) minmax(110px, auto) minmax(100px, auto)   minmax(120px, auto) minmax(80px, auto) minmax(70px, auto) minmax(80px, auto) minmax(70px, auto) minmax(100px, auto) minmax(50px, auto) minmax(50px, auto) minmax(50px, auto) minmax(50px, auto)",
             }}
           >
             <div className="p-2 border-b  border-black"></div>
@@ -268,13 +301,23 @@ const SalesAccountReport = () => {
               {overallTotals.usd.toFixed(2)}
             </div>
             <div className="p-2 border-b border-r border-black text-right">
+              {/* {(overallTotals.inr || 0).toFixed(2)} */}
               {overallTotals.inr.toFixed(2)}
             </div>
             <div className="p-2 border-b border-r border-black text-right">
               {overallTotals.fob.toFixed(2)}
             </div>
-            <div className="p-2 border-b  border-black text-right">
+            <div className="p-2 border-b border-r border-black text-right">
               {overallTotals.inrs.toFixed(2)}
+            </div>
+            <div className="p-2 border-b border-r border-black text-right">
+              {overallTotals.meis.toFixed(2)}
+            </div>
+            <div className="p-2 border-b border-r border-black text-right">
+              {overallTotals.drawback.toFixed(2)}
+            </div>
+            <div className="p-2 border-b border-black text-right">
+              {overallTotals.stax.toFixed(2)}
             </div>
           </div>
         </div>
@@ -283,4 +326,4 @@ const SalesAccountReport = () => {
   );
 };
 
-export default SalesAccountReport;
+export default DrawBackReport;
