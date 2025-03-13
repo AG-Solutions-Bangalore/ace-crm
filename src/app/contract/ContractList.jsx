@@ -66,6 +66,7 @@ import {
   ContractEdit,
   ContractView,
 } from "@/components/buttonIndex/ButtonComponents";
+import { encryptId } from "@/utils/encyrption/Encyrption";
 const ContractList = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteContractId, setDeleteContractId] = useState(null);
@@ -189,20 +190,6 @@ const ContractList = () => {
 
         return (
           <div className="flex flex-row">
-            {/* <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => navigate(`/tesview-contract/${contractId}`)}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Test View Contract</TooltipContent>
-              </Tooltip>
-            </TooltipProvider> */}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -214,7 +201,14 @@ const ContractList = () => {
                     <Eye className="h-4 w-4" />
                   </Button> */}
                   <ContractView
-                    onClick={() => navigate(`/view-contract/${contractId}`)}
+                    // onClick={() => navigate(`/view-contract/${contractId}`)}
+                    onClick={() => {
+                      const encryptedId = encryptId(contractId);
+
+                      navigate(
+                        `/view-contract/${encodeURIComponent(encryptedId)}`
+                      );
+                    }}
                   ></ContractView>
                 </TooltipTrigger>
                 <TooltipContent>View Contract</TooltipContent>
@@ -232,7 +226,14 @@ const ContractList = () => {
                     <Edit className="h-4 w-4" />
                   </Button> */}
                   <ContractEdit
-                    onClick={() => navigate(`/edit-contract/${contractId}`)}
+                    // onClick={() => navigate(`/edit-contract/${contractId}`)}
+                    onClick={() => {
+                      const encryptedId = encryptId(contractId);
+
+                      navigate(
+                        `/edit-contract/${encodeURIComponent(encryptedId)}`
+                      );
+                    }}
                   ></ContractEdit>
                 </TooltipTrigger>
                 <TooltipContent>Edit Contract</TooltipContent>

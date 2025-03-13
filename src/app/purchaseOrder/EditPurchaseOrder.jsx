@@ -57,14 +57,15 @@ import {
   useFetchVendor,
 } from "@/hooks/useApi";
 import gsap from "gsap";
+import { decryptId } from "@/utils/encyrption/Encyrption";
 
 // Validation Schemas
-const updatePurchaseOrder = async ({ id, data }) => {
+const updatePurchaseOrder = async ({ decryptedId, data }) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
 
   const response = await fetch(
-    `${BASE_URL}/api/panel-update-purchase-product/${id}`,
+    `${BASE_URL}/api/panel-update-purchase-product/${decryptedId}`,
     {
       method: "PUT",
       headers: {
@@ -256,6 +257,8 @@ const MemoizedProductSelect = React.memo(
 );
 const EditPurchaseOrder = () => {
   const { id } = useParams();
+  const decryptedId = decryptId(id);
+
   const { toast } = useToast();
   const navigate = useNavigate();
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -291,11 +294,11 @@ const EditPurchaseOrder = () => {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["purchaseProduct", id],
+    queryKey: ["purchaseProduct", decryptedId],
     queryFn: async () => {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${BASE_URL}/api/panel-fetch-purchase-product-by-id/${id}`,
+        `${BASE_URL}/api/panel-fetch-purchase-product-by-id/${decryptedId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -409,21 +412,6 @@ const EditPurchaseOrder = () => {
         [field]: value,
       }));
 
-      //   if (field === "branch_short") {
-      //     const selectedCompanySort = branchData?.branch?.find(
-      //       (branch) => branch.branch_short === value
-      //     );
-      //     if (selectedCompanySort) {
-      //       const productRef = `${selectedCompanySort.branch_name_short}/${selectedCompanySort.branch_state_short}/${formData?.purchase_product_no}/${formData.purchase_product_year}`;
-      //       setFormData((prev) => ({
-      //         ...prev,
-      //         branch_name: selectedCompanySort.branch_name,
-      //         branch_address: selectedCompanySort.branch_address,
-      //         purchase_product_ref: productRef,
-      //       }));
-      //     }
-      //   }
-
       if (field === "purchase_product_seller") {
         const selectedSeller = vendorData?.vendor?.find(
           (vendor) => vendor.vendor_name === value
@@ -450,19 +438,6 @@ const EditPurchaseOrder = () => {
           }));
         }
       }
-
-      //   if (field === "purchase_product_no") {
-      //     const selectedCompanySort = branchData?.branch?.find(
-      //       (branch) => branch.branch_short === formData.branch_short
-      //     );
-      //     if (selectedCompanySort) {
-      //       const productRef = `${selectedCompanySort.branch_name_short}/${selectedCompanySort.branch_state_short}/${value}/${formData.purchase_product_year}`;
-      //       setFormData((prev) => ({
-      //         ...prev,
-      //         purchase_product_ref: productRef,
-      //       }));
-      //     }
-      //   }
     },
     [formData.purchase_product_year]
   );
@@ -639,7 +614,7 @@ const EditPurchaseOrder = () => {
         ...formData,
         purchase_product_data: processedPurchaseData,
       };
-      updatePOMutation.mutate({ id, data: updateData });
+      updatePOMutation.mutate({ decryptedId, data: updateData });
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {

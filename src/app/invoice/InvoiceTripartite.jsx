@@ -8,10 +8,13 @@ import { useParams } from "react-router-dom";
 import BASE_URL from "@/config/BaseUrl";
 import { FaRegFileWord } from "react-icons/fa";
 import moment from "moment";
+import { decryptId } from "@/utils/encyrption/Encyrption";
 
 const InvoiceTripartite = () => {
   const containerRef = useRef();
   const { id } = useParams();
+  const decryptedId = decryptId(id);
+
   const [spiceBoard, setSpiceBoard] = useState(null);
   const [invoiceSubData, setInvoiceSubData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +25,7 @@ const InvoiceTripartite = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${id}`,
+          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${decryptedId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -45,7 +48,7 @@ const InvoiceTripartite = () => {
     };
 
     fetchContractData();
-  }, [id]);
+  }, [decryptedId]);
 
   const handlPrintPdf = useReactToPrint({
     content: () => containerRef.current,
@@ -119,7 +122,7 @@ const InvoiceTripartite = () => {
       </Card>
     );
   }
-  
+
   if (error) {
     return (
       <Card className="w-full">
@@ -134,17 +137,17 @@ const InvoiceTripartite = () => {
   return (
     <div>
       <div>
-              <button
-                onClick={handleSaveAsWord}
-                className="fixed top-5 right-24 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
-              >
-                <FaRegFileWord className="w-4 h-4" />
-              </button>
-      <button
+        <button
+          onClick={handleSaveAsWord}
+          className="fixed top-5 right-24 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
+        >
+          <FaRegFileWord className="w-4 h-4" />
+        </button>
+        <button
           onClick={handlPrintPdf}
           className="fixed top-5 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
         >
-         <Printer className="h-4 w-4"/>
+          <Printer className="h-4 w-4" />
         </button>
       </div>
       <div ref={containerRef} className="max-w-4xl mx-auto p-6 bg-white  ">
@@ -161,12 +164,13 @@ const InvoiceTripartite = () => {
           </p>
         </div>
 
-        
         <div className="mt-3 flex flex-row items-start gap-7 ">
           <p className="text-sm font-bold ">FIRST PARTY : </p>
           <div>
-          <p className=" text-sm font-bold">{spiceBoard?.branch_name}</p>
-          <p className="text-sm font-bold w-60">{spiceBoard?.branch_address}</p>
+            <p className=" text-sm font-bold">{spiceBoard?.branch_name}</p>
+            <p className="text-sm font-bold w-60">
+              {spiceBoard?.branch_address}
+            </p>
           </div>
         </div>
 
@@ -176,10 +180,11 @@ const InvoiceTripartite = () => {
         <div className="mt-3 flex flex-row items-start gap-[0.6rem] ">
           <p className="text-sm font-bold ">SECOND PARTY : </p>
           <div>
-          <p className=" text-sm font-bold">{spiceBoard?.invoice_buyer}</p>
-          <p className="text-sm font-bold w-60">{spiceBoard?.invoice_buyer_add}</p>
+            <p className=" text-sm font-bold">{spiceBoard?.invoice_buyer}</p>
+            <p className="text-sm font-bold w-60">
+              {spiceBoard?.invoice_buyer_add}
+            </p>
           </div>
-         
         </div>
         <div>
           <p className="text-sm text-center">And</p>
@@ -338,7 +343,7 @@ const InvoiceTripartite = () => {
         <div className="mt-6 text-sm">
           <p>
             <span>Date:</span>
-            <span>   {moment(getTodayDate()).format("DD-MMM-YYYY")}</span>
+            <span> {moment(getTodayDate()).format("DD-MMM-YYYY")}</span>
           </p>
           <p>
             <span>Place:</span>

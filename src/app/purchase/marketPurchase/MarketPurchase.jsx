@@ -50,6 +50,7 @@ import {
   PurchaseCreate,
   PurchaseEdit,
 } from "@/components/buttonIndex/ButtonComponents";
+import { encryptId } from "@/utils/encyrption/Encyrption";
 const MarketPurchase = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteContractId, setDeleteContractId] = useState(null);
@@ -143,7 +144,14 @@ const MarketPurchase = () => {
         return (
           <div className="flex flex-row">
             <PurchaseEdit
-              onClick={() => navigate(`/edit-market-order/${purchaseId}`)}
+              // onClick={() => navigate(`/edit-market-order/${purchaseId}`)}
+              onClick={() => {
+                const encryptedId = encryptId(purchaseId);
+
+                navigate(
+                  `/edit-market-order/${encodeURIComponent(encryptedId)}`
+                );
+              }}
             >
               <Edit className="h-4 w-4" />
             </PurchaseEdit>

@@ -9,10 +9,13 @@ import BASE_URL from "@/config/BaseUrl";
 import moment from "moment";
 
 import { FaRegFileWord } from "react-icons/fa";
+import { decryptId } from "@/utils/encyrption/Encyrption";
 const InvoiceCertificateOrigin = () => {
   const containerRef = useRef();
 
   const { id } = useParams();
+  const decryptedId = decryptId(id);
+
   const [spiceBoard, setSpiceBoard] = useState(null);
   const [invoiceSubData, setInvoiceSubData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,7 +26,7 @@ const InvoiceCertificateOrigin = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${id}`,
+          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${decryptedId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -46,7 +49,7 @@ const InvoiceCertificateOrigin = () => {
     };
 
     fetchContractData();
-  }, [id]);
+  }, [decryptedId]);
 
   const handlPrintPdf = useReactToPrint({
     content: () => containerRef.current,

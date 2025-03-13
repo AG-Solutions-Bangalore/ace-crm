@@ -1,24 +1,5 @@
 import Page from "@/app/dashboard/page";
-import React, {
-  useEffect,
-  useState,
-  useMemo,
-  useCallback,
-  useRef,
-} from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { z } from "zod";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table";
+import { ProgressBar } from "@/components/spinner/ProgressBar";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,44 +10,52 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
-  PlusCircle,
-  MinusCircle,
-  ChevronDown,
-  Trash2,
-  ChevronUp,
-  FileText,
-  Package,
-  TestTubes,
-  Truck,
-  Clock,
-} from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate, useParams } from "react-router-dom";
-import { getTodayDate } from "@/utils/currentDate";
-import { ProgressBar } from "@/components/spinner/ProgressBar";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import BASE_URL from "@/config/BaseUrl";
-import { Textarea } from "@/components/ui/textarea";
-import Select from "react-select";
-import { useCurrentYear } from "@/hooks/useCurrentYear";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { useToast } from "@/hooks/use-toast";
 import {
   useFetchCompanys,
   useFetchDispatchDcNo,
   useFetchGoDown,
-  useFetchProductNos,
   useFetchPurchaseProduct,
   useFetchVendor,
 } from "@/hooks/useApi";
+import { decryptId } from "@/utils/encyrption/Encyrption";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import gsap from "gsap";
+import {
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  MinusCircle,
+  Package,
+  PlusCircle,
+  TestTubes,
+  Trash2,
+} from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import Select from "react-select";
+import { z } from "zod";
 
 // Validation Schemas
-const updateDispatchOrder = async ({ id, data }) => {
+const updateDispatchOrder = async ({ decryptedId, data }) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
 
   const response = await fetch(
-    `${BASE_URL}/api/panel-update-market-dispatch/${id}`,
+    `${BASE_URL}/api/panel-update-market-dispatch/${decryptedId}`,
     {
       method: "PUT",
       headers: {
@@ -259,6 +248,8 @@ const MemoizedProductSelect = React.memo(
 
 const EditMarketDispatch = () => {
   const { id } = useParams();
+  const decryptedId = decryptId(id);
+
   const { toast } = useToast();
   const navigate = useNavigate();
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -283,11 +274,11 @@ const EditMarketDispatch = () => {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["marketDispatch", id],
+    queryKey: ["marketDispatch", decryptedId],
     queryFn: async () => {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${BASE_URL}/api/panel-fetch-market-dispatch-by-id/${id}`,
+        `${BASE_URL}/api/panel-fetch-market-dispatch-by-id/${decryptedId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -507,7 +498,7 @@ const EditMarketDispatch = () => {
         ...formData,
         dispatch_data: processedPurchaseData,
       };
-      updateDispatchMutation.mutate({ id, data: updateData });
+      updateDispatchMutation.mutate({ decryptedId, data: updateData });
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {

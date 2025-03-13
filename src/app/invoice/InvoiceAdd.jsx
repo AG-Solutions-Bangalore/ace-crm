@@ -438,8 +438,8 @@ const InvoiceAdd = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [submitLoading, setSubmitLoading] = useState(false);
-    const [saveAndViewLoading, setSaveAndViewLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [saveAndViewLoading, setSaveAndViewLoading] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
   const [invoiceData, setInvoiceData] = useState([
     {
@@ -870,8 +870,7 @@ const InvoiceAdd = () => {
     invoice_discharge: "Discharge",
     invoice_cif: "CIF",
     invoice_destination_country: "Destination Country",
-    invoice_payment_terms: "Payment Terms",
-    invoice_remarks: "Remarks",
+
     invoice_consig_bank: "Consig Bank",
     invoice_consig_bank_address: "Consig Bank Address",
     invoice_prereceipts: "Pre-Receipts",
@@ -907,7 +906,7 @@ const InvoiceAdd = () => {
         ...formData,
         invoice_data: processedContractData,
       });
-      const res = await   createInvoiceMutation.mutateAsync(validatedData);
+      const res = await createInvoiceMutation.mutateAsync(validatedData);
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {
@@ -948,7 +947,7 @@ const InvoiceAdd = () => {
         description: "An unexpected error occurred",
         variant: "destructive",
       });
-    }finally {
+    } finally {
       setSubmitLoading(false);
     }
   };
@@ -956,29 +955,25 @@ const InvoiceAdd = () => {
     e.preventDefault();
     setSaveAndViewLoading(true);
     try {
-    
-        const processedContractData = invoiceData.map((row) => ({
-            ...row,
-            invoiceSub_item_bag: parseFloat(row.invoiceSub_item_bag),
-            invoiceSub_qntyInMt: parseFloat(row.invoiceSub_qntyInMt),
-            invoiceSub_rateMT: parseFloat(row.invoiceSub_rateMT),
-            invoiceSub_packing: parseFloat(row.invoiceSub_packing),
-            invoiceSub_bagsize: parseFloat(row.invoiceSub_bagsize),
-          }));
-      
-          const validatedData = contractFormSchema.parse({
-            ...formData,
-            invoice_data: processedContractData,
-          });
-    
+      const processedContractData = invoiceData.map((row) => ({
+        ...row,
+        invoiceSub_item_bag: parseFloat(row.invoiceSub_item_bag),
+        invoiceSub_qntyInMt: parseFloat(row.invoiceSub_qntyInMt),
+        invoiceSub_rateMT: parseFloat(row.invoiceSub_rateMT),
+        invoiceSub_packing: parseFloat(row.invoiceSub_packing),
+        invoiceSub_bagsize: parseFloat(row.invoiceSub_bagsize),
+      }));
+
+      const validatedData = contractFormSchema.parse({
+        ...formData,
+        invoice_data: processedContractData,
+      });
+
       const response = await createInvoiceMutation.mutateAsync(validatedData);
 
-  
       if (response.code == 200) {
-      
         navigate(`/view-invoice/${response.latestid}`);
       } else {
-        
         toast({
           title: "Error",
           description: response.msg,
@@ -986,41 +981,40 @@ const InvoiceAdd = () => {
         });
       }
     } catch (error) {
-     if (error instanceof z.ZodError) {
-            const groupedErrors = error.errors.reduce((acc, err) => {
-              const field = err.path.join(".");
-              if (!acc[field]) {
-                acc[field] = [];
-              }
-              acc[field].push(err.message);
-              return acc;
-            }, {});
-    
-            const errorMessages = Object.entries(groupedErrors).map(
-              ([field, messages]) => {
-                const fieldKey = field.split(".").pop();
-                const label = fieldLabels[fieldKey] || field;
-                return `${label}: ${messages.join(", ")}`;
-              }
-            );
-    
-            toast({
-              title: "Validation Error",
-              description: (
-                <div>
-                  <ul className="list-disc pl-5">
-                    {errorMessages.map((message, index) => (
-                      <li key={index}>{message}</li>
-                    ))}
-                  </ul>
-                </div>
-              ),
-              variant: "destructive",
-            });
-            return;
+      if (error instanceof z.ZodError) {
+        const groupedErrors = error.errors.reduce((acc, err) => {
+          const field = err.path.join(".");
+          if (!acc[field]) {
+            acc[field] = [];
           }
-    
-    
+          acc[field].push(err.message);
+          return acc;
+        }, {});
+
+        const errorMessages = Object.entries(groupedErrors).map(
+          ([field, messages]) => {
+            const fieldKey = field.split(".").pop();
+            const label = fieldLabels[fieldKey] || field;
+            return `${label}: ${messages.join(", ")}`;
+          }
+        );
+
+        toast({
+          title: "Validation Error",
+          description: (
+            <div>
+              <ul className="list-disc pl-5">
+                {errorMessages.map((message, index) => (
+                  <li key={index}>{message}</li>
+                ))}
+              </ul>
+            </div>
+          ),
+          variant: "destructive",
+        });
+        return;
+      }
+
       toast({
         title: "Error",
         description: error.message,
@@ -1196,8 +1190,12 @@ const InvoiceAdd = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between`}
                   >
-                     <span>Buyer <span className="text-red-500">*</span></span>
-                     <span><CreateBuyer/></span>
+                    <span>
+                      Buyer <span className="text-red-500">*</span>
+                    </span>
+                    <span>
+                      <CreateBuyer />
+                    </span>
                   </label>
 
                   <MemoizedSelect
@@ -1218,8 +1216,13 @@ const InvoiceAdd = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between `}
                   >
-                    <span>  Consignee <span className="text-red-500">*</span></span>
-                    <span><CreateBuyer/></span>
+                    <span>
+                      {" "}
+                      Consignee <span className="text-red-500">*</span>
+                    </span>
+                    <span>
+                      <CreateBuyer />
+                    </span>
                   </label>
                   <MemoizedSelect
                     value={formData.invoice_consignee}
@@ -1259,8 +1262,12 @@ const InvoiceAdd = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between`}
                   >
-                     <span>Product <span className="text-red-500">*</span></span>
-                     <span><CreateProduct/></span>
+                    <span>
+                      Product <span className="text-red-500">*</span>
+                    </span>
+                    <span>
+                      <CreateProduct />
+                    </span>
                   </label>
                   <MemoizedSelect
                     value={formData.invoice_product}
@@ -1341,8 +1348,13 @@ const InvoiceAdd = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between`}
                   >
-                       <span>  Port of Loading <span className="text-red-500">*</span></span>
-                       <span><CreatePortofLoading/></span>
+                    <span>
+                      {" "}
+                      Port of Loading <span className="text-red-500">*</span>
+                    </span>
+                    <span>
+                      <CreatePortofLoading />
+                    </span>
                   </label>
                   <MemoizedSelect
                     value={formData.invoice_loading}
@@ -1364,8 +1376,13 @@ const InvoiceAdd = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between`}
                   >
-                     <span>  Destination Port <span className="text-red-500">*</span></span>
-                     <span><CreateCountry/></span>
+                    <span>
+                      {" "}
+                      Destination Port <span className="text-red-500">*</span>
+                    </span>
+                    <span>
+                      <CreateCountry />
+                    </span>
                   </label>
                   <MemoizedSelect
                     value={formData.invoice_destination_port}
@@ -1425,8 +1442,13 @@ const InvoiceAdd = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between`}
                   >
-                       <span> Dest. Country <span className="text-red-500">*</span></span>
-                       <span><CreateCountry/></span>
+                    <span>
+                      {" "}
+                      Dest. Country <span className="text-red-500">*</span>
+                    </span>
+                    <span>
+                      <CreateCountry />
+                    </span>
                   </label>
                   <MemoizedSelect
                     value={formData.invoice_destination_country}
@@ -1559,8 +1581,10 @@ const InvoiceAdd = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between`}
                   >
-                   <span>Payment Terms</span>
-                   <span><CreatePaymentTermC/></span>
+                    <span>Payment Terms</span>
+                    <span>
+                      <CreatePaymentTermC />
+                    </span>
                   </label>
                   <MemoizedSelect
                     value={formData.invoice_payment_terms}
@@ -1602,8 +1626,12 @@ const InvoiceAdd = () => {
               <div className="flex justify-between items-center mb-4">
                 <div className="flex flex-row items-center gap-8">
                   <h2 className="text-xl font-semibold">Products</h2>
-                  <span ><CreateItem/></span>
-                  <span><CreateDescriptionGoods/></span>
+                  <span>
+                    <CreateItem />
+                  </span>
+                  <span>
+                    <CreateDescriptionGoods />
+                  </span>
                 </div>
               </div>
 
@@ -1849,9 +1877,7 @@ const InvoiceAdd = () => {
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
             disabled={submitLoading}
           >
-            {submitLoading 
-              ? "Creating..."
-              : "Create & Exit"}
+            {submitLoading ? "Creating..." : "Create & Exit"}
           </Button>
           <Button
             type="button"

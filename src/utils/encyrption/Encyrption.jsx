@@ -1,32 +1,29 @@
-import CryptoJS from 'crypto-js';
+import CryptoJS from "crypto-js";
 
+const secretKey = import.meta.env.VITE_SECRET_KEY;
 
-const ENCRYPTION_KEY = import.meta.env.VITE_SECRET_KEY;
-
+if (!secretKey) {
+  console.error("Secret key is not defined in .env");
+}
 
 export const encryptId = (id) => {
-    try {
-        return encodeURIComponent(
-            CryptoJS.AES.encrypt(
-                id.toString(),
-                ENCRYPTION_KEY
-            ).toString()
-        );
-    } catch (error) {
-        console.error("Error encrypting ID:", error);
-        return null;
-    }
+  if (!id) {
+    console.error("ID is missing");
+    return "";
+  }
+  return CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
 };
 
 export const decryptId = (encryptedId) => {
-    try {
-        const bytes = CryptoJS.AES.decrypt(
-            decodeURIComponent(encryptedId), 
-            ENCRYPTION_KEY
-        );
-        return bytes.toString(CryptoJS.enc.Utf8);
-    } catch (error) {
-        console.error("Error decrypting ID:", error);
-        return null;
+  try {
+    if (!encryptedId) {
+      console.error("Encrypted ID is missing");
+      return "";
     }
+    const bytes = CryptoJS.AES.decrypt(encryptedId, secretKey);
+    return bytes.toString(CryptoJS.enc.Utf8);
+  } catch (error) {
+    console.error("Decryption Error:", error);
+    return "";
+  }
 };

@@ -62,6 +62,7 @@ import {
   useFetchStatus,
 } from "@/hooks/useApi";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { decryptId, encryptId } from "@/utils/encyrption/Encyrption";
 
 // API functions
 
@@ -187,18 +188,21 @@ const fetchProductCustomDescription = async (value) => {
   return response.json();
 };
 
-const updateInvoice = async ({ id, data }) => {
+const updateInvoice = async ({ decryptedId, data }) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
 
-  const response = await fetch(`${BASE_URL}/api/panel-update-invoice/${id}`, {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+  const response = await fetch(
+    `${BASE_URL}/api/panel-update-invoice/${decryptedId}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
 
   if (!response.ok) throw new Error("Failed to update contract");
   return response.json();
@@ -381,6 +385,8 @@ const MemoizedProductSelect = React.memo(
 );
 const InvoiceEdit = () => {
   const { id } = useParams();
+  const decryptedId = decryptId(id);
+
   const { toast } = useToast();
   const navigate = useNavigate();
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -429,11 +435,11 @@ const InvoiceEdit = () => {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["invoicess", id],
+    queryKey: ["invoicess", decryptedId],
     queryFn: async () => {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${BASE_URL}/api/panel-fetch-invoice-by-id/${id}`,
+        `${BASE_URL}/api/panel-fetch-invoice-by-id/${decryptedId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -887,7 +893,7 @@ const InvoiceEdit = () => {
         invoice_data: processedContractData,
       };
       const res = await updateInvoiceMutation.mutateAsync({
-        id,
+        decryptedId,
         data: updateData,
       });
     } catch (error) {
@@ -938,31 +944,32 @@ const InvoiceEdit = () => {
     e.preventDefault();
     setSaveAndViewLoading(true);
     try {
-    
-        const processedContractData = invoiceData.map((row) => ({
-            ...row,
-            invoiceSub_item_bag: parseFloat(row.invoiceSub_item_bag),
-            invoiceSub_qntyInMt: parseFloat(row.invoiceSub_qntyInMt),
-            invoiceSub_rateMT: parseFloat(row.invoiceSub_rateMT),
-            invoiceSub_packing: parseFloat(row.invoiceSub_packing),
-            invoiceSub_bagsize: parseFloat(row.invoiceSub_bagsize),
-          }));
-     
-      
+      const processedContractData = invoiceData.map((row) => ({
+        ...row,
+        invoiceSub_item_bag: parseFloat(row.invoiceSub_item_bag),
+        invoiceSub_qntyInMt: parseFloat(row.invoiceSub_qntyInMt),
+        invoiceSub_rateMT: parseFloat(row.invoiceSub_rateMT),
+        invoiceSub_packing: parseFloat(row.invoiceSub_packing),
+        invoiceSub_bagsize: parseFloat(row.invoiceSub_bagsize),
+      }));
+
       const updateData = {
         ...formData,
         invoice_data: processedContractData,
       };
 
-    
-      const response = await updateInvoiceMutation.mutateAsync({ id, data: updateData });
+      const response = await updateInvoiceMutation.mutateAsync({
+        decryptedId,
+        data: updateData,
+      });
 
-  
       if (response.code == 200) {
-      
-        navigate(`/view-invoice/${id}`);
+        // navigate(`/view-invoice/${decryptedId}`);
+
+        const encryptedId = encryptId(decryptedId);
+
+        navigate(`/view-invoice/${encodeURIComponent(encryptedId)}`);
       } else {
-        
         toast({
           title: "Error",
           description: response.msg,
@@ -970,40 +977,40 @@ const InvoiceEdit = () => {
         });
       }
     } catch (error) {
-    if (error instanceof z.ZodError) {
-            const groupedErrors = error.errors.reduce((acc, err) => {
-              const field = err.path.join(".");
-              if (!acc[field]) {
-                acc[field] = [];
-              }
-              acc[field].push(err.message);
-              return acc;
-            }, {});
-    
-            const errorMessages = Object.entries(groupedErrors).map(
-              ([field, messages]) => {
-                const fieldKey = field.split(".").pop();
-                const label = fieldLabels[fieldKey] || field;
-                return `${label}: ${messages.join(", ")}`;
-              }
-            );
-    
-            toast({
-              title: "Validation Error",
-              description: (
-                <div>
-                  <ul className="list-disc pl-5">
-                    {errorMessages.map((message, index) => (
-                      <li key={index}>{message}</li>
-                    ))}
-                  </ul>
-                </div>
-              ),
-              variant: "destructive",
-            });
-            return;
+      if (error instanceof z.ZodError) {
+        const groupedErrors = error.errors.reduce((acc, err) => {
+          const field = err.path.join(".");
+          if (!acc[field]) {
+            acc[field] = [];
           }
-    
+          acc[field].push(err.message);
+          return acc;
+        }, {});
+
+        const errorMessages = Object.entries(groupedErrors).map(
+          ([field, messages]) => {
+            const fieldKey = field.split(".").pop();
+            const label = fieldLabels[fieldKey] || field;
+            return `${label}: ${messages.join(", ")}`;
+          }
+        );
+
+        toast({
+          title: "Validation Error",
+          description: (
+            <div>
+              <ul className="list-disc pl-5">
+                {errorMessages.map((message, index) => (
+                  <li key={index}>{message}</li>
+                ))}
+              </ul>
+            </div>
+          ),
+          variant: "destructive",
+        });
+        return;
+      }
+
       toast({
         title: "Error",
         description: error.message,

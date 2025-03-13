@@ -25,10 +25,10 @@ import {
 
 // Validation Schema
 const branchFormSchema = z.object({
-  branch_short: z.string().min(1, "Branch short name is required"),
-  branch_name: z.string().min(1, "Branch name is required"),
-  branch_name_short: z.string().min(1, "Branch short name is required"),
-  branch_address: z.string().min(1, "Branch address is required"),
+  branch_short: z.string().min(1, "Company short name is required"),
+  branch_name: z.string().min(1, "Company name is required"),
+  branch_name_short: z.string().min(1, "Company short name is required"),
+  branch_address: z.string().min(1, "Company address is required"),
   branch_spice_board: z.string().optional(),
   branch_iec: z.string().min(1, "IEC code is required"),
   branch_apeda: z.string().optional(),
@@ -56,9 +56,9 @@ const BranchHeader = ({ progress }) => {
       className={`flex sticky top-0 z-10 border border-gray-200 rounded-lg justify-between items-start gap-8 mb-2 ${ButtonConfig.cardheaderColor} p-4 shadow-sm`}
     >
       <div className="flex-1">
-        <h1 className="text-3xl font-bold text-gray-800">Create Branch</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Create Company</h1>
         <p className="text-gray-600 mt-2">
-          Add a new branch to your organization
+          Add a new company to your organization
         </p>
       </div>
 
@@ -101,7 +101,7 @@ const createBranch = async (data) => {
     body: JSON.stringify(data),
   });
 
-  if (!response.ok) throw new Error("Failed to create branch");
+  if (!response.ok) throw new Error("Failed to create Company");
   return response.json();
 };
 
@@ -233,13 +233,13 @@ const CreateBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Branch Address <span className="text-red-500">*</span>
+                  Company Address <span className="text-red-500">*</span>
                 </label>
                 <Textarea
                   className="bg-white"
                   value={formData.branch_address}
                   onChange={(e) => handleInputChange(e, "branch_address")}
-                  placeholder="Enter branch address"
+                  placeholder="Enter company address"
                   rows={5}
                 />
               </div>
@@ -247,26 +247,26 @@ const CreateBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Branch Name <span className="text-red-500">*</span>
+                  Company Name <span className="text-red-500">*</span>
                 </label>
                 <Input
                   className="bg-white"
                   value={formData.branch_name}
                   onChange={(e) => handleInputChange(e, "branch_name")}
-                  placeholder="Enter branch name"
+                  placeholder="Enter company name"
                 />
               </div>
               <div>
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Branch Short <span className="text-red-500">*</span>
+                  Company Short <span className="text-red-500">*</span>
                 </label>
                 <Input
                   className="bg-white"
                   value={formData.branch_short}
                   onChange={(e) => handleInputChange(e, "branch_short")}
-                  placeholder="Enter branch short "
+                  placeholder="Enter company short "
                 />
               </div>
 
@@ -274,13 +274,13 @@ const CreateBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Branch Prefix <span className="text-red-500">*</span>
+                  Company Prefix <span className="text-red-500">*</span>
                 </label>
                 <Input
                   className="bg-white"
                   value={formData.branch_name_short}
                   onChange={(e) => handleInputChange(e, "branch_name_short")}
-                  placeholder="Enter branch prefix"
+                  placeholder="Enter company prefix"
                 />
               </div>
 
@@ -561,34 +561,6 @@ const CreateBranch = () => {
                   placeholder="Enter signatory No 2"
                 />
               </div>
-
-              {/* <div>
-                <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                >
-                  Signatory Name 2
-                </label>
-                <Input
-                  className="bg-white"
-                  value={formData.branch_sign_name2}
-                  onChange={(e) => handleInputChange(e, "branch_sign_name2")}
-                  placeholder="Enter signatory Name 2"
-                />
-              </div>
-
-              <div>
-                <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                >
-                  Signatory No 2
-                </label>
-                <Input
-                  className="bg-white"
-                  value={formData.branch_sign_no2}
-                  onChange={(e) => handleInputChange(e, "branch_sign_no2")}
-                  placeholder="Enter signatory No 2"
-                />
-              </div> */}
             </div>
           </CardContent>
         </Card>
@@ -601,7 +573,7 @@ const CreateBranch = () => {
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
             disabled={createBranchMutation.isPending}
           >
-            {createBranchMutation.isPending ? "Submitting..." : "Create Branch"}
+            {createBranchMutation.isPending ? "Submitting..." : "Create Company"}
           </Button>
         </div>
       </form>

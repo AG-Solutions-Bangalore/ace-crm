@@ -61,22 +61,26 @@ import {
 } from "@/hooks/useApi";
 import Page from "../dashboard/page";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { decryptId, encryptId } from "@/utils/encyrption/Encyrption";
 
 // Validation Schemas
 
 // Update Contract
-const updateContract = async ({ id, data }) => {
+const updateContract = async ({ decryptedId, data }) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
 
-  const response = await fetch(`${BASE_URL}/api/panel-update-contract/${id}`, {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+  const response = await fetch(
+    `${BASE_URL}/api/panel-update-contract/${decryptedId}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
 
   if (!response.ok) throw new Error("Failed to update contract");
   return response.json();
@@ -260,11 +264,12 @@ const MemoizedProductSelect = React.memo(
 
 const EditContract = () => {
   const { id } = useParams();
+  const decryptedId = decryptId(id);
   const { toast } = useToast();
   const navigate = useNavigate();
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-    const [submitLoading, setSubmitLoading] = useState(false);
-    const [saveAndViewLoading, setSaveAndViewLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [saveAndViewLoading, setSaveAndViewLoading] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
   const [formData, setFormData] = useState({
     branch_short: "",
@@ -303,11 +308,11 @@ const EditContract = () => {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["contract", id],
+    queryKey: ["contract", decryptedId],
     queryFn: async () => {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${BASE_URL}/api/panel-fetch-contract-by-id/${id}`,
+        `${BASE_URL}/api/panel-fetch-contract-by-id/${decryptedId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -659,7 +664,6 @@ const EditContract = () => {
     e.preventDefault();
     setSubmitLoading(true);
     try {
-      
       const processedContractData = contractData.map((row) => ({
         ...row,
         contractSub_item_bag: parseFloat(row.contractSub_item_bag),
@@ -668,12 +672,15 @@ const EditContract = () => {
         contractSub_packing: parseFloat(row.contractSub_packing),
         contractSub_bagsize: parseFloat(row.contractSub_bagsize),
       }));
-     
+
       const updateData = {
         ...formData,
         contract_data: processedContractData,
       };
-     const res = await updateContractMutation.mutateAsync({ id, data: updateData });
+      const res = await updateContractMutation.mutateAsync({
+        decryptedId,
+        data: updateData,
+      });
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {
@@ -712,15 +719,14 @@ const EditContract = () => {
         description: "An unexpected error occurred",
         variant: "destructive",
       });
-    }finally{
-      setSubmitLoading(false)
+    } finally {
+      setSubmitLoading(false);
     }
   };
   const handleSaveAndView = async (e) => {
     e.preventDefault();
     setSaveAndViewLoading(true);
     try {
-    
       const processedContractData = contractData.map((row) => ({
         ...row,
         contractSub_item_bag: parseFloat(row.contractSub_item_bag),
@@ -729,22 +735,29 @@ const EditContract = () => {
         contractSub_packing: parseFloat(row.contractSub_packing),
         contractSub_bagsize: parseFloat(row.contractSub_bagsize),
       }));
-     
-      
+
       const updateData = {
         ...formData,
         contract_data: processedContractData,
       };
 
-    
-      const response = await updateContractMutation.mutateAsync({ id, data: updateData });
+      const response = await updateContractMutation.mutateAsync({
+        decryptedId,
+        data: updateData,
+      });
 
-  
       if (response.code == 200) {
-      
-        navigate(`/view-contract/${id}`);
+        // const encryptedId = encryptId(id);
+
+        // navigate(
+        //   `/master/driver-edit/${encodeURIComponent(encryptedId)}`
+        // );
+        // navigate(`/view-contract/${decryptedId}`);
+
+        const encryptedId = encryptId(decryptedId);
+
+        navigate(`/view-contract/${encodeURIComponent(encryptedId)}`);
       } else {
-        
         toast({
           title: "Error",
           description: response.msg,
@@ -1560,19 +1573,15 @@ const EditContract = () => {
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
             disabled={submitLoading}
           >
-            {submitLoading
-              ? "Updating..."
-              : "Update & Exit"}
+            {submitLoading ? "Updating..." : "Update & Exit"}
           </Button>
           <Button
-            type="button" 
-            onClick={handleSaveAndView} 
+            type="button"
+            onClick={handleSaveAndView}
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
             disabled={saveAndViewLoading}
           >
-            {saveAndViewLoading
-              ? "Updating..."
-              : "Update & Print"}
+            {saveAndViewLoading ? "Updating..." : "Update & Print"}
           </Button>
         </div>
       </form>

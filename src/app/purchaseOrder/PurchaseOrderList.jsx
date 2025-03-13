@@ -65,6 +65,7 @@ import {
   PurchaseOrderEdit,
   PurchaseOrderView,
 } from "@/components/buttonIndex/ButtonComponents";
+import { encryptId } from "@/utils/encyrption/Encyrption";
 const PurchaseOrderList = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteContractId, setDeleteContractId] = useState(null);
@@ -176,7 +177,15 @@ const PurchaseOrderList = () => {
         return (
           <div className="flex flex-row">
             <PurchaseOrderView
-              onClick={() => navigate(`/view-purchase-order/${purchaseId}`)}
+              // onClick={() => navigate(`/view-purchase-order/${purchaseId}`)}
+
+              onClick={() => {
+                const encryptedId = encryptId(purchaseId);
+
+                navigate(
+                  `/view-purchase-order/${encodeURIComponent(encryptedId)}`
+                );
+              }}
             ></PurchaseOrderView>
             {/* <button onClick={() => navigate(`/test-view/${purchaseId}`)}>
               View
@@ -185,9 +194,18 @@ const PurchaseOrderList = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <PurchaseOrderEdit
-                    onClick={() =>
-                      navigate(`/edit-purchase-order/${purchaseId}`)
-                    }
+                    // onClick={() =>
+                    //   navigate(`/edit-purchase-order/${purchaseId}`)
+                    // }
+                    onClick={() => {
+                      const encryptedId = encryptId(purchaseId);
+
+                      navigate(
+                        `/edit-purchase-order/${encodeURIComponent(
+                          encryptedId
+                        )}`
+                      );
+                    }}
                   ></PurchaseOrderEdit>
                 </TooltipTrigger>
                 <TooltipContent>Edit Purchase</TooltipContent>

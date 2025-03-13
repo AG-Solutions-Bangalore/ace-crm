@@ -68,6 +68,7 @@ import {
   InvoiceEdit,
   InvoiceView,
 } from "@/components/buttonIndex/ButtonComponents";
+import { encryptId } from "@/utils/encyrption/Encyrption";
 const InvoiceList = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteInoice, setDeleteInoiceid] = useState(null);
@@ -203,7 +204,15 @@ const InvoiceList = () => {
                   </Button> */}
 
                   <InvoiceView
-                    onClick={() => navigate(`/view-invoice/${invoiceId}`)}
+                    // onClick={() => navigate(`/view-invoice/${invoiceId}`)}
+
+                    onClick={() => {
+                      const encryptedId = encryptId(invoiceId);
+
+                      navigate(
+                        `/view-invoice/${encodeURIComponent(encryptedId)}`
+                      );
+                    }}
                   ></InvoiceView>
                 </TooltipTrigger>
                 <TooltipContent>View Invoice</TooltipContent>
@@ -214,7 +223,14 @@ const InvoiceList = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <InvoiceEdit
-                    onClick={() => navigate(`/edit-invoice/${invoiceId}`)}
+                    // onClick={() => navigate(`/edit-invoice/${invoiceId}`)}
+                    onClick={() => {
+                      const encryptedId = encryptId(invoiceId);
+
+                      navigate(
+                        `/edit-invoice/${encodeURIComponent(encryptedId)}`
+                      );
+                    }}
                   ></InvoiceEdit>
                 </TooltipTrigger>
                 <TooltipContent>Edit Invoice</TooltipContent>
@@ -224,11 +240,18 @@ const InvoiceList = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <InvoiceDocument
-                    onClick={() =>
-                      navigate(`/document-edit-invoice/${invoiceId}`)
-                    }
+                    // onClick={() =>
+                    //   navigate(`/document-edit-invoice/${invoiceId}`)
+                    // }
+                    onClick={() => {
+                      const encryptedId = encryptId(invoiceId);
+
+                      navigate(
+                        `/document-edit-invoice/${encodeURIComponent(encryptedId)}`
+                      );
+                    }}
                   >
-                    <FilePlus2 className="h-4 w-4" /> 
+                    <FilePlus2 className="h-4 w-4" />
                   </InvoiceDocument>
                 </TooltipTrigger>
                 <TooltipContent>Invoice Document</TooltipContent>
@@ -319,20 +342,11 @@ const InvoiceList = () => {
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
           Invoice List
         </div>
-        {/* searching and column filter  */}
         <div className="flex items-center py-4">
-          {/* <Input
-          placeholder="Search..."
-          value={table.getState().globalFilter || ""}
-          onChange={(event) => {
-            table.setGlobalFilter(event.target.value);
-          }}
-          className="max-w-sm"
-        /> */}
           <div className="relative w-72">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
             <Input
-              placeholder="Search Products..."
+              placeholder="Search Invoice..."
               value={table.getState().globalFilter || ""}
               onChange={(event) => table.setGlobalFilter(event.target.value)}
               className="pl-8 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-gray-200"
@@ -483,4 +497,3 @@ const InvoiceList = () => {
 };
 
 export default InvoiceList;
-

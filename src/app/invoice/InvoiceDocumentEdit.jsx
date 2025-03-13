@@ -14,10 +14,13 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate, useParams } from "react-router-dom";
 import { ProgressBar } from "@/components/spinner/ProgressBar";
-import { Loader2 } from "lucide-react";
+import { ChevronDown, ChevronsUpDown, Loader2 } from "lucide-react";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import { useFetchShipper, useFetchVessel } from "@/hooks/useApi";
 import BASE_URL from "@/config/BaseUrl";
+import { decryptId } from "@/utils/encyrption/Encyrption";
+import ReactSelect from "react-select";
+
 const DocumentHeader = ({ documentDetails }) => {
   return (
     <div
@@ -46,13 +49,101 @@ const DocumentHeader = ({ documentDetails }) => {
     </div>
   );
 };
+
+const MemoizedSelect = React.memo(
+  ({ value, onChange, options, placeholder }) => {
+    const selectOptions = options.map((option) => ({
+      value: option.value,
+      label: option.label,
+    }));
+
+    const selectedOption = selectOptions.find(
+      (option) => option.value === value
+    );
+
+    const customStyles = {
+      control: (provided, state) => ({
+        ...provided,
+        minHeight: "36px",
+        borderRadius: "6px",
+        borderColor: state.isFocused ? "black" : "#e5e7eb",
+        boxShadow: state.isFocused ? "black" : "none",
+        "&:hover": {
+          borderColor: "none",
+          cursor: "text",
+        },
+      }),
+      option: (provided, state) => ({
+        ...provided,
+        fontSize: "14px",
+        backgroundColor: state.isSelected
+          ? "#A5D6A7"
+          : state.isFocused
+          ? "#f3f4f6"
+          : "white",
+        color: state.isSelected ? "black" : "#1f2937",
+        "&:hover": {
+          backgroundColor: "#EEEEEE",
+          color: "black",
+        },
+      }),
+
+      menu: (provided) => ({
+        ...provided,
+        borderRadius: "6px",
+        border: "1px solid #e5e7eb",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+      }),
+      placeholder: (provided) => ({
+        ...provided,
+        color: "#616161",
+        fontSize: "14px",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "start",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+      }),
+      singleValue: (provided) => ({
+        ...provided,
+        color: "black",
+        fontSize: "14px",
+      }),
+    };
+
+    const DropdownIndicator = (props) => {
+      return (
+        <div {...props.innerProps}>
+          <ChevronsUpDown className="h-3 w-3 mr-3 text-gray-400" />
+        </div>
+      );
+    };
+
+    return (
+      <ReactSelect
+        value={selectedOption}
+        onChange={(selected) => onChange(selected ? selected.value : "")}
+        options={selectOptions}
+        placeholder={placeholder}
+        styles={customStyles}
+        components={{
+          IndicatorSeparator: () => null,
+          DropdownIndicator,
+        }}
+        // menuPortalTarget={document.body}
+        //   menuPosition="fixed"
+      />
+    );
+  }
+);
 const InvoiceDocumentEdit = () => {
-  const updateBranch = async ({ id, data }) => {
+  const updateBranch = async ({ decryptedId, data }) => {
     const token = localStorage.getItem("token");
     if (!token) throw new Error("No authentication token found");
 
     const response = await fetch(
-      `${BASE_URL}/api/panel-update-invoice-document/${id}`,
+      `${BASE_URL}/api/panel-update-invoice-document/${decryptedId}`,
       {
         method: "PUT",
         headers: {
@@ -67,9 +158,13 @@ const InvoiceDocumentEdit = () => {
     return response.json();
   };
   const { id } = useParams();
+  const decryptedId = decryptId(id);
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [expectedFob, setExpectedFob] = useState(0);
+  console.log(expectedFob, "expectedFob");
   const [formData, setFormData] = useState({
     invoice_ref: "",
     invoice_bl_no: "",
@@ -84,7 +179,7 @@ const InvoiceDocumentEdit = () => {
     invoice_eta_date: "",
     invoice_i_value_usd: "",
     invoice_i_value_inr: "",
-    invoice_i_value_fob: "",
+    invoice_fob_usd: "",
     invoice_fob_inr: "",
     invoice_exch_rate: "",
     invoice_let_exports_date: "",
@@ -92,6 +187,8 @@ const InvoiceDocumentEdit = () => {
     invoice_insurance: "",
     invoice_freight: "",
   });
+  console.log(formData.invoice_fob_usd, "formData.invoice_fob_usd");
+
   const { data: vesselData } = useFetchVessel();
   const { data: shipperData } = useFetchShipper();
   // Fetch branch data by ID
@@ -101,11 +198,11 @@ const InvoiceDocumentEdit = () => {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["documentData", id],
+    queryKey: ["documentData", decryptedId],
     queryFn: async () => {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${BASE_URL}/api/panel-fetch-invoice-document-by-id/${id}`,
+        `${BASE_URL}/api/panel-fetch-invoice-document-by-id/${decryptedId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -148,8 +245,8 @@ const InvoiceDocumentEdit = () => {
         title: "Success",
         description: "Documents updated successfully",
       });
-      queryClient.invalidateQueries(["documentData", id]);
-      queryClient.refetchQueries(["documentData", id]);
+      queryClient.invalidateQueries(["documentData", decryptedId]);
+      queryClient.refetchQueries(["documentData", decryptedId]);
       navigate("/invoice");
     },
     onError: (error) => {
@@ -189,6 +286,7 @@ const InvoiceDocumentEdit = () => {
 
   const handleInputChange = (e, field) => {
     const value = e.target.value;
+    console.log(value, field, "onchnage");
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -197,16 +295,47 @@ const InvoiceDocumentEdit = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     const formattedData = {
       ...formData,
       invoice_i_value_usd: formatDecimal(formData.invoice_i_value_usd),
       invoice_i_value_inr: formatDecimal(formData.invoice_i_value_inr),
-      invoice_i_value_fob: formatDecimal(formData.invoice_i_value_fob),
+      invoice_fob_usd: formatDecimal(formData.invoice_fob_usd),
       invoice_fob_inr: formatDecimal(formData.invoice_fob_inr),
       invoice_exch_rate: formatDecimal(formData.invoice_exch_rate),
     };
-    updateBranchMutation.mutate({ id, data: formattedData });
+    updateBranchMutation.mutate({ decryptedId, data: formattedData });
   };
+
+  const isINRValueValid = (enteredValue, expectedValue) => {
+    const lowerBound = expectedValue - 2;
+    const upperBound = expectedValue + 2;
+    return enteredValue >= lowerBound && enteredValue <= upperBound;
+  };
+  const usd_value = Number(formData.invoice_i_value_usd);
+  const freight_value = Number(formData.invoice_freight);
+  const insurance_value = Number(formData.invoice_insurance);
+  const exchange_value = Number(formData?.invoice_exch_rate);
+  const inr_value = Number(formData.invoice_i_value_inr);
+
+  const expectedINRValue = usd_value * exchange_value;
+
+  const isINRValid = isINRValueValid(inr_value, expectedINRValue);
+
+  // auto calculation for fobusd and fobinr
+
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      invoice_fob_usd: (usd_value - (freight_value + insurance_value)).toFixed(
+        2
+      ),
+      invoice_fob_inr: (
+        (usd_value - (freight_value + insurance_value)) *
+        exchange_value
+      ).toFixed(2),
+    }));
+  }, [usd_value, freight_value, insurance_value, exchange_value]);
 
   if (isLoading) {
     return (
@@ -241,29 +370,6 @@ const InvoiceDocumentEdit = () => {
       </Page>
     );
   }
-  const isINRValueValid = (enteredValue, expectedValue) => {
-    const lowerBound = expectedValue - 2;
-    const upperBound = expectedValue + 2;
-    return enteredValue >= lowerBound && enteredValue <= upperBound;
-  };
-
-  const expectedINRValue =
-    formData.invoice_i_value_usd * formData.invoice_exch_rate;
-
-  const isINRValid = isINRValueValid(
-    formData.invoice_i_value_inr,
-    expectedINRValue
-  );
-
-  // auto calculation for fobusd and fobinr
-
-  const expectedFobValue =
-    formData.invoice_i_value_usd -
-    (formData.invoice_freight + formData.invoice_insurance);
-  const expectedFobInrVALUE =
-    (formData.invoice_i_value_usd -
-      (formData.invoice_freight + formData.invoice_insurance)) *
-    formData?.invoice_exch_rate;
   return (
     <Page>
       <form onSubmit={handleSubmit} className="w-full p-0 lg:p-4">
@@ -277,7 +383,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  BL No 
+                  BL No
                 </label>
                 <Input
                   className="bg-white"
@@ -290,7 +396,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Bl Date 
+                  Bl Date
                 </label>
                 <Input
                   type="date"
@@ -305,7 +411,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Shipping Bill No 
+                  Shipping Bill No
                 </label>
                 <Input
                   className="bg-white"
@@ -318,7 +424,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Shipping Bill Date 
+                  Shipping Bill Date
                 </label>
                 <Input
                   type="date"
@@ -333,7 +439,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Container 
+                  Container
                 </label>
                 <Input
                   className="bg-white"
@@ -347,7 +453,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Voyage 
+                  Voyage
                 </label>
                 <Input
                   className="bg-white"
@@ -361,10 +467,10 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Vessel 
+                  Vessel
                 </label>
 
-                <Select
+                {/* <Select
                   value={formData.invoice_vessel}
                   onValueChange={(value) =>
                     handleInputChange({ target: { value } }, "invoice_vessel")
@@ -380,13 +486,31 @@ const InvoiceDocumentEdit = () => {
                       </SelectItem>
                     ))}
                   </SelectContent>
-                </Select>
+                </Select> */}
+
+                <MemoizedSelect
+                  value={formData.invoice_vessel}
+                  onChange={(value) =>
+                    handleInputChange({ target: { value } }, "invoice_vessel")
+                  }
+                  // onValueChange={(value) =>
+                  //   handleInputChange({ target: { value } }, "invoice_vessel")
+                  // }
+                  options={
+                    vesselData?.vessel?.map((item, key) => ({
+                      key: key,
+                      value: item.vessel_name,
+                      label: item.vessel_name,
+                    })) || []
+                  }
+                  placeholder="Select Vessel."
+                />
               </div>
               <div>
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Seal 
+                  Seal
                 </label>
                 <Input
                   className="bg-white"
@@ -400,7 +524,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Shipper 
+                  Shipper
                 </label>
 
                 <Select
@@ -426,7 +550,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  USD Value 
+                  USD Value
                 </label>
                 <Input
                   className="bg-white"
@@ -441,7 +565,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2  font-medium `}
                 >
-                  Invoice Exchange rate 
+                  Invoice Exchange rate
                 </label>
                 <Input
                   className="bg-white"
@@ -457,7 +581,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Insurance 
+                  Insurance
                 </label>
                 <Input
                   className="bg-white"
@@ -473,7 +597,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Freight 
+                  Freight
                 </label>
                 <Input
                   className="bg-white"
@@ -489,9 +613,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 flex items-center justify-between font-medium `}
                 >
-                  <span>
-                    Invoice Value 
-                  </span>
+                  <span>Invoice Value</span>
                   <span>{expectedINRValue}</span>
                 </label>
                 <Input
@@ -508,18 +630,15 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 flex items-center justify-between font-medium `}
                 >
-                  <span>
-                    {" "}
-                    FOB USD 
-                  </span>
-                  <span>{expectedFobValue}</span>
+                  <span> FOB USD</span>
+                  <span>{formData.invoice_fob_usd}</span>
                 </label>
                 <Input
                   read-only
                   className="bg-white cursor-not-allowed"
-                  value={expectedFobValue}
+                  value={formData.invoice_fob_usd}
                   onChange={(e) =>
-                    handleDecimalInputChange(e, "invoice_i_value_fob")
+                    handleDecimalInputChange(e, "invoice_fob_usd")
                   }
                   placeholder="Enter FOB Value"
                 />
@@ -528,16 +647,13 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 flex items-center justify-between font-medium `}
                 >
-                  <span>
-                    {" "}
-                    FOB INR 
-                  </span>
-                  <span>{expectedFobInrVALUE}</span>
+                  <span> FOB INR</span>
+                  <span>{formData.invoice_fob_inr}</span>
                 </label>
                 <Input
                   read-only
                   className="bg-white cursor-not-allowed"
-                  value={expectedFobInrVALUE}
+                  value={formData.invoice_fob_inr}
                   onChange={(e) =>
                     handleDecimalInputChange(e, "invoice_fob_inr")
                   }
@@ -549,7 +665,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Let Export date 
+                  Let Export date
                 </label>
                 <Input
                   type="date"
@@ -566,7 +682,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Etd Date 
+                  Etd Date
                 </label>
                 <Input
                   type="date"
@@ -581,7 +697,7 @@ const InvoiceDocumentEdit = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Eta Date 
+                  Eta Date
                 </label>
                 <Input
                   type="date"
@@ -591,27 +707,6 @@ const InvoiceDocumentEdit = () => {
                   placeholder="Enter  Eta Date"
                 />
               </div>
-
-              {/* <div>
-                          <label className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}>
-                         Branch Status 
-                       </label>
-                       <Select
-                       
-                         value={formData.branch_status}
-                         onValueChange={(value) =>
-                           handleInputChange({ target: { value } }, "branch_status")
-                         }
-                       >
-                         <SelectTrigger    className="bg-white">
-                           <SelectValue placeholder="Select status" />
-                         </SelectTrigger>
-                         <SelectContent    className="bg-white">
-                           <SelectItem value="Active">Active</SelectItem>
-                           <SelectItem value="Inactive">Inactive</SelectItem>
-                         </SelectContent>
-                       </Select>
-                     </div> */}
             </div>
           </CardContent>
         </Card>
