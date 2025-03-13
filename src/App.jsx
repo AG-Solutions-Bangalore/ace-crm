@@ -79,7 +79,6 @@ import EditMarketOrder from "./app/purchase/marketPurchase/EditMarketOrder";
 import MarketPurchase from "./app/purchase/marketPurchase/MarketPurchase";
 import StockView from "./app/purchase/stock/StockView";
 import EditPurchaseOrder from "./app/purchaseOrder/EditPurchaseOrder";
-import TestingView from "./app/purchaseOrder/TestingView";
 import ViewPurchaseOrder from "./app/purchaseOrder/ViewPurchaseOrder";
 import MonthwisePurchaseForm from "./app/reports/monthwisePurchase/MonthwisePurchaseForm";
 import MonthwisePurchaseReport from "./app/reports/monthwisePurchase/MonthwisePurchaseReport";
@@ -91,6 +90,7 @@ import BASE_URL from "./config/BaseUrl";
 import DutyDrawBackPending from "./app/dutydrawback/pending/DutyDrawBackPending";
 import DutyDrawBackReceived from "./app/dutydrawback/received/DutyDrawBackReceived";
 import EditUserType from "./app/UserType/EditUserType";
+import DisableRightClick from "./components/DisableRightClick/DisableRightClick";
 
 function App() {
   const navigate = useNavigate();
@@ -117,6 +117,7 @@ function App() {
   return (
     <>
       <Toaster />
+      {/* <DisableRightClick /> */}
       <SessionTimeoutTracker expiryTime={time} onLogout={handleLogout} />
       <Routes>
         {/* Login Page        */}

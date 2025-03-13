@@ -246,7 +246,7 @@ const SalesAccountForm = () => {
                   <label
                     className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
                   >
-                    Branch
+                    Company
                   </label>
                   <Select
                     value={formData.branch_name}
@@ -256,7 +256,7 @@ const SalesAccountForm = () => {
                     disabled={isBranchesLoading}
                   >
                     <SelectTrigger className="bg-white">
-                      <SelectValue placeholder="Select Branch" />
+                      <SelectValue placeholder="Select Company" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
                       {/* {branchData?.branch?.map((branch, index) => (

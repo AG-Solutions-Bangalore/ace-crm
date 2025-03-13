@@ -368,7 +368,7 @@ export const BranchCreate = ({ onClick, className }) => {
 
   return (
     <Button variant="default" className={className} onClick={onClick}>
-      <SquarePlus className="h-4 w-4" /> Branch
+      <SquarePlus className="h-4 w-4" /> Company
     </Button>
   );
 };

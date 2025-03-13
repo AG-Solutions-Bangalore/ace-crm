@@ -1,5 +1,5 @@
 export const ButtonConfig = {
-  backgroundColor: "bg-blue-800",
+  backgroundColor: "bg-red-800",
   hoverBackgroundColor: "hover:bg-blue-500",
   textColor: "text-white",
   cardColor: "bg-blue-200",

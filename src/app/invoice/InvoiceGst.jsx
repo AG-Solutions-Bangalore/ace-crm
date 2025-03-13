@@ -10,10 +10,13 @@ import moment from "moment";
 import { toWords } from "number-to-words";
 
 import { FaRegFileWord } from "react-icons/fa";
+import { decryptId } from "@/utils/encyrption/Encyrption";
 const InvoiceGst = () => {
   const containerRef = useRef();
 
   const { id } = useParams();
+  const decryptedId = decryptId(id);
+
   const [spiceBoard, setSpiceBoard] = useState(null);
   const [spiceBoardBranch, setSpiceBoardBranch] = useState(null);
   const [productHsn, setProductHsn] = useState(null);
@@ -27,7 +30,7 @@ const InvoiceGst = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${id}`,
+          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${decryptedId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -53,7 +56,7 @@ const InvoiceGst = () => {
     };
 
     fetchContractData();
-  }, [id]);
+  }, [decryptedId]);
 
   const handlPrintPdf = useReactToPrint({
     content: () => containerRef.current,
@@ -127,7 +130,7 @@ const InvoiceGst = () => {
       </Card>
     );
   }
-  
+
   if (error) {
     return (
       <Card className="w-full">
@@ -168,17 +171,17 @@ const InvoiceGst = () => {
   return (
     <div>
       <div>
-              <button
-                onClick={handleSaveAsWord}
-                className="fixed top-5 right-24 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
-              >
-                <FaRegFileWord className="w-4 h-4" />
-              </button>
+        <button
+          onClick={handleSaveAsWord}
+          className="fixed top-5 right-24 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
+        >
+          <FaRegFileWord className="w-4 h-4" />
+        </button>
         <button
           onClick={handlPrintPdf}
           className="fixed top-5 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
         >
-         <Printer className="h-4 w-4"/>
+          <Printer className="h-4 w-4" />
         </button>
       </div>
       <div ref={containerRef}>

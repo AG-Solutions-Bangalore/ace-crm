@@ -8,10 +8,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { FaRegFileWord } from "react-icons/fa";
+import { decryptId } from "@/utils/encyrption/Encyrption";
 const InvoiceApta = () => {
   const containerRef = useRef();
 
   const { id } = useParams();
+  const decryptedId = decryptId(id);
+
   const [spiceBoard, setSpiceBoard] = useState(null);
   const [spiceBoardBranch, setSpiceBoardBranch] = useState(null);
   const [invoiceSubData, setInvoiceSubData] = useState([]);
@@ -23,7 +26,7 @@ const InvoiceApta = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${id}`,
+          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${decryptedId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -47,7 +50,7 @@ const InvoiceApta = () => {
     };
 
     fetchContractData();
-  }, [id]);
+  }, [decryptedId]);
 
   const handlPrintPdf = useReactToPrint({
     content: () => containerRef.current,

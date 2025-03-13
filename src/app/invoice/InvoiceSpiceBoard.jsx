@@ -5,14 +5,17 @@ import { FileText, Loader2, Printer } from "lucide-react";
 import html2pdf from "html2pdf.js";
 import BASE_URL from "@/config/BaseUrl";
 import { useParams } from "react-router-dom";
-import  { useReactToPrint } from "react-to-print";
+import { useReactToPrint } from "react-to-print";
 import { getTodayDate } from "@/utils/currentDate";
 import moment from "moment";
 import { FaRegFileWord } from "react-icons/fa";
 import { FaRegFilePdf } from "react-icons/fa";
+import { decryptId } from "@/utils/encyrption/Encyrption";
 const InvoiceSpiceBoard = () => {
   const containerRef = useRef();
   const { id } = useParams();
+  const decryptedId = decryptId(id);
+
   const [spiceBoard, setSpiceBoard] = useState(null);
   const [invoiceSubData, setInvoiceSubData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,7 +26,7 @@ const InvoiceSpiceBoard = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${id}`,
+          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${decryptedId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -46,11 +49,11 @@ const InvoiceSpiceBoard = () => {
     };
 
     fetchContractData();
-  }, [id]);
+  }, [decryptedId]);
 
   const handleSaveAsPdf = () => {
     const element = containerRef.current;
-  
+
     const options = {
       margin: [5, 5, 5, 5],
       filename: "spice_board.pdf",
@@ -68,7 +71,7 @@ const InvoiceSpiceBoard = () => {
       },
       pagebreak: { mode: "avoid" },
     };
-  
+
     html2pdf()
       .from(element)
       .set(options)
@@ -78,10 +81,10 @@ const InvoiceSpiceBoard = () => {
         const totalPages = pdf.internal.getNumberOfPages();
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
-  
+
         console.log(`Element Height: ${element.scrollHeight}`);
         console.log(`Page Width: ${pageWidth}, Page Height: ${pageHeight}`);
-  
+
         for (let i = 1; i <= totalPages; i++) {
           pdf.setPage(i);
           pdf.setFontSize(10);
@@ -96,7 +99,7 @@ const InvoiceSpiceBoard = () => {
       })
       .save();
   };
-  
+
   const handleSaveAsWord = () => {
     const content = containerRef.current.innerHTML;
 
@@ -165,7 +168,7 @@ const InvoiceSpiceBoard = () => {
             <Loader2 className="h-4 w-4 animate-spin" />
             Loading Spice Data
           </Button>
-        </CardContent> 
+        </CardContent>
       </Card>
     );
   }
@@ -184,18 +187,18 @@ const InvoiceSpiceBoard = () => {
     <div>
       <div>
         <button
-              onClick={handleSaveAsWord}
-              className="fixed top-5 right-40 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
-            >
-              <FaRegFileWord className="w-4 h-4" />
-            </button>
-      
-            <button
-              onClick={handleSaveAsPdf}
-              className="fixed top-5  right-24 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
-            >
-              <FaRegFilePdf className="w-4 h-4" />
-            </button>
+          onClick={handleSaveAsWord}
+          className="fixed top-5 right-40 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
+        >
+          <FaRegFileWord className="w-4 h-4" />
+        </button>
+
+        <button
+          onClick={handleSaveAsPdf}
+          className="fixed top-5  right-24 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
+        >
+          <FaRegFilePdf className="w-4 h-4" />
+        </button>
         <button
           onClick={handlPrintPdf}
           className="fixed top-5 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
@@ -205,7 +208,9 @@ const InvoiceSpiceBoard = () => {
       </div>
       <div ref={containerRef} className="max-w-4xl mx-auto p-6 bg-white  ">
         <div className="mb-4">
-          <p className="font-bold text-left  text-[13px] underlinebg-red-100 ">TO</p>
+          <p className="font-bold text-left  text-[13px] underlinebg-red-100 ">
+            TO
+          </p>
           <p className="font-bold text-left text-[13px] underline">
             THE SPICE BOARD, REGIONAL OFFICE
           </p>
@@ -272,7 +277,9 @@ const InvoiceSpiceBoard = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="bg-white">
-                      <th className="border-b border-r pb-2 border-black">Name</th>
+                      <th className="border-b border-r pb-2 border-black">
+                        Name
+                      </th>
                       <th className="border-b border-r pb-2 border-black">
                         QTY. (MT)
                       </th>

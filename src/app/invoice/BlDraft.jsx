@@ -1,18 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Loader2, Printer } from "lucide-react";
-import html2pdf from "html2pdf.js";
+import { Card, CardContent } from "@/components/ui/card";
 import BASE_URL from "@/config/BaseUrl";
+import { decryptId } from "@/utils/encyrption/Encyrption";
+import html2pdf from "html2pdf.js";
+import { Loader2, Printer } from "lucide-react";
+import { toWords } from "number-to-words";
+import { useEffect, useRef, useState } from "react";
+import { FaRegFilePdf, FaRegFileWord } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import ReactToPrint from "react-to-print";
-import moment from "moment";
-import { toWords } from "number-to-words";
-import { FaRegFileWord } from "react-icons/fa";
-import { FaRegFilePdf } from "react-icons/fa";
 const BlDraft = () => {
   const containerRef = useRef();
   const { id } = useParams();
+  const decryptedId = decryptId(id);
+
   const [invoicePackingData, setInvoicePackingData] = useState(null);
   const [branchData, setBranchData] = useState({});
   const [invoiceSubData, setInvoiceSubData] = useState([]);
@@ -35,7 +36,7 @@ const BlDraft = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${id}`,
+          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${decryptedId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -60,7 +61,7 @@ const BlDraft = () => {
     };
 
     fetchContractData();
-  }, [id]);
+  }, [decryptedId]);
 
   const handleSaveAsPdf = () => {
     const element = containerRef.current;
@@ -137,7 +138,6 @@ const BlDraft = () => {
       .save();
   };
 
-  
   const handleSaveAsWord = () => {
     const content = containerRef.current.innerHTML;
 
@@ -174,24 +174,24 @@ const BlDraft = () => {
   if (loading) {
     return (
       <Card className="w-[80vw] h-[80vh] flex items-center justify-center">
-      <CardContent>
-        <Button disabled className="flex items-center gap-2">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          Loading Invoice BiDraft Data
-        </Button>
-      </CardContent>
-    </Card>
+        <CardContent>
+          <Button disabled className="flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading Invoice BiDraft Data
+          </Button>
+        </CardContent>
+      </Card>
     );
   }
 
   if (error) {
     return (
       <Card className="w-[80vw]">
-      <CardContent className="p-6">
-        <div className="text-red-500 mb-4">Error: {error}</div>
-        <Button variant="outline">Try Again</Button>
-      </CardContent>
-    </Card>
+        <CardContent className="p-6">
+          <div className="text-red-500 mb-4">Error: {error}</div>
+          <Button variant="outline">Try Again</Button>
+        </CardContent>
+      </Card>
     );
   }
   const totalAmount = invoiceSubData.reduce((total, item) => {
@@ -206,23 +206,23 @@ const BlDraft = () => {
 
   return (
     <div>
-            <button
-              onClick={handleSaveAsWord}
-              className="fixed top-5 right-40 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
-            >
-              <FaRegFileWord className="w-4 h-4" />
-            </button>
-       <button
-        onClick={handleSaveAsPdf}
-          className="fixed top-5 right-24 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
+      <button
+        onClick={handleSaveAsWord}
+        className="fixed top-5 right-40 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
       >
-    <FaRegFilePdf className="w-4 h-4" />
+        <FaRegFileWord className="w-4 h-4" />
+      </button>
+      <button
+        onClick={handleSaveAsPdf}
+        className="fixed top-5 right-24 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
+      >
+        <FaRegFilePdf className="w-4 h-4" />
       </button>
       <ReactToPrint
         trigger={() => (
-        <button className="fixed top-5 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600">
-                   <Printer className="h-4 w-4" />
-                 </button>
+          <button className="fixed top-5 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600">
+            <Printer className="h-4 w-4" />
+          </button>
         )}
         content={() => containerRef.current}
         documentTitle={`contract-view`}

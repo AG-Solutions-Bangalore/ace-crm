@@ -10,10 +10,12 @@ import moment from "moment";
 import { toWords } from "number-to-words";
 import { FaRegFileWord } from "react-icons/fa";
 import { FaRegFilePdf } from "react-icons/fa";
+import { decryptId } from "@/utils/encyrption/Encyrption";
 const PreshipmentDetails = () => {
   const containerRef = useRef();
- 
+
   const { id } = useParams();
+  const decryptedId = decryptId(id);
   const [invoicePackingData, setInvoicePackingData] = useState(null);
   const [branchData, setBranchData] = useState({});
   const [invoiceSubData, setInvoiceSubData] = useState([]);
@@ -28,7 +30,7 @@ const PreshipmentDetails = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${id}`,
+          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${decryptedId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -53,7 +55,7 @@ const PreshipmentDetails = () => {
     };
 
     fetchContractData();
-  }, [id]);
+  }, [decryptedId]);
   useEffect(() => {
     if (invoiceSubData.length > 0) {
       const totalBags = invoiceSubData.reduce((sum, item) => {
@@ -588,10 +590,8 @@ const PreshipmentDetails = () => {
           </>
         )}
       </div>
-     
     </div>
   );
 };
 
 export default PreshipmentDetails;
-

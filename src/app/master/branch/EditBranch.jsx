@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { Card, CardContent } from "@/components/ui/card";
+import { ProgressBar } from "@/components/spinner/ProgressBar";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -11,47 +10,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ProgressBar } from "@/components/spinner/ProgressBar";
 
-import { Loader2 } from "lucide-react";
 import Page from "@/app/dashboard/page";
-import { ButtonConfig } from "@/config/ButtonConfig";
 import { Textarea } from "@/components/ui/textarea";
+import BASE_URL from "@/config/BaseUrl";
+import { ButtonConfig } from "@/config/ButtonConfig";
 import {
   useFetchPortofLoadings,
   useFetchScheme,
   useFetchState,
 } from "@/hooks/useApi";
-import { z } from "zod";
-import BASE_URL from "@/config/BaseUrl";
-
-
-const branchFormSchema = z.object({
-  branch_short: z.string().min(1, "Branch short name is required"),
-  branch_name: z.string().min(1, "Branch name is required"),
-  branch_name_short: z.string().min(1, "Branch short name is required"),
-  branch_address: z.string().min(1, "Branch address is required"),
-  branch_spice_board: z.string().optional(),
-  branch_iec: z.string().min(1, "IEC code is required"),
-  branch_apeda: z.string().optional(),
-  branch_gst: z.string().min(1, "GST number is required"),
-  branch_state: z.string().min(1, "State is required"),
-  branch_state_no: z.string().min(1, "State code is required"),
-  branch_state_short: z.string().min(1, "State Short is required"),
-  branch_scheme: z.string().optional(),
-  branch_pan_no: z.string().min(1, "PAN number is required"),
-  branch_ecgcncb: z.string().optional(),
-  branch_ecgc_policy: z.string().optional(),
-  branch_reg_no: z.string().optional(),
-  branch_port_of_loading: z.string().optional(),
-  branch_sign_name: z.string().optional(),
-  branch_sign_no: z.string().optional(),
-  branch_sign_name1: z.string().optional(),
-  branch_sign_no1: z.string().optional(),
-  branch_sign_name2: z.string().optional(),
-  branch_sign_no2: z.string().optional(),
-});
+import { Loader2 } from "lucide-react";
+import { decryptId } from "@/utils/encyrption/Encyrption";
 
 // Header Component
 const BranchHeader = ({ branchDetails }) => {
@@ -69,19 +42,19 @@ const BranchHeader = ({ branchDetails }) => {
           </span>
         </div>
         <div className="flex items-center gap-4">
-          <p className="text-gray-600 mt-2">Update branch/company details</p>
+          <p className="text-gray-600 mt-2">Update company details</p>
         </div>
       </div>
 
       <div className="flex-1 flex flex-col gap-3">
         <div className="flex items-center justify-end gap-2 text-sm">
           <span className="font-medium">
-            Branch Short : {branchDetails?.branch?.branch_short || "N/A"}
+          Company Short : {branchDetails?.branch?.branch_short || "N/A"}
           </span>
         </div>
         <div className="flex items-center justify-end gap-2 text-sm">
           <span className="font-medium">
-            Branch Prefix: {branchDetails?.branch?.branch_name_short || "N/A"}
+          Company Prefix: {branchDetails?.branch?.branch_name_short || "N/A"}
           </span>
         </div>
       </div>
@@ -89,12 +62,12 @@ const BranchHeader = ({ branchDetails }) => {
   );
 };
 
-const updateBranch = async ({ id, data }) => {
+const updateBranch = async ({ decryptedId, data }) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
 
   const response = await fetch(
-    `${BASE_URL}/api/panel-update-branch/${id}`,
+    `${BASE_URL}/api/panel-update-branch/${decryptedId}`,
     {
       method: "PUT",
       headers: {
@@ -105,12 +78,13 @@ const updateBranch = async ({ id, data }) => {
     }
   );
 
-  if (!response.ok) throw new Error("Failed to update branch");
+  if (!response.ok) throw new Error("Failed to update Company");
   return response.json();
 };
 
 const EditBranch = () => {
   const { id } = useParams();
+  const decryptedId = decryptId(id);
   const { toast } = useToast();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -147,11 +121,11 @@ const EditBranch = () => {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["branch", id],
+    queryKey: ["branch", decryptedId],
     queryFn: async () => {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${BASE_URL}/api/panel-fetch-branch-by-id/${id}`,
+        `${BASE_URL}/api/panel-fetch-branch-by-id/${decryptedId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -234,7 +208,7 @@ const EditBranch = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    updateBranchMutation.mutate({ id, data: formData });
+    updateBranchMutation.mutate({ decryptedId, data: formData });
   };
 
   if (isLoading) {
@@ -243,7 +217,7 @@ const EditBranch = () => {
         <div className="flex justify-center items-center h-full">
           <Button disabled>
             <Loader2 className="h-4 w-4 animate-spin" />
-            Loading Branch Data
+            Loading Company Data
           </Button>
         </div>
       </Page>
@@ -256,7 +230,7 @@ const EditBranch = () => {
         <Card className="w-full max-w-md mx-auto mt-10">
           <CardContent>
             <div className="text-destructive text-center">
-              Error Fetching Branch Data
+              Error Fetching Company Data
             </div>
             <Button
               onClick={() => refetch()}
@@ -284,14 +258,14 @@ const EditBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Branch Address <span className="text-red-500">*</span>
+                  Company Address <span className="text-red-500">*</span>
                 </label>
                 <Textarea
                   className="bg-white"
                   rows={5}
                   value={formData.branch_address}
                   onChange={(e) => handleInputChange(e, "branch_address")}
-                  placeholder="Enter branch address"
+                  placeholder="Enter company address"
                 />
               </div>
 
@@ -302,7 +276,6 @@ const EditBranch = () => {
                   IEC Code <span className="text-red-500">*</span>
                 </label>
                 <Input
-                  
                   className="bg-white"
                   value={formData.branch_iec}
                   onChange={(e) => handleInputChange(e, "branch_iec")}
@@ -348,13 +321,10 @@ const EditBranch = () => {
                   onChange={(e) => handleInputChange(e, "branch_state")}
                   placeholder="Enter state"
                 /> */}
-                  <Select
+                <Select
                   value={formData.branch_state}
                   onValueChange={(value) =>
-                    handleInputChange(
-                      { target: { value } },
-                      "branch_state"
-                    )
+                    handleInputChange({ target: { value } }, "branch_state")
                   }
                 >
                   <SelectTrigger className="bg-white">
@@ -362,10 +332,7 @@ const EditBranch = () => {
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     {stateData?.state?.map((item) => (
-                      <SelectItem
-                        value={item.state_name}
-                        key={item.state_name}
-                      >
+                      <SelectItem value={item.state_name} key={item.state_name}>
                         {item.state_name}
                       </SelectItem>
                     ))}
@@ -404,7 +371,7 @@ const EditBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Spice Board Details 
+                  Spice Board Details
                 </label>
                 <Input
                   className="bg-white"
@@ -418,7 +385,7 @@ const EditBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  APEDA Details 
+                  APEDA Details
                 </label>
                 <Input
                   className="bg-white"
@@ -432,7 +399,7 @@ const EditBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Scheme Details 
+                  Scheme Details
                 </label>
                 {/* <Input
                   className="bg-white"
@@ -440,13 +407,10 @@ const EditBranch = () => {
                   onChange={(e) => handleInputChange(e, "branch_scheme")}
                   placeholder="Enter scheme details"
                 /> */}
-                 <Select
+                <Select
                   value={formData.branch_scheme}
                   onValueChange={(value) =>
-                    handleInputChange(
-                      { target: { value } },
-                      "branch_scheme"
-                    )
+                    handleInputChange({ target: { value } }, "branch_scheme")
                   }
                 >
                   <SelectTrigger className="bg-white">
@@ -469,7 +433,7 @@ const EditBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  ECGC/NCB Details 
+                  ECGC/NCB Details
                 </label>
                 <Input
                   className="bg-white"
@@ -483,7 +447,7 @@ const EditBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  ECGC Policy Details 
+                  ECGC Policy Details
                 </label>
                 <Input
                   className="bg-white"
@@ -497,7 +461,7 @@ const EditBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Registration Number 
+                  Registration Number
                 </label>
                 <Input
                   className="bg-white"
@@ -511,7 +475,7 @@ const EditBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Port of Loading 
+                  Port of Loading
                 </label>
                 {/* <Input
                   className="bg-white"
@@ -603,13 +567,11 @@ const EditBranch = () => {
                 />
               </div>
 
-           
-
               <div>
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Branch Status <span className="text-red-500">*</span>
+                  Company Status <span className="text-red-500">*</span>
                 </label>
                 <Select
                   value={formData.branch_status}
@@ -638,7 +600,7 @@ const EditBranch = () => {
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
             disabled={updateBranchMutation.isPending}
           >
-            {updateBranchMutation.isPending ? "Updating..." : "Update Branch"}
+            {updateBranchMutation.isPending ? "Updating..." : "Update Company"}
           </Button>
         </div>
       </form>

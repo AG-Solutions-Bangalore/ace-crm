@@ -1,28 +1,6 @@
 import Page from "@/app/dashboard/page";
-import React, { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import {
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  ChevronDown,
-  Edit,
-  Eye,
-  Loader2,
-  Search,
-  SquarePlus,
-  Trash,
-  UserPen,
-  View,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -44,22 +22,24 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import BASE_URL from "@/config/BaseUrl";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from "@/components/ui/alert-dialog";
-import { useNavigate } from "react-router-dom";
-import moment from "moment";
-import { useToast } from "@/hooks/use-toast";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { useToast } from "@/hooks/use-toast";
+import { encryptId } from "@/utils/encyrption/Encyrption";
+import { useQuery } from "@tanstack/react-query";
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import axios from "axios";
+import { ChevronDown, Edit, Loader2, Search, SquarePlus } from "lucide-react";
+import moment from "moment";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const MarketDispatch = () => {
   const { toast } = useToast();
@@ -129,32 +109,27 @@ const MarketDispatch = () => {
 
         return (
           <div className="flex flex-row">
-            {/* <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => navigate(`/view-purchase-order`)}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                 
-                </TooltipTrigger>
-                <TooltipContent>View Dispatch</TooltipContent>
-              </Tooltip>
-            </TooltipProvider> */}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() =>
+                    // onClick={() =>
+                    //   navigate(
+                    //     `/purchase/market-dispatch/editDispatch/${dispatchId}`
+                    //   )
+                    // }
+
+                    onClick={() => {
+                      const encryptedId = encryptId(dispatchId);
+
                       navigate(
-                        `/purchase/market-dispatch/editDispatch/${dispatchId}`
-                      )
-                    }
+                        `/purchase/market-dispatch/editDispatch/${encodeURIComponent(
+                          encryptedId
+                        )}`
+                      );
+                    }}
                   >
                     <Edit className="h-4 w-4" />
                   </Button>

@@ -10,9 +10,12 @@ import { useParams } from "react-router-dom";
 import { getTodayDate } from "@/utils/currentDate";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ReactToPrint, { useReactToPrint } from "react-to-print";
+import { decryptId } from "@/utils/encyrption/Encyrption";
 const TestViewPrint = () => {
   const containerRef = useRef();
   const { id } = useParams();
+  const decryptedId = decryptId(id);
+
   const [contractData, setContractData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,7 +26,7 @@ const TestViewPrint = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${BASE_URL}/api/panel-fetch-contract-by-id/${id}`,
+          `${BASE_URL}/api/panel-fetch-contract-by-id/${decryptedId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -45,10 +48,8 @@ const TestViewPrint = () => {
     };
 
     fetchContractData();
-  }, [id]);
+  }, [decryptedId]);
 
-
-  
   const handlPrintPdf = useReactToPrint({
     content: () => containerRef.current,
     documentTitle: "contract-view",
@@ -176,7 +177,7 @@ const TestViewPrint = () => {
               </p>
             </div>
           </div>
-        
+
           <div
             ref={containerRef}
             className=" content page-break  min-h-screen font-normal "
@@ -287,7 +288,7 @@ const TestViewPrint = () => {
 
                     {/* Shipper's Bank -- if ship_date is not avaiilbe than show remove - */}
                     <div className="flex items-center gap-4 w-full">
-                      <span className="w-1/4 text-left">SHIPPER'S BANK</span>
+                      <span className="w-1/4 text-left">SHIPPER'S BANK 2</span>
                       <span className="w-1 text-center">:</span>
                       <p className="w-3/4">
                         {contractData?.contract?.contract_ship_date}
@@ -417,7 +418,6 @@ const TestViewPrint = () => {
           <Tabs defaultValue="header" className="w-full">
             <TabsList className="grid w-full grid-cols-1">
               <TabsTrigger value="header">Header</TabsTrigger>
-             
             </TabsList>
             <TabsContent value="header">
               <div className="flex flex-col gap-2 mt-4">
@@ -430,8 +430,6 @@ const TestViewPrint = () => {
                 </Button>
               </div>
             </TabsContent>
-           
-           
           </Tabs>
         </div>
       </div>

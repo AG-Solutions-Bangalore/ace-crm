@@ -233,13 +233,13 @@ const EditBank = ({ bankId }) => {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="bank_branch">Bank Branch Details</Label>
+              <Label htmlFor="bank_branch">Bank Company Details</Label>
               <Input
                 id="bank_branch"
                 name="bank_branch"
                 value={formData.bank_branch}
                 onChange={handleInputChange}
-                placeholder="Enter Bank Branch Details "
+                placeholder="Enter Bank Company Details "
               />
             </div>
 

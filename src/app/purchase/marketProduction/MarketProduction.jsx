@@ -1,24 +1,22 @@
-import React, { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import Page from "@/app/dashboard/page";
 import {
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+  ProductionCreate,
+  ProductionDelete,
+  ProductionEdit,
+  ProductionremoveRow,
+} from "@/components/buttonIndex/ButtonComponents";
 import {
-  ChevronDown,
-  Edit,
-  Eye,
-  Loader2,
-  Search,
-  SquarePlus,
-  Trash2,
-} from "lucide-react";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -34,35 +32,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import BASE_URL from "@/config/BaseUrl";
-import { useNavigate } from "react-router-dom";
-import moment from "moment";
-import { useToast } from "@/hooks/use-toast";
 import { ButtonConfig } from "@/config/ButtonConfig";
-import Page from "@/app/dashboard/page";
+import { useToast } from "@/hooks/use-toast";
+import { encryptId } from "@/utils/encyrption/Encyrption";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
-  ProductionCreate,
-  ProductionDelete,
-  ProductionEdit,
-  ProductionremoveRow,
-} from "@/components/buttonIndex/ButtonComponents";
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import axios from "axios";
+import { ChevronDown, Loader2, Search, Trash2 } from "lucide-react";
+import moment from "moment";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 const MarketProduction = () => {
   const { toast } = useToast();
   const {
@@ -195,7 +182,15 @@ const MarketProduction = () => {
         return (
           <div className="flex flex-row">
             <ProductionEdit
-              onClick={() => navigate(`/edit-market-production/${purchaseId}`)}
+              // onClick={() => navigate(`/edit-market-production/${purchaseId}`)}
+
+              onClick={() => {
+                const encryptedId = encryptId(purchaseId);
+
+                navigate(
+                  `/edit-market-production/${encodeURIComponent(encryptedId)}`
+                );
+              }}
             ></ProductionEdit>
 
             {purchaseId ? (

@@ -1,35 +1,19 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { z } from "zod";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table";
-import { PlusCircle, MinusCircle, ChevronDown, Trash2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate, useParams } from "react-router-dom";
-import { getTodayDate } from "@/utils/currentDate";
-import { ProgressBar } from "@/components/spinner/ProgressBar";
-import BASE_URL from "@/config/BaseUrl";
-import { Textarea } from "@/components/ui/textarea";
-import Select from "react-select";
-import { useCurrentYear } from "@/hooks/useCurrentYear";
-import { ButtonConfig } from "@/config/ButtonConfig";
-import {
-  useFetchCompanys,
-  useFetchGoDownMarketPurchase,
-  useFetchProductNos,
-  useFetchPurchaseProduct,
-  useFetchVendor,
-} from "@/hooks/useApi";
 import Page from "@/app/dashboard/page";
+import { ProgressBar } from "@/components/spinner/ProgressBar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import BASE_URL from "@/config/BaseUrl";
+import { ButtonConfig } from "@/config/ButtonConfig";
+import { useToast } from "@/hooks/use-toast";
+import { useFetchGoDownMarketPurchase } from "@/hooks/useApi";
+import { decryptId } from "@/utils/encyrption/Encyrption";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { ChevronDown } from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import Select from "react-select";
+import { z } from "zod";
 
 // Validation Schemas
 
@@ -40,12 +24,12 @@ const contractFormSchema = z.object({
   mpr_bag: z.number().min(1, "Quantity is required"),
   mpr_qnty: z.number().min(1, "Quantity is required"),
 });
-const updateProductionOrder = async ({ id, data }) => {
+const updateProductionOrder = async ({ decryptedId, data }) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
 
   const response = await fetch(
-    `${BASE_URL}/api/panel-update-market-production/${id}`,
+    `${BASE_URL}/api/panel-update-market-production/${decryptedId}`,
     {
       method: "PUT",
       headers: {
@@ -152,6 +136,7 @@ const EditMarketProduction = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { id } = useParams();
+  const decryptedId = decryptId(id);
 
   const [formData, setFormData] = useState({
     mpr_date: "",
@@ -163,11 +148,11 @@ const EditMarketProduction = () => {
 
   const { data: godownPurchaseData } = useFetchGoDownMarketPurchase();
   const { data: MarketProductionData } = useQuery({
-    queryKey: ["marketproduction", id],
+    queryKey: ["marketproduction", decryptedId],
     queryFn: async () => {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${BASE_URL}/api/panel-fetch-market-production-by-id/${id}`,
+        `${BASE_URL}/api/panel-fetch-market-production-by-id/${decryptedId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -224,7 +209,6 @@ const EditMarketProduction = () => {
     }));
   }, []);
 
-
   const handleSelectChange = useCallback((field, value) => {
     // console.log("Field:", field, "Value:", value, "Type:", typeof value);
     setFormData((prev) => ({
@@ -249,7 +233,7 @@ const EditMarketProduction = () => {
         mpr_bag: parseFloat(formData.mpr_bag),
         mpr_qnty: parseFloat(formData.mpr_qnty),
       });
-      updatePurchaseMutation.mutate({ data: validatedData, id });
+      updatePurchaseMutation.mutate({ data: validatedData, decryptedId });
     } catch (error) {
       console.error("Caught error:", error);
       console.log("Error name:", error.name);

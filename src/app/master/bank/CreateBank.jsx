@@ -151,7 +151,7 @@ const CreateBank = () => {
 
         <div className="grid gap-4 py-4">
           <div>
-            <Label htmlFor="branch_short">Branch Name</Label>
+            <Label htmlFor="branch_short">Company Name</Label>
             <Select
               value={formData.branch_short}
               onValueChange={(value) =>
@@ -159,7 +159,7 @@ const CreateBank = () => {
               }
             >
               <SelectTrigger className="bg-white">
-                <SelectValue placeholder="Select Branch" />
+                <SelectValue placeholder="Select Company" />
               </SelectTrigger>
               <SelectContent className="bg-white">
                 {branchData?.branch?.map((branch, index) => (
@@ -202,13 +202,13 @@ const CreateBank = () => {
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="bank_branch">Bank Branch </Label>
+            <Label htmlFor="bank_branch">Bank Company </Label>
             <Input
               id="bank_branch"
               name="bank_branch"
               value={formData.bank_branch}
               onChange={handleInputChange}
-              placeholder="Enter Bank Branch Details "
+              placeholder="Enter Bank Company Details "
             />
           </div>
         </div>

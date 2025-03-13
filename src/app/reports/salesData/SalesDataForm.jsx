@@ -340,7 +340,7 @@ const SalesDataForm = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                   >
-                    Branch <span className="text-red-500"></span>
+                    Company <span className="text-red-500"></span>
                   </label>
                   <SelectStatus
                     value={formData.branch_name}
@@ -349,7 +349,7 @@ const SalesDataForm = () => {
                     }
                   >
                     <SelectTrigger className="bg-white">
-                      <SelectValue placeholder="Select Branch" />
+                      <SelectValue placeholder="Select Company" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
                       <SelectContent>

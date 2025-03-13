@@ -109,7 +109,9 @@ const ContractViewPdf = ({ contractData, showSignature, signPdf }) => {
           <span className="w-1/4 text-left">SHIPPER'S BANK</span>
           <span className="w-1 text-center">:</span>
           <p className="w-3/4">
-            {contractData?.contract?.contract_ship_date}
+            {moment(contractData?.contract?.contract_ship_date).format(
+              "DD-MMM-YYYY"
+            )}
             {contractData?.contract?.contract_ship_date && " - "}
 
             {contractData?.contract?.contract_shipment}
@@ -137,7 +139,10 @@ const ContractViewPdf = ({ contractData, showSignature, signPdf }) => {
           <span className="w-1/4 text-left">Shipment</span>
           <span className="w-1 text-center">:</span>
           <p className="w-3/4">
-            ON OR BEFORE - {contractData?.contract?.contract_ship_date}
+            ON OR BEFORE -
+            {moment(contractData?.contract?.contract_ship_date).format(
+              "DD-MMM-YYYY"
+            )}
           </p>
         </div>
 

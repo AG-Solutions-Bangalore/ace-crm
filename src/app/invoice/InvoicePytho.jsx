@@ -9,47 +9,49 @@ import BASE_URL from "@/config/BaseUrl";
 import moment from "moment";
 import { FaRegFilePdf } from "react-icons/fa";
 import { FaRegFileWord } from "react-icons/fa";
+import { decryptId } from "@/utils/encyrption/Encyrption";
 const InvoicePytho = () => {
-
   const containerRef = useRef();
-  
-const { id } = useParams();
-const [spiceBoard, setSpiceBoard] = useState(null);
-const [spiceBoardBranch, setSpiceBoardBranch] = useState(null);
-const [invoiceSubData, setInvoiceSubData] = useState([]);
-const [loading, setLoading] = useState(true);
-const [error, setError] = useState(null);
 
-useEffect(() => {
-  const fetchContractData = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+  const { id } = useParams();
+  const decryptedId = decryptId(id);
+
+  const [spiceBoard, setSpiceBoard] = useState(null);
+  const [spiceBoardBranch, setSpiceBoardBranch] = useState(null);
+  const [invoiceSubData, setInvoiceSubData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchContractData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${decryptedId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch invoice data");
         }
-      );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch invoice data");
+        const data = await response.json();
+        setSpiceBoard(data?.invoice);
+        setSpiceBoardBranch(data?.branch);
+        setInvoiceSubData(data?.invoiceSub);
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
       }
+    };
 
-      const data = await response.json();
-      setSpiceBoard(data?.invoice);
-      setSpiceBoardBranch(data?.branch);
-      setInvoiceSubData(data?.invoiceSub);
-      setLoading(false);
-    } catch (error) {
-      setError(error.message);
-      setLoading(false);
-    }
-  };
-
-  fetchContractData();
-}, [id]);
+    fetchContractData();
+  }, [decryptedId]);
   const handlPrintPdf = useReactToPrint({
     content: () => containerRef.current,
     documentTitle: "apta",
@@ -79,27 +81,25 @@ useEffect(() => {
   });
   const handleSaveAsWord = () => {
     const container = containerRef.current;
-    
+
     // Get all stylesheet rules from the document
     const styleSheets = Array.from(document.styleSheets);
     let cssRules = [];
-    
-    styleSheets.forEach(sheet => {
+
+    styleSheets.forEach((sheet) => {
       try {
         // Get CSS rules from each stylesheet
         const rules = Array.from(sheet.cssRules || sheet.rules);
         cssRules = [...cssRules, ...rules];
       } catch (e) {
         // Handle CORS restrictions for external stylesheets
-        console.log('Could not access stylesheet rules');
+        console.log("Could not access stylesheet rules");
       }
     });
-  
+
     // Convert CSS rules to text
-    const stylesText = cssRules
-      .map(rule => rule.cssText)
-      .join('\n');
-  
+    const stylesText = cssRules.map((rule) => rule.cssText).join("\n");
+
     const html = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
         <head>
@@ -113,18 +113,18 @@ useEffect(() => {
         </body>
       </html>
     `;
-  
+
     const blob = new Blob([html], { type: "application/msword" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = "Pytho.doc";
-  
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(link.href);
   };
-  
+
   if (loading) {
     return (
       <Card className="w-[80vw] h-[80vh] flex items-center justify-center">
@@ -137,7 +137,7 @@ useEffect(() => {
       </Card>
     );
   }
-  
+
   if (error) {
     return (
       <Card className="w-full">
@@ -151,17 +151,17 @@ useEffect(() => {
   return (
     <div>
       <div>
-             <button
-                onClick={handleSaveAsWord}
-                className="fixed top-5 right-24 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
-              >
-                <FaRegFileWord className="w-4 h-4" />
-              </button>
-      <button
+        <button
+          onClick={handleSaveAsWord}
+          className="fixed top-5 right-24 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
+        >
+          <FaRegFileWord className="w-4 h-4" />
+        </button>
+        <button
           onClick={handlPrintPdf}
           className="fixed top-5 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
         >
-         <Printer className="h-4 w-4"/>
+          <Printer className="h-4 w-4" />
         </button>
       </div>
       <div ref={containerRef} className="max-w-3xl mx-auto p-6 bg-white  ">
@@ -183,15 +183,18 @@ useEffect(() => {
           <p className=" leading-relaxed text-base">
             It is declared that M/S Nifco Seafrieght Pvt.Ltd.,(name of the
             registered warehouse unit with Registration No. 04/2018-Warehouse dt
-            12.03.2018 has processed {" "}
+            12.03.2018 has processed{" "}
             {invoiceSubData?.reduce(
               (total, currItem) =>
                 total + (parseFloat(currItem?.invoiceSub_qntyInMt) || 0),
               0
             )}{" "}
-              MT of  {spiceBoard?.invoice_product} in our unit as per
-            “SOP for Export of Dry Chilli” and export through to M/S  {spiceBoard?.branch_name}, {spiceBoard?.branch_address}(complete address of the merchant exporter) as per attached
-            Invoice Nos.  {spiceBoard?.invoice_ref} dated {moment(spiceBoard?.invoice_date).format("DD-MM-YYYY")}  for export.
+            MT of {spiceBoard?.invoice_product} in our unit as per “SOP for
+            Export of Dry Chilli” and export through to M/S{" "}
+            {spiceBoard?.branch_name}, {spiceBoard?.branch_address}(complete
+            address of the merchant exporter) as per attached Invoice Nos.{" "}
+            {spiceBoard?.invoice_ref} dated{" "}
+            {moment(spiceBoard?.invoice_date).format("DD-MM-YYYY")} for export.
           </p>
         </div>
         <div className=" mt-8">
@@ -221,15 +224,15 @@ useEffect(() => {
             <p>Name of the registered warehouse unit:</p>
             <p>Nifco Seafreight Pvt.Ltd.</p>
             <p>Registration Certificate No. 04/2018-Warehouse</p>
-            <p>Date: {moment(spiceBoard?.invoice_date).format("DD-MM-YYYY")}</p> 
+            <p>Date: {moment(spiceBoard?.invoice_date).format("DD-MM-YYYY")}</p>
           </div>
           <div className=" col-span-1">
             <p>Signature:</p>
-            <p>Name: {spiceBoardBranch.branch_sign_name1}</p> 
+            <p>Name: {spiceBoardBranch.branch_sign_name1}</p>
             <p>Authorised Signatory</p>
             <p>Name of merchant exporter</p>
-            <p>{spiceBoard?.branch_name}</p> 
-            <p>Date:{moment(spiceBoard?.invoice_date).format("DD-MM-YYYY")}</p> 
+            <p>{spiceBoard?.branch_name}</p>
+            <p>Date:{moment(spiceBoard?.invoice_date).format("DD-MM-YYYY")}</p>
           </div>
         </div>
       </div>

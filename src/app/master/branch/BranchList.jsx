@@ -49,6 +49,7 @@ import {
   BranchCreate,
   BranchEdit,
 } from "@/components/buttonIndex/ButtonComponents";
+import { encryptId } from "@/utils/encyrption/Encyrption";
 const BranchList = () => {
   const {
     data: customers,
@@ -78,7 +79,6 @@ const BranchList = () => {
 
   // Define columns for the table
   const columns = [
-  
     {
       accessorKey: "index",
       header: "Sl No",
@@ -91,7 +91,7 @@ const BranchList = () => {
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-           Name
+          Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -138,15 +138,16 @@ const BranchList = () => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  {/* <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => navigate(`/edit-branch/${branchId}`)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button> */}
                   <BranchEdit
-                    onClick={() => navigate(`/edit-branch/${branchId}`)}
+                    // onClick={() => navigate(`/edit-branch/${branchId}`)}
+
+                    onClick={() => {
+                      const encryptedId = encryptId(branchId);
+
+                      navigate(
+                        `/edit-branch/${encodeURIComponent(encryptedId)}`
+                      );
+                    }}
                   ></BranchEdit>
                 </TooltipTrigger>
                 <TooltipContent>Edit Branch</TooltipContent>
@@ -190,7 +191,7 @@ const BranchList = () => {
         <div className="flex justify-center items-center h-full">
           <Button disabled>
             <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading Customer
+            Loading Branch
           </Button>
         </div>
       </Page>
@@ -204,7 +205,7 @@ const BranchList = () => {
         <Card className="w-full max-w-md mx-auto mt-10">
           <CardHeader>
             <CardTitle className="text-destructive">
-              Error Fetching Customer
+              Error Fetching Branch
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -221,23 +222,14 @@ const BranchList = () => {
     <Page>
       <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
-        Company List
+          Company List
         </div>
 
-        {/* searching and column filter  */}
         <div className="flex items-center py-4">
-          {/* <Input
-            placeholder="Search..."
-            value={table.getState().globalFilter || ""}
-            onChange={(event) => {
-              table.setGlobalFilter(event.target.value);
-            }}
-            className="max-w-sm"
-          /> */}
           <div className="relative w-72">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
             <Input
-              placeholder="Search branch..."
+              placeholder="Search company..."
               value={table.getState().globalFilter || ""}
               onChange={(event) => table.setGlobalFilter(event.target.value)}
               className="pl-8 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-gray-200"
@@ -269,14 +261,7 @@ const BranchList = () => {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          {/*    
-          <Button
-            variant="default"
-            className= {`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`} 
-            onClick={() => navigate("/create-branch")}
-          >
-            <SquarePlus className="h-4 w-4" /> Branch
-          </Button> */}
+
           <div>
             <BranchCreate
               className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}

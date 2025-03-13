@@ -10,10 +10,13 @@ import moment from "moment";
 import { toWords } from "number-to-words";
 import { FaRegFileWord } from "react-icons/fa";
 import { FaRegFilePdf } from "react-icons/fa";
+import { decryptId } from "@/utils/encyrption/Encyrption";
 
 const InvoiceView = () => {
   const containerRef = useRef();
   const { id } = useParams();
+  const decryptedId = decryptId(id);
+
   const [invoicePackingData, setInvoicePackingData] = useState(null);
   const [branchData, setBranchData] = useState({});
   const [invoiceSubData, setInvoiceSubData] = useState([]);
@@ -36,7 +39,7 @@ const InvoiceView = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${id}`,
+          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${decryptedId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -61,7 +64,7 @@ const InvoiceView = () => {
     };
 
     fetchContractData();
-  }, [id]);
+  }, [decryptedId]);
 
   const handleSaveAsPdf = () => {
     const element = containerRef.current;
@@ -182,7 +185,7 @@ const InvoiceView = () => {
       </Card>
     );
   }
-  
+
   if (error) {
     return (
       <Card className="w-full">
@@ -205,23 +208,23 @@ const InvoiceView = () => {
 
   return (
     <div>
-          <button
-              onClick={handleSaveAsWord}
-              className="fixed top-5 right-40 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
-            >
-              <FaRegFileWord className="w-4 h-4" />
-            </button>
+      <button
+        onClick={handleSaveAsWord}
+        className="fixed top-5 right-40 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
+      >
+        <FaRegFileWord className="w-4 h-4" />
+      </button>
       <button
         onClick={handleSaveAsPdf}
-          className="fixed top-5 right-24 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
+        className="fixed top-5 right-24 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
       >
-   <FaRegFilePdf className="w-4 h-4" />
+        <FaRegFilePdf className="w-4 h-4" />
       </button>
       <ReactToPrint
         trigger={() => (
-         <button className="fixed top-5 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600">
-                    <Printer className="h-4 w-4" />
-                  </button>
+          <button className="fixed top-5 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600">
+            <Printer className="h-4 w-4" />
+          </button>
         )}
         content={() => containerRef.current}
         documentTitle={`contract-view`}

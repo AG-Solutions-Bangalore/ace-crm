@@ -1,29 +1,5 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { z } from "zod";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table";
-import { PlusCircle, MinusCircle, ChevronDown, Trash2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate, useParams } from "react-router-dom";
-import { getTodayDate } from "@/utils/currentDate";
+import Page from "@/app/dashboard/page";
 import { ProgressBar } from "@/components/spinner/ProgressBar";
-import BASE_URL from "@/config/BaseUrl";
-import Select from "react-select";
-import { ButtonConfig } from "@/config/ButtonConfig";
-import {
-  useFetchGoDownMarketPurchase,
-  useFetchPurchaseProduct,
-} from "@/hooks/useApi";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,7 +10,31 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import Page from "@/app/dashboard/page";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import BASE_URL from "@/config/BaseUrl";
+import { ButtonConfig } from "@/config/ButtonConfig";
+import { useToast } from "@/hooks/use-toast";
+import {
+  useFetchGoDownMarketPurchase,
+  useFetchPurchaseProduct,
+} from "@/hooks/useApi";
+import { decryptId } from "@/utils/encyrption/Encyrption";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { ChevronDown, MinusCircle, PlusCircle, Trash2 } from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import Select from "react-select";
+import { z } from "zod";
 
 // Validation Schemas
 const productRowSchema = z.object({
@@ -53,19 +53,19 @@ const contractFormSchema = z.object({
   mp_bill_ref: z.string().min(1, "Ref is required"),
   mp_vendor_name: z.string().min(1, "Vendor Name is required"),
   mp_bill_value: z.number().min(1, "Bill Value is required"),
-  mp_remark: z.string().optional(),
+  mp_remark: z.any().optional(),
 
   market_data: z
     .array(productRowSchema)
     .min(1, "At least one product is required"),
 });
 
-const updatePurchaseOrder = async ({ id, data }) => {
+const updatePurchaseOrder = async ({ decryptedId, data }) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
 
   const response = await fetch(
-    `${BASE_URL}/api/panel-update-market-purchase/${id}`,
+    `${BASE_URL}/api/panel-update-market-purchase/${decryptedId}`,
     {
       method: "PUT",
       headers: {
@@ -259,7 +259,7 @@ const EditMarketOrder = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { id } = useParams();
-  console.log("id", id);
+  const decryptedId = decryptId(id);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
 
@@ -293,11 +293,11 @@ const EditMarketOrder = () => {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["market", id],
+    queryKey: ["market", decryptedId],
     queryFn: async () => {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${BASE_URL}/api/panel-fetch-market-purchase-by-id/${id}`,
+        `${BASE_URL}/api/panel-fetch-market-purchase-by-id/${decryptedId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -513,7 +513,7 @@ const EditMarketOrder = () => {
 
       console.log("Before processing:", validatedData);
 
-      updatePurchaseMutation.mutate({ id, data: validatedData });
+      updatePurchaseMutation.mutate({ decryptedId, data: validatedData });
     } catch (error) {
       console.error("Caught error:", error);
       console.log("Error name:", error.name);
