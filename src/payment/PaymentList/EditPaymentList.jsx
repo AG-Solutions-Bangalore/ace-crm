@@ -1,51 +1,41 @@
 import Page from "@/app/dashboard/page";
-import React, { useCallback, useEffect, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { z } from "zod";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate, useParams } from "react-router-dom";
-import { ProgressBar } from "@/components/spinner/ProgressBar";
-import { ButtonConfig } from "@/config/ButtonConfig";
-import { Textarea } from "@/components/ui/textarea";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import {
-  Select as SelectStatus,
   SelectContent,
   SelectItem,
+  Select as SelectStatus,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Select from "react-select";
-import BASE_URL from "@/config/BaseUrl";
-import {
-  MinusCircle,
-  PlusCircle,
-  ChevronDown,
-  Trash2,
-  Loader2,
-} from "lucide-react";
 import {
   Table,
-  TableHeader,
-  TableRow,
-  TableHead,
   TableBody,
   TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
-import { useCurrentYear } from "@/hooks/useCurrentYear";
+import { Textarea } from "@/components/ui/textarea";
+import BASE_URL from "@/config/BaseUrl";
+import { ButtonConfig } from "@/config/ButtonConfig";
+import { useToast } from "@/hooks/use-toast";
 import { useFetchPaymentAmount } from "@/hooks/useApi";
+import { useCurrentYear } from "@/hooks/useCurrentYear";
+import { decryptId } from "@/utils/encyrption/Encyrption";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  ChevronDown,
+  Loader2,
+  MinusCircle,
+  PlusCircle,
+  Trash2,
+} from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import Select from "react-select";
+import { z } from "zod";
 
 const productRowSchema = z.object({
   id: z.any().optional(),
@@ -180,6 +170,8 @@ const MemoizedProductSelect = React.memo(
 );
 const EditPaymentList = () => {
   const { id } = useParams();
+  const decryptedId = decryptId(id);
+
   const { toast } = useToast();
   const navigate = useNavigate();
   const { data: currentYear } = useCurrentYear();
@@ -227,11 +219,11 @@ const EditPaymentList = () => {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["payment", id],
+    queryKey: ["payment", decryptedId],
     queryFn: async () => {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${BASE_URL}/api/panel-fetch-invoice-payment-by-id/${id}`,
+        `${BASE_URL}/api/panel-fetch-invoice-payment-by-id/${decryptedId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -345,7 +337,7 @@ const EditPaymentList = () => {
     if (!token) throw new Error("No authentication token found");
 
     const response = await fetch(
-      `${BASE_URL}/api/panel-update-invoice-payment/${id}`,
+      `${BASE_URL}/api/panel-update-invoice-payment/${decryptedId}`,
       {
         method: "PUT",
         headers: {
@@ -470,7 +462,7 @@ const EditPaymentList = () => {
           description: "The total invoice amounts do not match the USD amount.",
           variant: "destructive",
         });
-        return; 
+        return;
       }
       if (crossedRows.size > 0) {
         setIsDeleting(true);
@@ -621,7 +613,7 @@ const EditPaymentList = () => {
                     type="tel"
                     onKeyPress={(e) => {
                       // Allow only numbers, backspace, and dot (for decimal)
-                      if (!/[0-9.]/.test(e.key) && e.key !== 'Backspace') {
+                      if (!/[0-9.]/.test(e.key) && e.key !== "Backspace") {
                         e.preventDefault();
                       }
                     }}

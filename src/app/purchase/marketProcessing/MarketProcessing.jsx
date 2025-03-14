@@ -67,6 +67,7 @@ import {
   ProcessingDelete,
   ProcessingEdit,
 } from "@/components/buttonIndex/ButtonComponents";
+import { encryptId } from "@/utils/encyrption/Encyrption";
 
 const MarketProcessing = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -164,11 +165,20 @@ const MarketProcessing = () => {
         return (
           <div className="flex flex-row">
             <ProcessingEdit
-              onClick={() =>
+              // onClick={() =>
+              //   navigate(
+              //     `/purchase/market-processing/editProcessing/${ProcessingId}`
+              //   )
+              // }
+              onClick={() => {
+                const encryptedId = encryptId(ProcessingId);
+
                 navigate(
-                  `/purchase/market-processing/editProcessing/${ProcessingId}`
-                )
-              }
+                  `/purchase/market-processing/editProcessing/${encodeURIComponent(
+                    encryptedId
+                  )}`
+                );
+              }}
             />
 
             <ProcessingDelete
@@ -244,7 +254,7 @@ const MarketProcessing = () => {
       <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
           Processing Liste
-        </div> 
+        </div>
         {/* searching and column filter  */}
         <div className="flex items-center py-4">
           <div className="relative w-72">

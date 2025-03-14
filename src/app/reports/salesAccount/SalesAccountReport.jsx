@@ -140,9 +140,13 @@ const SalesAccountReport = () => {
               <h2 className="p-2 bg-gray-200 font-bold ">{branchName}</h2>
               <div
                 className="grid bg-white"
+                // style={{
+                //   gridTemplateColumns:
+                //     "minmax(30px, auto) minmax(150px, auto) minmax(110px, auto) minmax(90px, auto) minmax(60px, auto) minmax(100px, auto) minmax(110px, auto) minmax(110px, auto) minmax(70px, auto) minmax(100px, auto) ",
+                // }}
                 style={{
                   gridTemplateColumns:
-                    "minmax(30px, auto) minmax(150px, auto) minmax(110px, auto) minmax(90px, auto) minmax(60px, auto) minmax(100px, auto) minmax(110px, auto) minmax(110px, auto) minmax(70px, auto) minmax(100px, auto) ",
+                    "0.5fr 1fr 1fr 1.5fr 1fr 1fr 1fr 1fr 1fr 1fr",
                 }}
               >
                 {/* Header */}
@@ -251,9 +255,14 @@ const SalesAccountReport = () => {
           {/* Overall Grand Total */}
           <div
             className="grid bg-gray-100 border-t border-l border-r border-black font-bold text-[10px]"
+            // style={{
+            //   gridTemplateColumns:
+            //     "minmax(110px, auto) minmax(150px, auto) minmax(150px, auto) minmax(90px, auto) minmax(60px, auto) minmax(100px, auto) minmax(110px, auto) minmax(110px, auto) minmax(70px, auto) minmax(80px, auto) ",
+            // }}
+
             style={{
               gridTemplateColumns:
-                "minmax(110px, auto) minmax(150px, auto) minmax(150px, auto) minmax(90px, auto) minmax(60px, auto) minmax(100px, auto) minmax(110px, auto) minmax(110px, auto) minmax(70px, auto) minmax(80px, auto) ",
+                "0.5fr 1fr 1fr 1.5fr 1fr 1fr 1fr 1fr 1fr 1fr",
             }}
           >
             <div className="p-2 border-b  border-black"></div>

@@ -40,6 +40,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useNavigate } from "react-router-dom";
+import { encryptId } from "@/utils/encyrption/Encyrption";
 
 const PaymentClose = () => {
   const navigate = useNavigate();
@@ -127,8 +128,15 @@ const PaymentClose = () => {
                 <TooltipTrigger asChild>
                   <Eye
                     className="h-4 w-4 cursor-pointer"
+                    // onClick={() => {
+                    //   navigate(`/payment-view/${row.original.invoice_no}`);
+                    // }}
                     onClick={() => {
-                      navigate(`/payment-view/${row.original.invoice_no}`);
+                      const encryptedId = encryptId(row.original.invoice_no);
+
+                      navigate(
+                        `/payment-view/${encodeURIComponent(encryptedId)}`
+                      );
                     }}
                   />
                 </TooltipTrigger>

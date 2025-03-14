@@ -72,10 +72,11 @@ import {
   PaymentCreate,
 } from "@/components/buttonIndex/ButtonComponents";
 import { Skeleton } from "@/components/ui/skeleton";
+import { encryptId } from "@/utils/encyrption/Encyrption";
 const PaymentList = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteInoice, setDeleteInoiceid] = useState(null);
- const [expandedRowId, setExpandedRowId] = useState(null);
+  const [expandedRowId, setExpandedRowId] = useState(null);
   const [subRowData, setSubRowData] = useState({});
   const { toast } = useToast();
   const {
@@ -118,7 +119,7 @@ const PaymentList = () => {
       if (!subRowData[rowId]) {
         try {
           const data = await fetchSubRowData(rowId);
-          setSubRowData(prev => ({ ...prev, [rowId]: data }));
+          setSubRowData((prev) => ({ ...prev, [rowId]: data }));
         } catch (error) {
           toast({
             title: "Error",
@@ -132,13 +133,16 @@ const PaymentList = () => {
 
   // Calculate total amount for subrow
   const calculateSubRowTotal = (subRowItems) => {
-    return subRowItems.reduce((total, item) => {
-      return total + (
-        parseFloat(item.invoicePSub_amt_adv || 0) +
-        parseFloat(item.invoicePSub_amt_dp || 0) +
-        parseFloat(item.invoicePSub_amt_da || 0)
-      );
-    }, 0).toFixed(2);
+    return subRowItems
+      .reduce((total, item) => {
+        return (
+          total +
+          (parseFloat(item.invoicePSub_amt_adv || 0) +
+            parseFloat(item.invoicePSub_amt_dp || 0) +
+            parseFloat(item.invoicePSub_amt_da || 0))
+        );
+      }, 0)
+      .toFixed(2);
   };
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
@@ -171,7 +175,6 @@ const PaymentList = () => {
 
   // Define columns for the table
   const columns = [
-
     {
       accessorKey: "invoiceP_date",
       header: "Date",
@@ -208,26 +211,27 @@ const PaymentList = () => {
         return date ? moment(date).format("DD-MMM-YYYY") : "";
       },
     },
-   {
-        accessorKey: "invoiceP_usd_amount",
-        header: "USD Amount",
-        cell: ({ row }) => (
-          <div className="flex items-center gap-2">
-            <span>{row.getValue("invoiceP_usd_amount")}</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleRowExpand(row.original.id)}
-              className="p-0 h-6 w-6"
-            >
-              {expandedRowId === row.original.id ? 
-                <ChevronUp className="h-4 w-4" /> : 
-                <ChevronDown className="h-4 w-4" />
-              }
-            </Button>
-          </div>
-        ),
-      },
+    {
+      accessorKey: "invoiceP_usd_amount",
+      header: "USD Amount",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <span>{row.getValue("invoiceP_usd_amount")}</span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleRowExpand(row.original.id)}
+            className="p-0 h-6 w-6"
+          >
+            {expandedRowId === row.original.id ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+      ),
+    },
     {
       accessorKey: "invoiceP_status",
       header: "Status",
@@ -248,7 +252,14 @@ const PaymentList = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <InvoiceEdit
-                    onClick={() => navigate(`/payment-edit/${invoiceId}`)}
+                    // onClick={() => navigate(`/payment-edit/${invoiceId}`)}
+                    onClick={() => {
+                      const encryptedId = encryptId(invoiceId);
+
+                      navigate(
+                        `/payment-edit/${encodeURIComponent(encryptedId)}`
+                      );
+                    }}
                   ></InvoiceEdit>
                 </TooltipTrigger>
                 <TooltipContent>Edit payment</TooltipContent>
@@ -304,8 +315,12 @@ const PaymentList = () => {
         <table className="min-w-full border-collapse border border-gray-200">
           <thead className="bg-gray-100">
             <tr>
-              <th className="border border-gray-300 px-4 py-2 text-left">Invoice Ref</th>
-              <th className="border border-gray-300 px-4 py-2 text-left">ADV</th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                Invoice Ref
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left">
+                ADV
+              </th>
               <th className="border border-gray-300 px-4 py-2 text-left">DP</th>
               <th className="border border-gray-300 px-4 py-2 text-left">DA</th>
             </tr>
@@ -313,18 +328,25 @@ const PaymentList = () => {
           <tbody>
             {data.paymentSub.map((sub, index) => (
               <tr key={index} className="bg-white">
-                <td className="border border-gray-300 px-4 py-2">{sub.invoicePSub_inv_ref}</td>
-                <td className="border border-gray-300 px-4 py-2">{sub.invoicePSub_amt_adv}</td>
-                <td className="border border-gray-300 px-4 py-2">{sub.invoicePSub_amt_dp}</td>
-                <td className="border border-gray-300 px-4 py-2">{sub.invoicePSub_amt_da}</td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {sub.invoicePSub_inv_ref}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {sub.invoicePSub_amt_adv}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {sub.invoicePSub_amt_dp}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {sub.invoicePSub_amt_da}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
     );
-};
-
+  };
 
   // Render loading state
   if (isLoading) {
@@ -452,12 +474,12 @@ const PaymentList = () => {
                       ))}
                     </TableRow>
                     {expandedRowId === row.original.id && (
-                                       <TableRow>
-                                         <TableCell colSpan={columns.length}>
-                                           <SubRowContent rowId={row.original.id} />
-                                         </TableCell>
-                                       </TableRow>
-                                     )}
+                      <TableRow>
+                        <TableCell colSpan={columns.length}>
+                          <SubRowContent rowId={row.original.id} />
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </React.Fragment>
                 ))
               ) : (
