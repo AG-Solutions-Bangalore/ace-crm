@@ -1,4 +1,4 @@
-import Page from '@/app/dashboard/page'
+import Page from "@/app/dashboard/page";
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -10,7 +10,14 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, Loader2, Edit, Search, SquarePlus } from "lucide-react";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  Loader2,
+  Edit,
+  Search,
+  SquarePlus,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -28,158 +35,138 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useNavigate } from 'react-router-dom';
-import BASE_URL from '@/config/BaseUrl';
-import CreateCountry from './CreateCountry';
-import EditCountry from './EditCountry';
-import { ButtonConfig } from '@/config/ButtonConfig';
+import { useNavigate } from "react-router-dom";
+import BASE_URL from "@/config/BaseUrl";
+import CreateCountry from "./CreateCountry";
+import EditCountry from "./EditCountry";
+import { ButtonConfig } from "@/config/ButtonConfig";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const CountryList = () => {
-    const {
-        data: countries,
-        isLoading,
-        isError,
-        refetch,
-      } = useQuery({
-        queryKey: ["countries"],
-        queryFn: async () => {
-          const token = localStorage.getItem("token");
-          const response = await axios.get(
-            `${BASE_URL}/api/panel-fetch-country-list`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          return response.data.country;
-        },
-      });
-    
-      // State for table management
-      const [sorting, setSorting] = useState([]);
-      const [columnFilters, setColumnFilters] = useState([]);
-      const [columnVisibility, setColumnVisibility] = useState({});
-      const [rowSelection, setRowSelection] = useState({});
-      const navigate = useNavigate();
-    
-      // Define columns for the table
-      const columns = [
+  const {
+    data: countries,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["countries"],
+    queryFn: async () => {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `${BASE_URL}/api/panel-fetch-country-list`,
         {
-          accessorKey: "index",
-          header: "Sl No",
-          cell: ({ row }) => <div>{row.index + 1}</div>,
-        },
-        {
-          accessorKey: "country_name",
-          header: ({ column }) => (
-            <Button
-              variant="ghost"
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            >
-              Country
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          ),
-          cell: ({ row }) => <div>{row.getValue("country_name")}</div>,
-        },
-        {
-          accessorKey: "country_port",
-          header: "Country Port",
-          cell: ({ row }) => <div>{row.getValue("country_port")}</div>,
-        },
-        {
-          accessorKey: "country_dp",
-          header: "DP",
-          cell: ({ row }) => <div>{row.getValue("country_dp")}</div>,
-        },
-        {
-          accessorKey: "country_da",
-          header: "DA",
-          cell: ({ row }) => <div>{row.getValue("country_da")}</div>,
-        },
-        {
-          accessorKey: "country_pol",
-          header: "POL",
-          cell: ({ row }) => <div>{row.getValue("country_pol")}</div>,
-        },
-       
-    
-        
-        {
-          id: "actions",
-          header: "Action",
-          cell: ({ row }) => {
-            const countryId = row.original.id;
-    
-            return (
-              <div className="flex flex-row">
-              <EditCountry countryId={countryId}/>
-              </div>
-            );
-          },
-        },
-      ];
-    
-      // Create the table instance
-      const table = useReactTable({
-        data: countries || [],
-        columns,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
-        state: {
-          sorting,
-          columnFilters,
-          columnVisibility,
-          rowSelection,
-        },
-        initialState: {
-          pagination: {
-            pageSize: 7,
-          },
-        },
-      });
-    
-      // Render loading state
-      if (isLoading) {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data.country;
+    },
+  });
+
+  // State for table management
+  const [sorting, setSorting] = useState([]);
+  const [columnFilters, setColumnFilters] = useState([]);
+  const [columnVisibility, setColumnVisibility] = useState({});
+  const [rowSelection, setRowSelection] = useState({});
+  const navigate = useNavigate();
+
+  // Define columns for the table
+  const columns = [
+    {
+      accessorKey: "index",
+      header: "Sl No",
+      cell: ({ row }) => <div>{row.index + 1}</div>,
+    },
+    {
+      accessorKey: "country_name",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Country
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <div>{row.getValue("country_name")}</div>,
+    },
+    {
+      accessorKey: "country_port",
+      header: "Country Port",
+      cell: ({ row }) => <div>{row.getValue("country_port")}</div>,
+    },
+    {
+      accessorKey: "country_dp",
+      header: "DP",
+      cell: ({ row }) => <div>{row.getValue("country_dp")}</div>,
+    },
+    {
+      accessorKey: "country_da",
+      header: "DA",
+      cell: ({ row }) => <div>{row.getValue("country_da")}</div>,
+    },
+    {
+      accessorKey: "country_pol",
+      header: "POL",
+      cell: ({ row }) => <div>{row.getValue("country_pol")}</div>,
+    },
+
+    {
+      id: "actions",
+      header: "Action",
+      cell: ({ row }) => {
+        const countryId = row.original.id;
+
         return (
-          <Page>
-            <div className="flex justify-center items-center h-full">
-              <Button disabled>
-                <Loader2 className=" h-4 w-4 animate-spin" />
-                Loading Country
-              </Button>
-            </div>
-          </Page>
+          <div className="flex flex-row">
+            <EditCountry countryId={countryId} />
+          </div>
         );
-      }
-    
-      // Render error state
-      if (isError) {
-        return (
-          <Page>
-            <Card className="w-full max-w-md mx-auto mt-10">
-              <CardHeader>
-                <CardTitle className="text-destructive">
-                  Error Fetching Country
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Button onClick={() => refetch()} variant="outline">
-                  Try Again
-                </Button>
-              </CardContent>
-            </Card>
-          </Page>
-        );
-      }
+      },
+    },
+  ];
+
+  // Create the table instance
+  const table = useReactTable({
+    data: countries || [],
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+    initialState: {
+      pagination: {
+        pageSize: 7,
+      },
+    },
+  });
+
+  // Render loading state
+  if (isLoading) {
+    return <LoaderComponent name="Country Data" />; // ✅ Correct prop usage
+  }
+
+  // Render error state
+  if (isError) {
+    return (
+      <ErrorComponent message="Error Fetching Country Data" refetch={refetch} />
+    );
+  }
   return (
     <Page>
-   <div className="w-full p-4">
+      <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
           Country List
         </div>
@@ -229,9 +216,8 @@ const CountryList = () => {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-   
-     
-         <CreateCountry/>
+
+          <CreateCountry />
         </div>
         {/* table  */}
         <div className="rounded-md border">
@@ -243,7 +229,7 @@ const CountryList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                              className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                        className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null

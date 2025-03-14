@@ -20,6 +20,10 @@ import { useFetchShipper, useFetchVessel } from "@/hooks/useApi";
 import BASE_URL from "@/config/BaseUrl";
 import { decryptId } from "@/utils/encyrption/Encyrption";
 import ReactSelect from "react-select";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const DocumentHeader = ({ documentDetails }) => {
   return (
@@ -338,36 +342,16 @@ const InvoiceDocumentEdit = () => {
   }, [usd_value, freight_value, insurance_value, exchange_value]);
 
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Loading Document Data
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="Document Data" />; // ✅ Correct prop usage
   }
 
+  // Render error state
   if (isError) {
     return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardContent>
-            <div className="text-destructive text-center">
-              Error Fetching Document Data
-            </div>
-            <Button
-              onClick={() => refetch()}
-              variant="outline"
-              className="mt-4"
-            >
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
+      <ErrorComponent
+        message="Error Fetching Document  Data"
+        refetch={refetch}
+      />
     );
   }
   return (

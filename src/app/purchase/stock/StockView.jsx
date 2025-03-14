@@ -12,6 +12,10 @@ import BASE_URL from "@/config/BaseUrl";
 import { useFetchGoDownMarketPurchase } from "@/hooks/useApi";
 import { ChevronDown, Loader2 } from "lucide-react";
 import Select from "react-select";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const createReport = async (data) => {
   const token = localStorage.getItem("token");
@@ -165,18 +169,6 @@ const StockView = () => {
       );
     }
   );
-  if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Loading Stock Summary
-          </Button>
-        </div>
-      </Page>
-    );
-  }
 
   return (
     <Page>

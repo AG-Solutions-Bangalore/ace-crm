@@ -1,4 +1,4 @@
-import Page from '@/app/dashboard/page'
+import Page from "@/app/dashboard/page";
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -10,7 +10,14 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, Loader2, Edit, Search, SquarePlus } from "lucide-react";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  Loader2,
+  Edit,
+  Search,
+  SquarePlus,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -28,12 +35,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useNavigate } from 'react-router-dom';
-import BASE_URL from '@/config/BaseUrl';
+import { useNavigate } from "react-router-dom";
+import BASE_URL from "@/config/BaseUrl";
 
-import { ButtonConfig } from '@/config/ButtonConfig';
-import CreatePurProd from './CreatePurProd';
-import StatusToggle from '@/components/toggle/StatusToggle';
+import { ButtonConfig } from "@/config/ButtonConfig";
+import CreatePurProd from "./CreatePurProd";
+import StatusToggle from "@/components/toggle/StatusToggle";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const PurchaseProductList = () => {
   const {
@@ -64,7 +75,6 @@ const PurchaseProductList = () => {
 
   // Define columns for the table
   const columns = [
-  
     {
       accessorKey: "index",
       header: "Sl No",
@@ -84,8 +94,6 @@ const PurchaseProductList = () => {
       cell: ({ row }) => <div>{row.getValue("purchaseOrderProduct")}</div>,
     },
 
-   
-
     {
       accessorKey: "purchaseOrderProduct_status",
       header: "Status",
@@ -103,7 +111,6 @@ const PurchaseProductList = () => {
         );
       },
     },
-   
   ];
 
   // Create the table instance
@@ -133,42 +140,24 @@ const PurchaseProductList = () => {
 
   // Render loading state
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading Purchase Product
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="Purchase Product Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (isError) {
     return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching Purchase Product
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
+      <ErrorComponent
+        message="Error Fetching Purchase Product Data"
+        refetch={refetch}
+      />
     );
   }
+
   return (
     <Page>
-       <div className="w-full p-4">
+      <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
-        Purchase Product List
+          Purchase Product List
         </div>
 
         {/* searching and column filter  */}
@@ -216,9 +205,8 @@ const PurchaseProductList = () => {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-   
-     
-          <CreatePurProd/>
+
+          <CreatePurProd />
         </div>
         {/* table  */}
         <div className="rounded-md border">
@@ -230,7 +218,7 @@ const PurchaseProductList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                              className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                        className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null
@@ -301,7 +289,7 @@ const PurchaseProductList = () => {
         </div>
       </div>
     </Page>
-  )
-}
+  );
+};
 
-export default PurchaseProductList
+export default PurchaseProductList;

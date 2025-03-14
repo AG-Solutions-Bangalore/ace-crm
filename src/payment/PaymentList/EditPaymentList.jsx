@@ -1,4 +1,8 @@
 import Page from "@/app/dashboard/page";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -540,6 +544,15 @@ const EditPaymentList = () => {
       setIsDeleting(false);
     }
   };
+
+  if (isLoading) {
+    return <LoaderComponent name="Payment  Data" />; // ✅ Correct prop usage
+  }
+
+  // Render error state
+  if (isError) {
+    return <ErrorComponent message="Error Payment Data" refetch={refetch} />;
+  }
 
   return (
     <Page>

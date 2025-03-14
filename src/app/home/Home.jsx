@@ -19,6 +19,10 @@ import {
 } from "lucide-react";
 import Page from "../dashboard/page";
 import BASE_URL from "@/config/BaseUrl";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const StatCard = ({ title, value, icon: Icon, className }) => (
   <Card className="relative overflow-hidden">
@@ -88,29 +92,12 @@ const Home = () => {
   });
 
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex items-center justify-center h-full">
-          <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="dashboard Data" />; // ✅ Correct prop usage
   }
 
+  // Render error state
   if (isError) {
-    return (
-      <Page>
-        <div className="p-4">
-          <Card className="border-red-200">
-            <CardContent className="p-6">
-              <h2 className="text-xl font-semibold text-red-600">
-                Error loading dashboard data
-              </h2>
-            </CardContent>
-          </Card>
-        </div>
-      </Page>
-    );
+    return <ErrorComponent message="Error Fetching dashboard  Data" />;
   }
 
   return (
@@ -141,9 +128,6 @@ const Home = () => {
 
         {/* <EnquiryTable enquiries={data.enquiry} /> */}
       </div>
-
-
-    
     </Page>
   );
 };

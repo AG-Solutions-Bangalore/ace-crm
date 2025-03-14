@@ -61,6 +61,10 @@ import {
   useFetchProduct,
   useFetchStatus,
 } from "@/hooks/useApi";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 // API functions
 
@@ -906,38 +910,28 @@ const InvoiceEdit = () => {
     }
   };
 
-  if (isLoading) {
+  if (error) {
     return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading invoice Data
-          </Button>
-        </div>
-      </Page>
+      <ErrorComponent
+        message="Error Fetching Certificate Origin  Data"
+        refetch={() => fetchContractData}
+      />
+    );
+  }
+  if (isLoading) {
+    return <LoaderComponent name="invoice Data" />; // ✅ Correct prop usage
+  }
+
+  // Render error state
+  if (isError) {
+    return (
+      <ErrorComponent
+        message="Error Fetching invoice  Data"
+        refetch={refetch}
+      />
     );
   }
 
-  //   Render error state
-  if (isError) {
-    return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching invoice Data
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
-    );
-  }
   const CompactViewSection = ({ invoiceDatas }) => {
     const [isExpanded, setIsExpanded] = useState(true);
     const containerRef = useRef(null);
@@ -1031,37 +1025,36 @@ const InvoiceEdit = () => {
               </span>
             </p>
           </h2>
-         
-                  
+
           <div className="flex items-center gap-2">
             <span className=" flex items-center gap-2    text-xs font-medium  text-yellow-800 ">
               {/* {invoiceDatas?.invoice?.invoice_status} */}
               <MemoizedSelect
-                    value={formData.invoice_product}
-                    onChange={(value) =>
-                      handleSelectChange("invoice_product", value)
-                    }
-                    options={
-                      productData?.product?.map((product) => ({
-                        value: product.product_name,
-                        label: product.product_name,
-                      })) || []
-                    }
-                    placeholder="Select Product"
-                  />
+                value={formData.invoice_product}
+                onChange={(value) =>
+                  handleSelectChange("invoice_product", value)
+                }
+                options={
+                  productData?.product?.map((product) => ({
+                    value: product.product_name,
+                    label: product.product_name,
+                  })) || []
+                }
+                placeholder="Select Product"
+              />
               <MemoizedSelect
-                    value={formData.invoice_status}
-                    onChange={(value) =>
-                      handleSelectChange("invoice_status", value)
-                    }
-                    options={
-                      statusData?.invoiceStatus?.map((status) => ({
-                        value: status.invoice_status,
-                        label: status.invoice_status,
-                      })) || []
-                    }
-                    placeholder="Select Status"
-                  />
+                value={formData.invoice_status}
+                onChange={(value) =>
+                  handleSelectChange("invoice_status", value)
+                }
+                options={
+                  statusData?.invoiceStatus?.map((status) => ({
+                    value: status.invoice_status,
+                    label: status.invoice_status,
+                  })) || []
+                }
+                placeholder="Select Status"
+              />
             </span>
 
             {isExpanded ? (
@@ -1119,24 +1112,21 @@ const InvoiceEdit = () => {
   };
   return (
     <Page>
-      <form
-        onSubmit={handleSubmit}
-        className="w-full p-4 bg-blue-50/30"
-      >
+      <form onSubmit={handleSubmit} className="w-full p-4 bg-blue-50/30">
         {/* <EnquiryHeader progress={progress} /> */}
         <CompactViewSection invoiceDatas={invoiceDatas} />
-        
+
         <Card className="mb-6    bg-blue-200">
           <CardContent className="p-6">
             {/* Basic Details Section */}
             {/* <div className="mb-8">
               <div className="grid grid-cols-5 gap-6"> */}
-                {/* <div> */}
-                {/* <label className="block text-sm font-medium mb-2">
+            {/* <div> */}
+            {/* <label className="block text-sm font-medium mb-2">
                     Contract Ref. <span className="text-red-500">*</span>
                   </label> */}
-                {/* this is just for show  no field required here  */}
-                {/* <MemoizedSelect
+            {/* this is just for show  no field required here  */}
+            {/* <MemoizedSelect
                  
                     value={formData.contract_ref}
                     onChange={(value) =>
@@ -1151,7 +1141,7 @@ const InvoiceEdit = () => {
                     placeholder="Select Contract Ref."
                     
                   /> */}
-                {/* <Input
+            {/* <Input
                     type="text"
                     placeholder="Enter Contract Ref"
                     className="bg-white"
@@ -1161,12 +1151,12 @@ const InvoiceEdit = () => {
                       handleSelectChange("contract_ref", value)
                     }
                   /> */}
-                {/* </div> */}
-                {/* <div> */}
-                {/* <label className="block text-sm font-medium mb-2">
+            {/* </div> */}
+            {/* <div> */}
+            {/* <label className="block text-sm font-medium mb-2">
                     Company <span className="text-red-500">*</span>
                   </label> */}
-                {/* <MemoizedSelect
+            {/* <MemoizedSelect
                     value={formData.branch_short}
                     onChange={(value) =>
                       handleSelectChange("branch_short", value)
@@ -1179,7 +1169,7 @@ const InvoiceEdit = () => {
                     }
                     placeholder="Select Company"
                   /> */}
-                {/* <Input
+            {/* <Input
                     type="text"
                     placeholder="Select Company"
                     className="bg-white"
@@ -1189,9 +1179,9 @@ const InvoiceEdit = () => {
                       handleSelectChange("branch_short", value)
                     }
                   /> */}
-                {/* </div> */}
+            {/* </div> */}
 
-                {/* <div>
+            {/* <div>
                   <label className="block text-sm font-medium mb-2">
                     Invoice No <span className="text-red-500">*</span>
                   </label>
@@ -1204,7 +1194,7 @@ const InvoiceEdit = () => {
                     onChange={(e) => handleInputChange(e, "invoice_no")}
                   />
                 </div> */}
-                {/* <div>
+            {/* <div>
                   <label className="block text-sm font-medium mb-2">
                     Invoice Date <span className="text-red-500">*</span>
                   </label>
@@ -1215,7 +1205,7 @@ const InvoiceEdit = () => {
                     onChange={(e) => handleInputChange(e, "invoice_date")}
                   />
                 </div> */}
-                {/* <div
+            {/* <div
                   style={{ textAlign: "center" }}
                   className="bg-white rounded-md"
                 >
@@ -1227,7 +1217,7 @@ const InvoiceEdit = () => {
                     {formData.branch_address}
                   </span>
                 </div> */}
-              {/* </div>
+            {/* </div>
             </div> */}
 
             {/* <div className="mb-8">
@@ -1348,7 +1338,6 @@ const InvoiceEdit = () => {
                     placeholder="Select Consig. Bank"
                   />
                 </div>
-                
               </div>
             </div>
 
@@ -1385,13 +1374,12 @@ const InvoiceEdit = () => {
                     }
                   />
                 </div>
-                
               </div>
             </div>
 
             <div className="mb-8">
               <div className="grid grid-cols-6 gap-6">
-              <div>
+                <div>
                   <label className="block text-sm font-medium mb-2">
                     Pre-Receipts <span className="text-red-500">*</span>
                   </label>
@@ -1642,8 +1630,6 @@ const InvoiceEdit = () => {
                 </div>
               </div>
             </div>
-          
-          
 
             {/* Products Section */}
             <div className="mb-2">
@@ -1936,7 +1922,6 @@ const InvoiceEdit = () => {
 
 export default InvoiceEdit;
 
-
 // <div>
 //                   <label className="block text-sm font-medium mb-2">
 //                     Product <span className="text-red-500">*</span>
@@ -1956,12 +1941,6 @@ export default InvoiceEdit;
 //                   />
 //                 </div>
 
-
-
-
-
-
-
 // <div>
 //                   <label className="block text-xs font-medium mb-[2px]">
 //                     Invoice Status <span className="text-red-500">*</span>
@@ -1979,7 +1958,4 @@ export default InvoiceEdit;
 //                     }
 //                     placeholder="Select Status"
 //                   />
-//                 </div>  
-
-
-
+//                 </div>

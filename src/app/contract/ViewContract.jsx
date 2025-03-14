@@ -19,6 +19,10 @@ import ContractViewPdf from "./contractView/ContractViewPdf";
 import ContractViewPrintHeader from "./contractView/ContractViewPrintHeader";
 import ContractViewPntWthHeader from "./contractView/ContractViewPntWthHeader";
 import { decryptId } from "@/utils/encyrption/Encyrption";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const ViewContract = () => {
   const withoutHeaderSignRef = useRef();
@@ -30,7 +34,7 @@ const ViewContract = () => {
   console.log(decryptedId, "dedecryptedId");
   const [contractData, setContractData] = useState(null);
   const [loading, setLoading] = useState(true);
-    const [isWordLoading, setIsWordLoading] = useState(false);
+  const [isWordLoading, setIsWordLoading] = useState(false);
   const [showLetterhead, setShowLetterhead] = useState(false);
   const [showSignature, setShowSignature] = useState(false);
   const [error, setError] = useState(null);
@@ -70,40 +74,39 @@ const ViewContract = () => {
 
   //   fetchContractData();
   // }, [decryptedId]);
-  useEffect(() => {
-    const fetchContractData = async () => {
-      setLoading(true);
+  const fetchContractData = async () => {
+    setLoading(true);
 
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `${BASE_URL}/api/panel-fetch-contract-by-id/${decryptedId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch contract data");
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${BASE_URL}/api/panel-fetch-contract-by-id/${decryptedId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
 
-        const data = await response.json();
-
-        if (!data?.branch?.branch_letter_head) {
-          setError("Letter head data is missing");
-          setLoading(true);
-        } else {
-          setContractData(data);
-        }
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error("Failed to fetch contract data");
       }
-    };
 
+      const data = await response.json();
+
+      if (!data?.branch?.branch_letter_head) {
+        setError("Letter head data is missing");
+        setLoading(true);
+      } else {
+        setContractData(data);
+      }
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchContractData();
   }, [decryptedId]);
 
@@ -802,7 +805,6 @@ const ViewContract = () => {
     });
   };
 
-
   /*-----------------------word------------------ */
   const wordWoheaderWoSign = async () => {
     setIsWordLoading(true);
@@ -1025,7 +1027,6 @@ const ViewContract = () => {
     }
   };
 
-  
   /*-----------------------------------word-end--------------------- */
 
   // print functions
@@ -1196,33 +1197,18 @@ const ViewContract = () => {
       </div>
     </div>
   );
+
   if (loading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading contract Data
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="contract Data" />; // ✅ Correct prop usage
   }
 
+  // Render error state
   if (error) {
     return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching contract Data
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline">Try Again</Button>
-          </CardContent>
-        </Card>
-      </Page>
+      <ErrorComponent
+        message="Error Fetching contract Data"
+        refetch={() => fetchContractData()}
+      />
     );
   }
   return (

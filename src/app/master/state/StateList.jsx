@@ -27,18 +27,17 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import axios from "axios";
-import {
-  ArrowUpDown,
-  ChevronDown,
-  Loader2,
-  Search
-} from "lucide-react";
+import { ArrowUpDown, ChevronDown, Loader2, Search } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ButtonConfig } from "@/config/ButtonConfig";
 import CreateState from "./CreateState";
 import EditState from "./EditState";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const StateList = () => {
   const {
@@ -152,37 +151,14 @@ const StateList = () => {
     },
   });
 
-  // Render loading state
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading State
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="State Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (isError) {
     return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching State
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
+      <ErrorComponent message="Error Fetching State Data" refetch={refetch} />
     );
   }
 
@@ -239,7 +215,7 @@ const StateList = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-            <CreateState />
+          <CreateState />
         </div>
         {/* table  */}
         <div className="rounded-md border">

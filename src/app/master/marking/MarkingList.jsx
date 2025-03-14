@@ -40,150 +40,132 @@ import BASE_URL from "@/config/BaseUrl";
 import CreateMarking from "./CreateMarking";
 import EditMarking from "./EditMarking";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const MarkingList = () => {
-    const {
-        data: markings,
-        isLoading,
-        isError,
-        refetch,
-      } = useQuery({
-        queryKey: ["markings"],
-        queryFn: async () => {
-          const token = localStorage.getItem("token");
-          const response = await axios.get(
-            `${BASE_URL}/api/panel-fetch-marking-list`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          return response.data.marking;
-        },
-      });
-    
-      // State for table management
-      const [sorting, setSorting] = useState([]);
-      const [columnFilters, setColumnFilters] = useState([]);
-      const [columnVisibility, setColumnVisibility] = useState({});
-      const [rowSelection, setRowSelection] = useState({});
-      const navigate = useNavigate();
-    
-      // Define columns for the table
-      const columns = [
+  const {
+    data: markings,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["markings"],
+    queryFn: async () => {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `${BASE_URL}/api/panel-fetch-marking-list`,
         {
-          accessorKey: "index",
-          header: "Sl No",
-          cell: ({ row }) => <div>{row.index + 1}</div>,
-        },
-        {
-          accessorKey: "marking",
-          header: ({ column }) => (
-            <Button
-              variant="ghost"
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            >
-             Marking
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          ),
-          cell: ({ row }) => <div>{row.getValue("marking")}</div>,
-        },
-      
-        {
-          accessorKey: "marking_status",
-          header: "Status",
-          cell: ({ row }) => {
-            const status = row.getValue("marking_status");
-    
-            return (
-              <span
-                className={`px-2 py-1 rounded text-xs ${
-                  status == "Active"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-gray-100 text-gray-800"
-                }`}
-              >
-                {status}
-              </span>
-            );
-          },
-        },
-        {
-          id: "actions",
-          header: "Action",
-          cell: ({ row }) => {
-            const markingId = row.original.id;
-    
-            return (
-              <div className="flex flex-row">
-                <EditMarking markingId={markingId}/>
-              </div>
-            );
-          },
-        },
-      ];
-    
-      // Create the table instance
-      const table = useReactTable({
-        data: markings || [],
-        columns,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
-        state: {
-          sorting,
-          columnFilters,
-          columnVisibility,
-          rowSelection,
-        },
-        initialState: {
-          pagination: {
-            pageSize: 7,
-          },
-        },
-      });
-    
-      // Render loading state
-      if (isLoading) {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data.marking;
+    },
+  });
+
+  // State for table management
+  const [sorting, setSorting] = useState([]);
+  const [columnFilters, setColumnFilters] = useState([]);
+  const [columnVisibility, setColumnVisibility] = useState({});
+  const [rowSelection, setRowSelection] = useState({});
+  const navigate = useNavigate();
+
+  // Define columns for the table
+  const columns = [
+    {
+      accessorKey: "index",
+      header: "Sl No",
+      cell: ({ row }) => <div>{row.index + 1}</div>,
+    },
+    {
+      accessorKey: "marking",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Marking
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <div>{row.getValue("marking")}</div>,
+    },
+
+    {
+      accessorKey: "marking_status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.getValue("marking_status");
+
         return (
-          <Page>
-            <div className="flex justify-center items-center h-full">
-              <Button disabled>
-                <Loader2 className=" h-4 w-4 animate-spin" />
-                Loading Marking Data
-              </Button>
-            </div>
-          </Page>
+          <span
+            className={`px-2 py-1 rounded text-xs ${
+              status == "Active"
+                ? "bg-green-100 text-green-800"
+                : "bg-gray-100 text-gray-800"
+            }`}
+          >
+            {status}
+          </span>
         );
-      }
-    
-      // Render error state
-      if (isError) {
+      },
+    },
+    {
+      id: "actions",
+      header: "Action",
+      cell: ({ row }) => {
+        const markingId = row.original.id;
+
         return (
-          <Page>
-            <Card className="w-full max-w-md mx-auto mt-10">
-              <CardHeader>
-                <CardTitle className="text-destructive">
-                  Error Marking Data
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Button onClick={() => refetch()} variant="outline">
-                  Try Again
-                </Button>
-              </CardContent>
-            </Card>
-          </Page>
+          <div className="flex flex-row">
+            <EditMarking markingId={markingId} />
+          </div>
         );
-      }
+      },
+    },
+  ];
+
+  // Create the table instance
+  const table = useReactTable({
+    data: markings || [],
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+    initialState: {
+      pagination: {
+        pageSize: 7,
+      },
+    },
+  });
+
+  // Render loading state
+  if (isLoading) {
+    return <LoaderComponent name="Marking Data" />; // ✅ Correct prop usage
+  }
+
+  // Render error state
+  if (isError) {
+    return (
+      <ErrorComponent message="Error Fetching Marking Data" refetch={refetch} />
+    );
+  }
   return (
-   <Page>
-   <div className="w-full p-4">
+    <Page>
+      <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
           Marking List
         </div>
@@ -233,7 +215,7 @@ const MarkingList = () => {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <CreateMarking/>
+          <CreateMarking />
         </div>
         {/* table  */}
         <div className="rounded-md border">
@@ -245,7 +227,7 @@ const MarkingList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                         className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                        className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null
@@ -315,8 +297,8 @@ const MarkingList = () => {
           </div>
         </div>
       </div>
-   </Page>
-  )
-}
+    </Page>
+  );
+};
 
-export default MarkingList
+export default MarkingList;

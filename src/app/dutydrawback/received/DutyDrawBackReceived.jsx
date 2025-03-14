@@ -33,6 +33,10 @@ import { useNavigate } from "react-router-dom";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import moment from "moment";
 import DutyDrawBackEdit from "../pending/DutyDrawBackEdit";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const DutyDrawBackReceived = () => {
   const {
@@ -202,38 +206,13 @@ const DutyDrawBackReceived = () => {
     },
   });
 
-  // Render loading state
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading Received
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="Received Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (isError) {
-    return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching Received
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
-    );
+    return <ErrorComponent message="Error Received Data" refetch={refetch} />;
   }
 
   return (

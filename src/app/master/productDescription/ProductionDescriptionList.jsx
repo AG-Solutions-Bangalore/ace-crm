@@ -1,4 +1,4 @@
-import Page from '@/app/dashboard/page'
+import Page from "@/app/dashboard/page";
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -10,7 +10,14 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, Loader2, Edit, Search, SquarePlus } from "lucide-react";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  Loader2,
+  Edit,
+  Search,
+  SquarePlus,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -28,171 +35,154 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useNavigate } from 'react-router-dom';
-import BASE_URL from '@/config/BaseUrl';
-import EditProductDescription from './EditProductDescription';
-import CreateProductDescription from './CreateProductDescription';
-import { ButtonConfig } from '@/config/ButtonConfig';
+import { useNavigate } from "react-router-dom";
+import BASE_URL from "@/config/BaseUrl";
+import EditProductDescription from "./EditProductDescription";
+import CreateProductDescription from "./CreateProductDescription";
+import { ButtonConfig } from "@/config/ButtonConfig";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 const ProductionDescriptionList = () => {
-    const {
-        data: productsSub,
-        isLoading,
-        isError,
-        refetch,
-      } = useQuery({
-        queryKey: ["productsSub"],
-        queryFn: async () => {
-          const token = localStorage.getItem("token");
-          const response = await axios.get(
-            `${BASE_URL}/api/panel-fetch-product-description-list`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          return response.data.productsub;
-        },
-      });
-    
-      // State for table management
-      const [sorting, setSorting] = useState([]);
-      const [columnFilters, setColumnFilters] = useState([]);
-      const [columnVisibility, setColumnVisibility] = useState({});
-      const [rowSelection, setRowSelection] = useState({});
-      const navigate = useNavigate();
-    
-      // Define columns for the table
-      const columns = [
+  const {
+    data: productsSub,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["productsSub"],
+    queryFn: async () => {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `${BASE_URL}/api/panel-fetch-product-description-list`,
         {
-          accessorKey: "index",
-          header: "Sl No",
-          cell: ({ row }) => <div>{row.index + 1}</div>,
-        },
-        {
-          accessorKey: "product_name",
-          header: ({ column }) => (
-            <Button
-              variant="ghost"
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            >
-              Product
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          ),
-          cell: ({ row }) => <div>{row.getValue("product_name")}</div>,
-        },
-        {
-            accessorKey: "product_description",
-            header: "Description",
-            cell: ({ row }) => <div>{row.getValue("product_description")}</div>,
-          },
-        {
-          accessorKey: "product_hs",
-          header: "HS ",
-          cell: ({ row }) => <div>{row.getValue("product_hs")}</div>,
-        },
-        {
-          accessorKey: "product_hsn",
-          header: "HSN ",
-          cell: ({ row }) => <div>{row.getValue("product_hsn")}</div>,
-        },
-       
-       
-    
-        {
-          accessorKey: "product_status",
-          header: "Status",
-          cell: ({ row }) => {
-            const status = row.getValue("product_status");
-    
-            return (
-              <span
-                className={`px-2 py-1 rounded text-xs ${
-                  status == "Active"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-gray-100 text-gray-800"
-                }`}
-              >
-                {status}
-              </span>
-            );
-          },
-        },
-        {
-          id: "actions",
-          header: "Action",
-          cell: ({ row }) => {
-            const proDescId = row.original.id;
-    
-            return (
-              <div className="flex flex-row">
-              <EditProductDescription proDescId={proDescId}/>
-              </div>
-            );
-          },
-        },
-      ];
-    
-      // Create the table instance
-      const table = useReactTable({
-        data: productsSub || [],
-        columns,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
-        state: {
-          sorting,
-          columnFilters,
-          columnVisibility,
-          rowSelection,
-        },
-        initialState: {
-          pagination: {
-            pageSize: 7,
-          },
-        },
-      });
-    
-      // Render loading state
-      if (isLoading) {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data.productsub;
+    },
+  });
+
+  // State for table management
+  const [sorting, setSorting] = useState([]);
+  const [columnFilters, setColumnFilters] = useState([]);
+  const [columnVisibility, setColumnVisibility] = useState({});
+  const [rowSelection, setRowSelection] = useState({});
+  const navigate = useNavigate();
+
+  // Define columns for the table
+  const columns = [
+    {
+      accessorKey: "index",
+      header: "Sl No",
+      cell: ({ row }) => <div>{row.index + 1}</div>,
+    },
+    {
+      accessorKey: "product_name",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Product
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <div>{row.getValue("product_name")}</div>,
+    },
+    {
+      accessorKey: "product_description",
+      header: "Description",
+      cell: ({ row }) => <div>{row.getValue("product_description")}</div>,
+    },
+    {
+      accessorKey: "product_hs",
+      header: "HS ",
+      cell: ({ row }) => <div>{row.getValue("product_hs")}</div>,
+    },
+    {
+      accessorKey: "product_hsn",
+      header: "HSN ",
+      cell: ({ row }) => <div>{row.getValue("product_hsn")}</div>,
+    },
+
+    {
+      accessorKey: "product_status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.getValue("product_status");
+
         return (
-          <Page>
-            <div className="flex justify-center items-center h-full">
-              <Button disabled>
-                <Loader2 className=" h-4 w-4 animate-spin" />
-                Loading Product Desc
-              </Button>
-            </div>
-          </Page>
+          <span
+            className={`px-2 py-1 rounded text-xs ${
+              status == "Active"
+                ? "bg-green-100 text-green-800"
+                : "bg-gray-100 text-gray-800"
+            }`}
+          >
+            {status}
+          </span>
         );
-      }
-    
-      // Render error state
-      if (isError) {
+      },
+    },
+    {
+      id: "actions",
+      header: "Action",
+      cell: ({ row }) => {
+        const proDescId = row.original.id;
+
         return (
-          <Page>
-            <Card className="w-full max-w-md mx-auto mt-10">
-              <CardHeader>
-                <CardTitle className="text-destructive">
-                  Error Fetching Product Desc
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Button onClick={() => refetch()} variant="outline">
-                  Try Again
-                </Button>
-              </CardContent>
-            </Card>
-          </Page>
+          <div className="flex flex-row">
+            <EditProductDescription proDescId={proDescId} />
+          </div>
         );
-      }
+      },
+    },
+  ];
+
+  // Create the table instance
+  const table = useReactTable({
+    data: productsSub || [],
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+    initialState: {
+      pagination: {
+        pageSize: 7,
+      },
+    },
+  });
+
+  // Render loading state
+  if (isLoading) {
+    return <LoaderComponent name="Product Description Data" />; // ✅ Correct prop usage
+  }
+
+  // Render error state
+  if (isError) {
+    return (
+      <ErrorComponent
+        message="Error Fetching Product Description Data"
+        refetch={refetch}
+      />
+    );
+  }
   return (
-  <Page>
-        <div className="w-full p-4">
+    <Page>
+      <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
           Product Description List
         </div>
@@ -242,9 +232,8 @@ const ProductionDescriptionList = () => {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-   
-     
-    <CreateProductDescription/>
+
+          <CreateProductDescription />
         </div>
         {/* table  */}
         <div className="rounded-md border">
@@ -256,7 +245,7 @@ const ProductionDescriptionList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                             className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                        className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null
@@ -326,8 +315,8 @@ const ProductionDescriptionList = () => {
           </div>
         </div>
       </div>
-  </Page>
-  )
-}
+    </Page>
+  );
+};
 
-export default ProductionDescriptionList
+export default ProductionDescriptionList;

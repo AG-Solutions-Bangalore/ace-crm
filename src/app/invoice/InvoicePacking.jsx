@@ -8,6 +8,10 @@ import { useParams } from "react-router-dom";
 import ReactToPrint from "react-to-print";
 import moment from "moment";
 import { toWords } from "number-to-words";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const InvoicePacking = () => {
   const containerRef = useRef();
@@ -28,34 +32,33 @@ const InvoicePacking = () => {
     }
   }, [invoiceSubData]);
 
-  useEffect(() => {
-    const fetchContractData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch invoice data");
+  const fetchContractData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
 
-        const data = await response.json();
-        setInvoicePackingData(data.invoice);
-        setBranchData(data.branch);
-        setInvoiceSubData(data.invoiceSub);
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error("Failed to fetch invoice data");
       }
-    };
 
+      const data = await response.json();
+      setInvoicePackingData(data.invoice);
+      setBranchData(data.branch);
+      setInvoiceSubData(data.invoiceSub);
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchContractData();
   }, [id]);
 
@@ -87,7 +90,6 @@ const InvoicePacking = () => {
     });
   };
 
-  
   const generatePdf = (element) => {
     const options = {
       margin: [0, 0, 15, 0],
@@ -135,28 +137,17 @@ const InvoicePacking = () => {
       .save();
   };
 
- 
   if (loading) {
-    return (
-      <Card className="w-[80vw] h-[80vh] flex items-center justify-center">
-        <CardContent>
-          <Button disabled className="flex items-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Loading Invoice Packing Data
-          </Button>
-        </CardContent>
-      </Card>
-    );
+    return <LoaderComponent name="Invoice Packing Data" />; // ✅ Correct prop usage
   }
-  
+
+  // Render error state
   if (error) {
     return (
-      <Card className="w-full">
-        <CardContent className="p-6">
-          <div className="text-red-500 mb-4">Error: {error}</div>
-          <Button variant="outline">Try Again</Button>
-        </CardContent>
-      </Card>
+      <ErrorComponent
+        message="Error Fetching Invoice Packing  Data"
+        refetch={() => fetchContractData}
+      />
     );
   }
   const totalAmount = invoiceSubData.reduce((total, item) => {

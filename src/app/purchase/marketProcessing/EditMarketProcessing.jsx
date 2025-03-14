@@ -23,6 +23,10 @@ import { ChevronDown } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import { decryptId } from "@/utils/encyrption/Encyrption";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 // Validation Schemas
 const updateProcessingOrder = async ({ decryptedId, data }) => {
@@ -284,6 +288,19 @@ const EditMarketProcessing = () => {
     }
   };
 
+  if (isLoading) {
+    return <LoaderComponent name=" Market Processing  Data" />; // ✅ Correct prop usage
+  }
+
+  // Render error state
+  if (isError) {
+    return (
+      <ErrorComponent
+        message="Error Fetching Processing   Data"
+        refetch={refetch}
+      />
+    );
+  }
   return (
     <Page>
       <form

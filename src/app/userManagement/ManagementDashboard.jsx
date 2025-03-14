@@ -6,6 +6,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ContextPanel } from "@/lib/ContextPanel";
 import BASE_URL from "@/config/BaseUrl";
 import Page from "../dashboard/page";
+import {
+  ErrorComponent,
+  LoaderComponent,
+  WithoutErrorComponent,
+  WithoutLoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const ManagementDashboard = () => {
   const { id } = useParams();
@@ -211,31 +217,13 @@ const ManagementDashboard = () => {
   }
 
   if (isLoadingButtons || isLoadingPages) {
-    return (
-      <Page>
-        <div className="container mx-auto p-6">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-lg">Loading...</div>
-          </div>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="user management Data" />; // ✅ Correct prop usage
   }
 
+  // Render error state
   if (isErrorPages || isErrorButtons) {
-    return (
-      <Page>
-        <div className="container mx-auto p-6">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-lg text-red-600">
-              Error loading user management
-            </div>
-          </div>
-        </div>
-      </Page>
-    );
+    return <ErrorComponent message="Error Teuser managementam Data" />;
   }
-
   return (
     <Page>
       <div className="container mx-auto p-6">
@@ -337,7 +325,6 @@ const ManagementDashboard = () => {
                                   >
                                     <td className="py-3 w-96">
                                       {permission.button}
-                                  
                                     </td>
                                     <td className="py-3">
                                       <Checkbox

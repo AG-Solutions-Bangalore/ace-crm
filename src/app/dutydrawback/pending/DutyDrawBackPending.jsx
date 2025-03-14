@@ -33,6 +33,10 @@ import { useNavigate } from "react-router-dom";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import moment from "moment";
 import DutyDrawBackEdit from "./DutyDrawBackEdit";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const DutyDrawBackPending = () => {
   const {
@@ -203,36 +207,12 @@ const DutyDrawBackPending = () => {
 
   // Render loading state
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading Pending
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="Pending Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (isError) {
-    return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching Pending
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
-    );
+    return <ErrorComponent message="Error Pending Data" refetch={refetch} />;
   }
 
   return (

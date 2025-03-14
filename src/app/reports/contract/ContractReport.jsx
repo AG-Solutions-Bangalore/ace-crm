@@ -10,6 +10,10 @@ import { useToast } from "@/hooks/use-toast";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import moment from "moment";
 import { useReactToPrint } from "react-to-print";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const ContractReport = () => {
   const { toast } = useToast();
@@ -134,35 +138,25 @@ const ContractReport = () => {
 
   if (isLoading) {
     return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Loading Contract
-          </Button>
-        </div>
-      </Page>
+      <LoaderComponent
+        name="Contract Summary
+ Data"
+      />
+    ); // ✅ Correct prop usage
+  }
+
+  // Render error state
+  if (isError) {
+    return (
+      <ErrorComponent
+        message="Error Contract Summary
+
+ Data"
+        refetch={refetch}
+      />
     );
   }
 
-  if (isError) {
-    return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching Contract
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
-    );
-  }
   return (
     <Page>
       <div className="p-4 " ref={containerRef}>

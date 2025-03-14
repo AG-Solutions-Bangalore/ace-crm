@@ -40,158 +40,141 @@ import BASE_URL from "@/config/BaseUrl";
 import CreateItem from "./CreateItem";
 import EditItem from "./EditItem";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 const ItemList = () => {
-    const {
-        data: items,
-        isLoading,
-        isError,
-        refetch,
-      } = useQuery({
-        queryKey: ["items"],
-        queryFn: async () => {
-          const token = localStorage.getItem("token");
-          const response = await axios.get(
-            `${BASE_URL}/api/panel-fetch-item-list`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          return response.data.item;
-        },
-      });
-    
-      // State for table management
-      const [sorting, setSorting] = useState([]);
-      const [columnFilters, setColumnFilters] = useState([]);
-      const [columnVisibility, setColumnVisibility] = useState({});
-      const [rowSelection, setRowSelection] = useState({});
-      const navigate = useNavigate();
-    
-      // Define columns for the table
-      const columns = [
+  const {
+    data: items,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["items"],
+    queryFn: async () => {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `${BASE_URL}/api/panel-fetch-item-list`,
         {
-          accessorKey: "index",
-          header: "Sl No",
-          cell: ({ row }) => <div>{row.index + 1}</div>,
-        },
-        {
-          accessorKey: "item_name",
-          header: ({ column }) => (
-            <Button
-              variant="ghost"
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            >
-             Item
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          ),
-          cell: ({ row }) => <div>{row.getValue("item_name")}</div>,
-        },
-        {
-            accessorKey: "item_type",
-            header: "Item Type",
-            cell: ({ row }) => <div>{row.getValue("item_type")}</div>,
-          },
-        {
-            accessorKey: "item_hsn",
-            header: "Item Hsn",
-            cell: ({ row }) => <div>{row.getValue("item_hsn")}</div>,
-          },
-        {
-          accessorKey: "item_status",
-          header: "Status",
-          cell: ({ row }) => {
-            const status = row.getValue("item_status");
-    
-            return (
-              <span
-                className={`px-2 py-1 rounded text-xs ${
-                  status == "Active"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-gray-100 text-gray-800"
-                }`}
-              >
-                {status}
-              </span>
-            );
-          },
-        },
-        {
-          id: "actions",
-          header: "Action",
-          cell: ({ row }) => {
-            const itemId = row.original.id;
-    
-            return (
-              <div className="flex flex-row">
-                <EditItem itemId={itemId}/>
-              </div>
-            );
-          },
-        },
-      ];
-    
-      // Create the table instance
-      const table = useReactTable({
-        data: items || [],
-        columns,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
-        state: {
-          sorting,
-          columnFilters,
-          columnVisibility,
-          rowSelection,
-        },
-        initialState: {
-          pagination: {
-            pageSize: 7,
-          },
-        },
-      });
-    
-      // Render loading state
-      if (isLoading) {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data.item;
+    },
+  });
+
+  // State for table management
+  const [sorting, setSorting] = useState([]);
+  const [columnFilters, setColumnFilters] = useState([]);
+  const [columnVisibility, setColumnVisibility] = useState({});
+  const [rowSelection, setRowSelection] = useState({});
+  const navigate = useNavigate();
+
+  // Define columns for the table
+  const columns = [
+    {
+      accessorKey: "index",
+      header: "Sl No",
+      cell: ({ row }) => <div>{row.index + 1}</div>,
+    },
+    {
+      accessorKey: "item_name",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Item
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <div>{row.getValue("item_name")}</div>,
+    },
+    {
+      accessorKey: "item_type",
+      header: "Item Type",
+      cell: ({ row }) => <div>{row.getValue("item_type")}</div>,
+    },
+    {
+      accessorKey: "item_hsn",
+      header: "Item Hsn",
+      cell: ({ row }) => <div>{row.getValue("item_hsn")}</div>,
+    },
+    {
+      accessorKey: "item_status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.getValue("item_status");
+
         return (
-          <Page>
-            <div className="flex justify-center items-center h-full">
-              <Button disabled>
-                <Loader2 className=" h-4 w-4 animate-spin" />
-                Loading Item Data
-              </Button>
-            </div>
-          </Page>
+          <span
+            className={`px-2 py-1 rounded text-xs ${
+              status == "Active"
+                ? "bg-green-100 text-green-800"
+                : "bg-gray-100 text-gray-800"
+            }`}
+          >
+            {status}
+          </span>
         );
-      }
-    
-      // Render error state
-      if (isError) {
+      },
+    },
+    {
+      id: "actions",
+      header: "Action",
+      cell: ({ row }) => {
+        const itemId = row.original.id;
+
         return (
-          <Page>
-            <Card className="w-full max-w-md mx-auto mt-10">
-              <CardHeader>
-                <CardTitle className="text-destructive">
-                  Error Item Data
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Button onClick={() => refetch()} variant="outline">
-                  Try Again
-                </Button>
-              </CardContent>
-            </Card>
-          </Page>
+          <div className="flex flex-row">
+            <EditItem itemId={itemId} />
+          </div>
         );
-      }
+      },
+    },
+  ];
+
+  // Create the table instance
+  const table = useReactTable({
+    data: items || [],
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+    initialState: {
+      pagination: {
+        pageSize: 7,
+      },
+    },
+  });
+
+  // Render loading state
+
+  if (isLoading) {
+    return <LoaderComponent name="Item Data" />; // ✅ Correct prop usage
+  }
+
+  // Render error state
+  if (isError) {
+    return (
+      <ErrorComponent message="Error Fetching Item Data" refetch={refetch} />
+    );
+  }
   return (
-   <Page>
-   <div className="w-full p-4">
+    <Page>
+      <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
           Item List
         </div>
@@ -241,7 +224,7 @@ const ItemList = () => {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <CreateItem/>
+          <CreateItem />
         </div>
         {/* table  */}
         <div className="rounded-md border">
@@ -253,7 +236,7 @@ const ItemList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                              className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                        className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null
@@ -323,8 +306,8 @@ const ItemList = () => {
           </div>
         </div>
       </div>
-   </Page>
-  )
-}
+    </Page>
+  );
+};
 
-export default ItemList
+export default ItemList;

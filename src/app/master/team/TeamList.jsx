@@ -43,6 +43,7 @@ import { ButtonConfig } from "@/config/ButtonConfig";
 import CreateTeam from "./CreateTeam";
 import EditTeam from "./EditTeam";
 import StatusToggle from "@/components/toggle/StatusToggle";
+import { WithoutLoaderComponent } from "@/components/LoaderComponent/LoaderComponent";
 
 const TeamList = () => {
   const {
@@ -176,37 +177,16 @@ const TeamList = () => {
 
   // Render loading state
   if (isLoading) {
-    return (
-   
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading Team
-          </Button>
-        </div>
-   
-    );
+    return <WithoutLoaderComponent name="Team Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (isError) {
     return (
-    
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching Team
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-    
+      <WithoutErrorComponent message="Error Team Data" refetch={refetch} />
     );
   }
+
   return (
     <div className="w-full p-4">
       <div className="flex text-left text-2xl text-gray-800 font-[400]">

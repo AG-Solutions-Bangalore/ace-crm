@@ -27,7 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   useFetchCompanys,
   useFetchPurchaseProduct,
-  useFetchVendor
+  useFetchVendor,
 } from "@/hooks/useApi";
 import { decryptId } from "@/utils/encyrption/Encyrption";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -40,18 +40,17 @@ import {
   Package,
   PlusCircle,
   TestTubes,
-  Trash2
+  Trash2,
 } from "lucide-react";
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import { z } from "zod";
 import Page from "../dashboard/page";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 // Validation Schemas
 const updatePurchaseOrder = async ({ decryptedId, data }) => {
@@ -796,6 +795,21 @@ const EditPurchaseOrder = () => {
       </Card>
     );
   };
+
+  if (isLoading) {
+    return <LoaderComponent name="Purchase Data" />; // ✅ Correct prop usage
+  }
+
+  // Render error state
+  if (isError) {
+    return (
+      <ErrorComponent
+        message="Error Fetching Purchase  Data"
+        refetch={refetch}
+      />
+    );
+  }
+
   return (
     <Page>
       <form

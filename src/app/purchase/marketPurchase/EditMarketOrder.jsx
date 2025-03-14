@@ -1,4 +1,8 @@
 import Page from "@/app/dashboard/page";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 import { ProgressBar } from "@/components/spinner/ProgressBar";
 import {
   AlertDialog,
@@ -566,7 +570,19 @@ const EditMarketOrder = () => {
       });
     }
   };
+  if (isLoading) {
+    return <LoaderComponent name=" Market Purchase Data" />; // ✅ Correct prop usage
+  }
 
+  // Render error state
+  if (isError) {
+    return (
+      <ErrorComponent
+        message="Error Fetching Market Purchase  Data"
+        refetch={refetch}
+      />
+    );
+  }
   return (
     <Page>
       <form

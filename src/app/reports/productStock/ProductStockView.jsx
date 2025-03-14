@@ -12,6 +12,10 @@ import { ButtonConfig } from "@/config/ButtonConfig";
 import { useReactToPrint } from "react-to-print";
 import html2pdf from "html2pdf.js";
 import moment from "moment";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const ProductStockView = () => {
   const { toast } = useToast();
@@ -81,71 +85,13 @@ const ProductStockView = () => {
   });
   console.log(stockDatas);
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Loading Stock
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="Stock Data" />; // ✅ Correct prop usage
   }
 
+  // Render error state
   if (isError) {
-    return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching Stock
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
-    );
+    return <ErrorComponent message="Error Stock Data" refetch={refetch} />;
   }
-
-  const generatePdf = (element) => {
-    const options = {
-      margin: [5, 5, 5, 5],
-      filename: "Product_Stock.pdf",
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: {
-        scale: 2,
-        useCORS: true,
-        windowHeight: element.scrollHeight,
-        scrollY: 0,
-      },
-      jsPDF: {
-        unit: "mm",
-        format: "a4",
-        orientation: "landscape",
-      },
-      pagebreak: { mode: "avoid" },
-    };
-
-    html2pdf()
-      .from(element)
-      .set(options)
-      .toPdf()
-      .get("pdf")
-      .then((pdf) => {
-        const totalPages = pdf.internal.getNumberOfPages();
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-
-        console.log(`Element Height: ${element.scrollHeight}`);
-        console.log(`Page Width: ${pageWidth}, Page Height: ${pageHeight}`);
-      })
-      .save();
-  };
 
   return (
     <Page>

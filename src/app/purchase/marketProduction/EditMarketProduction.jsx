@@ -1,4 +1,8 @@
 import Page from "@/app/dashboard/page";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 import { ProgressBar } from "@/components/spinner/ProgressBar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -147,7 +151,12 @@ const EditMarketProduction = () => {
   });
 
   const { data: godownPurchaseData } = useFetchGoDownMarketPurchase();
-  const { data: MarketProductionData } = useQuery({
+  const {
+    data: MarketProductionData,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
     queryKey: ["marketproduction", decryptedId],
     queryFn: async () => {
       const token = localStorage.getItem("token");
@@ -286,7 +295,20 @@ const EditMarketProduction = () => {
       });
     }
   };
-  console.log(formData);
+
+  if (isLoading) {
+    return <LoaderComponent name=" Market Production  Data" />; // ✅ Correct prop usage
+  }
+
+  // Render error state
+  if (isError) {
+    return (
+      <ErrorComponent
+        message="Error Fetching Market Production   Data"
+        refetch={refetch}
+      />
+    );
+  }
   return (
     <Page>
       <form

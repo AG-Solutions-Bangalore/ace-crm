@@ -40,6 +40,10 @@ import BASE_URL from "@/config/BaseUrl";
 import CreatePortofLoading from "./CreatePortofLoading";
 import EditPortofLoading from "./EditPortofLoading";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 const PortOfLoadingList = () => {
   const {
     data: portofLoading,
@@ -112,7 +116,6 @@ const PortOfLoadingList = () => {
       cell: ({ row }) => {
         const portId = row.original.id;
 
-
         return (
           <div className="flex flex-row">
             <EditPortofLoading portId={portId} />
@@ -149,35 +152,16 @@ const PortOfLoadingList = () => {
 
   // Render loading state
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading portofLoading Data
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="Port of Loading Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (isError) {
     return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching portofLoading
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
+      <ErrorComponent
+        message="Error Fetching Port of Loading Data"
+        refetch={refetch}
+      />
     );
   }
   return (
@@ -245,7 +229,7 @@ const PortOfLoadingList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                            className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                        className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null
