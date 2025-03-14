@@ -30,6 +30,7 @@ const ViewContract = () => {
   console.log(decryptedId, "dedecryptedId");
   const [contractData, setContractData] = useState(null);
   const [loading, setLoading] = useState(true);
+    const [isWordLoading, setIsWordLoading] = useState(false);
   const [showLetterhead, setShowLetterhead] = useState(false);
   const [showSignature, setShowSignature] = useState(false);
   const [error, setError] = useState(null);
@@ -801,6 +802,232 @@ const ViewContract = () => {
     });
   };
 
+
+  /*-----------------------word------------------ */
+  const wordWoheaderWoSign = async () => {
+    setIsWordLoading(true);
+    const element = pdfRef.current;
+
+    try {
+      // Generate PDF first
+      const pdfBlob = await mailWoheaderWoSign(element);
+
+      // Create a FormData object for the API request
+      const formData = new FormData();
+      formData.append(
+        "File",
+        new Blob([pdfBlob], { type: "application/pdf" }),
+        "document.pdf"
+      );
+      formData.append("StoreFile", "true");
+
+      // Make a direct fetch request to the ConvertAPI
+      const response = await fetch(
+        "https://v2.convertapi.com/convert/pdf/to/docx",
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer token_CIOdHxCv",
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(JSON.stringify(errorData));
+      }
+
+      const result = await response.json();
+
+      if (result && result.Files && result.Files.length > 0) {
+        const url = result.Files[0].Url;
+
+        // Download the DOCX file
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "Invoice_bl.docx";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        console.error("No files in conversion result");
+      }
+    } catch (error) {
+      console.error("Error converting PDF to DOCX:", error);
+    } finally {
+      setIsWordLoading(false);
+    }
+  };
+  const wordheadersign = async () => {
+    setIsWordLoading(true);
+    const element = pdfRef.current;
+
+    try {
+      // Generate PDF first
+      const pdfBlob = await mailheadersign(element);
+
+      // Create a FormData object for the API request
+      const formData = new FormData();
+      formData.append(
+        "File",
+        new Blob([pdfBlob], { type: "application/pdf" }),
+        "document.pdf"
+      );
+      formData.append("StoreFile", "true");
+
+      // Make a direct fetch request to the ConvertAPI
+      const response = await fetch(
+        "https://v2.convertapi.com/convert/pdf/to/docx",
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer token_CIOdHxCv",
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(JSON.stringify(errorData));
+      }
+
+      const result = await response.json();
+
+      if (result && result.Files && result.Files.length > 0) {
+        const url = result.Files[0].Url;
+
+        // Download the DOCX file
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "Invoice_bl.docx";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        console.error("No files in conversion result");
+      }
+    } catch (error) {
+      console.error("Error converting PDF to DOCX:", error);
+    } finally {
+      setIsWordLoading(false);
+    }
+  };
+  const wordHeaderWOSign = async () => {
+    setIsWordLoading(true);
+    const element = pdfRef.current;
+
+    try {
+      // Generate PDF first
+      const pdfBlob = await mailHeaderWOSign(element);
+
+      // Create a FormData object for the API request
+      const formData = new FormData();
+      formData.append(
+        "File",
+        new Blob([pdfBlob], { type: "application/pdf" }),
+        "document.pdf"
+      );
+      formData.append("StoreFile", "true");
+
+      // Make a direct fetch request to the ConvertAPI
+      const response = await fetch(
+        "https://v2.convertapi.com/convert/pdf/to/docx",
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer token_CIOdHxCv",
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(JSON.stringify(errorData));
+      }
+
+      const result = await response.json();
+
+      if (result && result.Files && result.Files.length > 0) {
+        const url = result.Files[0].Url;
+
+        // Download the DOCX file
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "Invoice_bl.docx";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        console.error("No files in conversion result");
+      }
+    } catch (error) {
+      console.error("Error converting PDF to DOCX:", error);
+    } finally {
+      setIsWordLoading(false);
+    }
+  };
+  const wordWOheadersign = async () => {
+    setIsWordLoading(true);
+    const element = pdfRef.current;
+
+    try {
+      // Generate PDF first
+      const pdfBlob = await mailWOheadersign(element);
+
+      // Create a FormData object for the API request
+      const formData = new FormData();
+      formData.append(
+        "File",
+        new Blob([pdfBlob], { type: "application/pdf" }),
+        "document.pdf"
+      );
+      formData.append("StoreFile", "true");
+
+      // Make a direct fetch request to the ConvertAPI
+      const response = await fetch(
+        "https://v2.convertapi.com/convert/pdf/to/docx",
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer token_CIOdHxCv",
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(JSON.stringify(errorData));
+      }
+
+      const result = await response.json();
+
+      if (result && result.Files && result.Files.length > 0) {
+        const url = result.Files[0].Url;
+
+        // Download the DOCX file
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "Invoice_bl.docx";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        console.error("No files in conversion result");
+      }
+    } catch (error) {
+      console.error("Error converting PDF to DOCX:", error);
+    } finally {
+      setIsWordLoading(false);
+    }
+  };
+
+  
+  /*-----------------------------------word-end--------------------- */
+
   // print functions
   const handleWithHeaderPrint = useReactToPrint({
     content: () => HeaderWithSignRef.current,
@@ -1098,6 +1325,12 @@ const ViewContract = () => {
             mailheadersign={mailheadersign}
             mailHeaderWOSign={mailHeaderWOSign}
             mailWOheadersign={mailWOheadersign}
+            // word
+            wordWoheaderWoSign={wordWoheaderWoSign}
+            wordheadersign={wordheadersign}
+            wordHeaderWOSign={wordHeaderWOSign}
+            wordWOheadersign={wordWOheadersign}
+            isWordLoading={isWordLoading}
           />
         </div>
       </div>
