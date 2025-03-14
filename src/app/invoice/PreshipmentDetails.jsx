@@ -172,12 +172,12 @@ const PreshipmentDetails = () => {
   }`;
   return (
     <div>
-      <button
+      {/* <button
         onClick={handleSaveAsWord}
         className="fixed top-5 right-40 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
       >
         <FaRegFileWord className="w-4 h-4" />
-      </button>
+      </button> */}
 
       <button
         onClick={handleSaveAsPdf}

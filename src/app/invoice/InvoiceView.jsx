@@ -10,6 +10,7 @@ import moment from "moment";
 import { toWords } from "number-to-words";
 import { FaRegFileWord } from "react-icons/fa";
 import { FaRegFilePdf } from "react-icons/fa";
+import { FaRegFileExcel } from "react-icons/fa";
 import { decryptId } from "@/utils/encyrption/Encyrption";
 
 const InvoiceView = () => {
@@ -22,7 +23,8 @@ const InvoiceView = () => {
   const [invoiceSubData, setInvoiceSubData] = useState([]);
   const [sumbag, setSumBag] = useState(0);
   const [prouducthsn, setProuductHsn] = useState({});
-
+  const [isWordLoading, setIsWordLoading] = useState(false);
+  const [isExcelLoading, setIsExcelLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   useEffect(() => {
@@ -140,38 +142,138 @@ const InvoiceView = () => {
       })
       .save();
   };
-  const handleSaveAsWord = () => {
-    const content = containerRef.current.innerHTML;
 
-    const styles = `
-      <style>
-        table { border-collapse: collapse; width: 100%; }
-        td { border: 0px solid black; padding: 0px; }
-      </style>
-    `;
+  const handleSaveAsWord = async () => {
+    setIsWordLoading(true);
+    const element = containerRef.current;
 
-    const html = `
-      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
-        <head>
-          <meta charset="utf-8">
-          ${styles}
-        </head>
-        <body>
-          ${content}
-        </body>
-      </html>
-    `;
+    try {
+      // Generate PDF first
+      const pdfBlob = await generatePdfBlob(element);
 
-    const blob = new Blob([html], { type: "application/msword" });
+      // Create a FormData object for the API request
+      const formData = new FormData();
+      formData.append(
+        "File",
+        new Blob([pdfBlob], { type: "application/pdf" }),
+        "document.pdf"
+      );
+      formData.append("StoreFile", "true");
 
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "Invoice_Packing.doc";
+      // Make a direct fetch request to the ConvertAPI
+      const response = await fetch(
+        "https://v2.convertapi.com/convert/pdf/to/docx",
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer token_CIOdHxCv",
+          },
+          body: formData,
+        }
+      );
 
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(JSON.stringify(errorData));
+      }
+
+      const result = await response.json();
+
+      if (result && result.Files && result.Files.length > 0) {
+        const url = result.Files[0].Url;
+
+        // Download the DOCX file
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "Invoice_bl.docx";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        console.error("No files in conversion result");
+      }
+    } catch (error) {
+      console.error("Error converting PDF to DOCX:", error);
+    } finally {
+      setIsWordLoading(false);
+    }
+  };
+
+  const handleSaveAsExcel = async () => {
+    setIsExcelLoading(true);
+    const element = containerRef.current;
+
+    try {
+      // Generate PDF first
+      const pdfBlob = await generatePdfBlob(element);
+
+      // Create a FormData object for the API request
+      const formData = new FormData();
+      formData.append(
+        "File",
+        new Blob([pdfBlob], { type: "application/pdf" }),
+        "document.pdf"
+      );
+      formData.append("StoreFile", "true");
+
+      // Make a direct fetch request to the ConvertAPI
+      const response = await fetch(
+        "https://v2.convertapi.com/convert/pdf/to/xlsx",
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer token_CIOdHxCv",
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(JSON.stringify(errorData));
+      }
+
+      const result = await response.json();
+
+      if (result && result.Files && result.Files.length > 0) {
+        const url = result.Files[0].Url;
+
+        // Download the DOCX file
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "Invoice_bl.xlsx";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        console.error("No files in conversion result");
+      }
+    } catch (error) {
+      console.error("Error converting PDF to xlxs:", error);
+    } finally {
+      setIsExcelLoading(false);
+    }
+  };
+
+  const generatePdfBlob = async (element) => {
+    const options = {
+      margin: [0, 0, 0, 0],
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        windowHeight: element.scrollHeight,
+        scrollY: 0,
+      },
+      jsPDF: {
+        unit: "mm",
+        format: "a4",
+        orientation: "portrait",
+      },
+      pagebreak: { mode: "avoid" },
+    };
+
+    return html2pdf().from(element).set(options).outputPdf("blob");
   };
   if (loading) {
     return (
@@ -209,10 +311,27 @@ const InvoiceView = () => {
   return (
     <div>
       <button
-        onClick={handleSaveAsWord}
-        className="fixed top-5 right-40 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
+        onClick={handleSaveAsExcel}
+        disabled={isExcelLoading}
+        className="fixed top-5 right-56 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600 flex items-center justify-center"
       >
-        <FaRegFileWord className="w-4 h-4" />
+        {isExcelLoading ? (
+          <Loader2 className="h-4 w-4 animate-spin text-white" />
+        ) : (
+          <FaRegFileExcel className="w-4 h-4" />
+        )}
+      </button>
+
+      <button
+        onClick={handleSaveAsWord}
+        disabled={isWordLoading}
+        className="fixed top-5 right-40 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600 flex items-center justify-center"
+      >
+        {isWordLoading ? (
+          <Loader2 className="h-4 w-4 animate-spin text-white" />
+        ) : (
+          <FaRegFileWord className="w-4 h-4" />
+        )}
       </button>
       <button
         onClick={handleSaveAsPdf}

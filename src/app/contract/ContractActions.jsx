@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Printer, Mail, MessageCircle, File } from "lucide-react";
+import { Printer, Mail, MessageCircle, File, Loader2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import SendEmailDialog from "./emailContract/SendEmailDialog";
+import { FaRegFilePdf, FaRegFileWord } from "react-icons/fa";
 
 const ContractActions = ({
   showLetterhead,
@@ -25,6 +26,12 @@ const ContractActions = ({
   mailheadersign,
   mailHeaderWOSign,
   mailWOheadersign,
+  //word
+  wordWoheaderWoSign,
+  wordheadersign,
+  wordHeaderWOSign,
+  wordWOheadersign,
+  isWordLoading,
 }) => {
   const [withHeader, setWithHeader] = useState(false); // Default is without header
   const [withSign, setWithSign] = useState(false);
@@ -68,6 +75,17 @@ const ContractActions = ({
       return await mailWoheaderWoSign(ref);
     }
   };
+  const handleWord = async (ref) => {
+    if (showLetterhead && showSignature) {
+      return await wordheadersign(ref);
+    } else if (showLetterhead) {
+      return await wordHeaderWOSign(ref);
+    } else if (showSignature) {
+      return await wordWOheadersign(ref);
+    } else {
+      return await wordWoheaderWoSign(ref);
+    }
+  };
 
   // const handleWhatsapp = () => {
   //   withHeader ? whatsappPdf() : whatsappWithoutHeaderPdf();
@@ -89,8 +107,27 @@ const ContractActions = ({
             onClick={handleSave}
             className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
           >
-            <File className="h-4 w-4" />
+            <FaRegFilePdf className="h-4 w-4" />
             <span>PDF</span>
+          </Button>
+          <Button
+            onClick={handleWord}
+            disabled={isWordLoading}
+            className="w-full bg-yellow-200 text-black hover:bg-yellow-500 flex items-center justify-start gap-2"
+          >
+              {isWordLoading ? (
+         <>
+          <Loader2 className="h-4 w-4 animate-spin text-white" />
+          <span>Loading..</span>
+         </>
+        ) : (
+         <>
+          <FaRegFileWord className="w-4 h-4" />
+          <span>Word</span>
+         </>
+        )}
+           
+            
           </Button>
 
           <SendEmailDialog pdfRef={pdfRef} handleEmail={handleEmail} />
