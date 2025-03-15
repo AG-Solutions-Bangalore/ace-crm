@@ -1,48 +1,40 @@
 import Page from "@/app/dashboard/page";
-import React, {
-  useEffect,
-  useState,
-  useMemo,
-  useCallback,
-  useRef,
-} from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { z } from "zod";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Table,
-  TableHeader,
-  TableRow,
-  TableHead,
   TableBody,
   TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import React, { useCallback, useEffect, useState } from "react";
+import { z } from "zod";
 
-import { PlusCircle, MinusCircle, ChevronDown, Trash2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate, useParams } from "react-router-dom";
 import { ProgressBar } from "@/components/spinner/ProgressBar";
 import BASE_URL from "@/config/BaseUrl";
-import Select from "react-select";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { useToast } from "@/hooks/use-toast";
+import { useFetchPurchaseProduct } from "@/hooks/useApi";
+import { ChevronDown } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import Select from "react-select";
+import { decryptId } from "@/utils/encyrption/Encyrption";
 import {
-  useFetchCompanys,
-  useFetchDispatchDcNo,
-  useFetchGoDown,
-  useFetchProductNos,
-  useFetchPurchaseProduct,
-  useFetchVendor,
-} from "@/hooks/useApi";
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 // Validation Schemas
-const updateProcessingOrder = async ({ id, data }) => {
+const updateProcessingOrder = async ({ decryptedId, data }) => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No authentication token found");
 
   const response = await fetch(
-    `${BASE_URL}/api/panel-update-market-processing/${id}`,
+    `${BASE_URL}/api/panel-update-market-processing/${decryptedId}`,
     {
       method: "PUT",
       headers: {
@@ -56,94 +48,6 @@ const updateProcessingOrder = async ({ id, data }) => {
   if (!response.ok) throw new Error("Failed to update processing");
   return response.json();
 };
-
-const MemoizedSelect = React.memo(
-  ({ value, onChange, options, placeholder }) => {
-    const selectOptions = options.map((option) => ({
-      value: option.value,
-      label: option.label,
-    }));
-
-    const selectedOption = selectOptions.find(
-      (option) => option.value === value
-    );
-
-    const customStyles = {
-      control: (provided, state) => ({
-        ...provided,
-        minHeight: "36px",
-        borderRadius: "6px",
-        borderColor: state.isFocused ? "black" : "#e5e7eb",
-        boxShadow: state.isFocused ? "black" : "none",
-        "&:hover": {
-          borderColor: "none",
-          cursor: "text",
-        },
-      }),
-      option: (provided, state) => ({
-        ...provided,
-        fontSize: "14px",
-        backgroundColor: state.isSelected
-          ? "#A5D6A7"
-          : state.isFocused
-          ? "#f3f4f6"
-          : "white",
-        color: state.isSelected ? "black" : "#1f2937",
-        "&:hover": {
-          backgroundColor: "#EEEEEE",
-          color: "black",
-        },
-      }),
-
-      menu: (provided) => ({
-        ...provided,
-        borderRadius: "6px",
-        border: "1px solid #e5e7eb",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-      }),
-      placeholder: (provided) => ({
-        ...provided,
-        color: "#616161",
-        fontSize: "14px",
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "start",
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-      }),
-      singleValue: (provided) => ({
-        ...provided,
-        color: "black",
-        fontSize: "14px",
-      }),
-    };
-
-    const DropdownIndicator = (props) => {
-      return (
-        <div {...props.innerProps}>
-          <ChevronDown className="h-4 w-4 mr-3 text-gray-500" />
-        </div>
-      );
-    };
-
-    return (
-      <Select
-        value={selectedOption}
-        onChange={(selected) => onChange(selected ? selected.value : "")}
-        options={selectOptions}
-        placeholder={placeholder}
-        styles={customStyles}
-        components={{
-          IndicatorSeparator: () => null,
-          DropdownIndicator,
-        }}
-        // menuPortalTarget={document.body}
-        //   menuPosition="fixed"
-      />
-    );
-  }
-);
 
 const MemoizedProductSelect = React.memo(
   ({ value, onChange, options, placeholder }) => {
@@ -235,6 +139,8 @@ const MemoizedProductSelect = React.memo(
 
 const EditMarketProcessing = () => {
   const { id } = useParams();
+  const decryptedId = decryptId(id);
+
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -251,11 +157,11 @@ const EditMarketProcessing = () => {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["marketProcessing", id],
+    queryKey: ["marketProcessing", decryptedId],
     queryFn: async () => {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${BASE_URL}/api/panel-fetch-market-processing-by-id/${id}`,
+        `${BASE_URL}/api/panel-fetch-market-processing-by-id/${decryptedId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -340,7 +246,7 @@ const EditMarketProcessing = () => {
       const updateData = {
         ...formData,
       };
-      updateProcessingMutation.mutate({ id, data: updateData });
+      updateProcessingMutation.mutate({ decryptedId, data: updateData });
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {
@@ -382,6 +288,19 @@ const EditMarketProcessing = () => {
     }
   };
 
+  if (isLoading) {
+    return <LoaderComponent name=" Market Processing  Data" />; // ✅ Correct prop usage
+  }
+
+  // Render error state
+  if (isError) {
+    return (
+      <ErrorComponent
+        message="Error Fetching Processing   Data"
+        refetch={refetch}
+      />
+    );
+  }
   return (
     <Page>
       <form

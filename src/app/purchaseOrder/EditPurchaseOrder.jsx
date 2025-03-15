@@ -1,23 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useMemo,
-  useCallback,
-  useRef,
-} from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { z } from "zod";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table";
+import { ProgressBar } from "@/components/spinner/ProgressBar";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,36 +9,48 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
-  PlusCircle,
-  MinusCircle,
-  ChevronDown,
-  Trash2,
-  ChevronUp,
-  FileText,
-  Package,
-  TestTubes,
-  Truck,
-  Clock,
-} from "lucide-react";
-import Page from "../dashboard/page";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate, useParams } from "react-router-dom";
-import { getTodayDate } from "@/utils/currentDate";
-import { ProgressBar } from "@/components/spinner/ProgressBar";
-import BASE_URL from "@/config/BaseUrl";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import Select from "react-select";
-import { useCurrentYear } from "@/hooks/useCurrentYear";
+import BASE_URL from "@/config/BaseUrl";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { useToast } from "@/hooks/use-toast";
 import {
   useFetchCompanys,
-  useFetchProductNos,
   useFetchPurchaseProduct,
   useFetchVendor,
 } from "@/hooks/useApi";
-import gsap from "gsap";
 import { decryptId } from "@/utils/encyrption/Encyrption";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import gsap from "gsap";
+import {
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  MinusCircle,
+  Package,
+  PlusCircle,
+  TestTubes,
+  Trash2,
+} from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import Select from "react-select";
+import { z } from "zod";
+import Page from "../dashboard/page";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 // Validation Schemas
 const updatePurchaseOrder = async ({ decryptedId, data }) => {
@@ -802,6 +795,21 @@ const EditPurchaseOrder = () => {
       </Card>
     );
   };
+
+  if (isLoading) {
+    return <LoaderComponent name="Purchase Data" />; // ✅ Correct prop usage
+  }
+
+  // Render error state
+  if (isError) {
+    return (
+      <ErrorComponent
+        message="Error Fetching Purchase  Data"
+        refetch={refetch}
+      />
+    );
+  }
+
   return (
     <Page>
       <form

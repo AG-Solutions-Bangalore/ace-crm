@@ -49,190 +49,173 @@ import {
   BranchCreate,
   BranchEdit,
 } from "@/components/buttonIndex/ButtonComponents";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const VendorList = () => {
-    const {
-        data: vendors,
-        isLoading,
-        isError,
-        refetch,
-      } = useQuery({
-        queryKey: ["vendors"],
-        queryFn: async () => {
-          const token = localStorage.getItem("token");
-          const response = await axios.get(
-            `${BASE_URL}/api/panel-fetch-vendor-list`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          return response.data.vendor;
-        },
-      });
-    
-      // State for table management
-      const [sorting, setSorting] = useState([]);
-      const [columnFilters, setColumnFilters] = useState([]);
-      const [columnVisibility, setColumnVisibility] = useState({});
-      const [rowSelection, setRowSelection] = useState({});
-      const navigate = useNavigate();
-    
-      // Define columns for the table
-      const columns = [
+  const {
+    data: vendors,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["vendors"],
+    queryFn: async () => {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `${BASE_URL}/api/panel-fetch-vendor-list`,
         {
-          accessorKey: "index",
-          header: "Sl No",
-          cell: ({ row }) => <div>{row.index + 1}</div>,
-        },
-        {
-          accessorKey: "vendor_name",
-          header: ({ column }) => (
-            <Button
-              variant="ghost"
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            >
-               Name
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          ),
-          cell: ({ row }) => <div>{row.getValue("vendor_name")}</div>,
-        },
-        {
-          accessorKey: "vendor_alias",
-          header: "Alias",
-          cell: ({ row }) => <div>{row.getValue("vendor_alias")}</div>,
-        },
-        {
-          accessorKey: "vendor_contact_person",
-          header: "Contact Person",
-          cell: ({ row }) => <div>{row.getValue("vendor_contact_person")}</div>,
-        },
-        {
-          accessorKey: "vendor_mobile1",
-          header: "Mobile 1",
-          cell: ({ row }) => <div>{row.getValue("vendor_mobile1")}</div>,
-        },
-        {
-          accessorKey: "vendor_city",
-          header: "City",
-          cell: ({ row }) => <div>{row.getValue("vendor_city")}</div>,
-        },
-        {
-          accessorKey: "vendor_product",
-          header: "Product",
-          cell: ({ row }) => <div>{row.getValue("vendor_product")}</div>,
-        },
-    
-        {
-          accessorKey: "vendor_status",
-          header: "Status",
-          cell: ({ row }) => {
-            const status = row.getValue("vendor_status");
-    
-            return (
-              <span
-                className={`px-2 py-1 rounded text-xs ${
-                  status == "Active"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-gray-100 text-gray-800"
-                }`}
-              >
-                {status}
-              </span>
-            );
-          },
-        },
-        {
-          id: "actions",
-          header: "Action",
-          cell: ({ row }) => {
-            const vendorId = row.original.id;
-    
-            return (
-              <div className="flex flex-row">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate(`/master/vendor/edit-vendor/${vendorId}`)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                  
-                    </TooltipTrigger>
-                    <TooltipContent>Edit Branch</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            );
-          },
-        },
-      ];
-    
-      // Create the table instance
-      const table = useReactTable({
-        data: vendors || [],
-        columns,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
-        state: {
-          sorting,
-          columnFilters,
-          columnVisibility,
-          rowSelection,
-        },
-        initialState: {
-          pagination: {
-            pageSize: 7,
-          },
-        },
-      });
-    
-      // Render loading state
-      if (isLoading) {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data.vendor;
+    },
+  });
+
+  // State for table management
+  const [sorting, setSorting] = useState([]);
+  const [columnFilters, setColumnFilters] = useState([]);
+  const [columnVisibility, setColumnVisibility] = useState({});
+  const [rowSelection, setRowSelection] = useState({});
+  const navigate = useNavigate();
+
+  // Define columns for the table
+  const columns = [
+    {
+      accessorKey: "index",
+      header: "Sl No",
+      cell: ({ row }) => <div>{row.index + 1}</div>,
+    },
+    {
+      accessorKey: "vendor_name",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Name
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <div>{row.getValue("vendor_name")}</div>,
+    },
+    {
+      accessorKey: "vendor_alias",
+      header: "Alias",
+      cell: ({ row }) => <div>{row.getValue("vendor_alias")}</div>,
+    },
+    {
+      accessorKey: "vendor_contact_person",
+      header: "Contact Person",
+      cell: ({ row }) => <div>{row.getValue("vendor_contact_person")}</div>,
+    },
+    {
+      accessorKey: "vendor_mobile1",
+      header: "Mobile 1",
+      cell: ({ row }) => <div>{row.getValue("vendor_mobile1")}</div>,
+    },
+    {
+      accessorKey: "vendor_city",
+      header: "City",
+      cell: ({ row }) => <div>{row.getValue("vendor_city")}</div>,
+    },
+    {
+      accessorKey: "vendor_product",
+      header: "Product",
+      cell: ({ row }) => <div>{row.getValue("vendor_product")}</div>,
+    },
+
+    {
+      accessorKey: "vendor_status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.getValue("vendor_status");
+
         return (
-          <Page>
-            <div className="flex justify-center items-center h-full">
-              <Button disabled>
-                <Loader2 className=" h-4 w-4 animate-spin" />
-                Loading Vendor
-              </Button>
-            </div>
-          </Page>
+          <span
+            className={`px-2 py-1 rounded text-xs ${
+              status == "Active"
+                ? "bg-green-100 text-green-800"
+                : "bg-gray-100 text-gray-800"
+            }`}
+          >
+            {status}
+          </span>
         );
-      }
-    
-      // Render error state
-      if (isError) {
+      },
+    },
+    {
+      id: "actions",
+      header: "Action",
+      cell: ({ row }) => {
+        const vendorId = row.original.id;
+
         return (
-          <Page>
-            <Card className="w-full max-w-md mx-auto mt-10">
-              <CardHeader>
-                <CardTitle className="text-destructive">
-                  Error Fetching vendor
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Button onClick={() => refetch()} variant="outline">
-                  Try Again
-                </Button>
-              </CardContent>
-            </Card>
-          </Page>
+          <div className="flex flex-row">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() =>
+                      navigate(`/master/vendor/edit-vendor/${vendorId}`)
+                    }
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Edit Branch</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         );
-      }
-    
+      },
+    },
+  ];
+
+  // Create the table instance
+  const table = useReactTable({
+    data: vendors || [],
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+    initialState: {
+      pagination: {
+        pageSize: 7,
+      },
+    },
+  });
+
+  // Render loading state
+  if (isLoading) {
+    return <LoaderComponent name="Vendor Data" />; // ✅ Correct prop usage
+  }
+
+  // Render error state
+  if (isError) {
+    return (
+      <ErrorComponent message="Error Fetching Vendor Data" refetch={refetch} />
+    );
+  }
+
   return (
-  <Page>
-                <div className="w-full p-4">
+    <Page>
+      <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
           Vendor List
         </div>
@@ -282,10 +265,10 @@ const VendorList = () => {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-             
+
           <Button
             variant="default"
-            className= {`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`} 
+            className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             onClick={() => navigate("/master/vendor/create-vendor")}
           >
             <SquarePlus className="h-4 w-4" /> Vendor
@@ -377,9 +360,8 @@ const VendorList = () => {
           </div>
         </div>
       </div>
-     
-  </Page>
-  )
-}
+    </Page>
+  );
+};
 
-export default VendorList
+export default VendorList;

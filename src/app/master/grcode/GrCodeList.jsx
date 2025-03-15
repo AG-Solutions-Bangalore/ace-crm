@@ -40,6 +40,10 @@ import BASE_URL from "@/config/BaseUrl";
 import CreateGrCode from "./CreateGrCode";
 import EditGrCode from "./EditGrCode";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 const GrCodeList = () => {
   const {
     data: grCode,
@@ -147,36 +151,15 @@ const GrCodeList = () => {
   });
 
   // Render loading state
+
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading grcode Data
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="Gr Code Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (isError) {
     return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching grcode
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
+      <ErrorComponent message="Error Fetching Gr Code Data" refetch={refetch} />
     );
   }
   return (
@@ -244,7 +227,7 @@ const GrCodeList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                             className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                        className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null

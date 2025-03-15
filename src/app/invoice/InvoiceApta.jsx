@@ -21,34 +21,33 @@ const InvoiceApta = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchContractData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${decryptedId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch invoice data");
+  const fetchContractData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${decryptedId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
 
-        const data = await response.json();
-        setSpiceBoard(data?.invoice);
-        setSpiceBoardBranch(data?.branch);
-        setInvoiceSubData(data?.invoiceSub);
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error("Failed to fetch invoice data");
       }
-    };
 
+      const data = await response.json();
+      setSpiceBoard(data?.invoice);
+      setSpiceBoardBranch(data?.branch);
+      setInvoiceSubData(data?.invoiceSub);
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchContractData();
   }, [decryptedId]);
 
@@ -115,26 +114,16 @@ const InvoiceApta = () => {
   };
 
   if (loading) {
-    return (
-      <Card className="w-[80vw] h-[80vh] flex items-center justify-center">
-        <CardContent>
-          <Button disabled className="flex items-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Loading Invoice Apta Data
-          </Button>
-        </CardContent>
-      </Card>
-    );
+    return <LoaderComponent name="Invoive Apta Data" />; // ✅ Correct prop usage
   }
 
+  // Render error state
   if (error) {
     return (
-      <Card className="w-full">
-        <CardContent className="p-6">
-          <div className="text-red-500 mb-4">Error: {error}</div>
-          <Button variant="outline">Try Again</Button>
-        </CardContent>
-      </Card>
+      <ErrorComponent
+        message="Error Fetching Invoive Apta Data"
+        refetch={() => fetchContractData}
+      />
     );
   }
   return (

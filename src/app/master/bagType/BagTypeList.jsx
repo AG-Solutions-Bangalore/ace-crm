@@ -40,6 +40,10 @@ import BASE_URL from "@/config/BaseUrl";
 import CreateBagType from "./CreateBagType";
 import EditBagType from "./EditBagType";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const BagTypeList = () => {
   const {
@@ -150,35 +154,16 @@ const BagTypeList = () => {
 
   // Render loading state
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading bagType Data
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="Bag Type  Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (isError) {
     return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching bagType
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
+      <ErrorComponent
+        message="Error Fetching Bag Type  Data"
+        refetch={refetch}
+      />
     );
   }
   return (
@@ -246,7 +231,7 @@ const BagTypeList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                              className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                        className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null

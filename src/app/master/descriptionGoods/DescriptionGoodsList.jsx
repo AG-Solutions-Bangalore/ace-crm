@@ -40,6 +40,7 @@ import BASE_URL from "@/config/BaseUrl";
 import CreateDescriptionGoods from "./CreateDescriptionGoods";
 import EditDescriptionGoods from "./EditDescriptionGoods";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import { ErrorComponent, LoaderComponent } from "@/components/LoaderComponent/LoaderComponent";
 
 const DescriptionGoodsList = () => {
   const {
@@ -150,37 +151,16 @@ const DescriptionGoodsList = () => {
 
   // Render loading state
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading Description of Goods Data
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="Description of Goods Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (isError) {
     return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching Description of Goods
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
+      <ErrorComponent message="Error Fetching Description of Goods Data" refetch={refetch} />
     );
   }
+
   return (
     <Page>
       <div className="w-full p-4">
@@ -246,7 +226,7 @@ const DescriptionGoodsList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                             className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                        className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null

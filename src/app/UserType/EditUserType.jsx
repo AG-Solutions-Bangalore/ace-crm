@@ -8,10 +8,14 @@ import { ButtonConfig } from "@/config/ButtonConfig";
 import BASE_URL from "@/config/BaseUrl";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { decryptId } from "@/utils/encyrption/Encyrption";
+import { LoaderComponent } from "@/components/LoaderComponent/LoaderComponent";
 
 const EditUserType = () => {
   const { toast } = useToast();
   const { id } = useParams();
+  const decryptedId = decryptId(id);
+
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -58,7 +62,7 @@ const EditUserType = () => {
         setLoading(true);
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `${BASE_URL}/api/panel-fetch-usertype-by-id/${id}`,
+          `${BASE_URL}/api/panel-fetch-usertype-by-id/${decryptedId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -90,7 +94,7 @@ const EditUserType = () => {
     };
 
     fetchUserData();
-  }, [id]);
+  }, [decryptedId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -112,12 +116,16 @@ const EditUserType = () => {
         default_page_role: selectedPages.map((page) => page.value).join(","),
       };
 
-      await axios.put(`${BASE_URL}/api/panel-update-usertype/${id}`, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      await axios.put(
+        `${BASE_URL}/api/panel-update-usertype/${decryptedId}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       navigate("/user-type");
     } catch (error) {
@@ -128,16 +136,7 @@ const EditUserType = () => {
   };
 
   if (loading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading UserType
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="UserType Data" />; // ✅ Correct prop usage
   }
 
   return (

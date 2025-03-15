@@ -17,6 +17,7 @@ import { useReactToPrint } from "react-to-print";
 import white from "../../../public/letterHead/white.png";
 import Page from "../dashboard/page";
 import EmailDialog from "./EmailDialog";
+import { LoaderComponent } from "@/components/LoaderComponent/LoaderComponent";
 // import { saveAs } from "file-saver";
 
 const ViewPurchaseOrder = () => {
@@ -221,6 +222,9 @@ const ViewPurchaseOrder = () => {
 
     html2pdf().from(containerRef.current).set(opt).save();
   };
+  if (loading) {
+    return <LoaderComponent name="Purchase Data" />; // ✅ Correct prop usage
+  }
 
   return (
     <Page>

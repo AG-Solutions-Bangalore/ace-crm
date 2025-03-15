@@ -40,6 +40,10 @@ import BASE_URL from "@/config/BaseUrl";
 import CreateType from "./CreateType";
 import EditType from "./EditType";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 const TypeList = () => {
   const {
     data: typedata,
@@ -149,33 +153,13 @@ const TypeList = () => {
 
   // Render loading state
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading Type Data
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="Type  Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (isError) {
     return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">Error on Type</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
+      <ErrorComponent message="Error Fetching Type  Data" refetch={refetch} />
     );
   }
   return (
@@ -243,7 +227,7 @@ const TypeList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                             className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                        className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null

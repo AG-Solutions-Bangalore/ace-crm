@@ -5,6 +5,8 @@ import { Edit, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import Page from "../dashboard/page";
 import BASE_URL from "@/config/BaseUrl";
 import { Button } from "@/components/ui/button";
+import { encryptId } from "@/utils/encyrption/Encyrption";
+import { WithoutLoaderComponent } from "@/components/LoaderComponent/LoaderComponent";
 
 const UserTypeList = () => {
   const [userTypeData, setUserTypeData] = useState([]);
@@ -53,16 +55,7 @@ const UserTypeList = () => {
   };
 
   if (loading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading UserType
-          </Button>
-        </div>
-      </Page>
-    );
+    return <WithoutLoaderComponent name="UserType Data" />; // ✅ Correct prop usage
   }
 
   return (
@@ -77,7 +70,7 @@ const UserTypeList = () => {
             <thead>
               <tr className="bg-gray-100">
                 <th className="border p-2 text-left">User Type</th>
-             
+
                 <th className="border p-2 text-left">Role</th>
                 <th className="border p-2 text-left">User Position</th>
                 <th className="border p-2 text-left">Default Button</th>
@@ -141,7 +134,16 @@ const UserTypeList = () => {
                       </td>
                       <td className="border p-2 text-center ">
                         <button
-                          onClick={() => navigate(`/edit-user-type/${user.id}`)}
+                          // onClick={() => navigate(`/edit-user-type/${user.id}`)}
+                          onClick={() => {
+                            const encryptedId = encryptId(user.id);
+
+                            navigate(
+                              `/edit-user-type/${encodeURIComponent(
+                                encryptedId
+                              )}`
+                            );
+                          }}
                           className="text-black hover:text-blue-700 flex items-center justify-center"
                           title="Edit"
                         >

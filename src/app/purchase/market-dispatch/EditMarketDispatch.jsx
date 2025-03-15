@@ -1,4 +1,8 @@
 import Page from "@/app/dashboard/page";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 import { ProgressBar } from "@/components/spinner/ProgressBar";
 import {
   AlertDialog,
@@ -606,6 +610,15 @@ const EditMarketDispatch = () => {
           </div>
         </div>
       );
+
+    if (isLoading) {
+      return <LoaderComponent name="Dispatch  Data" />; // ✅ Correct prop usage
+    }
+
+    // Render error state
+    if (isError) {
+      return <ErrorComponent message="Error Dispatch Data" refetch={refetch} />;
+    }
 
     return (
       <Card className="mb-2 " ref={containerRef}>

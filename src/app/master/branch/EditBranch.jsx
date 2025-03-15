@@ -23,8 +23,11 @@ import {
   useFetchScheme,
   useFetchState,
 } from "@/hooks/useApi";
-import { Loader2 } from "lucide-react";
 import { decryptId } from "@/utils/encyrption/Encyrption";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 // Header Component
 const BranchHeader = ({ branchDetails }) => {
@@ -49,12 +52,12 @@ const BranchHeader = ({ branchDetails }) => {
       <div className="flex-1 flex flex-col gap-3">
         <div className="flex items-center justify-end gap-2 text-sm">
           <span className="font-medium">
-          Company Short : {branchDetails?.branch?.branch_short || "N/A"}
+            Company Short : {branchDetails?.branch?.branch_short || "N/A"}
           </span>
         </div>
         <div className="flex items-center justify-end gap-2 text-sm">
           <span className="font-medium">
-          Company Prefix: {branchDetails?.branch?.branch_name_short || "N/A"}
+            Company Prefix: {branchDetails?.branch?.branch_name_short || "N/A"}
           </span>
         </div>
       </div>
@@ -212,36 +215,11 @@ const EditBranch = () => {
   };
 
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Loading Company Data
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="Company Data" />; // ✅ Correct prop usage
   }
-
   if (isError) {
     return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardContent>
-            <div className="text-destructive text-center">
-              Error Fetching Company Data
-            </div>
-            <Button
-              onClick={() => refetch()}
-              variant="outline"
-              className="mt-4"
-            >
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
+      <ErrorComponent message="Error Fetching Company Data" refetch={refetch} />
     );
   }
 

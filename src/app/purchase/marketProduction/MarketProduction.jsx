@@ -6,6 +6,10 @@ import {
   ProductionremoveRow,
 } from "@/components/buttonIndex/ButtonComponents";
 import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -240,34 +244,16 @@ const MarketProduction = () => {
   });
 
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading Market Production
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name=" Market Production  Data" />; // ✅ Correct prop usage
   }
 
+  // Render error state
   if (isError) {
     return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching Market Production
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
+      <ErrorComponent
+        message="Error Fetching Market Production   Data"
+        refetch={refetch}
+      />
     );
   }
   return (

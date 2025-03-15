@@ -63,6 +63,10 @@ import {
 } from "@/hooks/useApi";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import { decryptId, encryptId } from "@/utils/encyrption/Encyrption";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 // API functions
 
@@ -1021,35 +1025,13 @@ const InvoiceEdit = () => {
     }
   };
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading invoice Data
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="Invoice Data" />; // ✅ Correct prop usage
   }
 
-  //   Render error state
+  // Render error state
   if (isError) {
     return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching invoice Data
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
+      <ErrorComponent message="Error Fetching Invoice Data" refetch={refetch} />
     );
   }
   const CompactViewSection = ({ invoiceDatas }) => {

@@ -139,13 +139,19 @@ const DrawBackReport = () => {
               key={branchName}
               className="mb-6 border-t mt-6  border-l border-r border-black text-[10px]"
             >
-              <h2 className="p-2 bg-gray-200 font-bold ">{branchName}</h2>
+              <h2 className="p-2 bg-gray-200 font-bold  print:border-r print:border-t border-black">
+                {branchName}
+              </h2>
 
               <div
                 className="grid bg-white"
+                // style={{
+                //   gridTemplateColumns:
+                //     "minmax(30px, auto) minmax(90px, auto) minmax(90px, auto)   minmax(120px, auto) minmax(80px, auto) minmax(70px, auto) minmax(80px, auto) minmax(70px, auto) minmax(100px, auto) minmax(50px, auto) minmax(50px, auto) minmax(50px, auto) minmax(50px, auto)",
+                // }}
                 style={{
                   gridTemplateColumns:
-                    "minmax(30px, auto) minmax(90px, auto) minmax(90px, auto)   minmax(120px, auto) minmax(80px, auto) minmax(70px, auto) minmax(80px, auto) minmax(70px, auto) minmax(100px, auto) minmax(50px, auto) minmax(50px, auto) minmax(50px, auto) minmax(50px, auto)",
+                    "0.5fr 1fr 1fr 1.5fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr",
                 }}
               >
                 {/* Header */}
@@ -213,7 +219,7 @@ const DrawBackReport = () => {
                     <div className="p-2 border-b border-r border-black text-right">
                       {Number(item.drawback || 0).toFixed(2)}
                     </div>
-                    <div className="p-2 border-b  border-black text-right">
+                    <div className="p-2 border-b print:border-r border-black text-right">
                       {Number(item.stax || 0).toFixed(2)}
                     </div>
                   </React.Fragment>
@@ -273,7 +279,7 @@ const DrawBackReport = () => {
                     .reduce((sum, item) => sum + Number(item.drawback || 0), 0)
                     .toFixed(2)}
                 </div>
-                <div className="p-2 border-b  font-bold border-black text-right">
+                <div className="p-2 border-b print:border-r font-bold border-black text-right">
                   {invoices
                     .reduce((sum, item) => sum + Number(item.stax || 0), 0)
                     .toFixed(2)}
@@ -284,9 +290,13 @@ const DrawBackReport = () => {
           {/* Overall Grand Total */}
           <div
             className="grid bg-gray-100 border-t border-l border-r border-black font-bold text-[10px]"
+            // style={{
+            //   gridTemplateColumns:
+            //     "minmax(110px, auto) minmax(110px, auto) minmax(100px, auto)   minmax(120px, auto) minmax(80px, auto) minmax(70px, auto) minmax(80px, auto) minmax(70px, auto) minmax(100px, auto) minmax(50px, auto) minmax(50px, auto) minmax(50px, auto) minmax(50px, auto)",
+            // }}
             style={{
               gridTemplateColumns:
-                "minmax(110px, auto) minmax(110px, auto) minmax(100px, auto)   minmax(120px, auto) minmax(80px, auto) minmax(70px, auto) minmax(80px, auto) minmax(70px, auto) minmax(100px, auto) minmax(50px, auto) minmax(50px, auto) minmax(50px, auto) minmax(50px, auto)",
+                "0.5fr 1fr 1fr 1.5fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr",
             }}
           >
             <div className="p-2 border-b  border-black"></div>
@@ -301,7 +311,6 @@ const DrawBackReport = () => {
               {overallTotals.usd.toFixed(2)}
             </div>
             <div className="p-2 border-b border-r border-black text-right">
-              {/* {(overallTotals.inr || 0).toFixed(2)} */}
               {overallTotals.inr.toFixed(2)}
             </div>
             <div className="p-2 border-b border-r border-black text-right">

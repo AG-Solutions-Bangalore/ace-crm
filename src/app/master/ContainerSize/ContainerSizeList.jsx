@@ -40,6 +40,10 @@ import BASE_URL from "@/config/BaseUrl";
 import CreateContainerSize from "./CreateContainerSize";
 import EditContainerSize from "./EditContainerSize";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const ContainerSizeList = () => {
   const {
@@ -116,7 +120,7 @@ const ContainerSizeList = () => {
 
         return (
           <div className="flex flex-row">
-            <EditContainerSize containerId={containerId}/>
+            <EditContainerSize containerId={containerId} />
           </div>
         );
       },
@@ -148,37 +152,17 @@ const ContainerSizeList = () => {
     },
   });
 
-  // Render loading state
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading Conatainer Size
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="ContainerSize Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (isError) {
     return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching Container Size
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
+      <ErrorComponent
+        message="Error Fetching ContainerSize Data"
+        refetch={refetch}
+      />
     );
   }
 
@@ -246,7 +230,7 @@ const ContainerSizeList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                              className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                        className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null

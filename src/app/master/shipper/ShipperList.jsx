@@ -40,150 +40,132 @@ import BASE_URL from "@/config/BaseUrl";
 import EditShipper from "./EditShipper";
 import CreateShipper from "./CreateShipper";
 import { ButtonConfig } from "@/config/ButtonConfig";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const ShipperList = () => {
-    const {
-        data: shippers,
-        isLoading,
-        isError,
-        refetch,
-      } = useQuery({
-        queryKey: ["shippers"],
-        queryFn: async () => {
-          const token = localStorage.getItem("token");
-          const response = await axios.get(
-            `${BASE_URL}/api/panel-fetch-shipper-list`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          return response.data.shipper;
-        },
-      });
-    
-      // State for table management
-      const [sorting, setSorting] = useState([]);
-      const [columnFilters, setColumnFilters] = useState([]);
-      const [columnVisibility, setColumnVisibility] = useState({});
-      const [rowSelection, setRowSelection] = useState({});
-      const navigate = useNavigate();
-    
-      // Define columns for the table
-      const columns = [
+  const {
+    data: shippers,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["shippers"],
+    queryFn: async () => {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `${BASE_URL}/api/panel-fetch-shipper-list`,
         {
-          accessorKey: "index",
-          header: "Sl No",
-          cell: ({ row }) => <div>{row.index + 1}</div>,
-        },
-        {
-          accessorKey: "shipper_name",
-          header: ({ column }) => (
-            <Button
-              variant="ghost"
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            >
-             Shipper 
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          ),
-          cell: ({ row }) => <div>{row.getValue("shipper_name")}</div>,
-        },
-    
-        {
-          accessorKey: "shipper_status",
-          header: "Status",
-          cell: ({ row }) => {
-            const status = row.getValue("shipper_status");
-    
-            return (
-              <span
-                className={`px-2 py-1 rounded text-xs ${
-                  status == "Active"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-gray-100 text-gray-800"
-                }`}
-              >
-                {status}
-              </span>
-            );
-          },
-        },
-        {
-          id: "actions",
-          header: "Action",
-          cell: ({ row }) => {
-            const shipperId = row.original.id;
-    
-            return (
-              <div className="flex flex-row">
-                <EditShipper shipperId={shipperId} />
-              </div>
-            );
-          },
-        },
-      ];
-    
-      // Create the table instance
-      const table = useReactTable({
-        data: shippers || [],
-        columns,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
-        state: {
-          sorting,
-          columnFilters,
-          columnVisibility,
-          rowSelection,
-        },
-        initialState: {
-          pagination: {
-            pageSize: 7,
-          },
-        },
-      });
-    
-      // Render loading state
-      if (isLoading) {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data.shipper;
+    },
+  });
+
+  // State for table management
+  const [sorting, setSorting] = useState([]);
+  const [columnFilters, setColumnFilters] = useState([]);
+  const [columnVisibility, setColumnVisibility] = useState({});
+  const [rowSelection, setRowSelection] = useState({});
+  const navigate = useNavigate();
+
+  // Define columns for the table
+  const columns = [
+    {
+      accessorKey: "index",
+      header: "Sl No",
+      cell: ({ row }) => <div>{row.index + 1}</div>,
+    },
+    {
+      accessorKey: "shipper_name",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Shipper
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <div>{row.getValue("shipper_name")}</div>,
+    },
+
+    {
+      accessorKey: "shipper_status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.getValue("shipper_status");
+
         return (
-          <Page>
-            <div className="flex justify-center items-center h-full">
-              <Button disabled>
-                <Loader2 className=" h-4 w-4 animate-spin" />
-                Loading Shipper List
-              </Button>
-            </div>
-          </Page>
+          <span
+            className={`px-2 py-1 rounded text-xs ${
+              status == "Active"
+                ? "bg-green-100 text-green-800"
+                : "bg-gray-100 text-gray-800"
+            }`}
+          >
+            {status}
+          </span>
         );
-      }
-    
-      // Render error state
-      if (isError) {
+      },
+    },
+    {
+      id: "actions",
+      header: "Action",
+      cell: ({ row }) => {
+        const shipperId = row.original.id;
+
         return (
-          <Page>
-            <Card className="w-full max-w-md mx-auto mt-10">
-              <CardHeader>
-                <CardTitle className="text-destructive">
-                  Error Fetching Shipper List
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Button onClick={() => refetch()} variant="outline">
-                  Try Again
-                </Button>
-              </CardContent>
-            </Card>
-          </Page>
+          <div className="flex flex-row">
+            <EditShipper shipperId={shipperId} />
+          </div>
         );
-      }
+      },
+    },
+  ];
+
+  // Create the table instance
+  const table = useReactTable({
+    data: shippers || [],
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+    initialState: {
+      pagination: {
+        pageSize: 7,
+      },
+    },
+  });
+
+  // Render loading state
+  if (isLoading) {
+    return <LoaderComponent name="Shipper Data" />; // ✅ Correct prop usage
+  }
+
+  // Render error state
+  if (isError) {
+    return (
+      <ErrorComponent message="Error Fetching Shipper Data" refetch={refetch} />
+    );
+  }
   return (
-   <Page>
-       <div className="w-full p-4">
+    <Page>
+      <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
           Shipper List
         </div>
@@ -233,7 +215,7 @@ const ShipperList = () => {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-<CreateShipper/>
+          <CreateShipper />
         </div>
         {/* table  */}
         <div className="rounded-md border">
@@ -245,7 +227,7 @@ const ShipperList = () => {
                     return (
                       <TableHead
                         key={header.id}
-                            className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
+                        className={` ${ButtonConfig.tableHeader} ${ButtonConfig.tableLabel}`}
                       >
                         {header.isPlaceholder
                           ? null
@@ -315,8 +297,8 @@ const ShipperList = () => {
           </div>
         </div>
       </div>
-   </Page>
-  )
-}
+    </Page>
+  );
+};
 
-export default ShipperList
+export default ShipperList;

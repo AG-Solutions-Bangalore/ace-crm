@@ -69,6 +69,10 @@ import {
   InvoiceView,
 } from "@/components/buttonIndex/ButtonComponents";
 import { encryptId } from "@/utils/encyrption/Encyrption";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 const InvoiceList = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteInoice, setDeleteInoiceid] = useState(null);
@@ -247,7 +251,9 @@ const InvoiceList = () => {
                       const encryptedId = encryptId(invoiceId);
 
                       navigate(
-                        `/document-edit-invoice/${encodeURIComponent(encryptedId)}`
+                        `/document-edit-invoice/${encodeURIComponent(
+                          encryptedId
+                        )}`
                       );
                     }}
                   >
@@ -304,38 +310,18 @@ const InvoiceList = () => {
   });
 
   // Render loading state
+
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading Invoice
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="Invoice Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (isError) {
     return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching Invoice
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
+      <ErrorComponent message="Error Fetching Invoice Data" refetch={refetch} />
     );
   }
+
   return (
     <Page>
       <div className="w-full p-4">

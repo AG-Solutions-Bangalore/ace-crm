@@ -46,6 +46,10 @@ import {
 } from "@/components/ui/tooltip";
 
 import PaymentDetailsDialog from "./PaymentDetailsDialog";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const PaymentPending = () => {
   // State for table management
@@ -197,35 +201,13 @@ const PaymentPending = () => {
 
   // Render loading state
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading Payment Pending
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="Payment Pending  Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (isError) {
     return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching Payment Pending
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
+      <ErrorComponent message="Error Payment Pending Data" refetch={refetch} />
     );
   }
 

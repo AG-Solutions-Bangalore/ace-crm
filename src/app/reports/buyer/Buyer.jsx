@@ -13,6 +13,10 @@ import {
   BuyerRPrint,
 } from "@/components/buttonIndex/ButtonComponents";
 import { useReactToPrint } from "react-to-print";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const Buyer = () => {
   const containerRef = useRef();
@@ -43,7 +47,6 @@ const Buyer = () => {
     // staleTime: Infinity,
   });
 
- 
   //excel download
   const onSubmit = (e) => {
     e.preventDefault();
@@ -102,34 +105,17 @@ const Buyer = () => {
   });
 
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading Buyer
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="Buyer Summary Data" />; // ✅ Correct prop usage
   }
 
+  // Render error state
   if (isError) {
     return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching Buyer
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
+      <ErrorComponent
+        message="Error Buyer Summary
+ Data"
+        refetch={refetch}
+      />
     );
   }
 
@@ -149,7 +135,6 @@ const Buyer = () => {
                 className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
                 onClick={onSubmit}
               />
-              
             </div>
           </div>
         </div>
@@ -190,29 +175,29 @@ const Buyer = () => {
             </thead>
             <tbody>
               {buyerData.map((buyer, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
-                    <td className="border border-black px-2 py-2 ">
-                      {buyer.buyer_sort}
-                    </td>
-                    <td className="border border-black px-2 py-2 ">
-                      {buyer.buyer_group}
-                    </td>
-                    <td className="border border-black px-2 py-2 ">
-                      {buyer.buyer_name}
-                    </td>
-                    <td className="border border-black px-2 py-2 ">
-                      {buyer.buyer_address}
-                    </td>
-                    <td className="border border-black px-2 py-2 ">
-                      {buyer.buyer_port}
-                    </td>
-                    <td className="border border-black px-2 py-2 ">
-                      {buyer.buyer_country}
-                    </td>
-                    <td className="border border-black px-2 py-2 ">
-                      {buyer.buyer_status}
-                    </td>
-                  </tr>
+                <tr key={index} className="hover:bg-gray-50">
+                  <td className="border border-black px-2 py-2 ">
+                    {buyer.buyer_sort}
+                  </td>
+                  <td className="border border-black px-2 py-2 ">
+                    {buyer.buyer_group}
+                  </td>
+                  <td className="border border-black px-2 py-2 ">
+                    {buyer.buyer_name}
+                  </td>
+                  <td className="border border-black px-2 py-2 ">
+                    {buyer.buyer_address}
+                  </td>
+                  <td className="border border-black px-2 py-2 ">
+                    {buyer.buyer_port}
+                  </td>
+                  <td className="border border-black px-2 py-2 ">
+                    {buyer.buyer_country}
+                  </td>
+                  <td className="border border-black px-2 py-2 ">
+                    {buyer.buyer_status}
+                  </td>
+                </tr>
               ))}
             </tbody>
           </table>

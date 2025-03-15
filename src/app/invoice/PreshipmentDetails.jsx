@@ -11,6 +11,10 @@ import { toWords } from "number-to-words";
 import { FaRegFileWord } from "react-icons/fa";
 import { FaRegFilePdf } from "react-icons/fa";
 import { decryptId } from "@/utils/encyrption/Encyrption";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 const PreshipmentDetails = () => {
   const containerRef = useRef();
 
@@ -25,35 +29,34 @@ const PreshipmentDetails = () => {
   const [sumbag, setSumBag] = useState(0);
 
   const logoUrl = "/api/public/assets/images/letterHead/AceB.png";
-  useEffect(() => {
-    const fetchContractData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${decryptedId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch preshipmentData ");
+  const fetchContractData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${BASE_URL}/api/panel-fetch-invoice-view-by-id/${decryptedId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
 
-        const data = await response.json();
-        setInvoicePackingData(data.invoice);
-        setBranchData(data.branch);
-        setInvoiceSubData(data.invoiceSub);
-        setProuductHsn(data.producthsn);
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error("Failed to fetch preshipmentData ");
       }
-    };
 
+      const data = await response.json();
+      setInvoicePackingData(data.invoice);
+      setBranchData(data.branch);
+      setInvoiceSubData(data.invoiceSub);
+      setProuductHsn(data.producthsn);
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchContractData();
   }, [decryptedId]);
   useEffect(() => {
@@ -139,28 +142,19 @@ const PreshipmentDetails = () => {
   };
 
   if (loading) {
+    return <LoaderComponent name="Pre_Shipment Data" />; // ✅ Correct prop usage
+  }
+
+  // Render error state
+  if (error) {
     return (
-      <Card className="w-[80vw] h-[80vh] flex items-center justify-center">
-        <CardContent>
-          <Button disabled className="flex items-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Loading Pre_Shipment Data
-          </Button>
-        </CardContent>
-      </Card>
+      <ErrorComponent
+        message="Error Fetching Pre_Shipment  Data"
+        refetch={() => fetchContractData}
+      />
     );
   }
 
-  if (error) {
-    return (
-      <Card className="w-full">
-        <CardContent className="p-6">
-          <div className="text-red-500 mb-4">Error: {error}</div>
-          <Button variant="outline">Try Again</Button>
-        </CardContent>
-      </Card>
-    );
-  }
   const totalAmount = invoiceSubData.reduce((total, item) => {
     return total + (item.invoiceSub_qntyInMt * item.invoiceSub_rateMT || 0);
   }, 0);

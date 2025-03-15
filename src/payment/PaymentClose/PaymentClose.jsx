@@ -40,6 +40,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useNavigate } from "react-router-dom";
+import { encryptId } from "@/utils/encyrption/Encyrption";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 
 const PaymentClose = () => {
   const navigate = useNavigate();
@@ -127,8 +132,15 @@ const PaymentClose = () => {
                 <TooltipTrigger asChild>
                   <Eye
                     className="h-4 w-4 cursor-pointer"
+                    // onClick={() => {
+                    //   navigate(`/payment-view/${row.original.invoice_no}`);
+                    // }}
                     onClick={() => {
-                      navigate(`/payment-view/${row.original.invoice_no}`);
+                      const encryptedId = encryptId(row.original.invoice_no);
+
+                      navigate(
+                        `/payment-view/${encodeURIComponent(encryptedId)}`
+                      );
                     }}
                   />
                 </TooltipTrigger>
@@ -168,37 +180,16 @@ const PaymentClose = () => {
 
   // Render loading state
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading Payment Close
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name="Payment Close Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (isError) {
     return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching Payment Close
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
+      <ErrorComponent message="Error Payment Close Data" refetch={refetch} />
     );
   }
+
   return (
     <Page>
       <div className="w-full p-4">

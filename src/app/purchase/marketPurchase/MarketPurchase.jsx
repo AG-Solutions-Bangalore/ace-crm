@@ -51,6 +51,10 @@ import {
   PurchaseEdit,
 } from "@/components/buttonIndex/ButtonComponents";
 import { encryptId } from "@/utils/encyrption/Encyrption";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 const MarketPurchase = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteContractId, setDeleteContractId] = useState(null);
@@ -187,34 +191,16 @@ const MarketPurchase = () => {
   });
 
   if (isLoading) {
-    return (
-      <Page>
-        <div className="flex justify-center items-center h-full">
-          <Button disabled>
-            <Loader2 className=" h-4 w-4 animate-spin" />
-            Loading Market Purchase
-          </Button>
-        </div>
-      </Page>
-    );
+    return <LoaderComponent name=" Market Purchase Data" />; // ✅ Correct prop usage
   }
 
+  // Render error state
   if (isError) {
     return (
-      <Page>
-        <Card className="w-full max-w-md mx-auto mt-10">
-          <CardHeader>
-            <CardTitle className="text-destructive">
-              Error Fetching Market Purchase
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => refetch()} variant="outline">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </Page>
+      <ErrorComponent
+        message="Error Fetching Market Purchase  Data"
+        refetch={refetch}
+      />
     );
   }
   return (
