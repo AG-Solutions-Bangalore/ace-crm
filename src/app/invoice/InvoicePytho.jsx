@@ -1,19 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useReactToPrint } from "react-to-print";
-import { getTodayDate } from "@/utils/currentDate";
-import { Loader2, Printer } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useParams } from "react-router-dom";
-import BASE_URL from "@/config/BaseUrl";
-import moment from "moment";
-import { FaRegFilePdf } from "react-icons/fa";
-import { FaRegFileWord } from "react-icons/fa";
-import { decryptId } from "@/utils/encyrption/Encyrption";
 import {
   ErrorComponent,
   LoaderComponent,
+  WithoutErrorComponent,
+  WithoutLoaderComponent,
 } from "@/components/LoaderComponent/LoaderComponent";
+import BASE_URL from "@/config/BaseUrl";
+import { decryptId } from "@/utils/encyrption/Encyrption";
+import { Printer } from "lucide-react";
+import moment from "moment";
+import { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useReactToPrint } from "react-to-print";
 const InvoicePytho = () => {
   const containerRef = useRef();
 
@@ -129,13 +126,13 @@ const InvoicePytho = () => {
   };
 
   if (loading) {
-    return <LoaderComponent name="Invoice Pytho Data" />; // ✅ Correct prop usage
+    return <WithoutLoaderComponent name="Invoice Pytho Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (error) {
     return (
-      <ErrorComponent
+      <WithoutErrorComponent
         message="Error Fetching Invoice Pytho  Data"
         refetch={() => fetchContractData}
       />

@@ -1,4 +1,9 @@
-import { ErrorComponent, LoaderComponent } from "@/components/LoaderComponent/LoaderComponent";
+import {
+  ErrorComponent,
+  LoaderComponent,
+  WithoutErrorComponent,
+  WithoutLoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import BASE_URL from "@/config/BaseUrl";
@@ -172,13 +177,13 @@ const BlDraft = () => {
     URL.revokeObjectURL(link.href);
   };
   if (loading) {
-    return <LoaderComponent name="BiDraft Data Data" />; // ✅ Correct prop usage
+    return <WithoutLoaderComponent name="BiDraft Data Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (error) {
     return (
-      <ErrorComponent
+      <WithoutErrorComponent
         message="Error Fetching BiDraft Data Data"
         refetch={() => fetchContractData}
       />
@@ -258,13 +263,7 @@ const BlDraft = () => {
                     <p className="font-bold">
                       {invoicePackingData.branch_name}
                     </p>
-                    <div>
-                      {invoicePackingData.branch_address
-                        .split(",")
-                        .map((line, index) => (
-                          <p key={index}>{line.trim()}</p>
-                        ))}
-                    </div>
+                    <div>{invoicePackingData.branch_address}</div>
                   </div>
 
                   <div className="col-span-7">
@@ -281,13 +280,7 @@ const BlDraft = () => {
                       <p className="font-bold">
                         {invoicePackingData.invoice_consignee}
                       </p>{" "}
-                      <div>
-                        {invoicePackingData.invoice_consignee_add
-                          .split(",")
-                          .map((line, index) => (
-                            <p key={index}>{line.trim()}</p>
-                          ))}
-                      </div>
+                      <div>{invoicePackingData.invoice_consignee_add}</div>
                     </div>
 
                     <div className="col-span-7  ">

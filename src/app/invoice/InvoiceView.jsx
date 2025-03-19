@@ -15,6 +15,7 @@ import { decryptId } from "@/utils/encyrption/Encyrption";
 import {
   ErrorComponent,
   LoaderComponent,
+  WithoutLoaderComponent,
 } from "@/components/LoaderComponent/LoaderComponent";
 
 const InvoiceView = () => {
@@ -279,7 +280,7 @@ const InvoiceView = () => {
     return html2pdf().from(element).set(options).outputPdf("blob");
   };
   if (loading) {
-    return <LoaderComponent name="Invoice  Data" />; // ✅ Correct prop usage
+    return <WithoutLoaderComponent name="Invoice  Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
@@ -381,13 +382,7 @@ const InvoiceView = () => {
                     <p className="font-bold">
                       {invoicePackingData.branch_name}
                     </p>
-                    <div>
-                      {invoicePackingData.branch_address
-                        .split(",")
-                        .map((line, index) => (
-                          <p key={index}>{line.trim()}</p>
-                        ))}
-                    </div>
+                    <div>{invoicePackingData?.branch_address}</div>
                   </div>
 
                   <div className="col-span-7 grid grid-rows-3 ">
@@ -442,13 +437,7 @@ const InvoiceView = () => {
                       <p className="font-bold">
                         {invoicePackingData.invoice_consignee}
                       </p>{" "}
-                      <div>
-                        {invoicePackingData.invoice_consignee_add
-                          .split(",")
-                          .map((line, index) => (
-                            <p key={index}>{line.trim()}</p>
-                          ))}
-                      </div>
+                      <div>{invoicePackingData?.invoice_consignee_add}</div>
                     </div>
 
                     <div className="col-span-4 border-r border-black ">
@@ -459,13 +448,7 @@ const InvoiceView = () => {
                         <p className="mb-[3px] font-bold">
                           {invoicePackingData.invoice_consignee}
                         </p>
-                        <div>
-                          {invoicePackingData.invoice_buyer_add
-                            .split(",")
-                            .map((line, index) => (
-                              <p key={index}>{line.trim()}</p>
-                            ))}
-                        </div>
+                        <div>{invoicePackingData?.invoice_buyer_add}</div>
                       </div>
 
                       <div className="grid grid-cols-2  px-2  ">
@@ -489,11 +472,7 @@ const InvoiceView = () => {
                               {invoicePackingData.invoice_consignee}
                             </span>
                             <div>
-                              {invoicePackingData.invoice_consignee_add
-                                .split(",")
-                                .map((line, index) => (
-                                  <p key={index}>{line.trim()}</p>
-                                ))}
+                              {invoicePackingData.invoice_consignee_add}
                             </div>
                           </div>
                         </div>
@@ -789,13 +768,7 @@ const InvoiceView = () => {
                     <p className="font-bold">
                       {invoicePackingData.branch_name}
                     </p>
-                    <div>
-                      {invoicePackingData.branch_address
-                        .split(",")
-                        .map((line, index) => (
-                          <p key={index}>{line.trim()}</p>
-                        ))}
-                    </div>
+                    <div>{invoicePackingData?.branch_address}</div>
                   </div>
 
                   <div className="col-span-7 grid grid-rows-3 ">
@@ -850,13 +823,7 @@ const InvoiceView = () => {
                       <p className="font-bold">
                         {invoicePackingData.invoice_consignee}
                       </p>{" "}
-                      <div>
-                        {invoicePackingData.invoice_consignee_add
-                          .split(",")
-                          .map((line, index) => (
-                            <p key={index}>{line.trim()}</p>
-                          ))}
-                      </div>
+                      <div>{invoicePackingData.invoice_consignee_add}</div>
                     </div>
 
                     <div className="col-span-4 border-r border-black ">
@@ -867,13 +834,7 @@ const InvoiceView = () => {
                         <p className="mb-[3px] font-bold">
                           {invoicePackingData.invoice_consignee}
                         </p>
-                        <div>
-                          {invoicePackingData.invoice_buyer_add
-                            .split(",")
-                            .map((line, index) => (
-                              <p key={index}>{line.trim()}</p>
-                            ))}
-                        </div>
+                        <div>{invoicePackingData.invoice_buyer_add}</div>
                       </div>
 
                       <div className="grid grid-cols-2  px-2  ">
@@ -897,11 +858,7 @@ const InvoiceView = () => {
                               {invoicePackingData.invoice_consignee}
                             </span>
                             <div>
-                              {invoicePackingData.invoice_consignee_add
-                                .split(",")
-                                .map((line, index) => (
-                                  <p key={index}>{line.trim()}</p>
-                                ))}
+                              {invoicePackingData.invoice_consignee_add}
                             </div>
                           </div>
                         </div>
@@ -1046,52 +1003,6 @@ const InvoiceView = () => {
                     </thead>
 
                     <tbody>
-                      {/* {invoiceSubData.map((item, index) => (
-                        <>
-                          <tr key={index}>
-                            <td className="border-r border-black p-2">
-                              {item.invoiceSub_marking} <br />
-                            </td>
-                            <td className="border-r border-black p-2">
-                              <p className="text-center">
-                                {" "}
-                                {item.invoiceSub_item_bag}
-                              </p>{" "}
-                              <p className="text-center">
-                                {" "}
-                                {item.invoiceSub_sbaga}
-                              </p>{" "}
-                            </td>
-                            <td className="border-r border-black p-2">
-                              {item.InvoiceSubs.item_hsn && (
-                                <p>HSN : {item.InvoiceSubs.item_hsn}</p>
-                              )}
-                              {item.invoiceSub_item_name && (
-                                <p>{item.invoiceSub_item_name}</p>
-                              )}
-                              {item.invoiceSub_descriptionofGoods && (
-                                <p>{item.invoiceSub_descriptionofGoods}</p>
-                              )}
-                              {(item.invoiceSub_packing ||
-                                item.invoiceSub_sbaga) && (
-                                <p>
-                                  PACKED {item.invoiceSub_packing} KGS NET IN
-                                  EACH {item.invoiceSub_sbaga}
-                                </p>
-                              )}
-                            </td>
-                            <td className="border-r border-black p-2 text-center">
-                              {item.invoiceSub_qntyInMt}
-                            </td>
-                       
-                            <td className="p-2 text-right">
-                            
-                               TOTAL NET WEIGHT : 
-
-                            </td>
-                          </tr>
-                        </>
-                      ))} */}
                       {invoiceSubData.map((item, index) => (
                         <tr key={index}>
                           <td className="border-r border-black p-2">
@@ -1182,29 +1093,14 @@ const InvoiceView = () => {
                         <td className="border-r border-black p-2"></td>
                         <td className="border-r border-black p-2"></td>
                         <td className="border-r border-black p-2"></td>
-                        {/* <td className="border-r border-black p-2"></td> */}
-                        <td className=" p-2 text-right font-bold">
-                          {/* $
-                          {invoiceSubData
-                            .reduce((total, item) => {
-                              return (
-                                total +
-                                (item.invoiceSub_qntyInMt *
-                                  item.invoiceSub_rateMT || 0)
-                              );
-                            }, 0)
-                            .toFixed(2)} */}
-                        </td>
+                        <td className=" p-2 text-right font-bold"></td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
 
                 <div className="text-[10px] ">
-                  <p className="flex p-2">
-                    {/* AMOUNT CHARGEABLE IN WORDS -
-                    <p className=" font-semibold ml-4">{totalInWords}</p> */}
-                  </p>
+                  <p className="flex p-2"></p>
 
                   <p className="block font-semibold ml-4">
                     {invoicePackingData.invoice_lut_code}
@@ -1269,13 +1165,7 @@ const InvoiceView = () => {
                     <p className="font-bold">
                       {invoicePackingData.branch_name}
                     </p>
-                    <div>
-                      {invoicePackingData.branch_address
-                        .split(",")
-                        .map((line, index) => (
-                          <p key={index}>{line.trim()}</p>
-                        ))}
-                    </div>
+                    <div>{invoicePackingData.branch_address}</div>
                   </div>
 
                   <div className="col-span-7 grid grid-rows-3 ">
@@ -1326,13 +1216,7 @@ const InvoiceView = () => {
                       <p className="font-bold">
                         {invoicePackingData.invoice_consignee}
                       </p>{" "}
-                      <div>
-                        {invoicePackingData.invoice_consignee_add
-                          .split(",")
-                          .map((line, index) => (
-                            <p key={index}>{line.trim()}</p>
-                          ))}
-                      </div>
+                      <div>{invoicePackingData.invoice_consignee_add}</div>
                     </div>
 
                     <div className="col-span-7  ">
@@ -1343,13 +1227,7 @@ const InvoiceView = () => {
                         <p className="mb-[3px] font-bold">
                           {invoicePackingData.invoice_consignee}
                         </p>
-                        <div>
-                          {invoicePackingData.invoice_buyer_add
-                            .split(",")
-                            .map((line, index) => (
-                              <p key={index}>{line.trim()}</p>
-                            ))}
-                        </div>
+                        <div>{invoicePackingData.invoice_buyer_add}</div>
                       </div>
 
                       <div className="grid grid-cols-3 px-2">
@@ -1634,13 +1512,7 @@ const InvoiceView = () => {
                     <p className="font-bold">
                       {invoicePackingData.branch_name}
                     </p>
-                    <div>
-                      {invoicePackingData.branch_address
-                        .split(",")
-                        .map((line, index) => (
-                          <p key={index}>{line.trim()}</p>
-                        ))}
-                    </div>
+                    <div>{invoicePackingData.branch_address}</div>
                   </div>
 
                   <div className="col-span-7 grid grid-rows-3 ">
@@ -1691,13 +1563,7 @@ const InvoiceView = () => {
                       <p className="font-bold">
                         {invoicePackingData.invoice_consignee}
                       </p>{" "}
-                      <div>
-                        {invoicePackingData.invoice_consignee_add
-                          .split(",")
-                          .map((line, index) => (
-                            <p key={index}>{line.trim()}</p>
-                          ))}
-                      </div>
+                      <div>{invoicePackingData.invoice_consignee_add}</div>
                     </div>
                     <div className="col-span-7  ">
                       <div className="border-b border-black p-2 text-[10px] leading-3">
@@ -1707,13 +1573,7 @@ const InvoiceView = () => {
                         <p className="mb-[3px] font-bold">
                           {invoicePackingData.invoice_consignee}
                         </p>
-                        <div>
-                          {invoicePackingData.invoice_buyer_add
-                            .split(",")
-                            .map((line, index) => (
-                              <p key={index}>{line.trim()}</p>
-                            ))}
-                        </div>
+                        <div>{invoicePackingData.invoice_buyer_add}</div>
                       </div>
 
                       <div className="grid grid-cols-3 px-2">

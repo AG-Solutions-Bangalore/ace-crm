@@ -14,6 +14,8 @@ import { decryptId } from "@/utils/encyrption/Encyrption";
 import {
   ErrorComponent,
   LoaderComponent,
+  WithoutErrorComponent,
+  WithoutLoaderComponent,
 } from "@/components/LoaderComponent/LoaderComponent";
 const PreshipmentDetails = () => {
   const containerRef = useRef();
@@ -142,13 +144,13 @@ const PreshipmentDetails = () => {
   };
 
   if (loading) {
-    return <LoaderComponent name="Pre_Shipment Data" />; // ✅ Correct prop usage
+    return <WithoutLoaderComponent name="Pre_Shipment Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (error) {
     return (
-      <ErrorComponent
+      <WithoutErrorComponent
         message="Error Fetching Pre_Shipment  Data"
         refetch={() => fetchContractData}
       />

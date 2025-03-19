@@ -1,20 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { FileText, Loader2, Printer } from "lucide-react";
-import html2pdf from "html2pdf.js";
-import BASE_URL from "@/config/BaseUrl";
-import { useParams } from "react-router-dom";
-import ReactToPrint from "react-to-print";
-import moment from "moment";
-import { toWords } from "number-to-words";
-import { FaRegFileWord } from "react-icons/fa";
-import { FaRegFilePdf } from "react-icons/fa";
-import { decryptId } from "@/utils/encyrption/Encyrption";
 import {
   ErrorComponent,
   LoaderComponent,
+  WithoutErrorComponent,
+  WithoutLoaderComponent,
 } from "@/components/LoaderComponent/LoaderComponent";
+import BASE_URL from "@/config/BaseUrl";
+import { decryptId } from "@/utils/encyrption/Encyrption";
+import html2pdf from "html2pdf.js";
+import { Printer } from "lucide-react";
+import moment from "moment";
+import { toWords } from "number-to-words";
+import { useEffect, useRef, useState } from "react";
+import { FaRegFilePdf } from "react-icons/fa";
+import { useParams } from "react-router-dom";
+import ReactToPrint from "react-to-print";
 const PerfomaInvoice = () => {
   const containerRef = useRef();
   const { id } = useParams();
@@ -176,13 +175,13 @@ const PerfomaInvoice = () => {
     URL.revokeObjectURL(link.href);
   };
   if (loading) {
-    return <LoaderComponent name=" Perfomal Invoice Data" />; // ✅ Correct prop usage
+    return <WithoutLoaderComponent name=" Perfomal Invoice Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (error) {
     return (
-      <ErrorComponent
+      <WithoutErrorComponent
         message="Error Fetching Perfomal Invoice  Data"
         refetch={() => fetchContractData}
       />
@@ -262,13 +261,7 @@ const PerfomaInvoice = () => {
                     <p className="font-bold">
                       {invoicePackingData.branch_name}
                     </p>
-                    <div>
-                      {invoicePackingData.branch_address
-                        .split(",")
-                        .map((line, index) => (
-                          <p key={index}>{line.trim()}</p>
-                        ))}
-                    </div>
+                    <div>{invoicePackingData.branch_address}</div>
                   </div>
 
                   <div className="col-span-7 grid grid-rows-3 ">
@@ -319,13 +312,7 @@ const PerfomaInvoice = () => {
                       <p className="font-bold">
                         {invoicePackingData.invoice_consignee}
                       </p>{" "}
-                      <div>
-                        {invoicePackingData.invoice_consignee_add
-                          .split(",")
-                          .map((line, index) => (
-                            <p key={index}>{line.trim()}</p>
-                          ))}
-                      </div>
+                      <div>{invoicePackingData.invoice_consignee_add}</div>
                     </div>
 
                     <div className="col-span-7  ">
@@ -336,13 +323,7 @@ const PerfomaInvoice = () => {
                         <p className="mb-[3px] font-bold">
                           {invoicePackingData.invoice_consignee}
                         </p>
-                        <div>
-                          {invoicePackingData.invoice_buyer_add
-                            .split(",")
-                            .map((line, index) => (
-                              <p key={index}>{line.trim()}</p>
-                            ))}
-                        </div>
+                        <div>{invoicePackingData.invoice_buyer_add}</div>
                       </div>
 
                       <div className="grid grid-cols-3 px-2">
@@ -624,13 +605,7 @@ const PerfomaInvoice = () => {
                     <p className="font-bold">
                       {invoicePackingData.branch_name}
                     </p>
-                    <div>
-                      {invoicePackingData.branch_address
-                        .split(",")
-                        .map((line, index) => (
-                          <p key={index}>{line.trim()}</p>
-                        ))}
-                    </div>
+                    <div>{invoicePackingData.branch_address}</div>
                   </div>
 
                   <div className="col-span-7 grid grid-rows-3 ">
@@ -681,13 +656,7 @@ const PerfomaInvoice = () => {
                       <p className="font-bold">
                         {invoicePackingData.invoice_consignee}
                       </p>{" "}
-                      <div>
-                        {invoicePackingData.invoice_consignee_add
-                          .split(",")
-                          .map((line, index) => (
-                            <p key={index}>{line.trim()}</p>
-                          ))}
-                      </div>
+                      <div>{invoicePackingData.invoice_consignee_add}</div>
                     </div>
                     <div className="col-span-7  ">
                       <div className="border-b border-black p-2 text-[10px] leading-3">
@@ -697,13 +666,7 @@ const PerfomaInvoice = () => {
                         <p className="mb-[3px] font-bold">
                           {invoicePackingData.invoice_consignee}
                         </p>
-                        <div>
-                          {invoicePackingData.invoice_buyer_add
-                            .split(",")
-                            .map((line, index) => (
-                              <p key={index}>{line.trim()}</p>
-                            ))}
-                        </div>
+                        <div>{invoicePackingData.invoice_buyer_add}</div>
                       </div>
 
                       <div className="grid grid-cols-3 px-2">

@@ -1,24 +1,3 @@
-import Page from "@/app/dashboard/page";
-import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import {
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  ChevronDown,
-  Loader2,
-  Edit,
-  Search,
-  SquarePlus,
-  ExternalLink,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -35,15 +14,29 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
 import BASE_URL from "@/config/BaseUrl";
+import { useQuery } from "@tanstack/react-query";
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import axios from "axios";
+import { ArrowUpDown, ChevronDown, ExternalLink, Search } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
+import StatusToggle from "@/components/toggle/StatusToggle";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import CreateTeam from "./CreateTeam";
 import EditTeam from "./EditTeam";
-import StatusToggle from "@/components/toggle/StatusToggle";
-import { WithoutLoaderComponent } from "@/components/LoaderComponent/LoaderComponent";
 
 const TeamList = () => {
   const {
@@ -177,14 +170,12 @@ const TeamList = () => {
 
   // Render loading state
   if (isLoading) {
-    return <WithoutLoaderComponent name="Team Data" />; // ✅ Correct prop usage
+    return <ErrorComponent name="Team Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (isError) {
-    return (
-      <WithoutErrorComponent message="Error Team Data" refetch={refetch} />
-    );
+    return <LoaderComponent message="Error Team Data" refetch={refetch} />;
   }
 
   return (

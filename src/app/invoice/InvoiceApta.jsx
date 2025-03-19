@@ -9,6 +9,11 @@ import { useParams } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { FaRegFileWord } from "react-icons/fa";
 import { decryptId } from "@/utils/encyrption/Encyrption";
+import {
+  LoaderComponent,
+  WithoutErrorComponent,
+  WithoutLoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 const InvoiceApta = () => {
   const containerRef = useRef();
 
@@ -114,13 +119,13 @@ const InvoiceApta = () => {
   };
 
   if (loading) {
-    return <LoaderComponent name="Invoive Apta Data" />; // ✅ Correct prop usage
+    return <WithoutLoaderComponent name="Invoive Apta Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (error) {
     return (
-      <ErrorComponent
+      <WithoutErrorComponent
         message="Error Fetching Invoive Apta Data"
         refetch={() => fetchContractData}
       />
