@@ -176,9 +176,8 @@ const ContractList = () => {
 
         return (
           <span
-            className={`px-2 py-1 rounded text-xs ${
-              statusColors[status] || "bg-gray-100 text-gray-800"
-            }`}
+            className={`px-2 py-1 rounded text-xs ${statusColors[status] || "bg-gray-100 text-gray-800"
+              }`}
           >
             {status}
           </span>
@@ -191,6 +190,7 @@ const ContractList = () => {
       header: "Action",
       cell: ({ row }) => {
         const contractId = row.original.id;
+        const contractStatus = row.original.contract_status;
 
         return (
           <div className="flex flex-row">
@@ -218,31 +218,30 @@ const ContractList = () => {
                 <TooltipContent>View Contract</TooltipContent>
               </Tooltip>
             </TooltipProvider>
+            {contractStatus !== "Close" && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
 
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  {/* <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => navigate(`/edit-contract/${contractId}`)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button> */}
-                  <ContractEdit
-                    // onClick={() => navigate(`/edit-contract/${contractId}`)}
-                    onClick={() => {
-                      const encryptedId = encryptId(contractId);
+                    <ContractEdit
 
-                      navigate(
-                        `/edit-contract/${encodeURIComponent(encryptedId)}`
-                      );
-                    }}
-                  ></ContractEdit>
-                </TooltipTrigger>
-                <TooltipContent>Edit Contract</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+                      onClick={() => {
+                        const encryptedId = encryptId(contractId);
+
+                        navigate(
+                          `/edit-contract/${encodeURIComponent(encryptedId)}`
+                        );
+                      }}
+                    ></ContractEdit>
+                  </TooltipTrigger>
+                  <TooltipContent>Edit Contract</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+
+
+
+
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -371,9 +370,9 @@ const ContractList = () => {
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                       </TableHead>
                     );
                   })}

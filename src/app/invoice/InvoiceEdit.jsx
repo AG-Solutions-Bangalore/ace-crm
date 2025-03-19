@@ -67,6 +67,7 @@ import {
   ErrorComponent,
   LoaderComponent,
 } from "@/components/LoaderComponent/LoaderComponent";
+import moment from "moment";
 
 // API functions
 
@@ -1197,7 +1198,7 @@ const InvoiceEdit = () => {
               <InfoItem
                 icon={TestTubes}
                 label="Contract Date"
-                value={invoiceDatas?.invoice?.contract_date}
+                value={moment(invoiceDatas?.invoice?.contract_date).format("DD-MM-YYYY")}
               />
               <InfoItem
                 icon={Truck}

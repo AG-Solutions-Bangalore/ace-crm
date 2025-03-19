@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import {
   useFetchPortofLoadings,
+  useFetchPreReceipt,
   useFetchScheme,
   useFetchState,
 } from "@/hooks/useApi";
@@ -34,6 +35,7 @@ const branchFormSchema = z.object({
   branch_apeda: z.string().optional(),
   branch_gst: z.string().min(1, "GST number is required"),
   branch_state: z.string().min(1, "State is required"),
+  branch_prereceipts: z.string().min(1, "Pre Receipt is required"),
   branch_state_no: z.string().min(1, "State Code is required"),
   branch_state_short: z.string().min(1, "State Short is required"),
   branch_scheme: z.string().optional(),
@@ -132,11 +134,14 @@ const CreateBranch = () => {
     branch_sign_name2: "",
     branch_sign_no2: "",
     branch_state_short: "",
+    branch_prereceipts: "",
   });
   const [progress, setProgress] = useState(0);
   const { data: portofLoadingData } = useFetchPortofLoadings();
   const { data: stateData } = useFetchState();
   const { data: schemeData } = useFetchScheme();
+  const { data: prereceiptsData } = useFetchPreReceipt();
+  
   const createBranchMutation = useMutation({
     mutationFn: createBranch,
 
@@ -376,6 +381,33 @@ const CreateBranch = () => {
                   placeholder="Enter state short"
                 />
               </div>
+              
+              <div>
+                <label
+                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                >
+                  Pre Receipt <span className="text-red-500">*</span>
+                </label>
+                <Select
+                  key={formData.branch_prereceipts}
+                  value={formData.branch_prereceipts}
+                  onValueChange={(value) =>
+                    handleInputChange({ target: { value } }, "branch_prereceipts")
+                  }
+                >
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder="Enter pre receipt" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {prereceiptsData?.prereceipts?.map((item) => (
+                      <SelectItem value={item.prereceipts_name} key={item.prereceipts_name}>
+                        {item.prereceipts_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
 
               <div>
                 <label
@@ -409,7 +441,7 @@ const CreateBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Scheme Details
+                  LUT Scheme
                 </label>
                 <Select
                   value={formData.branch_scheme}
@@ -418,7 +450,7 @@ const CreateBranch = () => {
                   }
                 >
                   <SelectTrigger className="bg-white">
-                    <SelectValue placeholder="Enter scheme details" />
+                    <SelectValue placeholder="Enter  LUT scheme " />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     {schemeData?.scheme?.map((item) => (
@@ -432,7 +464,7 @@ const CreateBranch = () => {
                   </SelectContent>
                 </Select>
               </div>
-
+{/*  
               <div>
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
@@ -474,7 +506,7 @@ const CreateBranch = () => {
                   placeholder="Enter registration number"
                 />
               </div>
-
+*/}
               <div>
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}

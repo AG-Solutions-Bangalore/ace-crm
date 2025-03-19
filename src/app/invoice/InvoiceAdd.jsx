@@ -58,6 +58,7 @@ import CreateCountry from "../master/country/CreateCountry";
 import CreatePaymentTermC from "../master/paymentTermC/CreatePaymentTermC";
 import CreateItem from "../master/item/CreateItem";
 import CreateDescriptionGoods from "../master/descriptionGoods/CreateDescriptionGoods";
+import CreateMarking from "../master/marking/CreateMarking";
 
 // Validation Schemas
 const productRowSchema = z.object({
@@ -104,7 +105,7 @@ const contractFormSchema = z.object({
   invoice_remarks: z.string().optional(),
   invoice_consig_bank: z.string().optional(),
   invoice_consig_bank_address: z.string().optional(),
-  invoice_prereceipts: z.string().optional(),
+  invoice_prereceipts: z.string().min(1, "Pre Receipt is required"),
   invoice_precarriage: z.string().optional(),
   invoice_product_cust_des: z
     .string()
@@ -723,6 +724,10 @@ const InvoiceAdd = () => {
                 contract.contract_destination_country,
               invoice_payment_terms: contract.contract_payment_terms,
               invoice_remarks: contract.contract_remarks,
+              invoice_product_cust_des: contract.contract_product_cust_des,
+              invoice_gr_code: contract.contract_gr_code,
+              invoice_lut_code: contract.contract_lut_code,
+              invoice_prereceipts: contract.contract_prereceipts,
               invoice_no: contract.contract_no.toString(),
             };
             if (
@@ -765,6 +770,7 @@ const InvoiceAdd = () => {
           if (selectedCompanySort) {
             updatedFormData.branch_name = selectedCompanySort.branch_name;
             updatedFormData.branch_address = selectedCompanySort.branch_address;
+            updatedFormData.invoice_prereceipts = selectedCompanySort.branch_prereceipts;
 
             const selectedBuyer = buyerData?.buyer?.find(
               (buyer) => buyer.buyer_name == prev.invoice_buyer
@@ -816,7 +822,7 @@ const InvoiceAdd = () => {
         const newData = [...prev];
         newData[rowIndex] = {
           ...newData[rowIndex],
-          [field]: value,
+          [field]:  value === null ? "" : value,
         };
         return newData;
       });
@@ -900,11 +906,15 @@ const InvoiceAdd = () => {
         invoiceSub_rateMT: parseFloat(row.invoiceSub_rateMT),
         invoiceSub_packing: parseFloat(row.invoiceSub_packing),
         invoiceSub_bagsize: parseFloat(row.invoiceSub_bagsize),
+        invoiceSub_marking: row.invoiceSub_marking || "",
       }));
 
       const validatedData = contractFormSchema.parse({
         ...formData,
         invoice_data: processedContractData,
+        invoice_payment_terms: formData.invoice_payment_terms || "",
+        invoice_remarks: formData.invoice_remarks || "", 
+    
       });
       const res = await createInvoiceMutation.mutateAsync(validatedData);
     } catch (error) {
@@ -925,7 +935,7 @@ const InvoiceAdd = () => {
             return `${label}: ${messages.join(", ")}`;
           }
         );
-
+console.log("toast",errorMessages)
         toast({
           title: "Validation Error",
           description: (
@@ -1632,6 +1642,7 @@ const InvoiceAdd = () => {
                   <span>
                     <CreateDescriptionGoods />
                   </span>
+                  <span><CreateMarking/></span>
                 </div>
               </div>
 

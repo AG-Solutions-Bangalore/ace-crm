@@ -40,6 +40,7 @@ const EditProductDescription = ({ proDescId }) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
+    product_name:"",
     product_description: "",
     product_hs: "",
     product_hsn: "",
@@ -58,6 +59,7 @@ const EditProductDescription = ({ proDescId }) => {
       );
       const productSubData = response.data.productSub;
       setFormData({
+        product_name: productSubData?.product_name,
         product_description: productSubData.product_description,
         product_hs: productSubData.product_hs,
         product_hsn: productSubData.product_hsn,
@@ -189,14 +191,14 @@ const EditProductDescription = ({ proDescId }) => {
             </DialogTrigger>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Edit Scheme</p>
+            <p>Edit Custome</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
 
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit Product Desc</DialogTitle>
+          <DialogTitle>Edit Custom Desc for {formData.product_name}</DialogTitle>
         </DialogHeader>
 
         {isFetching ? (

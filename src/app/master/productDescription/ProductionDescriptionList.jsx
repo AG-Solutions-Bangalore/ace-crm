@@ -184,7 +184,7 @@ const ProductionDescriptionList = () => {
     <Page>
       <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
-          Product Description List
+          Custom Description List
         </div>
 
         {/* searching and column filter  */}

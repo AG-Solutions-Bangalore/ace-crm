@@ -134,18 +134,18 @@ const { data: productData } = useFetchProduct();
           <div>
             <ProductDescriptionCreate
               className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-            ></ProductDescriptionCreate>
+            />
           </div>
         ) : pathname === "/create-contract" ? (
           <p className="text-xs text-yellow-700 ml-2 mt-1 w-32 hover:text-red-800 cursor-pointer">
-            Create Product Desc
+            Create Custom Desc
           </p>
         ) : null}
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Create New Product Desc</DialogTitle>
+          <DialogTitle>Create New Custom Desc</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">

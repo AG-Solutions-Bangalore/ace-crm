@@ -988,7 +988,7 @@ export const ProductDescriptionCreate = ({ onClick, className }) => {
 
   return (
     <Button variant="default" className={className} onClick={onClick}>
-      <SquarePlus className="h-4 w-4" /> Product Description
+      <SquarePlus className="h-4 w-4" /> Custom Description
     </Button>
   );
 };

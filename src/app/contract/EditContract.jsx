@@ -880,11 +880,12 @@ const EditContract = () => {
                   >
                     Company <span className="text-red-500">*</span>
                   </label>
-                  <MemoizedSelect
+                  {/* <MemoizedSelect
                     value={formData.branch_short}
                     onChange={(value) =>
                       handleSelectChange("branch_short", value)
                     }
+                    
                     options={
                       branchData?.branch?.map((branch) => ({
                         value: branch.branch_short,
@@ -892,6 +893,15 @@ const EditContract = () => {
                       })) || []
                     }
                     placeholder="Select Company"
+                  /> */}
+                   <Input
+                    type="text"
+                    value={formData.branch_short}
+                    disabled
+                    className="bg-white"
+                    onChange={(e) =>
+                      handleInputChange("branch_short", e.target.value)
+                    }
                   />
                 </div>
                 <div>
@@ -900,7 +910,7 @@ const EditContract = () => {
                   >
                     Contract No <span className="text-red-500">*</span>
                   </label>
-                  <MemoizedSelect
+                  {/* <MemoizedSelect
                     value={formData?.contract_no}
                     onChange={(value) =>
                       handleSelectChange("contract_no", value)
@@ -912,6 +922,15 @@ const EditContract = () => {
                       })) || []
                     }
                     placeholder="Select Contract No"
+                  /> */}
+                   <Input
+                    type="text"
+                    value={formData?.contract_no}
+                    disabled
+                    className="bg-white"
+                    onChange={(e) =>
+                      handleInputChange("contract_no", e.target.value)
+                    }
                   />
                 </div>
               </div>
