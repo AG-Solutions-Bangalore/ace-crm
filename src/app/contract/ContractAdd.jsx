@@ -45,6 +45,7 @@ import CreateCountry from "../master/country/CreateCountry";
 import CreatePaymentTermC from "../master/paymentTermC/CreatePaymentTermC";
 import CreateItem from "../master/item/CreateItem";
 import CreateDescriptionGoods from "../master/descriptionGoods/CreateDescriptionGoods";
+import CreateMarking from "../master/marking/CreateMarking";
 
 // Validation Schemas
 const productRowSchema = z.object({
@@ -1204,6 +1205,7 @@ const ContractAdd = () => {
                   <h2 className="text-xl font-semibold">Products</h2>
                   <span ><CreateItem/></span>
                   <span><CreateDescriptionGoods/></span>
+                  <span><CreateMarking/></span>
                 </div>
               </div>
 

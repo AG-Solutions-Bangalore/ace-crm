@@ -20,6 +20,7 @@ import BASE_URL from "@/config/BaseUrl";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import {
   useFetchPortofLoadings,
+  useFetchPreReceipt,
   useFetchScheme,
   useFetchState,
 } from "@/hooks/useApi";
@@ -114,6 +115,7 @@ const EditBranch = () => {
     branch_sign_name2: "",
     branch_sign_no2: "",
     branch_state_short: "",
+    branch_prereceipts: "",
     branch_status: "Active",
   });
 
@@ -143,6 +145,7 @@ const EditBranch = () => {
   const { data: portofLoadingData } = useFetchPortofLoadings();
   const { data: stateData } = useFetchState();
   const { data: schemeData } = useFetchScheme();
+  const { data: prereceiptsData } = useFetchPreReceipt();
   useEffect(() => {
     if (branchDetails) {
       setFormData({
@@ -154,9 +157,9 @@ const EditBranch = () => {
         branch_iec: branchDetails.branch.branch_iec,
         branch_apeda: branchDetails.branch.branch_apeda,
         branch_gst: branchDetails.branch.branch_gst,
-        branch_state: branchDetails.branch.branch_state,
+        branch_state: branchDetails?.branch?.branch_state,
         branch_state_no: branchDetails.branch.branch_state_no,
-        branch_scheme: branchDetails.branch.branch_scheme,
+        branch_scheme: branchDetails?.branch?.branch_scheme,
         branch_pan_no: branchDetails.branch.branch_pan_no,
         branch_ecgcncb: branchDetails.branch.branch_ecgcncb,
         branch_ecgc_policy: branchDetails.branch.branch_ecgc_policy,
@@ -169,6 +172,7 @@ const EditBranch = () => {
         branch_sign_name2: branchDetails.branch.branch_sign_name2,
         branch_sign_no2: branchDetails.branch.branch_sign_no2,
         branch_state_short: branchDetails.branch.branch_state_short,
+        branch_prereceipts: branchDetails.branch.branch_prereceipts,
         branch_status: branchDetails.branch.branch_status,
       });
     }
@@ -293,17 +297,13 @@ const EditBranch = () => {
                 >
                   State <span className="text-red-500">*</span>
                 </label>
-                {/* <Input
-                  className="bg-white"
-                  value={formData.branch_state}
-                  onChange={(e) => handleInputChange(e, "branch_state")}
-                  placeholder="Enter state"
-                /> */}
+            
                 <Select
-                  value={formData.branch_state}
-                  onValueChange={(value) =>
-                    handleInputChange({ target: { value } }, "branch_state")
-                  }
+                key={formData.branch_state} 
+                   value={formData.branch_state} 
+                   onValueChange={(value) =>
+                     handleInputChange({ target: { value } }, "branch_state")
+                   }
                 >
                   <SelectTrigger className="bg-white">
                     <SelectValue placeholder="Enter state" />
@@ -344,7 +344,31 @@ const EditBranch = () => {
                   placeholder="Enter state short"
                 />
               </div>
-
+ <div>
+                <label
+                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                >
+                  Pre Receipt <span className="text-red-500">*</span>
+                </label>
+                <Select
+                  key={formData.branch_prereceipts}
+                  value={formData.branch_prereceipts}
+                  onValueChange={(value) =>
+                    handleInputChange({ target: { value } }, "branch_prereceipts")
+                  }
+                >
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder="Enter pre receipt" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {prereceiptsData?.prereceipts?.map((item) => (
+                      <SelectItem value={item.prereceipts_name} key={item.prereceipts_name}>
+                        {item.prereceipts_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <div>
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
@@ -377,7 +401,7 @@ const EditBranch = () => {
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                 >
-                  Scheme Details
+                  LUT Scheme
                 </label>
                 {/* <Input
                   className="bg-white"
@@ -386,13 +410,14 @@ const EditBranch = () => {
                   placeholder="Enter scheme details"
                 /> */}
                 <Select
+                  key={formData.branch_scheme}
                   value={formData.branch_scheme}
                   onValueChange={(value) =>
                     handleInputChange({ target: { value } }, "branch_scheme")
                   }
                 >
                   <SelectTrigger className="bg-white">
-                    <SelectValue placeholder="Enter scheme details" />
+                    <SelectValue placeholder="Enter LUT scheme " />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     {schemeData?.scheme?.map((item) => (
@@ -406,7 +431,7 @@ const EditBranch = () => {
                   </SelectContent>
                 </Select>
               </div>
-
+{/* 
               <div>
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
@@ -448,7 +473,7 @@ const EditBranch = () => {
                   placeholder="Enter registration number"
                 />
               </div>
-
+ */}
               <div>
                 <label
                   className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
@@ -465,6 +490,7 @@ const EditBranch = () => {
                 /> */}
 
                 <Select
+                  key={formData.branch_port_of_loading}
                   value={formData.branch_port_of_loading}
                   onValueChange={(value) =>
                     handleInputChange(
