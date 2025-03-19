@@ -14,6 +14,8 @@ import { decryptId } from "@/utils/encyrption/Encyrption";
 import {
   ErrorComponent,
   LoaderComponent,
+  WithoutErrorComponent,
+  WithoutLoaderComponent,
 } from "@/components/LoaderComponent/LoaderComponent";
 const InvoiceSpiceBoard = () => {
   const containerRef = useRef();
@@ -164,13 +166,13 @@ const InvoiceSpiceBoard = () => {
       `,
   });
   if (loading) {
-    return <LoaderComponent name="Invoice Spice Data" />; // ✅ Correct prop usage
+    return <WithoutLoaderComponent name="Invoice Spice Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (error) {
     return (
-      <ErrorComponent
+      <WithoutErrorComponent
         message="Error Fetching Invoice Spice  Data"
         refetch={() => fetchContractData}
       />

@@ -1,20 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { FileText, Loader2, Printer } from "lucide-react";
-import html2pdf from "html2pdf.js";
-import BASE_URL from "@/config/BaseUrl";
-import { useParams } from "react-router-dom";
-import ReactToPrint from "react-to-print";
-import moment from "moment";
-import { toWords } from "number-to-words";
-import { FaRegFileWord } from "react-icons/fa";
-import { FaRegFilePdf } from "react-icons/fa";
-import { decryptId } from "@/utils/encyrption/Encyrption";
 import {
   ErrorComponent,
   LoaderComponent,
+  WithoutErrorComponent,
+  WithoutLoaderComponent,
 } from "@/components/LoaderComponent/LoaderComponent";
+import BASE_URL from "@/config/BaseUrl";
+import { decryptId } from "@/utils/encyrption/Encyrption";
+import html2pdf from "html2pdf.js";
+import { Printer } from "lucide-react";
+import moment from "moment";
+import { toWords } from "number-to-words";
+import { useEffect, useRef, useState } from "react";
+import { FaRegFilePdf } from "react-icons/fa";
+import { useParams } from "react-router-dom";
+import ReactToPrint from "react-to-print";
 const PerfomaInvoice = () => {
   const containerRef = useRef();
   const { id } = useParams();
@@ -176,13 +175,13 @@ const PerfomaInvoice = () => {
     URL.revokeObjectURL(link.href);
   };
   if (loading) {
-    return <LoaderComponent name=" Perfomal Invoice Data" />; // ✅ Correct prop usage
+    return <WithoutLoaderComponent name=" Perfomal Invoice Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (error) {
     return (
-      <ErrorComponent
+      <WithoutErrorComponent
         message="Error Fetching Perfomal Invoice  Data"
         refetch={() => fetchContractData}
       />

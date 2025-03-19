@@ -1,12 +1,11 @@
+import { LoaderComponent } from "@/components/LoaderComponent/LoaderComponent";
+import BASE_URL from "@/config/BaseUrl";
+import { encryptId } from "@/utils/encyrption/Encyrption";
+import axios from "axios";
+import { ChevronDown, ChevronUp, Edit } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { Edit, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import Page from "../dashboard/page";
-import BASE_URL from "@/config/BaseUrl";
-import { Button } from "@/components/ui/button";
-import { encryptId } from "@/utils/encyrption/Encyrption";
-import { WithoutLoaderComponent } from "@/components/LoaderComponent/LoaderComponent";
 
 const UserTypeList = () => {
   const [userTypeData, setUserTypeData] = useState([]);
@@ -55,7 +54,7 @@ const UserTypeList = () => {
   };
 
   if (loading) {
-    return <WithoutLoaderComponent name="UserType Data" />; // ✅ Correct prop usage
+    return <LoaderComponent name="UserType Data" />; // ✅ Correct prop usage
   }
 
   return (

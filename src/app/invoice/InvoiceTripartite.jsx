@@ -12,6 +12,8 @@ import { decryptId } from "@/utils/encyrption/Encyrption";
 import {
   ErrorComponent,
   LoaderComponent,
+  WithoutErrorComponent,
+  WithoutLoaderComponent,
 } from "@/components/LoaderComponent/LoaderComponent";
 
 const InvoiceTripartite = () => {
@@ -114,13 +116,13 @@ const InvoiceTripartite = () => {
     URL.revokeObjectURL(link.href);
   };
   if (loading) {
-    return <LoaderComponent name="Invoice Spice Data" />; // ✅ Correct prop usage
+    return <WithoutLoaderComponent name="Invoice Spice Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (error) {
     return (
-      <ErrorComponent
+      <WithoutErrorComponent
         message="Error Fetching Invoice Triparitite  Data"
         refetch={() => fetchContractData}
       />

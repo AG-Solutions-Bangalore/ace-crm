@@ -13,6 +13,8 @@ import { decryptId } from "@/utils/encyrption/Encyrption";
 import {
   ErrorComponent,
   LoaderComponent,
+  WithoutErrorComponent,
+  WithoutLoaderComponent,
 } from "@/components/LoaderComponent/LoaderComponent";
 const InvoiceCertificateOrigin = () => {
   const containerRef = useRef();
@@ -117,13 +119,13 @@ const InvoiceCertificateOrigin = () => {
   };
 
   if (loading) {
-    return <LoaderComponent name="Certificate Origin  Data" />; // ✅ Correct prop usage
+    return <WithoutLoaderComponent name="Certificate Origin  Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (error) {
     return (
-      <ErrorComponent
+      <WithoutErrorComponent
         message="Error Fetching Certificate Origin  Data"
         refetch={() => fetchContractData}
       />
