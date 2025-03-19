@@ -263,13 +263,7 @@ const BlDraft = () => {
                     <p className="font-bold">
                       {invoicePackingData.branch_name}
                     </p>
-                    <div>
-                      {invoicePackingData.branch_address
-                        .split(",")
-                        .map((line, index) => (
-                          <p key={index}>{line.trim()}</p>
-                        ))}
-                    </div>
+                    <div>{invoicePackingData.branch_address}</div>
                   </div>
 
                   <div className="col-span-7">
@@ -286,13 +280,7 @@ const BlDraft = () => {
                       <p className="font-bold">
                         {invoicePackingData.invoice_consignee}
                       </p>{" "}
-                      <div>
-                        {invoicePackingData.invoice_consignee_add
-                          .split(",")
-                          .map((line, index) => (
-                            <p key={index}>{line.trim()}</p>
-                          ))}
-                      </div>
+                      <div>{invoicePackingData.invoice_consignee_add}</div>
                     </div>
 
                     <div className="col-span-7  ">
