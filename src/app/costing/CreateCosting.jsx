@@ -360,13 +360,15 @@ const CreateCosting = () => {
 
       if (field === "costingSub_material_cost") {
         let percentageValue =
-          parseFloat(newData[rowIndex].costingSub_material_cost) || 0;
+          parseFloat(newData[rowIndex].costingSub_percentage) || 0;
+        let rmCost = parseFloat(costingeData.costing_raw_material) || 0;
 
-        let rmCost = parseFloat(newData[rowIndex].costingSub_rm_cost) || 0;
-        newData[rowIndex].costingSub_material_cost = (
-          (percentageValue / 100) *
-          rmCost
-        ).toFixed(2);
+        const updatedRawMaterial = (rmCost + percentageValue).toFixed(2);
+
+        setCostingData((prevData) => ({
+          ...prevData,
+          costing_raw_material: updatedRawMaterial,
+        }));
       }
 
       return newData;
