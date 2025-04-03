@@ -133,9 +133,11 @@ export const useFetchItemNames = () => {
 };
 export const useFetchState = () => {
   return useQuery(createQueryConfig(["state"], "/api/panel-fetch-state"));
-}
+};
 export const useFetchPreReceipt = () => {
-  return useQuery(createQueryConfig(["preReceipt"], "/api/panel-fetch-prereceipts"));
+  return useQuery(
+    createQueryConfig(["preReceipt"], "/api/panel-fetch-prereceipts")
+  );
 };
 export const useFetchScheme = () => {
   return useQuery(createQueryConfig(["scheme"], "/api/panel-fetch-scheme"));
@@ -223,3 +225,31 @@ export const useFetchDispatchDcNo = () => {
     createQueryConfig(["dispatchDcNo"], "/api/panel-fetch-market-dispatch-dcno")
   );
 };
+
+// //product dropdown in costing
+// export const useFetchProductCosting = (costing_product_id) => {
+//   const queryClient = useQueryClient();
+
+//   const query = useQuery(
+//     createQueryConfig(
+//       ["costing", costing_product_id],
+//       `/api/panel-fetch-costing-default/${costing_product_id}`,
+//       {
+//         enabled: Boolean(costing_product_id),
+//       }
+//     )
+//   );
+
+//   const prefetchNextContractNos = async () => {
+//     if (costing_product_id) {
+//       await queryClient.prefetchQuery(
+//         createQueryConfig(
+//           ["costing", costing_product_id],
+//           `/api/panel-fetch-costing-default/${costing_product_id}`
+//         )
+//       );
+//     }
+//   };
+
+//   return { data: query.data ?? [], prefetchNextContractNos };
+// };

@@ -37,31 +37,32 @@ const CreatePortofLoading = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.post(`${BASE_URL}/api/panel-create-portofLoading`, formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.post(
+        `${BASE_URL}/api/panel-create-portofLoading`,
+        formData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (response?.data.code == 200) {
-    
         toast({
           title: "Success",
-          description: response.data.msg
+          description: response.data.msg,
         });
-  
+
         setFormData({
           portofLoading: "",
         });
         await queryClient.invalidateQueries(["portofLoadingList"]);
         setOpen(false);
       } else {
-       
         toast({
           title: "Error",
           description: response.data.msg,
           variant: "destructive",
         });
       }
-  
     } catch (error) {
       toast({
         title: "Error",
@@ -88,12 +89,14 @@ const CreatePortofLoading = () => {
               className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             ></PortofLoadingCreate>
           </div>
-        ) : pathname === "/create-contract" || pathname === "/create-invoice" ? (
-            <p className="text-xs text-blue-600  hover:text-red-800 cursor-pointer">
-                      <span className="flex items-center flex-row gap-1">
-                        <SquarePlus className="w-4 h-4" /> <span>Add</span>
-                      </span>
-                    </p>
+        ) : pathname === "/create-contract" ||
+          pathname === "/create-invoice" ||
+          pathname === "/costing-create" ? (
+          <p className="text-xs text-blue-600  hover:text-red-800 cursor-pointer">
+            <span className="flex items-center flex-row gap-1">
+              <SquarePlus className="w-4 h-4" /> <span>Add</span>
+            </span>
+          </p>
         ) : null}
       </PopoverTrigger>
       <PopoverContent className="w-80">

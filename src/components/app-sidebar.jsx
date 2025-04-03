@@ -314,6 +314,12 @@ export function AppSidebar({ ...props }) {
           },
         ],
       },
+      {
+        title: "Costing",
+        url: "/costing",
+        icon: NotebookText,
+        isActive: false,
+      },
     ],
 
     userManagement: [
