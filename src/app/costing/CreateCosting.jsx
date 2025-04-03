@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const MemoizedSelect = React.memo(
   ({ value, onChange, options, placeholder }) => {
@@ -119,15 +120,12 @@ const MemoizedSelect = React.memo(
     );
   }
 );
-const branch = [
-  {
-    branch_short: "ASI",
-    branch_name: "ADITYA SPICE INDUSTRIES",
-    branch_address:
-      "S.No. 155-1C,155-1B,156-2,156-3\r\nO V Road, Singara Botla Palem,\r\nPrakasam, Andhra Pradesh - 523109",
-  },
-];
-
+const branch = {
+  branch_short: "ASI",
+  branch_name: "ADITYA SPICE INDUSTRIES",
+  branch_address:
+    "S.No. 155-1C,155-1B,156-2,156-3\r\nO V Road, Singara Botla Palem,\r\nPrakasam, Andhra Pradesh - 523109",
+};
 const CreateCosting = () => {
   const [costingeData, setCostingData] = useState({
     branch_short: branch?.branch_short,
@@ -166,8 +164,9 @@ const CreateCosting = () => {
     costing_sale_rate: "",
     costing_exchange_rate: "",
   });
+  console.log(costingeData);
   const { toast } = useToast(); // Initialize Chakra UI Toast
-
+  const navigate = useNavigate();
   const [consigneData, setConsigneData] = useState([
     {
       costingSub_date: "",
@@ -310,6 +309,7 @@ const CreateCosting = () => {
         "costingSub_colour",
         "costingSub_rm_cost",
         "costingSub_percentage",
+        "costingSub_percentage",
       ];
 
       if (numericFields.includes(field)) {
@@ -317,19 +317,14 @@ const CreateCosting = () => {
         sanitizedValue = value.replace(/[^\d.]/g, "");
         const decimalCount = (sanitizedValue.match(/\./g) || []).length;
         if (decimalCount > 1) return prev;
-
-        if (field === "costingSub_percentage") {
-          sanitizedValue = value.replace(/[^\d%]/g, "");
-        }
       }
 
       newData[rowIndex] = { ...newData[rowIndex], [field]: sanitizedValue };
 
       if (field === "costingSub_percentage" || field === "costingSub_rm_cost") {
         let percentageValue =
-          parseFloat(
-            newData[rowIndex].costingSub_percentage.replace("%", "")
-          ) || 0;
+          parseFloat(newData[rowIndex].costingSub_percentage) || 0;
+
         let rmCost = parseFloat(newData[rowIndex].costingSub_rm_cost) || 0;
         newData[rowIndex].costingSub_material_cost = (
           (percentageValue / 100) *
@@ -339,9 +334,8 @@ const CreateCosting = () => {
 
       if (field === "costingSub_percentage" || field === "costingSub_colour") {
         let percentageValue =
-          parseFloat(
-            newData[rowIndex].costingSub_percentage?.replace("%", "")
-          ) || 0;
+          parseFloat(newData[rowIndex].costingSub_percentage) || 0;
+
         let rmCost = parseFloat(newData[rowIndex].costingSub_colour) || 0;
 
         newData[rowIndex].costingSub_ex_colour = (
@@ -354,12 +348,22 @@ const CreateCosting = () => {
         field === "costingSub_pungency"
       ) {
         let percentageValue =
-          parseFloat(
-            newData[rowIndex].costingSub_percentage?.replace("%", "")
-          ) || 0;
+          parseFloat(newData[rowIndex].costingSub_percentage) || 0;
+
         let rmCost = parseFloat(newData[rowIndex].costingSub_pungency) || 0;
 
         newData[rowIndex].costingSub_ex_pungency = (
+          (percentageValue / 100) *
+          rmCost
+        ).toFixed(2);
+      }
+
+      if (field === "costingSub_material_cost") {
+        let percentageValue =
+          parseFloat(newData[rowIndex].costingSub_material_cost) || 0;
+
+        let rmCost = parseFloat(newData[rowIndex].costingSub_rm_cost) || 0;
+        newData[rowIndex].costingSub_material_cost = (
           (percentageValue / 100) *
           rmCost
         ).toFixed(2);
@@ -406,13 +410,11 @@ const CreateCosting = () => {
       costing_consignee_add: "Consignee Address",
       costing_product_id: "Product ID",
       costing_country: "Country",
-      costing_port: "Port",
       costing_destination_country: "Destination Country",
       costing_destination_port: "Destination Port",
-      costing_shipper: "Shipper",
     };
     const missingFields = Object.entries(requiredFields)
-      .filter(([key]) => !costingeData[key]?.trim())
+      .filter(([key]) => !String(costingeData[key] || "").trim()) // Ensure it's a string before trimming
       .map(([_, label]) => `${label} is required`);
 
     // Check for missing fields in consigneData
@@ -445,23 +447,28 @@ const CreateCosting = () => {
 
     try {
       const data = {
-        ...formData,
-        contract_data: processedContractData,
-
+        ...costingeData,
+        costing_data: consigneData,
       };
+      const token = localStorage.getItem("token");
 
       const response = await axios.post(
         `${BASE_URL}/api/panel-create-costing`,
-        formData,
+        data,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
       );
-
-      toast({
-        title: "Success",
-        description: response.msg,
-      });
+      if (response.data.code === 200) {
+        toast({
+          title: "Success",
+          description: response.data.msg,
+        });
+        navigate("/costing");
+      }
     } catch (error) {
       toast({
         title: "Error",

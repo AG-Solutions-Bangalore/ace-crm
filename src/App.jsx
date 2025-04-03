@@ -90,6 +90,8 @@ import EditUserType from "./app/UserType/EditUserType";
 import DisableRightClick from "./components/DisableRightClick/DisableRightClick";
 import DrawBackForm from "./app/reports/drawBack/DrawBackForm";
 import DrawBackReport from "./app/reports/drawBack/DrawBackReport";
+import CostingList from "./app/costing/CostingList";
+import CreateCosting from "./app/costing/CreateCosting";
 
 function App() {
   const navigate = useNavigate();
@@ -326,11 +328,13 @@ function App() {
         <Route path="/dutydrawback/pending" element={<DutyDrawBackPending />} />
         {/* -------------Received------------ */}
 
+        <Route path="/costing" element={<CostingList />} />
+        <Route path="/costing-create" element={<CreateCosting />} />
+        {/* //costing */}
         <Route
           path="/dutydrawback/received"
           element={<DutyDrawBackReceived />}
         />
-
         {/* //management */}
         <Route path="/userManagement" element={<UserPage />} />
         <Route
