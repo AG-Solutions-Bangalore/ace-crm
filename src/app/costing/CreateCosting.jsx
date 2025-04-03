@@ -10,7 +10,7 @@ import {
   useFetchPorts,
   useFetchProduct,
 } from "@/hooks/useApi";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, MinusCircle, PlusCircle, Trash2 } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 import Select from "react-select";
 import Page from "../dashboard/page";
@@ -21,6 +21,17 @@ import CreateProduct from "../product/CreateProduct";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import BASE_URL from "@/config/BaseUrl";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const MemoizedSelect = React.memo(
   ({ value, onChange, options, placeholder }) => {
@@ -109,14 +120,12 @@ const MemoizedSelect = React.memo(
     );
   }
 );
-const branch = [
-  {
-    branch_short: "ASI",
-    branch_name: "ADITYA SPICE INDUSTRIES",
-    branch_address:
-      "S.No. 155-1C,155-1B,156-2,156-3\r\nO V Road, Singara Botla Palem,\r\nPrakasam, Andhra Pradesh - 523109",
-  },
-];
+const branch = {
+  branch_short: "ASI",
+  branch_name: "ADITYA SPICE INDUSTRIES",
+  branch_address:
+    "S.No. 155-1C,155-1B,156-2,156-3\r\nO V Road, Singara Botla Palem,\r\nPrakasam, Andhra Pradesh - 523109",
+};
 const CreateCosting = () => {
   const [costingeData, setCostingData] = useState({
     branch_short: branch?.branch_short,
@@ -148,13 +157,29 @@ const CreateCosting = () => {
     costing_amc_1: "",
     costing_purchase_expences: "",
     costing_labels: "",
-    costing_ex_factory: "",
-    costing_ex_chennai: "",
-    costing_to_destination: "",
-    costing_over_head_margin: "",
+    costing_ex_factory: "0.00",
+    costing_ex_chennai: "0.00",
+    costing_to_destination: "0.00",
+    costing_over_head_margin: "3.30",
     costing_sale_rate: "",
     costing_exchange_rate: "",
   });
+  console.log(costingeData);
+  const { toast } = useToast(); // Initialize Chakra UI Toast
+  const navigate = useNavigate();
+  const [consigneData, setConsigneData] = useState([
+    {
+      costingSub_date: "",
+      costingSub_variety: "",
+      costingSub_percentage: "",
+      costingSub_rm_cost: "",
+      costingSub_material_cost: "",
+      costingSub_colour: "",
+      costingSub_pungency: "",
+      costingSub_ex_colour: "",
+      costingSub_ex_pungency: "",
+    },
+  ]);
   const {
     data: costingDefaults = [],
     isLoading,
@@ -272,11 +297,195 @@ const CreateCosting = () => {
     },
     [branchData, buyerData, costingDefaults]
   );
+  const handleRowDataChange = useCallback((rowIndex, field, value) => {
+    setConsigneData((prev) => {
+      const newData = [...prev];
+      let sanitizedValue = value;
+
+      const numericFields = [
+        "costingSub_ex_colour",
+        "costingSub_ex_pungency",
+        "costingSub_pungency",
+        "costingSub_colour",
+        "costingSub_rm_cost",
+        "costingSub_percentage",
+        "costingSub_percentage",
+      ];
+
+      if (numericFields.includes(field)) {
+        // Allow only numbers and decimal point
+        sanitizedValue = value.replace(/[^\d.]/g, "");
+        const decimalCount = (sanitizedValue.match(/\./g) || []).length;
+        if (decimalCount > 1) return prev;
+      }
+
+      newData[rowIndex] = { ...newData[rowIndex], [field]: sanitizedValue };
+
+      if (field === "costingSub_percentage" || field === "costingSub_rm_cost") {
+        let percentageValue =
+          parseFloat(newData[rowIndex].costingSub_percentage) || 0;
+
+        let rmCost = parseFloat(newData[rowIndex].costingSub_rm_cost) || 0;
+        newData[rowIndex].costingSub_material_cost = (
+          (percentageValue / 100) *
+          rmCost
+        ).toFixed(2);
+      }
+
+      if (field === "costingSub_percentage" || field === "costingSub_colour") {
+        let percentageValue =
+          parseFloat(newData[rowIndex].costingSub_percentage) || 0;
+
+        let rmCost = parseFloat(newData[rowIndex].costingSub_colour) || 0;
+
+        newData[rowIndex].costingSub_ex_colour = (
+          (percentageValue / 100) *
+          rmCost
+        ).toFixed(2);
+      }
+      if (
+        field === "costingSub_percentage" ||
+        field === "costingSub_pungency"
+      ) {
+        let percentageValue =
+          parseFloat(newData[rowIndex].costingSub_percentage) || 0;
+
+        let rmCost = parseFloat(newData[rowIndex].costingSub_pungency) || 0;
+
+        newData[rowIndex].costingSub_ex_pungency = (
+          (percentageValue / 100) *
+          rmCost
+        ).toFixed(2);
+      }
+
+      if (field === "costingSub_material_cost") {
+        let percentageValue =
+          parseFloat(newData[rowIndex].costingSub_material_cost) || 0;
+
+        let rmCost = parseFloat(newData[rowIndex].costingSub_rm_cost) || 0;
+        newData[rowIndex].costingSub_material_cost = (
+          (percentageValue / 100) *
+          rmCost
+        ).toFixed(2);
+      }
+
+      return newData;
+    });
+  }, []);
+
+  const addRow = useCallback(() => {
+    setConsigneData((prev) => [
+      ...prev,
+      {
+        costingSub_date: "",
+        costingSub_variety: "",
+        costingSub_percentage: "",
+        costingSub_rm_cost: "",
+        costingSub_colour: "",
+        costingSub_pungency: "",
+        costingSub_ex_colour: "",
+        costingSub_ex_pungency: "",
+      },
+    ]);
+  }, []);
+
+  const removeRow = useCallback(
+    (index) => {
+      if (consigneData.length > 1) {
+        setConsigneData((prev) => prev.filter((_, i) => i !== index));
+      }
+    },
+    [consigneData.length]
+  );
+
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent default form submission
+
+    // Required fields for costingeData
+    const requiredFields = {
+      costing_inv_no: "Invoice Number",
+      costing_pono: "Purchase Order Number",
+      costing_sc_no: "SC Number",
+      costing_consignee: "Consignee Name",
+      costing_consignee_add: "Consignee Address",
+      costing_product_id: "Product ID",
+      costing_country: "Country",
+      costing_destination_country: "Destination Country",
+      costing_destination_port: "Destination Port",
+    };
+    const missingFields = Object.entries(requiredFields)
+      .filter(([key]) => !String(costingeData[key] || "").trim()) // Ensure it's a string before trimming
+      .map(([_, label]) => `${label} is required`);
+
+    // Check for missing fields in consigneData
+    consigneData.forEach((row, index) => {
+      if (!row.costingSub_variety?.trim()) {
+        missingFields.push(`Row ${index + 1}: Variety is required`);
+      }
+      if (!row.costingSub_percentage?.trim()) {
+        missingFields.push(`Row ${index + 1}: Percentage is required`);
+      }
+      if (!row.costingSub_rm_cost?.trim()) {
+        missingFields.push(`Row ${index + 1}: RM Cost is required`);
+      }
+    });
+
+    if (missingFields.length > 0) {
+      toast({
+        title: "Error",
+        description: (
+          <div>
+            {missingFields.map((msg, idx) => (
+              <div key={idx}>{msg}</div>
+            ))}
+          </div>
+        ),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const data = {
+        ...costingeData,
+        costing_data: consigneData,
+      };
+      const token = localStorage.getItem("token");
+
+      const response = await axios.post(
+        `${BASE_URL}/api/panel-create-costing`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.data.code === 200) {
+        toast({
+          title: "Success",
+          description: response.data.msg,
+        });
+        navigate("/costing");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description:
+          error.response?.data?.msg ||
+          "An error occurred while submitting. Try again later.",
+        variant: "destructive",
+      });
+
+      console.error("Error submitting data:", error);
+    }
+  };
 
   return (
     <Page>
       <form
-        // onSubmit={handleSubmit}
+        onSubmit={handleSubmit}
         className="w-full p-4 bg-blue-50/30 rounded-lg"
       >
         {" "}
@@ -285,26 +494,6 @@ const CreateCosting = () => {
             <div className="grid grid-cols-12 gap-4">
               <div className="col-span-12 md:col-span-8 gap-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {/* <div>
-                    <label
-                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                    >
-                      Company <span className="text-red-500">*</span>
-                    </label>
-                    <MemoizedSelect
-                      value={costingeData.branch_short}
-                      onChange={(value) =>
-                        handleSelectChange("branch_short", value)
-                      }
-                      options={
-                        branchData?.branch?.map((branch) => ({
-                          value: branch.branch_short,
-                          label: branch.branch_short,
-                        })) || []
-                      }
-                      placeholder="Select Company"
-                    />
-                  </div> */}
                   <div>
                     <label
                       className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between `}
@@ -517,349 +706,294 @@ const CreateCosting = () => {
                       placeholder="Select Destination Port"
                     />
                   </div>
-                  {/* <div>
-                    <label
-                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between `}
-                    >
-                      <span>
-                        {" "}
-                        Dest. Country <span className="text-red-500">*</span>
-                      </span>
-                      <span>
-                        <CreateCountry />
-                      </span>
-                    </label>
-                    <MemoizedSelect
-                      value={costingeData.costing_destination_country}
-                      onChange={(value) =>
-                        handleSelectChange("costing_destination_country", value)
-                      }
-                      options={
-                        countryData?.country?.map((country) => ({
-                          value: country.country_name,
-                          label: country.country_name,
-                        })) || []
-                      }
-                      placeholder="Select Dest. Country"
-                    />
-                  </div> */}
-                  {/* <div>
+                  <div>
                     <label
                       className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
                     >
-                      Shipper. <span className="text-red-500">*</span>
+                      Ex Factory. <span className="text-red-500">*</span>
                     </label>
                     <Input
                       type="text"
-                      placeholder="Enter Shipper"
-                      value={costingeData.costing_shipper}
+                      value={costingeData.costing_ex_factory}
                       className="bg-white"
                       onChange={(e) =>
-                        handleInputChange("costing_shipper", e.target.value)
+                        handleInputChange("costing_ex_factory", e.target.value)
                       }
+                      placeholder="Enter Ex Factory"
                     />
-                  </div> */}
+                  </div>
+                  <div>
+                    <label
+                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                    >
+                      Ex Chennai. <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      type="text"
+                      value={costingeData.costing_ex_chennai}
+                      className="bg-white"
+                      onChange={(e) =>
+                        handleInputChange("costing_ex_chennai", e.target.value)
+                      }
+                      placeholder="Enter Ex Chennai"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                    >
+                      To Designation. <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      type="text"
+                      value={costingeData.costing_to_destination}
+                      className="bg-white"
+                      onChange={(e) =>
+                        handleInputChange(
+                          "costing_to_destination",
+                          e.target.value
+                        )
+                      }
+                      placeholder="Enter To Designation"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                    >
+                      Head Margin. <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      type="text"
+                      value={costingeData.costing_over_head_margin}
+                      className="bg-white"
+                      onChange={(e) =>
+                        handleInputChange(
+                          "costing_over_head_margin",
+                          e.target.value
+                        )
+                      }
+                      placeholder="Enter Head Margin"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                    >
+                      Sales Rate. <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      type="text"
+                      value={costingeData.costing_sale_rate}
+                      className="bg-white"
+                      onChange={(e) =>
+                        handleInputChange("costing_sale_rate", e.target.value)
+                      }
+                      placeholder="Enter Sales Rate"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+                    >
+                      Exchange Rate. <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      type="text"
+                      value={costingeData.costing_exchange_rate}
+                      className="bg-white"
+                      onChange={(e) =>
+                        handleInputChange(
+                          "costing_exchange_rate",
+                          e.target.value
+                        )
+                      }
+                      placeholder="Enter Exchange Rate"
+                    />
+                  </div>
+                </div>
+                <div className="overflow-x-auto mt-6">
+                  <Table className="w-full border rounded-lg">
+                    <TableHeader>
+                      <TableRow className="bg-gray-100 text-[13px] font-medium">
+                        {[
+                          "Date",
+                          "Variety / %",
+                          "RM / Material Cost",
+                          "Color / Pungency",
+                          "Ex-Color / Ex-Pungency",
+                          "Action",
+                        ].map((head, i) => (
+                          <TableHead
+                            key={i}
+                            className="p-2 text-center border whitespace-nowrap"
+                          >
+                            {head}
+                          </TableHead>
+                        ))}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {consigneData.map((row, rowIndex) => (
+                        <TableRow
+                          key={rowIndex}
+                          className="hover:bg-gray-50 text-sm"
+                        >
+                          <TableCell className="p-1 border">
+                            <Input
+                              type="date"
+                              value={row.costingSub_date}
+                              onChange={(e) =>
+                                handleRowDataChange(
+                                  rowIndex,
+                                  "costingSub_date",
+                                  e.target.value
+                                )
+                              }
+                              className="bg-white w-full"
+                            />
+                          </TableCell>
+                          <TableCell className="p-1 border">
+                            <div className="flex flex-col gap-1">
+                              <Input
+                                type="text"
+                                value={row.costingSub_variety}
+                                onChange={(e) =>
+                                  handleRowDataChange(
+                                    rowIndex,
+                                    "costingSub_variety",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="Variety"
+                                className="bg-white w-full"
+                              />
+                              <Input
+                                type="text"
+                                value={row.costingSub_percentage}
+                                onChange={(e) =>
+                                  handleRowDataChange(
+                                    rowIndex,
+                                    "costingSub_percentage",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="%"
+                                className="bg-white w-full"
+                              />
+                            </div>
+                          </TableCell>
+                          <TableCell className="p-1 border">
+                            <div className="flex flex-col gap-1">
+                              <Input
+                                value={row.costingSub_rm_cost}
+                                onChange={(e) =>
+                                  handleRowDataChange(
+                                    rowIndex,
+                                    "costingSub_rm_cost",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="RM Cost"
+                                className="bg-white w-full"
+                              />
+                              <Input
+                                value={row.costingSub_material_cost}
+                                onChange={(e) =>
+                                  handleRowDataChange(
+                                    rowIndex,
+                                    "costingSub_material_cost",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="Material Cost"
+                                className="bg-white w-full"
+                              />
+                            </div>
+                          </TableCell>
+                          <TableCell className="p-1 border">
+                            <div className="flex flex-col gap-1">
+                              <Input
+                                value={row.costingSub_colour}
+                                onChange={(e) =>
+                                  handleRowDataChange(
+                                    rowIndex,
+                                    "costingSub_colour",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="Color"
+                                className="bg-white w-full"
+                              />
+                              <Input
+                                value={row.costingSub_pungency}
+                                onChange={(e) =>
+                                  handleRowDataChange(
+                                    rowIndex,
+                                    "costingSub_pungency",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="Pungency"
+                                className="bg-white w-full"
+                              />
+                            </div>
+                          </TableCell>
+                          <TableCell className="p-1 border">
+                            <div className="flex flex-col gap-1">
+                              <Input
+                                value={row.costingSub_ex_colour}
+                                onChange={(e) =>
+                                  handleRowDataChange(
+                                    rowIndex,
+                                    "costingSub_ex_colour",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="Ex-Color"
+                                className="bg-white w-full"
+                              />
+                              <Input
+                                value={row.costingSub_ex_pungency}
+                                onChange={(e) =>
+                                  handleRowDataChange(
+                                    rowIndex,
+                                    "costingSub_ex_pungency",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="Ex-Pungency"
+                                className="bg-white w-full"
+                              />
+                            </div>
+                          </TableCell>
+                          <TableCell className="p-1 border text-center w-10">
+                            <Button
+                              variant="ghost"
+                              onClick={() => removeRow(rowIndex)}
+                              className="text-red-500"
+                              type="button"
+                            >
+                              <MinusCircle className="h-5 w-5" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  <div className="mt-3 flex justify-end">
+                    <Button
+                      type="button"
+                      onClick={addRow}
+                      className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center`}
+                    >
+                      <PlusCircle className="h-4 w-4 mr-1" />
+                      Add Costing
+                    </Button>
+                  </div>
                 </div>
               </div>
               <div className="col-span-12 md:col-span-4 gap-4">
-                {/* <div className="grid grid-cols-1 md:grid-cols-2  gap-4">
-                  {costingeData.costing_raw_material && (
-                    <div>
-                      <label
-                        className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                      >
-                        Raw Material. <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="text"
-                        value={costingeData.costing_raw_material}
-                        className="bg-white"
-                        onChange={(e) =>
-                          handleInputChange(
-                            "costing_raw_material",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </div>
-                  )}
-                  {costingeData.costing_process_loss && (
-                    <div>
-                      <label
-                        className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                      >
-                        Process Loss. <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="text"
-                        value={costingeData.costing_process_loss}
-                        className="bg-white"
-                        onChange={(e) =>
-                          handleInputChange(
-                            "costing_process_loss",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </div>
-                  )}
-                  {costingeData.costing_grinding_charges && (
-                    <div>
-                      <label
-                        className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                      >
-                        Grading Charge. <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="text"
-                        value={costingeData.costing_grinding_charges}
-                        className="bg-white"
-                        onChange={(e) =>
-                          handleInputChange(
-                            "costing_grinding_charges",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </div>
-                  )}
-                  {costingeData.costing_pala_charges && (
-                    <div>
-                      <label
-                        className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                      >
-                        Pala Charge. <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="text"
-                        value={costingeData.costing_pala_charges}
-                        className="bg-white"
-                        onChange={(e) =>
-                          handleInputChange(
-                            "costing_pala_charges",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </div>
-                  )}
-                  {costingeData.costing_local_transport && (
-                    <div>
-                      <label
-                        className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                      >
-                        Local Transport. <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="text"
-                        value={costingeData.costing_local_transport}
-                        className="bg-white"
-                        onChange={(e) =>
-                          handleInputChange(
-                            "costing_local_transport",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </div>
-                  )}
-                  {costingeData.costing_loading_unloading && (
-                    <div>
-                      <label
-                        className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                      >
-                        UnLoading. <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="text"
-                        value={costingeData.costing_loading_unloading}
-                        className="bg-white"
-                        onChange={(e) =>
-                          handleInputChange(
-                            "costing_loading_unloading",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </div>
-                  )}
-                  {costingeData.costing_packing_material && (
-                    <div>
-                      <label
-                        className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                      >
-                        Packing Material.{" "}
-                        <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="text"
-                        value={costingeData.costing_packing_material}
-                        className="bg-white"
-                        onChange={(e) =>
-                          handleInputChange(
-                            "costing_packing_material",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </div>
-                  )}
-                  {costingeData.costing_lab_testing_cost && (
-                    <div>
-                      <label
-                        className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                      >
-                        Testing Cost. <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="text"
-                        value={costingeData.costing_lab_testing_cost}
-                        className="bg-white"
-                        onChange={(e) =>
-                          handleInputChange(
-                            "costing_lab_testing_cost",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </div>
-                  )}
-                  {costingeData.costing_adding_oil_cost && (
-                    <div>
-                      <label
-                        className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                      >
-                        Oil Cost. <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="text"
-                        value={costingeData.costing_adding_oil_cost}
-                        className="bg-white"
-                        onChange={(e) =>
-                          handleInputChange(
-                            "costing_adding_oil_cost",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </div>
-                  )}
-                  {costingeData.costing_chennai_cfs_feight && (
-                    <div>
-                      <label
-                        className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                      >
-                        Cfs Feight. <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="text"
-                        value={costingeData.costing_chennai_cfs_feight}
-                        className="bg-white"
-                        onChange={(e) =>
-                          handleInputChange(
-                            "costing_chennai_cfs_feight",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </div>
-                  )}
-                  {costingeData.costing_fright_charges && (
-                    <div>
-                      <label
-                        className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                      >
-                        Fright Charge. <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="text"
-                        value={costingeData.costing_fright_charges}
-                        className="bg-white"
-                        onChange={(e) =>
-                          handleInputChange(
-                            "costing_fright_charges",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </div>
-                  )}
-                  {costingeData.costing_c_f_charges && (
-                    <div>
-                      <label
-                        className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                      >
-                        C F Charge. <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="text"
-                        value={costingeData.costing_c_f_charges}
-                        className="bg-white"
-                        onChange={(e) =>
-                          handleInputChange(
-                            "costing_c_f_charges",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </div>
-                  )}
-                  {costingeData.costing_amc_1 && (
-                    <div>
-                      <label
-                        className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                      >
-                        Amc. <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="text"
-                        value={costingeData.costing_amc_1}
-                        className="bg-white"
-                        onChange={(e) =>
-                          handleInputChange("costing_amc_1", e.target.value)
-                        }
-                      />
-                    </div>
-                  )}
-                  {costingeData.costing_purchase_expences && (
-                    <div>
-                      <label
-                        className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                      >
-                        Purchase Expences.{" "}
-                        <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="text"
-                        value={costingeData.costing_purchase_expences}
-                        className="bg-white"
-                        onChange={(e) =>
-                          handleInputChange(
-                            "costing_purchase_expences",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </div>
-                  )}
-                  {costingeData.costing_labels && (
-                    <div>
-                      <label
-                        className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                      >
-                        Costing Label. <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="text"
-                        value={costingeData.costing_labels}
-                        className="bg-white"
-                        onChange={(e) =>
-                          handleInputChange("costing_labels", e.target.value)
-                        }
-                      />
-                    </div>
-                  )}
-                </div> */}
                 {costingDefaults.length > 0 && (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 border border-blue-400 p-4 rounded-xl">
                     {[
@@ -919,6 +1053,14 @@ const CreateCosting = () => {
             </div>
           </CardContent>
         </Card>
+        <div className="flex items-center justify-end  gap-2">
+          <Button
+            type="submit"
+            className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
+          >
+            Create
+          </Button>
+        </div>
       </form>
     </Page>
   );
