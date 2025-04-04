@@ -74,64 +74,38 @@ const CostingList = () => {
   // Define columns for the table
   const columns = [
     {
-      accessorKey: "invoice_date",
-      header: "Date",
-      cell: ({ row }) => {
-        const date = row.getValue("invoice_date");
-        return moment(date).format("DD-MMM-YYYY");
-      },
-    },
-    {
-      accessorKey: "branch_short",
-      header: "Company",
-      cell: ({ row }) => <div>{row.getValue("branch_short")}</div>,
+      accessorKey: "costing_consignee",
+      header: "Consignee",
+      cell: ({ row }) => <div>{row.getValue("costing_consignee")}</div>,
     },
 
     {
-      accessorKey: "invoice_no",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Invoice No
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+      accessorKey: "costing_product",
+      header: "Product",
+      cell: ({ row }) => <div>{row.getValue("costing_product")}</div>,
+    },
+
+    {
+      accessorKey: "costing_country",
+      header: "Country",
+      cell: ({ row }) => <div>{row.getValue("costing_country")}</div>,
+    },
+    {
+      accessorKey: "costing_port",
+      header: "Port",
+      cell: ({ row }) => <div>{row.getValue("costing_port")}</div>,
+    },
+    {
+      accessorKey: "costing_destination_country",
+      header: "Desg Country",
+      cell: ({ row }) => (
+        <div>{row.getValue("costing_destination_country")}</div>
       ),
-      cell: ({ row }) => <div>{row.getValue("invoice_no")}</div>,
     },
     {
-      accessorKey: "invoice_buyer",
-      header: "Buyer Name",
-      cell: ({ row }) => <div>{row.getValue("invoice_buyer")}</div>,
-    },
-    {
-      accessorKey: "invoice_consignee",
-      header: "Consignee Name",
-      cell: ({ row }) => <div>{row.getValue("invoice_consignee")}</div>,
-    },
-    {
-      accessorKey: "invoice_status",
-      header: "Status",
-      cell: ({ row }) => {
-        const status = row.getValue("invoice_status");
-
-        const statusColors = {
-          PENDING: "bg-blue-100 text-blue-800",
-          OPEN: "bg-green-100 text-green-800",
-          CLOSE: "bg-red-100 text-red-800",
-        };
-
-        return (
-          <span
-            className={`px-2 py-1 rounded text-xs ${
-              statusColors[status] || "bg-gray-100 text-gray-800"
-            }`}
-          >
-            {status}
-          </span>
-        );
-      },
+      accessorKey: "costing_destination_port",
+      header: "Desg Port",
+      cell: ({ row }) => <div>{row.getValue("costing_destination_port")}</div>,
     },
 
     {
@@ -139,7 +113,6 @@ const CostingList = () => {
       header: "Action",
       cell: ({ row }) => {
         const invoiceId = row.original.id;
-
         return (
           <div className="flex flex-row">
             <TooltipProvider>
@@ -151,7 +124,7 @@ const CostingList = () => {
                       const encryptedId = encryptId(invoiceId);
 
                       navigate(
-                        `/edit-invoice/${encodeURIComponent(encryptedId)}`
+                        `/costing-edit/${encodeURIComponent(encryptedId)}`
                       );
                     }}
                   ></InvoiceEdit>
