@@ -21,17 +21,31 @@ import {
   useFetchPorts,
   useFetchProduct,
 } from "@/hooks/useApi";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { ChevronDown, MinusCircle, PlusCircle } from "lucide-react";
-import React, { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { ChevronDown, MinusCircle, PlusCircle, Trash2 } from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import Page from "../dashboard/page";
+import { decryptId } from "@/utils/encyrption/Encyrption";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
 import { ProgressBar } from "@/components/spinner/ProgressBar";
-
 const MemoizedSelect = React.memo(
-  ({ value, onChange, options, placeholder }) => {
+  ({ value, onChange, options, placeholder, disabled }) => {
     const selectOptions = options.map((option) => ({
       value: option.value,
       label: option.label,
@@ -107,6 +121,7 @@ const MemoizedSelect = React.memo(
         options={selectOptions}
         placeholder={placeholder}
         styles={customStyles}
+        isDisabled={disabled}
         components={{
           IndicatorSeparator: () => null,
           DropdownIndicator,
@@ -123,8 +138,10 @@ const branch = {
   branch_address:
     "S.No. 155-1C,155-1B,156-2,156-3\r\nO V Road, Singara Botla Palem,\r\nPrakasam, Andhra Pradesh - 523109",
 };
-const CreateCosting = () => {
+const EditCosting = () => {
   const [initialRawMaterial, setInitialRawMaterial] = useState(null);
+  const { id } = useParams();
+  const decryptedId = decryptId(id);
   const [submitLoading, setSubmitLoading] = useState(false);
 
   const [costingeData, setCostingData] = useState({
@@ -157,19 +174,19 @@ const CreateCosting = () => {
     costing_amc_1: "",
     costing_purchase_expences: "",
     costing_labels: "",
-    costing_ex_factory: "0.00",
-    costing_ex_chennai: "0.00",
-    costing_to_destination: "0.00",
-    costing_over_head_margin: "3.30",
-    costing_sale_rate: "",
-    costing_exchange_rate: "1",
     costing_total_amount: "",
   });
-  console.log(costingeData);
+  // console.log(costingeData.costing_raw_material, "costing_raw_material");
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [deleteOption, setDeleteOptions] = useState(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleteItemId, setDeleteItemId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
   const [consigneData, setConsigneData] = useState([
     {
+      id: "",
       costingSub_date: "",
       costingSub_variety: "",
       costingSub_percentage: "",
@@ -181,40 +198,41 @@ const CreateCosting = () => {
       costingSub_ex_pungency: "",
     },
   ]);
-  useEffect(() => {
-    console.log("Consigne Data:", consigneData);
-  }, [consigneData]);
 
-  const {
-    data: costingDefaults = [],
-    isLoading,
-    isError,
-    refetch,
-  } = useQuery({
-    queryKey: ["costingDefault", costingeData.costing_product_id], // Ensure dependency
-    queryFn: async () => {
-      console.log(
-        "📡 Fetching costingDefaults for:",
-        costingeData.costing_product_id
-      );
+  const fetchCostingById = async () => {
+    setIsLoading(true);
+    try {
       const token = localStorage.getItem("token");
 
-      try {
-        const response = await axios.get(
-          `${BASE_URL}/api/panel-fetch-costing-default/${costingeData.costing_product_id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        console.log("✅ API Response:", response.data);
-        return response.data.costingDefault;
-      } catch (error) {
-        console.error("❌ API Fetch Error:", error);
-        return [];
+      const response = await axios.get(
+        `${BASE_URL}/api/panel-fetch-costing-by-id/${decryptedId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.data) {
+        const { costing, costingSub } = response.data;
+        setDeleteOptions(false);
+        setCostingData((prev) => ({
+          ...prev,
+          ...costing,
+        }));
+        setConsigneData(costingSub || []);
       }
-    },
-    enabled: Boolean(costingeData.costing_product_id),
-  });
+    } catch (error) {
+      console.error("Error fetching costing data:", error);
+      setIsError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
+    if (decryptedId) {
+      fetchCostingById();
+    }
+  }, [decryptedId]);
 
   const { data: branchData } = useFetchCompanys();
   const { data: buyerData } = useFetchBuyers();
@@ -222,40 +240,6 @@ const CreateCosting = () => {
   const { data: countryData } = useFetchCountrys();
   const { data: portofLoadingData } = useFetchPortofLoadings();
   const { data: portsData } = useFetchPorts();
-
-  useEffect(() => {
-    if (
-      !costingDefaults ||
-      !Array.isArray(costingDefaults) ||
-      costingDefaults.length === 0
-    ) {
-      //   console.warn("⚠️ costingDefaults is empty or not yet loaded!");
-      return;
-    }
-
-    const getAmount = (type) =>
-      costingDefaults.find((item) => item.costing_default_type === type)
-        ?.costing_default_amount || "";
-
-    setCostingData((prev) => ({
-      ...prev,
-      costing_raw_material: getAmount("Raw Material"),
-      costing_process_loss: getAmount("Process Loss"),
-      costing_grinding_charges: getAmount("Grinding Charges"),
-      costing_pala_charges: getAmount("Pala Charges"),
-      costing_local_transport: getAmount("Local Transport"),
-      costing_loading_unloading: getAmount("Loading & Unloading"),
-      costing_packing_material: getAmount("Packing Material"),
-      costing_lab_testing_cost: getAmount("Lab Testing Cost"),
-      costing_adding_oil_cost: getAmount("Adding Oil Cost"),
-      costing_chennai_cfs_feight: getAmount("Chennai CFS Fright"),
-      costing_fright_charges: getAmount("Fright Charges"),
-      costing_c_f_charges: getAmount("C& F Charges"),
-      costing_amc_1: getAmount("AMC 1%"),
-      costing_purchase_expences: getAmount("Purchase Expences"),
-      costing_labels: getAmount("Labels/Stickers"),
-    }));
-  }, [costingDefaults]);
 
   const handleInputChange = useCallback((field, value) => {
     console.log(value);
@@ -288,8 +272,9 @@ const CreateCosting = () => {
         return updatedData;
       });
     },
-    [branchData, buyerData, costingDefaults]
+    [branchData, buyerData]
   );
+
   const handleRowDataChange = useCallback((rowIndex, field, value) => {
     setConsigneData((prev) => {
       const newData = [...prev];
@@ -302,11 +287,9 @@ const CreateCosting = () => {
         "costingSub_colour",
         "costingSub_rm_cost",
         "costingSub_percentage",
-        "costingSub_percentage",
       ];
 
       if (numericFields.includes(field)) {
-        // Allow only numbers and decimal point
         sanitizedValue = value.replace(/[^\d.]/g, "");
         const decimalCount = (sanitizedValue.match(/\./g) || []).length;
         if (decimalCount > 1) return prev;
@@ -315,10 +298,9 @@ const CreateCosting = () => {
       newData[rowIndex] = { ...newData[rowIndex], [field]: sanitizedValue };
 
       if (field === "costingSub_percentage" || field === "costingSub_rm_cost") {
-        let percentageValue =
+        const percentageValue =
           parseFloat(newData[rowIndex].costingSub_percentage) || 0;
-
-        let rmCost = parseFloat(newData[rowIndex].costingSub_rm_cost) || 0;
+        const rmCost = parseFloat(newData[rowIndex].costingSub_rm_cost) || 0;
         newData[rowIndex].costingSub_material_cost = (
           (percentageValue / 100) *
           rmCost
@@ -326,59 +308,45 @@ const CreateCosting = () => {
       }
 
       if (field === "costingSub_percentage" || field === "costingSub_colour") {
-        let percentageValue =
+        const percentageValue =
           parseFloat(newData[rowIndex].costingSub_percentage) || 0;
-
-        let rmCost = parseFloat(newData[rowIndex].costingSub_colour) || 0;
-
+        const colour = parseFloat(newData[rowIndex].costingSub_colour) || 0;
         newData[rowIndex].costingSub_ex_colour = (
           (percentageValue / 100) *
-          rmCost
+          colour
         ).toFixed(2);
       }
+
       if (
         field === "costingSub_percentage" ||
         field === "costingSub_pungency"
       ) {
-        let percentageValue =
+        const percentageValue =
           parseFloat(newData[rowIndex].costingSub_percentage) || 0;
-
-        let rmCost = parseFloat(newData[rowIndex].costingSub_pungency) || 0;
-
+        const pungency = parseFloat(newData[rowIndex].costingSub_pungency) || 0;
         newData[rowIndex].costingSub_ex_pungency = (
           (percentageValue / 100) *
-          rmCost
+          pungency
         ).toFixed(2);
       }
+
+      // 💡 Calculate updated raw material cost after updating the row
+      const totalMaterialCost = newData.reduce((acc, item) => {
+        const materialCost = Number(item.costingSub_material_cost) || 0;
+        return acc + materialCost;
+      }, 0);
+
+      const updatedRawMaterial = (initialRawMaterial || 0) + totalMaterialCost;
+
+      // 💡 Set it in costingData
+      setCostingData((prev) => ({
+        ...prev,
+        costing_raw_material: updatedRawMaterial.toFixed(2),
+      }));
 
       return newData;
     });
   }, []);
-
-  useEffect(() => {
-    if (initialRawMaterial === null && costingeData?.costing_raw_material) {
-      const initial = Number(costingeData.costing_raw_material) || 0;
-      setInitialRawMaterial(initial);
-    }
-  }, [costingeData, initialRawMaterial]);
-  useEffect(() => {
-    if (initialRawMaterial === null) return;
-
-    const totalMaterialCost = consigneData.reduce((acc, item) => {
-      const materialCost = Number(item.costingSub_material_cost) || 0;
-      return acc + materialCost;
-    }, 0);
-
-    const updatedRawMaterial = initialRawMaterial + totalMaterialCost;
-
-    console.log("initialRawMaterial", initialRawMaterial);
-    console.log("updatedRawMaterial", updatedRawMaterial);
-
-    setCostingData((prev) => ({
-      ...prev,
-      costing_raw_material: updatedRawMaterial.toFixed(2),
-    }));
-  }, [consigneData, initialRawMaterial]);
 
   const addRow = useCallback(() => {
     setConsigneData((prev) => [
@@ -395,6 +363,32 @@ const CreateCosting = () => {
       },
     ]);
   }, []);
+  useEffect(() => {
+    if (initialRawMaterial === null && costingeData?.costing_raw_material) {
+      const initial = Number(costingeData.costing_raw_material) || 0;
+      setInitialRawMaterial(initial);
+    }
+  }, [costingeData, initialRawMaterial, deleteOption]);
+  // const rawMaterialRef = useRef();
+
+  // useEffect(() => {
+  //   if (initialRawMaterial === null) return;
+
+  //   const totalMaterialCost = consigneData.reduce((acc, item) => {
+  //     const materialCost = Number(item.costingSub_material_cost) || 0;
+  //     return acc + materialCost;
+  //   }, 0);
+  //   const updatedRawMaterial = totalMaterialCost.toFixed(2);
+
+  //   rawMaterialRef.current = updatedRawMaterial;
+
+  //   setCostingData((prev) => ({
+  //     ...prev,
+  //     costing_raw_material: updatedRawMaterial,
+  //   }));
+  // }, [deleteOption, initialRawMaterial]);
+
+  // Then use rawMaterialRef.current in submit
 
   const removeRow = useCallback(
     (index) => {
@@ -406,8 +400,9 @@ const CreateCosting = () => {
   );
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
     const requiredFields = {
       costing_consignee: "Consignee Name",
       costing_consignee_add: "Consignee Address",
@@ -417,10 +412,9 @@ const CreateCosting = () => {
       costing_destination_port: "Destination Port",
     };
     const missingFields = Object.entries(requiredFields)
-      .filter(([key]) => !String(costingeData[key] || "").trim())
+      .filter(([key]) => !String(costingeData[key] || "").trim()) // Ensure it's a string before trimming
       .map(([_, label]) => `${label} is required`);
 
-    // Check for missing fields in consigneData
     consigneData.forEach((row, index) => {
       if (!row.costingSub_date?.trim()) {
         missingFields.push(`Row ${index + 1}: Date is required`);
@@ -450,7 +444,6 @@ const CreateCosting = () => {
       });
       return;
     }
-    // Check if total percentage equals 100
     const totalPercentage = consigneData.reduce((sum, row) => {
       return sum + parseFloat(row.costingSub_percentage || 0);
     }, 0);
@@ -465,7 +458,6 @@ const CreateCosting = () => {
       });
       return;
     }
-
     try {
       setSubmitLoading(true);
 
@@ -475,8 +467,8 @@ const CreateCosting = () => {
       };
       const token = localStorage.getItem("token");
 
-      const response = await axios.post(
-        `${BASE_URL}/api/panel-create-costing`,
+      const response = await axios.put(
+        `${BASE_URL}/api/panel-update-costing/${decryptedId}`,
         data,
         {
           headers: {
@@ -491,12 +483,6 @@ const CreateCosting = () => {
           description: response.data.msg,
         });
         navigate("/costing");
-      } else {
-        toast({
-          title: "Error",
-          description: response.data.msg,
-          variant: "destructive",
-        });
       }
     } catch (error) {
       toast({
@@ -513,43 +499,44 @@ const CreateCosting = () => {
       setSubmitLoading(false);
     }
   };
-  const fieldsToSum = [
-    "costing_raw_material",
-    "costing_process_loss",
-    "costing_grinding_charges",
-    "costing_pala_charges",
-    "costing_local_transport",
-    "costing_loading_unloading",
-    "costing_packing_material",
-    "costing_lab_testing_cost",
-    "costing_adding_oil_cost",
-    "costing_chennai_cfs_feight",
-    "costing_fright_charges",
-    "costing_c_f_charges",
-    "costing_amc_1",
-    "costing_purchase_expences",
-    "costing_labels",
-    "costing_over_head_margin",
-  ];
 
-  const anyValueEntered = fieldsToSum.some(
-    (field) => costingeData[field] && costingeData[field] !== ""
-  );
-
-  if (!anyValueEntered) return;
-
-  const totalINR = fieldsToSum
-    .reduce((acc, field) => {
-      const val = Number(costingeData[field]) || 0;
-      return acc + val;
-    }, 0)
-    .toFixed(2);
-  const exchangeRate = Number(costingeData.costing_exchange_rate) || 1;
-  const totalUSD = totalINR / exchangeRate;
-
-  const totalSales = Math.round(totalUSD * 1000);
   useEffect(() => {
-    // Update calculated fields
+    const fieldsToSum = [
+      "costing_raw_material",
+      "costing_process_loss",
+      "costing_grinding_charges",
+      "costing_pala_charges",
+      "costing_local_transport",
+      "costing_loading_unloading",
+      "costing_packing_material",
+      "costing_lab_testing_cost",
+      "costing_adding_oil_cost",
+      "costing_chennai_cfs_feight",
+      "costing_fright_charges",
+      "costing_c_f_charges",
+      "costing_amc_1",
+      "costing_purchase_expences",
+      "costing_labels",
+      "costing_over_head_margin",
+    ];
+
+    const anyValueEntered = fieldsToSum.some(
+      (field) => costingeData[field] && costingeData[field] !== ""
+    );
+
+    if (!anyValueEntered) return;
+
+    const totalINR = fieldsToSum
+      .reduce((acc, field) => {
+        const val = Number(costingeData[field]) || 0;
+        return acc + val;
+      }, 0)
+      .toFixed(2);
+
+    const exchangeRate = Number(costingeData.costing_exchange_rate) || 1;
+    const totalUSD = totalINR / exchangeRate;
+    const totalSales = Math.round(totalUSD * 1000);
+
     setCostingData((prev) => ({
       ...prev,
       costing_total_amount: totalINR,
@@ -578,6 +565,81 @@ const CreateCosting = () => {
     (acc, row) => acc + (parseFloat(row.costingSub_percentage) || 0),
     0
   );
+
+  // const deleteProductMutation = useMutation({
+  //   mutationFn: async (productId) => {
+  //     const token = localStorage.getItem("token");
+  //     const response = await fetch(
+  //       `${BASE_URL}/api/panel-delete-costing-sub/${productId}`,
+  //       {
+  //         method: "DELETE",
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+  //     if (!response.ok) throw new Error("Failed to delete consting Table");
+  //     return response.json();
+  //   },
+  //   onSuccess: (response) => {
+
+  //     if (response.code === 200) {
+  //       fetchCostingById();
+  //       toast({
+  //         title: "Success",
+  //         description: response.msg,
+  //       });
+  //     } else {
+  //       toast({
+  //         title: "Error",
+  //         description: response.msg,
+  //         variant: "destructive",
+  //       });
+  //     }
+  //   },
+  //   onError: (error) => {
+  //     toast({
+  //       title: "Error",
+  //       description: error.message,
+  //       variant: "destructive",
+  //     });
+  //   },
+  // });
+  // const handleDeleteRow = (productId) => {
+  //   setDeleteItemId(productId);
+  //   setDeleteConfirmOpen(true);
+  //   setDeleteOptions(true);
+  // };
+
+  // const confirmDelete = async () => {
+  //   try {
+  //     await deleteProductMutation.mutateAsync(deleteItemId);
+  //     setDeleteOptions(true);
+
+  //     setConsigneData((prevData) =>
+  //       prevData.filter((row) => row.id !== deleteItemId)
+  //     );
+  //   } catch (error) {
+  //     console.error("Failed to delete product:", error);
+  //   } finally {
+  //     setDeleteConfirmOpen(false);
+  //     setDeleteItemId(null);
+  //   }
+  // };
+
+  if (isLoading) {
+    return <LoaderComponent name="Costing Data" />; // ✅ Correct prop usage
+  }
+
+  // Render error state
+  if (isError) {
+    return (
+      <ErrorComponent
+        message="Error Fetching Costing Data"
+        refetch={fetchCostingById()}
+      />
+    );
+  }
   return (
     <Page>
       <form
@@ -652,11 +714,11 @@ const CreateCosting = () => {
                     <label
                       className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
                     >
-                      Invoice No.
+                      Costing No.
                     </label>
                     <Input
                       type="text"
-                      placeholder="Enter  Invoice No"
+                      placeholder="Enter  Costing No"
                       value={costingeData.costing_inv_no}
                       className="bg-white"
                       onChange={(e) =>
@@ -686,6 +748,7 @@ const CreateCosting = () => {
                         })) || []
                       }
                       placeholder="Select Product"
+                      disabled={true}
                     />
                   </div>
                   <div>
@@ -694,7 +757,7 @@ const CreateCosting = () => {
                     >
                       <span>
                         {" "}
-                        Country <span className="text-red-500">*</span>
+                        Costing. Country <span className="text-red-500">*</span>
                       </span>
                       <span></span>
                     </label>
@@ -718,7 +781,7 @@ const CreateCosting = () => {
                     >
                       <span>
                         {" "}
-                        Port <span className="text-red-500">*</span>
+                        Costing Port <span className="text-red-500">*</span>
                       </span>
                       <span></span>
                     </label>
@@ -921,14 +984,27 @@ const CreateCosting = () => {
                               </div>
                             </TableCell>
                             <TableCell className="p-1 border text-center w-10">
+                              {/* {row.id ? ( */}
+                              {/* <Button
+                                variant="ghost"
+                                onClick={() => handleDeleteRow(row.id)}
+                                disabled={consigneData.length === 1}
+                                className="text-red-500"
+                                type="button"
+                              >
+                                <Trash2 className="h-5 w-5" />
+                              </Button> */}
+                              {/* ) : ( */}
                               <Button
                                 variant="ghost"
                                 onClick={() => removeRow(rowIndex)}
                                 className="text-red-500"
+                                disabled={row.id}
                                 type="button"
                               >
                                 <MinusCircle className="h-5 w-5" />
                               </Button>
+                              {/* )} */}
                             </TableCell>
                           </TableRow>
                           {/* //Footer sum */}
@@ -947,7 +1023,6 @@ const CreateCosting = () => {
                         >
                           {totalPercentage.toFixed(2)}%
                         </TableCell>
-
                         <TableCell className="p-2 border">
                           ₹{" "}
                           {consigneData
@@ -981,7 +1056,16 @@ const CreateCosting = () => {
                             )
                             .toFixed(2)}
                         </TableCell>
-                        <TableCell className="p-0 border"></TableCell>
+                        <TableCell className="p-0 border">
+                          {" "}
+                          {/* <Button
+                            type="button"
+                            onClick={addRow}
+                            className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center`}
+                          >
+                            <PlusCircle className="h-2 w-2 " />
+                          </Button> */}
+                        </TableCell>
                       </TableRow>
                     </TableFooter>
                   </Table>
@@ -996,104 +1080,15 @@ const CreateCosting = () => {
                     </Button>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mt-3">
-                  <div>
-                    <label
-                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                    >
-                      Ex Factory. <span className="text-red-500">*</span>
-                    </label>
-                    <Input
-                      type="text"
-                      value={costingeData.costing_ex_factory}
-                      className="bg-white"
-                      onChange={(e) =>
-                        handleInputChange("costing_ex_factory", e.target.value)
-                      }
-                      placeholder="Enter Ex Factory"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                    >
-                      Ex Chennai. <span className="text-red-500">*</span>
-                    </label>
-                    <Input
-                      type="text"
-                      value={costingeData.costing_ex_chennai}
-                      className="bg-white"
-                      onChange={(e) =>
-                        handleInputChange("costing_ex_chennai", e.target.value)
-                      }
-                      placeholder="Enter Ex Chennai"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                    >
-                      To Designation. <span className="text-red-500">*</span>
-                    </label>
-                    <Input
-                      type="text"
-                      value={costingeData.costing_to_destination}
-                      className="bg-white"
-                      onChange={(e) =>
-                        handleInputChange(
-                          "costing_to_destination",
-                          e.target.value
-                        )
-                      }
-                      placeholder="Enter To Designation"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                    >
-                      Head Margin. <span className="text-red-500">*</span>
-                    </label>
-                    <Input
-                      type="text"
-                      value={costingeData.costing_over_head_margin}
-                      className="bg-white"
-                      onChange={(e) =>
-                        handleInputChange(
-                          "costing_over_head_margin",
-                          e.target.value
-                        )
-                      }
-                      placeholder="Enter Head Margin"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
-                    >
-                      Exchange Rate. <span className="text-red-500">*</span>
-                    </label>
-                    <Input
-                      type="text"
-                      value={costingeData.costing_exchange_rate}
-                      className="bg-white"
-                      onChange={(e) =>
-                        handleInputChange(
-                          "costing_exchange_rate",
-                          e.target.value
-                        )
-                      }
-                      placeholder="Enter Exchange Rate"
-                    />
-                  </div>
-                </div>
+
                 <div className="flex flex-col sm:flex-row gap-4 mt-4">
                   <div className="p-4 border border-gray-300 rounded-xl shadow-sm w-full sm:w-1/2">
                     <p className="text-lg font-semibold text-gray-700">
                       Total Amount (INR)
                     </p>
                     <p className="text-xl text-green-600 font-bold">
-                      {/* ₹ {costingeData?.costing_total_amount} */}₹ {totalINR}
+                      ₹ {costingeData?.costing_total_amount}
+                      {/* {totalINR} */}
                     </p>
                   </div>
 
@@ -1102,67 +1097,65 @@ const CreateCosting = () => {
                       Amount in USD
                     </p>
                     <p className="text-xl text-blue-600 font-bold">
-                      $ {totalSales}
+                      {/* ₹ {totalSales} */}₹ {costingeData?.costing_sale_rate}
                     </p>
                   </div>
                 </div>
               </div>
               <div className="col-span-12 md:col-span-4 gap-4">
-                {costingDefaults.length > 0 && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 border border-blue-400 p-4 rounded-xl">
-                    {[
-                      { key: "costing_raw_material", label: "Raw Material" },
-                      { key: "costing_process_loss", label: "Process Loss" },
-                      {
-                        key: "costing_grinding_charges",
-                        label: "Grading Charge",
-                      },
-                      { key: "costing_pala_charges", label: "Pala Charge" },
-                      {
-                        key: "costing_local_transport",
-                        label: "Local Transport",
-                      },
-                      { key: "costing_loading_unloading", label: "UnLoading" },
-                      {
-                        key: "costing_packing_material",
-                        label: "Packing Material",
-                      },
-                      {
-                        key: "costing_lab_testing_cost",
-                        label: "Testing Cost",
-                      },
-                      { key: "costing_adding_oil_cost", label: "Oil Cost" },
-                      {
-                        key: "costing_chennai_cfs_feight",
-                        label: "Cfs Feight",
-                      },
-                      { key: "costing_fright_charges", label: "Fright Charge" },
-                      { key: "costing_c_f_charges", label: "C F Charge" },
-                      { key: "costing_amc_1", label: "Amc" },
-                      {
-                        key: "costing_purchase_expences",
-                        label: "Purchase Expenses",
-                      },
-                      { key: "costing_labels", label: "Costing Label" },
-                    ].map(({ key, label }) =>
-                      costingeData[key] ? (
-                        <div key={key} className="w-full">
-                          <label className="block text-xs font-medium text-gray-700 mb-1">
-                            {label} <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            value={costingeData[key]}
-                            className="w-full md:w-36 p-2 border border-gray-300 rounded-md bg-gray-50"
-                            onChange={(e) =>
-                              handleInputChange(key, e.target.value)
-                            }
-                          />
-                        </div>
-                      ) : null
-                    )}
-                  </div>
-                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 border border-blue-400 p-4 rounded-xl">
+                  {[
+                    { key: "costing_raw_material", label: "Raw Material" },
+                    { key: "costing_process_loss", label: "Process Loss" },
+                    {
+                      key: "costing_grinding_charges",
+                      label: "Grading Charge",
+                    },
+                    { key: "costing_pala_charges", label: "Pala Charge" },
+                    {
+                      key: "costing_local_transport",
+                      label: "Local Transport",
+                    },
+                    { key: "costing_loading_unloading", label: "UnLoading" },
+                    {
+                      key: "costing_packing_material",
+                      label: "Packing Material",
+                    },
+                    {
+                      key: "costing_lab_testing_cost",
+                      label: "Testing Cost",
+                    },
+                    { key: "costing_adding_oil_cost", label: "Oil Cost" },
+                    {
+                      key: "costing_chennai_cfs_feight",
+                      label: "Cfs Feight",
+                    },
+                    { key: "costing_fright_charges", label: "Fright Charge" },
+                    { key: "costing_c_f_charges", label: "C F Charge" },
+                    { key: "costing_amc_1", label: "Amc" },
+                    {
+                      key: "costing_purchase_expences",
+                      label: "Purchase Expenses",
+                    },
+                    { key: "costing_labels", label: "Costing Label" },
+                  ].map(({ key, label }) =>
+                    costingeData[key] ? (
+                      <div key={key} className="w-full">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          {label} <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={costingeData[key]}
+                          className="w-full md:w-36 p-2 border border-gray-300 rounded-md bg-gray-50"
+                          onChange={(e) =>
+                            handleInputChange(key, e.target.value)
+                          }
+                        />
+                      </div>
+                    ) : null
+                  )}
+                </div>
               </div>
             </div>
           </CardContent>
@@ -1172,13 +1165,34 @@ const CreateCosting = () => {
           <Button
             type="submit"
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
+            disabled={submitLoading}
           >
-            {submitLoading ? "Creating..." : "Create"}{" "}
+            {submitLoading ? "Updating..." : "Update"}{" "}
           </Button>
         </div>
       </form>
+      {/* <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              costing data from this Costing.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center`}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog> */}
     </Page>
   );
 };
 
-export default CreateCosting;
+export default EditCosting;
