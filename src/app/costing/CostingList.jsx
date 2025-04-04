@@ -1,4 +1,9 @@
-import { InvoiceEdit } from "@/components/buttonIndex/ButtonComponents";
+import {
+  CostingCreate,
+  CostingEdit,
+  CostingView,
+  InvoiceEdit,
+} from "@/components/buttonIndex/ButtonComponents";
 import {
   ErrorComponent,
   LoaderComponent,
@@ -115,23 +120,22 @@ const CostingList = () => {
         const invoiceId = row.original.id;
         return (
           <div className="flex flex-row">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <InvoiceEdit
-                    // onClick={() => navigate(`/edit-invoice/${invoiceId}`)}
-                    onClick={() => {
-                      const encryptedId = encryptId(invoiceId);
+            <CostingEdit
+              // className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+              onClick={() => {
+                const encryptedId = encryptId(invoiceId);
 
-                      navigate(
-                        `/costing-edit/${encodeURIComponent(encryptedId)}`
-                      );
-                    }}
-                  ></InvoiceEdit>
-                </TooltipTrigger>
-                <TooltipContent>Edit Invoice</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+                navigate(`/costing-edit/${encodeURIComponent(encryptedId)}`);
+              }}
+            />
+
+            {/* <CostingView
+              onClick={() => {
+                const encryptedId = encryptId(invoiceId);
+
+                navigate(`/costing-view/${encodeURIComponent(encryptedId)}`);
+              }}
+            ></CostingView> */}
           </div>
         );
       },
@@ -218,13 +222,11 @@ const CostingList = () => {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
-            variant="default"
+
+          <CostingCreate
             className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             onClick={() => navigate("/costing-create")}
-          >
-            <SquarePlus className="h-4 w-4" /> Costing
-          </Button>
+          ></CostingCreate>
         </div>
         {/* table  */}
         <div className="rounded-md border">

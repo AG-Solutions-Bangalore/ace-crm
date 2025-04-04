@@ -24,7 +24,7 @@ import {
 import { useQuery, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { ChevronDown, MinusCircle, PlusCircle, Trash2 } from "lucide-react";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import Page from "../dashboard/page";
@@ -39,6 +39,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  ErrorComponent,
+  LoaderComponent,
+} from "@/components/LoaderComponent/LoaderComponent";
+import { ProgressBar } from "@/components/spinner/ProgressBar";
 const MemoizedSelect = React.memo(
   ({ value, onChange, options, placeholder, disabled }) => {
     const selectOptions = options.map((option) => ({
@@ -137,6 +142,8 @@ const EditCosting = () => {
   const [initialRawMaterial, setInitialRawMaterial] = useState(null);
   const { id } = useParams();
   const decryptedId = decryptId(id);
+  const [submitLoading, setSubmitLoading] = useState(false);
+
   const [costingeData, setCostingData] = useState({
     branch_short: branch?.branch_short,
     branch_name: branch?.branch_name,
@@ -169,11 +176,14 @@ const EditCosting = () => {
     costing_labels: "",
     costing_total_amount: "",
   });
-  console.log(decryptedId);
+  // console.log(costingeData.costing_raw_material, "costing_raw_material");
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [deleteOption, setDeleteOptions] = useState(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
   const [consigneData, setConsigneData] = useState([
     {
       id: "",
@@ -189,33 +199,36 @@ const EditCosting = () => {
     },
   ]);
 
-  useEffect(() => {
-    const fetchCostingById = async () => {
-      try {
-        const token = localStorage.getItem("token");
+  const fetchCostingById = async () => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem("token");
 
-        const response = await axios.get(
-          `${BASE_URL}/api/panel-fetch-costing-by-id/${decryptedId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        if (response.data) {
-          const { costing, costingSub } = response.data;
-
-          setCostingData((prev) => ({
-            ...prev,
-            ...costing,
-          }));
-          setConsigneData(costingSub || []);
+      const response = await axios.get(
+        `${BASE_URL}/api/panel-fetch-costing-by-id/${decryptedId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      } catch (error) {
-        console.error("Error fetching costing data:", error);
+      );
+      if (response.data) {
+        const { costing, costingSub } = response.data;
+        setDeleteOptions(false);
+        setCostingData((prev) => ({
+          ...prev,
+          ...costing,
+        }));
+        setConsigneData(costingSub || []);
       }
-    };
-
+    } catch (error) {
+      console.error("Error fetching costing data:", error);
+      setIsError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
     if (decryptedId) {
       fetchCostingById();
     }
@@ -350,6 +363,32 @@ const EditCosting = () => {
       },
     ]);
   }, []);
+  useEffect(() => {
+    if (initialRawMaterial === null && costingeData?.costing_raw_material) {
+      const initial = Number(costingeData.costing_raw_material) || 0;
+      setInitialRawMaterial(initial);
+    }
+  }, [costingeData, initialRawMaterial, deleteOption]);
+  // const rawMaterialRef = useRef();
+
+  // useEffect(() => {
+  //   if (initialRawMaterial === null) return;
+
+  //   const totalMaterialCost = consigneData.reduce((acc, item) => {
+  //     const materialCost = Number(item.costingSub_material_cost) || 0;
+  //     return acc + materialCost;
+  //   }, 0);
+  //   const updatedRawMaterial = totalMaterialCost.toFixed(2);
+
+  //   rawMaterialRef.current = updatedRawMaterial;
+
+  //   setCostingData((prev) => ({
+  //     ...prev,
+  //     costing_raw_material: updatedRawMaterial,
+  //   }));
+  // }, [deleteOption, initialRawMaterial]);
+
+  // Then use rawMaterialRef.current in submit
 
   const removeRow = useCallback(
     (index) => {
@@ -361,9 +400,9 @@ const EditCosting = () => {
   );
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission
-
-    // Required fields for costingeData
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
     const requiredFields = {
       costing_consignee: "Consignee Name",
       costing_consignee_add: "Consignee Address",
@@ -420,6 +459,8 @@ const EditCosting = () => {
       return;
     }
     try {
+      setSubmitLoading(true);
+
       const data = {
         ...costingeData,
         costing_data: consigneData,
@@ -451,8 +492,11 @@ const EditCosting = () => {
           "An error occurred while submitting. Try again later.",
         variant: "destructive",
       });
+      setSubmitLoading(false);
 
       console.error("Error submitting data:", error);
+    } finally {
+      setSubmitLoading(false);
     }
   };
 
@@ -522,60 +566,80 @@ const EditCosting = () => {
     0
   );
 
-  const deleteProductMutation = useMutation({
-    mutationFn: async (productId) => {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${BASE_URL}/api/panel-delete-costing-sub/${productId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to delete consting Table");
-      return response.json();
-    },
-    onSuccess: () => {
-      if (response.data.code == 200) {
-        toast({
-          title: "Success",
-          description: response.data.msg,
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: response.data.msg,
-          variant: "destructive",
-        });
-      }
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-  const handleDeleteRow = (productId) => {
-    setDeleteItemId(productId);
-    setDeleteConfirmOpen(true);
-  };
-  const confirmDelete = async () => {
-    try {
-      await deleteProductMutation.mutateAsync(deleteItemId);
-      consigneData((prevData) =>
-        prevData.filter((row) => row.id !== deleteItemId)
-      );
-    } catch (error) {
-      console.error("Failed to delete product:", error);
-    } finally {
-      setDeleteConfirmOpen(false);
-      setDeleteItemId(null);
-    }
-  };
+  // const deleteProductMutation = useMutation({
+  //   mutationFn: async (productId) => {
+  //     const token = localStorage.getItem("token");
+  //     const response = await fetch(
+  //       `${BASE_URL}/api/panel-delete-costing-sub/${productId}`,
+  //       {
+  //         method: "DELETE",
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+  //     if (!response.ok) throw new Error("Failed to delete consting Table");
+  //     return response.json();
+  //   },
+  //   onSuccess: (response) => {
+
+  //     if (response.code === 200) {
+  //       fetchCostingById();
+  //       toast({
+  //         title: "Success",
+  //         description: response.msg,
+  //       });
+  //     } else {
+  //       toast({
+  //         title: "Error",
+  //         description: response.msg,
+  //         variant: "destructive",
+  //       });
+  //     }
+  //   },
+  //   onError: (error) => {
+  //     toast({
+  //       title: "Error",
+  //       description: error.message,
+  //       variant: "destructive",
+  //     });
+  //   },
+  // });
+  // const handleDeleteRow = (productId) => {
+  //   setDeleteItemId(productId);
+  //   setDeleteConfirmOpen(true);
+  //   setDeleteOptions(true);
+  // };
+
+  // const confirmDelete = async () => {
+  //   try {
+  //     await deleteProductMutation.mutateAsync(deleteItemId);
+  //     setDeleteOptions(true);
+
+  //     setConsigneData((prevData) =>
+  //       prevData.filter((row) => row.id !== deleteItemId)
+  //     );
+  //   } catch (error) {
+  //     console.error("Failed to delete product:", error);
+  //   } finally {
+  //     setDeleteConfirmOpen(false);
+  //     setDeleteItemId(null);
+  //   }
+  // };
+
+  if (isLoading) {
+    return <LoaderComponent name="Costing Data" />; // ✅ Correct prop usage
+  }
+
+  // Render error state
+  if (isError) {
+    return (
+      <ErrorComponent
+        message="Error Fetching Costing Data"
+        refetch={fetchCostingById()}
+      />
+    );
+  }
   return (
     <Page>
       <form
@@ -920,25 +984,27 @@ const EditCosting = () => {
                               </div>
                             </TableCell>
                             <TableCell className="p-1 border text-center w-10">
-                              {row.id ? (
-                                <Button
-                                  variant="ghost"
-                                  onClick={() => handleDeleteRow(row.id)}
-                                  className="text-red-500"
-                                  type="button"
-                                >
-                                  <Trash2 className="h-5 w-5" />
-                                </Button>
-                              ) : (
-                                <Button
-                                  variant="ghost"
-                                  onClick={() => removeRow(rowIndex)}
-                                  className="text-red-500"
-                                  type="button"
-                                >
-                                  <MinusCircle className="h-5 w-5" />
-                                </Button>
-                              )}
+                              {/* {row.id ? ( */}
+                              {/* <Button
+                                variant="ghost"
+                                onClick={() => handleDeleteRow(row.id)}
+                                disabled={consigneData.length === 1}
+                                className="text-red-500"
+                                type="button"
+                              >
+                                <Trash2 className="h-5 w-5" />
+                              </Button> */}
+                              {/* ) : ( */}
+                              <Button
+                                variant="ghost"
+                                onClick={() => removeRow(rowIndex)}
+                                className="text-red-500"
+                                disabled={row.id}
+                                type="button"
+                              >
+                                <MinusCircle className="h-5 w-5" />
+                              </Button>
+                              {/* )} */}
                             </TableCell>
                           </TableRow>
                           {/* //Footer sum */}
@@ -1022,15 +1088,16 @@ const EditCosting = () => {
                     </p>
                     <p className="text-xl text-green-600 font-bold">
                       ₹ {costingeData?.costing_total_amount}
+                      {/* {totalINR} */}
                     </p>
                   </div>
 
                   <div className="p-4 border border-gray-300 rounded-xl shadow-sm w-full sm:w-1/2">
                     <p className="text-lg font-semibold text-gray-700">
-                      Sales Rate
+                      Amount in USD
                     </p>
                     <p className="text-xl text-blue-600 font-bold">
-                      ₹ {costingeData?.costing_sale_rate}
+                      {/* ₹ {totalSales} */}₹ {costingeData?.costing_sale_rate}
                     </p>
                   </div>
                 </div>
@@ -1094,15 +1161,17 @@ const EditCosting = () => {
           </CardContent>
         </Card>
         <div className="flex items-center justify-end  gap-2">
+          {submitLoading && <ProgressBar progress={70} />}
           <Button
             type="submit"
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
+            disabled={submitLoading}
           >
-            Update
+            {submitLoading ? "Updating..." : "Update"}{" "}
           </Button>
         </div>
       </form>
-      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+      {/* <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
@@ -1121,7 +1190,7 @@ const EditCosting = () => {
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog> */}
     </Page>
   );
 };

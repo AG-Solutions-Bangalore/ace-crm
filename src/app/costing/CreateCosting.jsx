@@ -28,6 +28,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import Page from "../dashboard/page";
+import { ProgressBar } from "@/components/spinner/ProgressBar";
 
 const MemoizedSelect = React.memo(
   ({ value, onChange, options, placeholder }) => {
@@ -124,6 +125,7 @@ const branch = {
 };
 const CreateCosting = () => {
   const [initialRawMaterial, setInitialRawMaterial] = useState(null);
+  const [submitLoading, setSubmitLoading] = useState(false);
 
   const [costingeData, setCostingData] = useState({
     branch_short: branch?.branch_short,
@@ -405,6 +407,7 @@ const CreateCosting = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const requiredFields = {
       costing_consignee: "Consignee Name",
       costing_consignee_add: "Consignee Address",
@@ -464,6 +467,8 @@ const CreateCosting = () => {
     }
 
     try {
+      setSubmitLoading(true);
+
       const data = {
         ...costingeData,
         costing_data: consigneData,
@@ -501,8 +506,11 @@ const CreateCosting = () => {
           "An error occurred while submitting. Try again later.",
         variant: "destructive",
       });
+      setSubmitLoading(false);
 
       console.error("Error submitting data:", error);
+    } finally {
+      setSubmitLoading(false);
     }
   };
   const fieldsToSum = [
@@ -1160,11 +1168,12 @@ const CreateCosting = () => {
           </CardContent>
         </Card>
         <div className="flex items-center justify-end  gap-2">
+          {submitLoading && <ProgressBar progress={70} />}
           <Button
             type="submit"
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
           >
-            Create
+            {submitLoading ? "Creating..." : "Create"}{" "}
           </Button>
         </div>
       </form>
