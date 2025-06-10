@@ -1736,6 +1736,36 @@ export const CostingView = ({ onClick, className }) => {
 };
 CostingView.page = "Costing";
 
+export const FolderCreate = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "FolderCreate", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      <SquarePlus className="h-4 w-4" /> Folder
+    </Button>
+  );
+};
+FolderCreate.page = "Folder";
+export const FileCreate = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "FileCreate", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      <SquarePlus className="h-4 w-4" /> File
+    </Button>
+  );
+};
+FileCreate.page = "Folder";
 export default {
   InvoiceCreate,
   InvoiceEdit,
@@ -1821,4 +1851,6 @@ export default {
   CostingCreate,
   CostingEdit,
   CostingView,
+  FolderCreate,
+  FileCreate,
 };

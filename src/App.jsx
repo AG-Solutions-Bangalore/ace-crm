@@ -94,6 +94,8 @@ import CostingList from "./app/costing/CostingList";
 import CreateCosting from "./app/costing/CreateCosting";
 import EditCosting from "./app/costing/EditCosting";
 import ViewCosting from "./app/costing/ViewCosting";
+import FolderList from "./app/folder/FolderList";
+import FileList from "./app/folder/file/FileList";
 
 function App() {
   const navigate = useNavigate();
@@ -329,12 +331,14 @@ function App() {
         {/* -------------Pending------------ */}
         <Route path="/dutydrawback/pending" element={<DutyDrawBackPending />} />
         {/* -------------Received------------ */}
-
+        {/* //costing */}
         <Route path="/costing" element={<CostingList />} />
         <Route path="/costing-create" element={<CreateCosting />} />
         <Route path="/costing-edit/:id" element={<EditCosting />} />
         <Route path="/costing-view/:id" element={<ViewCosting />} />
-        {/* //costing */}
+        <Route path="/folder" element={<FolderList />} />
+        <Route path="/file/:id" element={<FileList />} />
+
         <Route
           path="/dutydrawback/received"
           element={<DutyDrawBackReceived />}

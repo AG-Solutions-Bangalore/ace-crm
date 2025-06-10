@@ -14,23 +14,24 @@ import {
 } from "@/components/ui/popover";
 import { useLocation } from "react-router-dom";
 import { ButtonConfig } from "@/config/ButtonConfig";
-import { StateCreate } from "@/components/buttonIndex/ButtonComponents";
+import {
+  FolderCreate,
+  StateCreate,
+} from "@/components/buttonIndex/ButtonComponents";
 
-const CreateState = () => {
+const CreateFolder = () => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    state_name: "",
-    state_no: "",
+    file_folder: "",
   });
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const { pathname } = useLocation();
   const handleSubmit = async () => {
-    if (!formData.state_name.trim() || !formData.state_no.trim()) {
+    if (!formData.file_folder.trim()) {
       toast({
         title: "Error",
-        description: "State name and state number are required",
+        description: "Folder name  are required",
         variant: "destructive",
       });
       return;
@@ -40,7 +41,7 @@ const CreateState = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        `${BASE_URL}/api/panel-create-state`,
+        `${BASE_URL}/api/panel-create-folder`,
         formData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -54,10 +55,8 @@ const CreateState = () => {
         });
 
         setFormData({
-          state_name: "",
-          state_no: "",
+          file_folder: "",
         });
-        await queryClient.invalidateQueries(["customers"]);
         setOpen(false);
       } else {
         toast({
@@ -80,49 +79,40 @@ const CreateState = () => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        {pathname === "/master/state" ? (
-          // <Button
-          //   variant="default"
-          //   className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-          // >
-          //   <SquarePlus className="h-4 w-4 mr-2" /> State
-          // </Button>
-          <div>
-            <StateCreate
+        {pathname === "/folder" ? (
+          <div className="inline-block">
+            <FolderCreate
               className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-            ></StateCreate>
+            />
           </div>
-        ) : pathname === "/create-contract" ? (
-          <p className="text-xs text-yellow-700 ml-2 mt-1 w-32 hover:text-red-800 cursor-pointer">
-            State
+        ) : pathname === "/folder" ? (
+          <p className="text-xs text-yellow-700 ml-2 mt-1 w-32 hover:text-red-800 cursor-pointer inline-block">
+            Folder
           </p>
         ) : null}
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+
+      <PopoverContent side="bottom" align="start" className="w-80">
         <div className="grid gap-4">
           <div className="space-y-2">
-            <h4 className="font-medium leading-none">Create New State</h4>
+            <h4 className="font-medium leading-none">Create New Folder</h4>
             <p className="text-sm text-muted-foreground">
-              Enter the details for the new State
+              Enter the details for the new Folder
             </p>
           </div>
           <div className="grid gap-2">
             <Input
-              id="state_name"
-              placeholder="Enter state name"
-              value={formData.state_name}
+              id="file_folder"
+              placeholder="Enter folder name"
+              value={formData.file_folder}
               onChange={(e) =>
-                setFormData((prev) => ({ ...prev, state_name: e.target.value }))
+                setFormData((prev) => ({
+                  ...prev,
+                  file_folder: e.target.value,
+                }))
               }
             />
-            <Input
-              id="state_no"
-              placeholder="Enter state number"
-              value={formData.state_no}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, state_no: e.target.value }))
-              }
-            />
+
             <Button
               onClick={handleSubmit}
               disabled={isLoading}
@@ -134,7 +124,7 @@ const CreateState = () => {
                   Creating...
                 </>
               ) : (
-                "Create State"
+                "Create Folder"
               )}
             </Button>
           </div>
@@ -144,4 +134,4 @@ const CreateState = () => {
   );
 };
 
-export default CreateState;
+export default CreateFolder;

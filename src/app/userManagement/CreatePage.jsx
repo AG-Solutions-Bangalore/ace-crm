@@ -127,6 +127,7 @@ const CreatePage = () => {
         { name: "Invoice", url: "/invoice" },
         { name: "Purchase Order", url: "/purchase-order" },
         { name: "Costing", url: "/costing" },
+        { name: "Folder", url: "/folder" },
       ],
       userManagement: [
         { name: "User Management", url: "/userManagement" },
