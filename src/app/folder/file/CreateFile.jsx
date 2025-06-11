@@ -17,13 +17,14 @@ const CreateFile = ({ id, refetch }) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [file, setFile] = useState(null);
+  const [filename, setFileName] = useState(null);
   const { toast } = useToast();
 
   const handleSubmit = async () => {
-    if (!file || !id) {
+    if (!file || !id || !filename) {
       toast({
         title: "Error",
-        description: "File and folder ID are required",
+        description: "File Name  and File  are required",
         variant: "destructive",
       });
       return;
@@ -32,6 +33,7 @@ const CreateFile = ({ id, refetch }) => {
     const formData = new FormData();
     formData.append("file_folder_unique", id);
     formData.append("file_name", file);
+    formData.append("folder_file_name", filename);
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
@@ -91,11 +93,33 @@ const CreateFile = ({ id, refetch }) => {
             </p>
           </div>
           <div className="grid gap-2">
-            <Input
-              id="file_name"
-              type="file"
-              onChange={(e) => setFile(e.target.files[0])}
-            />
+            <div>
+              <label
+                className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+              >
+                File Name
+              </label>
+              <Input
+                label="File Name"
+                id="folder_file_name"
+                type="text"
+                onChange={(e) => setFileName(e.target.value)}
+                placeholder="Enter your File Name"
+              />
+            </div>
+            <div>
+              <label
+                className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
+              >
+                Upload File
+              </label>
+              <Input
+                id="file_name"
+                type="file"
+                onChange={(e) => setFile(e.target.files[0])}
+              />
+            </div>
+
             <Button
               onClick={handleSubmit}
               disabled={isLoading}
