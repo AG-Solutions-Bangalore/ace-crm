@@ -19,7 +19,7 @@ import {
   StateCreate,
 } from "@/components/buttonIndex/ButtonComponents";
 
-const CreateFolder = () => {
+const CreateFolder = ({ refetch }) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -53,7 +53,7 @@ const CreateFolder = () => {
           title: "Success",
           description: response.data.msg,
         });
-
+        refetch();
         setFormData({
           file_folder: "",
         });

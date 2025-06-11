@@ -96,6 +96,7 @@ import EditCosting from "./app/costing/EditCosting";
 import ViewCosting from "./app/costing/ViewCosting";
 import FolderList from "./app/folder/FolderList";
 import FileList from "./app/folder/file/FileList";
+import FilePreviewWrapper from "./app/folder/FilePreviewWrapper";
 
 function App() {
   const navigate = useNavigate();
@@ -338,6 +339,7 @@ function App() {
         <Route path="/costing-view/:id" element={<ViewCosting />} />
         <Route path="/folder" element={<FolderList />} />
         <Route path="/file/:id" element={<FileList />} />
+        <Route path="/file-preview" element={<FilePreviewWrapper />} />
 
         <Route
           path="/dutydrawback/received"
