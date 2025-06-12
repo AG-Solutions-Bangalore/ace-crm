@@ -116,6 +116,7 @@ const CreateFile = ({ id, refetch }) => {
               <Input
                 id="file_name"
                 type="file"
+                accept=".pdf, .xls, .xlsx, application/pdf, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 onChange={(e) => setFile(e.target.files[0])}
               />
             </div>

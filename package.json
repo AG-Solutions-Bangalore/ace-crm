@@ -12,7 +12,6 @@
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
-    "@handsontable/react": "^15.3.0",
     "@heroicons/react": "2.0.18",
     "@hookform/resolvers": "^3.9.1",
     "@material-tailwind/react": "^2.1.9",
@@ -46,7 +45,6 @@
     "file-saver": "^2.0.5",
     "framer-motion": "^11.11.11",
     "gsap": "^3.12.5",
-    "handsontable": "^15.3.0",
     "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.9.0",
     "jspdf": "^2.5.2",

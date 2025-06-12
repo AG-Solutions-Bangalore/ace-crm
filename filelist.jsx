@@ -115,11 +115,6 @@ const FileList = () => {
                 return isExcel ? (
                   <div
                     key={file.path}
-                    // onClick={() =>
-                    //   navigate("/file-preview", {
-                    //     state: { fileUrl, fileName, id },
-                    //   })
-                    // }
                     onClick={() => {
                       const randomQuery = Date.now();
                       navigate(`/file-preview?=${randomQuery}`, {
