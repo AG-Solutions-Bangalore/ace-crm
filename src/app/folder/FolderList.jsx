@@ -123,7 +123,7 @@ const FolderList = () => {
             </div>
           ))}
         </div>
-      ) : (
+      ) : fetchfolder && fetchfolder.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {fetchfolder?.map((folder) => (
             <div
@@ -148,6 +148,10 @@ const FolderList = () => {
             </div>
           ))}
         </div>
+      ) : (
+        <div className="text-gray-500 text-center py-10 col-span-full">
+          No folders found.
+        </div>
       )}
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <AlertDialogContent>
@@ -162,7 +166,7 @@ const FolderList = () => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
-              className={`${ButtonConfig.backgroundColor}  ${ButtonConfig.textColor} text-black hover:bg-red-600`}
+              className={`${ButtonConfig.backgroundColor}  ${ButtonConfig.textColor}  hover:bg-red-600`}
             >
               Delete
             </AlertDialogAction>

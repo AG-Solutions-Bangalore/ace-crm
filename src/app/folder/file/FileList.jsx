@@ -161,35 +161,14 @@ const FileList = () => {
 
                 const isExcel = ext === "xlsx" || ext === "xls";
                 const isPdf = ext === "pdf";
-                const isWord = ext == "doc" || ext == "docx";
-                const isImage = [
-                  "png",
-                  "jpg",
-                  "jpeg",
-                  "gif",
-                  "bmp",
-                  "webp",
-                ].includes(ext);
-                const isText = ext === "txt" || ext === "csv";
-
                 let IconComponent = File;
                 let iconColor = "text-gray-500";
-
                 if (isExcel) {
                   IconComponent = FileSpreadsheet;
                   iconColor = "text-green-500";
                 } else if (isPdf) {
                   IconComponent = FaRegFilePdf;
                   iconColor = "text-red-500";
-                } else if (isWord) {
-                  IconComponent = FaRegFileWord;
-                  iconColor = "text-blue-500";
-                } else if (isImage) {
-                  IconComponent = FileImage;
-                  iconColor = "text-pink-500";
-                } else if (isText) {
-                  IconComponent = FileText;
-                  iconColor = "text-yellow-500";
                 }
 
                 return isExcel ? (
@@ -261,7 +240,7 @@ const FileList = () => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
-              className={`${ButtonConfig.backgroundColor}  ${ButtonConfig.textColor} text-black hover:bg-red-600`}
+              className={`${ButtonConfig.backgroundColor}  ${ButtonConfig.textColor}  hover:bg-red-600`}
             >
               Delete
             </AlertDialogAction>

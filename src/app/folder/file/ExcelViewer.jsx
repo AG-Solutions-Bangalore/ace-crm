@@ -171,7 +171,7 @@ const ExcelViewer = ({ fileUrl, fileName, folderunique }) => {
   const headers = rows[0] || [];
 
   if (sheets.length === 0)
-    return <WithoutLoaderComponent name="Loading Excel" />;
+    return <WithoutLoaderComponent name="File" />;
 
   return (
     <>
