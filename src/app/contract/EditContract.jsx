@@ -58,6 +58,7 @@ import {
   useFetchBagsTypes,
   useFetchPorts,
   useFetchProduct,
+  useFetchBank,
 } from "@/hooks/useApi";
 import Page from "../dashboard/page";
 import { ButtonConfig } from "@/config/ButtonConfig";
@@ -275,6 +276,7 @@ const EditContract = () => {
   const [submitLoading, setSubmitLoading] = useState(false);
   const [saveAndViewLoading, setSaveAndViewLoading] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
+   
   const [formData, setFormData] = useState({
     branch_short: "",
     branch_name: "",
@@ -378,7 +380,7 @@ const EditContract = () => {
   const { data: bagTypeData } = useFetchBagsTypes();
   const { data: portsData } = useFetchPorts();
   const { data: productData } = useFetchProduct();
-
+  const { data: bankData } = useFetchBank();
   const updateContractMutation = useMutation({
     mutationFn: updateContract,
     onSuccess: (response) => {
@@ -467,6 +469,8 @@ const EditContract = () => {
             contract_loading: selectedCompanySort.branch_port_of_loading,
           }));
 
+           
+
           const selectedBuyer = buyerData?.buyer?.find(
             (buyer) => buyer.buyer_name === formData.contract_buyer
           );
@@ -517,8 +521,10 @@ const EditContract = () => {
       formData.contract_buyer,
       formData.contract_no,
       formData.contract_year,
+      bankData
     ]
   );
+
 
   const handleRowDataChange = useCallback((rowIndex, field, value) => {
     const numericFields = [
@@ -1221,13 +1227,28 @@ const EditContract = () => {
                   >
                     Shipment
                   </label>
-                  <Input
+                  {/* <Input
                     className="bg-white"
                     type="text"
                     value={formData.contract_shipment}
                     onChange={(e) =>
                       handleInputChange("contract_shipment", e.target.value)
                     }
+                  /> */}
+                   <MemoizedSelect
+                    value={formData.contract_shipment}
+                    onChange={(value) =>
+                      handleSelectChange("contract_shipment", value)
+                    }
+                    options={
+                      bankData?.bank
+                      ?.filter((item) => item.branch_short === formData.branch_short)
+                      .map((item) => ({
+                        value: item.bank_name,
+                        label: item.bank_name,
+                      })) || []
+                  }
+                    placeholder="Select Bank"
                   />
                 </div>
               </div>

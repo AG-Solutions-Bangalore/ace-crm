@@ -39,6 +39,7 @@ const CreateBank = () => {
     bank_name: "",
     bank_details: "",
     bank_acc_no: "",
+    bank_ifsc_code: "",
     bank_branch: "",
   });
 
@@ -65,6 +66,7 @@ const CreateBank = () => {
       !formData.bank_name ||
       !formData.bank_details ||
       !formData.bank_acc_no ||
+      !formData.bank_ifsc_code ||
       !formData.bank_branch
     ) {
       toast({
@@ -98,6 +100,7 @@ const CreateBank = () => {
           bank_details: "",
           bank_acc_no: "",
           bank_branch: "",
+          bank_ifsc_code: "",
         });
         await queryClient.invalidateQueries(["banks"]);
         setOpen(false);
@@ -202,13 +205,23 @@ const CreateBank = () => {
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="bank_branch">Bank Company </Label>
+            <Label htmlFor="bank_ifsc_code">Bank IFSC Code</Label>
+            <Input
+              id="bank_ifsc_code"
+              name="bank_ifsc_code"
+              value={formData.bank_ifsc_code}
+              onChange={handleInputChange}
+              placeholder="Enter Bank IFSC Code "
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="bank_branch">Bank Branch </Label>
             <Input
               id="bank_branch"
               name="bank_branch"
               value={formData.bank_branch}
               onChange={handleInputChange}
-              placeholder="Enter Bank Company Details "
+              placeholder="Enter Bank Branch Details "
             />
           </div>
         </div>
