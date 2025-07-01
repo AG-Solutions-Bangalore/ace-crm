@@ -136,7 +136,9 @@ const CreateBuyer = () => {
           >
             <SquarePlus className="h-4 w-4" /> Buyer
           </Button>
-        ) : pathname === "/create-contract" || pathname === "/create-invoice" ? (
+        ) : pathname === "/create-contract" ||
+          pathname === "/create-invoice" ||
+          pathname === "/costing-create" ? (
           <p className="text-xs text-blue-600  hover:text-red-800 cursor-pointer">
             <span className="flex items-center flex-row gap-1">
               <SquarePlus className="w-4 h-4" /> <span>Add</span>
@@ -162,26 +164,26 @@ const CreateBuyer = () => {
             />
           </div>
           <div className=" flex items-center justify-between gap-2 ">
-          <div className="grid gap-2">
-            <Label htmlFor="buyer_sort"> Short Name</Label>
-            <Input
-              id="buyer_sort"
-              name="buyer_sort"
-              value={formData.buyer_sort}
-              onChange={handleInputChange}
-              placeholder="Enter buyer short name"
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="buyer_group"> Group</Label>
-            <Input
-              id="buyer_group"
-              name="buyer_group"
-              value={formData.buyer_group}
-              onChange={handleInputChange}
-              placeholder="Enter buyer group name"
-            />
-          </div>
+            <div className="grid gap-2">
+              <Label htmlFor="buyer_sort"> Short Name</Label>
+              <Input
+                id="buyer_sort"
+                name="buyer_sort"
+                value={formData.buyer_sort}
+                onChange={handleInputChange}
+                placeholder="Enter buyer short name"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="buyer_group"> Group</Label>
+              <Input
+                id="buyer_group"
+                name="buyer_group"
+                value={formData.buyer_group}
+                onChange={handleInputChange}
+                placeholder="Enter buyer group name"
+              />
+            </div>
           </div>
           <div className="grid gap-2">
             <Label htmlFor="buyer_address"> Address</Label>

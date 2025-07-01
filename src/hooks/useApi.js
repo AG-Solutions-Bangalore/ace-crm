@@ -133,9 +133,11 @@ export const useFetchItemNames = () => {
 };
 export const useFetchState = () => {
   return useQuery(createQueryConfig(["state"], "/api/panel-fetch-state"));
-}
+};
 export const useFetchPreReceipt = () => {
-  return useQuery(createQueryConfig(["preReceipt"], "/api/panel-fetch-prereceipts"));
+  return useQuery(
+    createQueryConfig(["preReceipt"], "/api/panel-fetch-prereceipts")
+  );
 };
 export const useFetchScheme = () => {
   return useQuery(createQueryConfig(["scheme"], "/api/panel-fetch-scheme"));
@@ -221,10 +223,5 @@ export const useFetchGoDown = () => {
 export const useFetchDispatchDcNo = () => {
   return useQuery(
     createQueryConfig(["dispatchDcNo"], "/api/panel-fetch-market-dispatch-dcno")
-  );
-};
-export const useFetchBank = () => {
-  return useQuery(
-    createQueryConfig(["bank"], "/api/panel-fetch-bank")
   );
 };

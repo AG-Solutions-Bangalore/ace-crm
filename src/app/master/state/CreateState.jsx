@@ -39,17 +39,20 @@ const CreateState = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.post(`${BASE_URL}/api/panel-create-state`, formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.post(
+        `${BASE_URL}/api/panel-create-state`,
+        formData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (response?.data.code == 200) {
-    
         toast({
           title: "Success",
-          description: response.data.msg
+          description: response.data.msg,
         });
-  
+
         setFormData({
           state_name: "",
           state_no: "",
@@ -57,16 +60,12 @@ const CreateState = () => {
         await queryClient.invalidateQueries(["customers"]);
         setOpen(false);
       } else {
-       
         toast({
           title: "Error",
           description: response.data.msg,
           variant: "destructive",
         });
       }
-
-
-
     } catch (error) {
       toast({
         title: "Error",

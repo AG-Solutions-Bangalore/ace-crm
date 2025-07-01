@@ -13,20 +13,25 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useLocation } from "react-router-dom";
-import { ProductCreate } from "@/components/buttonIndex/ButtonComponents";
 import { ButtonConfig } from "@/config/ButtonConfig";
-const CreateProduct = () => {
+import {
+  FolderCreate,
+  StateCreate,
+} from "@/components/buttonIndex/ButtonComponents";
+
+const CreateFolder = ({ refetch }) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [productName, setProductName] = useState("");
+  const [formData, setFormData] = useState({
+    file_folder: "",
+  });
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const { pathname } = useLocation();
   const handleSubmit = async () => {
-    if (!productName.trim()) {
+    if (!formData.file_folder.trim()) {
       toast({
         title: "Error",
-        description: "Product name is required",
+        description: "Folder name  are required",
         variant: "destructive",
       });
       return;
@@ -35,22 +40,31 @@ const CreateProduct = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        `${BASE_URL}/api/panel-create-product`,
-        { product_name: productName },
+      const response = await axios.post(
+        `${BASE_URL}/api/panel-create-folder`,
+        formData,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      toast({
-        title: "Success",
-        description: "Product created successfully",
-      });
-
-      setProductName("");
-      await queryClient.invalidateQueries(["products"]);
-      setOpen(false);
+      if (response?.data.code == 200) {
+        toast({
+          title: "Success",
+          description: response.data.msg,
+        });
+        refetch();
+        setFormData({
+          file_folder: "",
+        });
+        setOpen(false);
+      } else {
+        toast({
+          title: "Error",
+          description: response.data.msg,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",
@@ -65,43 +79,44 @@ const CreateProduct = () => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        {pathname === "/products" ? (
-          //  <Button variant="default" className="ml-2 bg-yellow-500 text-black hover:bg-yellow-100">
-          //    <SquarePlus className="h-4 w-4 mr-2" /> Product
-          //  </Button>
-          <div>
-            <ProductCreate
+        {pathname === "/folder" ? (
+          <div className="inline-block">
+            <FolderCreate
               className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-            >
-              <SquarePlus className="h-4 w-4 mr-2" /> Product
-            </ProductCreate>
+            />
           </div>
-        ) : pathname === "/create-enquiries" ||
-          pathname === "/costing-create" ? (
-          <p className="text-xs text-yellow-700 ml-2 mt-1 w-32 hover:text-red-800 cursor-pointer">
-            Create Product
+        ) : pathname === "/folder" ? (
+          <p className="text-xs text-yellow-700 ml-2 mt-1 w-32 hover:text-red-800 cursor-pointer inline-block">
+            Folder
           </p>
         ) : null}
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+
+      <PopoverContent side="bottom" align="start" className="w-80">
         <div className="grid gap-4">
           <div className="space-y-2">
-            <h4 className="font-medium leading-none">Create New Product</h4>
+            <h4 className="font-medium leading-none">Create New Folder</h4>
             <p className="text-sm text-muted-foreground">
-              Enter the details for the new product
+              Enter the details for the new Folder
             </p>
           </div>
           <div className="grid gap-2">
             <Input
-              id="product_name"
-              placeholder="Enter product name"
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
+              id="file_folder"
+              placeholder="Enter folder name"
+              value={formData.file_folder}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  file_folder: e.target.value,
+                }))
+              }
             />
+
             <Button
               onClick={handleSubmit}
               disabled={isLoading}
-              className=" bg-yellow-500 text-black hover:bg-yellow-100"
+              className={`mt-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             >
               {isLoading ? (
                 <>
@@ -109,7 +124,7 @@ const CreateProduct = () => {
                   Creating...
                 </>
               ) : (
-                "Create Product"
+                "Create Folder"
               )}
             </Button>
           </div>
@@ -119,4 +134,4 @@ const CreateProduct = () => {
   );
 };
 
-export default CreateProduct;
+export default CreateFolder;

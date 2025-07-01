@@ -22,24 +22,6 @@ const ExcelLikeEditor = ({ fileUrl, fileName, folderunique }) => {
 
   const { toast } = useToast();
   const navigate = useNavigate();
-  //   useEffect(() => {
-  //     const fetchExcel = async () => {
-  //       const response = await fetch(fileUrl);
-  //       const arrayBuffer = await response.arrayBuffer();
-  //       const workbook = XLSX.read(arrayBuffer, { type: "array" });
-  //       //   const sheet = workbook.Sheets[workbook.SheetNames[0]];
-  //       //   const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-  //       //   setData(jsonData);
-  //       const allSheets = workbook.SheetNames.map((name) => ({
-  //         name,
-  //         data: XLSX.utils.sheet_to_json(workbook.Sheets[name], { header: 1 }),
-  //       }));
-  //       setSheets(allSheets); // state: [ { name: 'Sheet1', data: [...] }, ... ]
-  //       setData(allSheets[0].data);
-  //     };
-
-  //     fetchExcel();
-  //   }, [fileUrl]);
   useEffect(() => {
     const fetchExcel = async () => {
       const response = await fetch(fileUrl);
@@ -55,8 +37,8 @@ const ExcelLikeEditor = ({ fileUrl, fileName, folderunique }) => {
       }));
 
       setSheets(allSheets);
-      setData(allSheets[0].data); // display first sheet initially
-      setCurrentSheetIndex(0); // reset index
+      setData(allSheets[0].data);
+      setCurrentSheetIndex(0);
     };
 
     fetchExcel();
@@ -68,12 +50,20 @@ const ExcelLikeEditor = ({ fileUrl, fileName, folderunique }) => {
       return;
     }
 
-    const hotInstance = hotRef.current.hotInstance;
-    const tableData = hotInstance.getData();
+    const hotInstance = hotRef.current?.hotInstance;
+    const updatedCurrentSheet = hotInstance.getData();
 
-    const worksheet = XLSX.utils.aoa_to_sheet(tableData);
+    const updatedSheets = sheets.map((sheet, idx) =>
+      idx === currentSheetIndex
+        ? { ...sheet, data: updatedCurrentSheet }
+        : sheet
+    );
+
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    updatedSheets.forEach((sheet) => {
+      const worksheet = XLSX.utils.aoa_to_sheet(sheet.data);
+      XLSX.utils.book_append_sheet(workbook, worksheet, sheet.name);
+    });
 
     const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
     const blob = new Blob([wbout], {
@@ -155,8 +145,19 @@ const ExcelLikeEditor = ({ fileUrl, fileName, folderunique }) => {
                   : "bg-gray-200"
               }`}
               onClick={() => {
+                const hotInstance = hotRef.current?.hotInstance;
+                if (hotInstance) {
+                  const updatedData = hotInstance.getData();
+                  setSheets((prev) =>
+                    prev.map((sheet, sIdx) =>
+                      sIdx === currentSheetIndex
+                        ? { ...sheet, data: updatedData }
+                        : sheet
+                    )
+                  );
+                }
                 setCurrentSheetIndex(idx);
-                setData(sheet.data);
+                setData(sheets[idx].data);
               }}
             >
               {sheet.name}
@@ -166,22 +167,6 @@ const ExcelLikeEditor = ({ fileUrl, fileName, folderunique }) => {
 
         <div className="w-full overflow-auto max-h-[calc(100vh-150px)] border rounded bg-gray-50 shadow-inner">
           <div>
-            {/* <HotTable
-              ref={hotRef}
-              data={data}
-              colHeaders={true}
-              rowHeaders={true}
-              licenseKey="non-commercial-and-evaluation"
-              width="99%"
-              height="600"
-              stretchH="all"
-              className="border"
-              manualColumnResize={true}
-              viewportRowRenderingOffset="auto"
-              manualRowResize={true}
-              contextMenu={true}
-              dropdownMenu={true}
-            /> */}
             <HotTable
               ref={hotRef}
               data={data}
@@ -196,8 +181,8 @@ const ExcelLikeEditor = ({ fileUrl, fileName, folderunique }) => {
               manualRowResize={true}
               contextMenu={true}
               dropdownMenu={true}
-            //   fixedRowsTop={1}
-            //   fixedColumnsLeft={1}
+              //   fixedRowsTop={1}
+              //   fixedColumnsLeft={1}
             />
           </div>
         </div>

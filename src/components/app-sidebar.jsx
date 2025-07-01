@@ -4,6 +4,7 @@ import {
   BadgeIndianRupee,
   Blocks,
   Command,
+  Folder,
   Frame,
   GalleryVerticalEnd,
   Map,
@@ -313,6 +314,18 @@ export function AppSidebar({ ...props }) {
             url: "/report/product-stock",
           },
         ],
+      },
+      {
+        title: "Costing",
+        url: "/costing",
+        icon: NotebookText,
+        isActive: false,
+      },
+      {
+        title: "Folder",
+        url: "/folder",
+        icon: Folder,
+        isActive: false,
       },
     ],
 

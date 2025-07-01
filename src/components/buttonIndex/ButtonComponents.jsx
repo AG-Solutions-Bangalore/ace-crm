@@ -1667,6 +1667,105 @@ export const DutyDrawBackReceivedEdit = ({ onClick, className }) => {
   );
 };
 DutyDrawBackReceivedEdit.page = "Received";
+// -------------------------Costing------------------------------
+//Costing  List
+export const CostingCreate = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "CostingCreate", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      <SquarePlus className="h-4 w-4" /> Costing
+    </Button>
+  );
+};
+CostingCreate.page = "Costing";
+
+export const CostingEdit = ({ onClick, className }) => {
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "CostingEdit", staticPermissions)) {
+    return null;
+  }
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          onClick={onClick}
+          className={className}
+          variant="ghost"
+          size="icon"
+        >
+          <Edit className="h-4 w-4 text-black" />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>Edit Costing</TooltipContent>
+    </Tooltip>
+  );
+};
+CostingEdit.page = "Costing";
+
+export const CostingView = ({ onClick, className }) => {
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "CostingView", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            onClick={onClick}
+            className={className}
+            variant="ghost"
+            size="icon"
+          >
+            <Eye className="h-4 w-4 text-black" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>View Costing</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+CostingView.page = "Costing";
+
+export const FolderCreate = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "FolderCreate", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      <SquarePlus className="h-4 w-4" /> Folder
+    </Button>
+  );
+};
+FolderCreate.page = "Folder";
+export const FileCreate = ({ onClick, className }) => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("id") || "";
+  const staticPermissions = getStaticPermissions();
+  if (!checkPermission(userId, "FileCreate", staticPermissions)) {
+    return null;
+  }
+
+  return (
+    <Button variant="default" className={className} onClick={onClick}>
+      <SquarePlus className="h-4 w-4" /> File
+    </Button>
+  );
+};
+FileCreate.page = "Folder";
 export default {
   InvoiceCreate,
   InvoiceEdit,
@@ -1749,4 +1848,9 @@ export default {
   ProcessingDelete,
   DutyDrawBackPendingEdit,
   DutyDrawBackReceivedEdit,
+  CostingCreate,
+  CostingEdit,
+  CostingView,
+  FolderCreate,
+  FileCreate,
 };
