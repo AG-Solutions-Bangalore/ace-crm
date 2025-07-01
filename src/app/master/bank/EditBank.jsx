@@ -44,6 +44,7 @@ const EditBank = ({ bankId }) => {
     bank_details: "",
     bank_acc_no: "",
     bank_branch: "",
+    bank_ifsc_code: "",
     bank_status: "Active",
   });
 
@@ -63,6 +64,7 @@ const EditBank = ({ bankId }) => {
         bank_details: bankData.bank_details,
         bank_acc_no: bankData.bank_acc_no,
         bank_branch: bankData.bank_branch,
+        bank_ifsc_code: bankData.bank_ifsc_code,
         bank_status: bankData.bank_status,
       });
     } catch (error) {
@@ -103,6 +105,7 @@ const EditBank = ({ bankId }) => {
       !formData.bank_details ||
       !formData.bank_acc_no ||
       !formData.bank_branch ||
+      !formData.bank_ifsc_code ||
       !formData.bank_status
     ) {
       toast({
@@ -233,13 +236,23 @@ const EditBank = ({ bankId }) => {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="bank_branch">Bank Company Details</Label>
+              <Label htmlFor="bank_ifsc_code">Bank IFSC Code</Label>
+              <Input
+                id="bank_ifsc_code"
+                name="bank_ifsc_code"
+                value={formData.bank_ifsc_code}
+                onChange={handleInputChange}
+                placeholder="Enter Bank IFSC Code "
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="bank_branch">Bank Branch Details</Label>
               <Input
                 id="bank_branch"
                 name="bank_branch"
                 value={formData.bank_branch}
                 onChange={handleInputChange}
-                placeholder="Enter Bank Company Details "
+                placeholder="Enter Bank Branch Details "
               />
             </div>
 

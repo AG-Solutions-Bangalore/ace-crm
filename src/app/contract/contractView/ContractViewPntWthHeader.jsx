@@ -97,24 +97,10 @@ const ContractViewPntWthHeader = ({ contractData, SIGN_IN_PURCHASE }) => {
 
         {/* Terms of Payment */}
         <div className="flex items-center gap-4 w-full">
-          <span className="w-1/4 text-left">TERMS OF PAYMENT</span>
+          <span className="w-1/4 text-left">Terms Of Payment</span>
           <span className="w-1 text-center">:</span>
           <p className="w-3/4">
             {contractData?.contract?.contract_payment_terms}
-          </p>
-        </div>
-
-        {/* Shipper's Bank -- if ship_date is not avaiilbe than show remove - */}
-        <div className="flex items-center gap-4 w-full">
-          <span className="w-1/4 text-left">SHIPPER'S BANK </span>
-          <span className="w-1 text-center">:</span>
-          <p className="w-3/4">
-            {moment(contractData?.contract?.contract_ship_date).format(
-              "DD-MMM-YYYY"
-            )}
-            {contractData?.contract?.contract_ship_date && " - "}
-
-            {contractData?.contract?.contract_shipment}
           </p>
         </div>
       </div>
@@ -195,8 +181,81 @@ const ContractViewPntWthHeader = ({ contractData, SIGN_IN_PURCHASE }) => {
           <span className="w-1 text-center">:</span>
           <p className="w-3/4">{contractData?.contract?.contract_remarks}</p>
         </div>
+
+        {/* Shipper's Bank -- if ship_date is not avaiilbe than show remove - */}
+        {!contractData?.contract?.contract_shipment && (
+          <div className="flex items-center gap-4 w-full">
+            <span className="w-1/4 text-left">Shipper's Bank</span>
+            <span className="w-1 text-center">:</span>
+            <p className="w-3/4">
+              {/* {moment(contractData?.contract?.contract_ship_date).format(
+              "DD-MMM-YYYY"
+            )}
+            {contractData?.contract?.contract_ship_date && " - "} */}
+
+              {contractData?.contract?.contract_shipment}
+            </p>
+          </div>
+        )}
       </div>
 
+      {/* add extra start  */}
+      {contractData?.contract?.contract_shipment && (
+        <>
+          
+         
+          <div className="text-[12px]  ml-[2%] w-[98%] flex flex-col items-start ">
+         {/* Name  */}
+            <div className="flex items-center gap-4 w-full">
+              <span className="w-1/4 text-left">Name</span>
+              <span className="w-1 text-center">:</span>
+              <p className="w-3/4">
+                {localStorage.getItem("companyName")}
+              </p>
+            </div>
+        {/* bank  */}
+            <div className="flex items-center gap-4 w-full">
+              <span className="w-1/4 text-left">Bank</span>
+              <span className="w-1 text-center">:</span>
+              <p className="w-3/4">
+                {contractData?.bank?.bank_name}
+              </p>
+            </div>
+
+        {/* Branch  */}
+            <div className="flex items-center gap-4 w-full">
+              <span className="w-1/4 text-left">Branch</span>
+              <span className="w-1 text-center">:</span>
+              <p className="w-3/4">
+                {contractData?.bank?.bank_branch}
+              </p>
+            </div>
+            {/* Account No  */}
+            <div className="flex items-center gap-4 w-full">
+              <span className="w-1/4 text-left">Account No</span>
+              <span className="w-1 text-center">:</span>
+              <p className="w-3/4">
+               
+                {contractData?.bank?.bank_acc_no }
+
+              
+              </p>
+            </div>
+            {/* Shift Code  */}
+            <div className="flex items-center gap-4 w-full">
+              <span className="w-1/4 text-left">Shift Code</span>
+              <span className="w-1 text-center">:</span>
+              <p className="w-3/4">
+              
+                {contractData?.bank?.bank_ifsc_code}
+
+              </p>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* add extra end  */}
       <div className="border-b w-fit mt-5 text-[12px] ml-[2%]   font-semibold border-black pt-4 mb-1">
         <p>Kindly Mail your Purchase Order at the earliest.</p>
       </div>
