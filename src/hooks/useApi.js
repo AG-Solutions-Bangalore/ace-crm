@@ -225,3 +225,8 @@ export const useFetchDispatchDcNo = () => {
     createQueryConfig(["dispatchDcNo"], "/api/panel-fetch-market-dispatch-dcno")
   );
 };
+export const useFetchBank = () => {
+  return useQuery(
+    createQueryConfig(["bank"], "/api/panel-fetch-bank")
+  );
+};
