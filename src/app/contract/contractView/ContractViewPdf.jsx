@@ -3,7 +3,6 @@ import moment from "moment";
 import React from "react";
 
 const ContractViewPdf = ({ contractData, showSignature, signPdf }) => {
-
   return (
     <div className="max-w-4xl mx-auto    p-4">
       <div className=" mb-6 flex items-center   justify-between   w-full gap-5">
@@ -186,74 +185,60 @@ const ContractViewPdf = ({ contractData, showSignature, signPdf }) => {
           <p className="w-3/4">{contractData?.contract?.contract_remarks}</p>
         </div>
         {/* Shipper's Bank -- if ship_date is not avaiilbe than show remove - */}
-        {!contractData?.contract?.contract_shipment &&(
+        {!contractData?.contract?.contract_shipment && (
           <div className="flex items-center gap-4 w-full">
-          <span className="w-1/4 text-left">Shipper's Bank</span>
-          <span className="w-1 text-center">:</span>
-          <p className="w-3/4">
-            {/* {moment(contractData?.contract?.contract_ship_date).format(
+            <span className="w-1/4 text-left">Shipper's Bank</span>
+            <span className="w-1 text-center">:</span>
+            <p className="w-3/4">
+              {/* {moment(contractData?.contract?.contract_ship_date).format(
               "DD-MMM-YYYY"
             )}
             {contractData?.contract?.contract_ship_date && " - "} */}
 
-            {contractData?.contract?.contract_shipment}
-          </p>
-        </div>
+              {contractData?.contract?.contract_shipment}
+            </p>
+          </div>
         )}
-        
       </div>
 
-      {/* add extra start  */}
-      {contractData?.contract?.contract_shipment && (
+      {contractData?.contract?.contract_shipment != null && (
         <>
-        
+          <div className=" w-fit text-[12px] ml-[2%]     pt-4 mb-4">
+            <p className="font-semibold">Bank Details:</p>
+            <hr className="mt-2 border-0 h-[0.5px] bg-black" />
+          </div>
           <div className="text-[12px]  ml-[2%] w-[98%] flex flex-col items-start ">
-        {/* Name  */}
+            {/* Name  */}
             <div className="flex items-center gap-4 w-full">
-              <span className="w-1/4 text-left">Name</span>
+              <span className="w-1/4 text-left">Account Name</span>
               <span className="w-1 text-center">:</span>
-              <p className="w-3/4">
-                {localStorage.getItem("companyName")}
-              </p>
+              <p className="w-3/4">{localStorage.getItem("companyName")}</p>
             </div>
             {/* Bank  */}
             <div className="flex items-center gap-4 w-full">
               <span className="w-1/4 text-left">Bank</span>
               <span className="w-1 text-center">:</span>
-              <p className="w-3/4">
-                {contractData?.bank?.bank_name}
-              </p>
+              <p className="w-3/4">{contractData?.bank?.bank_name}</p>
             </div>
 
-           {/* Branch  */}
+            {/* Branch  */}
             <div className="flex items-center gap-4 w-full">
               <span className="w-1/4 text-left">Branch</span>
               <span className="w-1 text-center">:</span>
-              <p className="w-3/4">
-                {contractData?.bank?.bank_branch}
-              </p>
+              <p className="w-3/4">{contractData?.bank?.bank_branch}</p>
             </div>
-         {/* Account No  */}
+            {/* Account No  */}
             <div className="flex items-center gap-4 w-full">
               <span className="w-1/4 text-left">Account No</span>
               <span className="w-1 text-center">:</span>
-              <p className="w-3/4">
-               
-                {contractData?.bank?.bank_acc_no }
-
-              
-              </p>
+              <p className="w-3/4">{contractData?.bank?.bank_acc_no}</p>
             </div>
 
             {/* shift code  */}
             <div className="flex items-center gap-4 w-full">
               <span className="w-1/4 text-left">Shift Code</span>
               <span className="w-1 text-center">:</span>
-              <p className="w-3/4">
-              
-                {contractData?.bank?.bank_ifsc_code}
-
-              </p>
+              <p className="w-3/4">{contractData?.bank?.bank_ifsc_code}</p>
             </div>
           </div>
         </>
@@ -290,7 +275,13 @@ const ContractViewPdf = ({ contractData, showSignature, signPdf }) => {
           </div>
           <div className=" mr-[7%] flex flex-col border-t-2 w-[18rem]  border-black items-center">
             <p>Accepted with Co Seal </p>
-            <p>{moment(getTodayDate()).format("DD-MM-YYYY")}</p>
+            <p>
+              {contractData?.contract?.contract_date
+                ? moment(contractData?.contract?.contract_date).format(
+                    "DD-MM-YYYY"
+                  )
+                : ""}
+            </p>
           </div>
         </div>
       </div>

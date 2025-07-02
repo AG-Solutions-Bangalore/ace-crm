@@ -1214,7 +1214,7 @@ const ViewContract = () => {
   return (
     <Page>
       <div className="  flex w-full  p-2 gap-2 relative ">
-        <div className="w-[85%] border border-gray-200 rounded-lg p-1">
+        <div className="w-[80%] border border-gray-200 rounded-lg p-1">
           {showLetterhead && (
             <div className="      ">
               <img
@@ -1287,7 +1287,7 @@ const ViewContract = () => {
           </div>
         </div>
 
-        <div className="fixed w-[15%] flex flex-col right-0 bottom-10 h-[30vh] border border-gray-200   rounded-lg  p-2 ">
+        <div className="fixed w-[15%] flex flex-col right-0 bottom-5  border border-gray-200   rounded-lg  p-2 ">
           <ContractActions
             showLetterhead={showLetterhead}
             setShowLetterhead={setShowLetterhead}

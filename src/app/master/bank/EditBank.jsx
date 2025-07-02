@@ -102,7 +102,6 @@ const EditBank = ({ bankId }) => {
   const handleSubmit = async () => {
     if (
       !formData.bank_name ||
-      !formData.bank_details ||
       !formData.bank_acc_no ||
       !formData.bank_branch ||
       !formData.bank_ifsc_code ||
@@ -119,32 +118,29 @@ const EditBank = ({ bankId }) => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.put(`${BASE_URL}/api/panel-update-bank/${bankId}`, formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.put(
+        `${BASE_URL}/api/panel-update-bank/${bankId}`,
+        formData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (response?.data.code == 200) {
-    
         toast({
           title: "Success",
-          description: response.data.msg
+          description: response.data.msg,
         });
-  
-       
+
         await queryClient.invalidateQueries(["banks"]);
         setOpen(false);
       } else {
-       
         toast({
           title: "Error",
           description: response.data.msg,
           variant: "destructive",
         });
       }
-
-
-
-
     } catch (error) {
       toast({
         title: "Error",
@@ -216,6 +212,36 @@ const EditBank = ({ bankId }) => {
             </div>
 
             <div className="grid gap-2">
+              <Label htmlFor="bank_acc_no">Account No</Label>
+              <Input
+                id="bank_acc_no"
+                name="bank_acc_no"
+                value={formData.bank_acc_no}
+                onChange={handleInputChange}
+                placeholder="Enter Account No"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="bank_ifsc_code">Shift Code</Label>
+              <Input
+                id="bank_ifsc_code"
+                name="bank_ifsc_code"
+                value={formData.bank_ifsc_code}
+                onChange={handleInputChange}
+                placeholder="Enter Shift Code"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="bank_branch">Branch Name</Label>
+              <Input
+                id="bank_branch"
+                name="bank_branch"
+                value={formData.bank_branch}
+                onChange={handleInputChange}
+                placeholder="Enter Branch Name "
+              />
+            </div>
+            <div className="grid gap-2">
               <Label htmlFor="bank_details">Bank Details</Label>
               <Input
                 id="bank_details"
@@ -225,37 +251,6 @@ const EditBank = ({ bankId }) => {
                 placeholder="Enter Bank Details "
               />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="bank_acc_no">Bank A/C Details</Label>
-              <Input
-                id="bank_acc_no"
-                name="bank_acc_no"
-                value={formData.bank_acc_no}
-                onChange={handleInputChange}
-                placeholder="Enter Bank A/C Details "
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="bank_ifsc_code">Bank IFSC Code</Label>
-              <Input
-                id="bank_ifsc_code"
-                name="bank_ifsc_code"
-                value={formData.bank_ifsc_code}
-                onChange={handleInputChange}
-                placeholder="Enter Bank IFSC Code "
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="bank_branch">Bank Branch Details</Label>
-              <Input
-                id="bank_branch"
-                name="bank_branch"
-                value={formData.bank_branch}
-                onChange={handleInputChange}
-                placeholder="Enter Bank Branch Details "
-              />
-            </div>
-
             <div className="grid gap-2">
               <Label htmlFor="bank_status">Status</Label>
               <Select
