@@ -1,13 +1,15 @@
-import { useToast } from "@/hooks/use-toast";
-import React from "react";
+import { BankCreate } from "@/components/buttonIndex/ButtonComponents";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -15,18 +17,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import axios from "axios";
 import BASE_URL from "@/config/BaseUrl";
-import { Loader2, SquarePlus } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
-import { useLocation } from "react-router-dom";
 import { ButtonConfig } from "@/config/ButtonConfig";
-import { BankCreate } from "@/components/buttonIndex/ButtonComponents";
+import { useToast } from "@/hooks/use-toast";
 import { useFetchCompanys } from "@/hooks/useApi";
+import { useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import { useLocation } from "react-router-dom";
 
 const CreateBank = () => {
   const [open, setOpen] = useState(false);
@@ -64,7 +63,6 @@ const CreateBank = () => {
     if (
       !formData.branch_short ||
       !formData.bank_name ||
-      !formData.bank_details ||
       !formData.bank_acc_no ||
       !formData.bank_ifsc_code ||
       !formData.bank_branch
@@ -185,6 +183,36 @@ const CreateBank = () => {
           </div>
 
           <div className="grid gap-2">
+            <Label htmlFor="bank_acc_no">Account No</Label>
+            <Input
+              id="bank_acc_no"
+              name="bank_acc_no"
+              value={formData.bank_acc_no}
+              onChange={handleInputChange}
+              placeholder="Enter Account No"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="bank_branch">Branch Name</Label>
+            <Input
+              id="bank_branch"
+              name="bank_branch"
+              value={formData.bank_branch}
+              onChange={handleInputChange}
+              placeholder="Enter Branch Name"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="bank_ifsc_code">Shift Code</Label>
+            <Input
+              id="bank_ifsc_code"
+              name="bank_ifsc_code"
+              value={formData.bank_ifsc_code}
+              onChange={handleInputChange}
+              placeholder="Enter Shift Code"
+            />
+          </div>
+          <div className="grid gap-2">
             <Label htmlFor="bank_details">Bank Details</Label>
             <Input
               id="bank_details"
@@ -192,36 +220,6 @@ const CreateBank = () => {
               value={formData.bank_details}
               onChange={handleInputChange}
               placeholder="Enter Bank Details "
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="bank_acc_no">Bank A/C No</Label>
-            <Input
-              id="bank_acc_no"
-              name="bank_acc_no"
-              value={formData.bank_acc_no}
-              onChange={handleInputChange}
-              placeholder="Enter Bank A/C no "
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="bank_ifsc_code">Bank IFSC Code</Label>
-            <Input
-              id="bank_ifsc_code"
-              name="bank_ifsc_code"
-              value={formData.bank_ifsc_code}
-              onChange={handleInputChange}
-              placeholder="Enter Bank IFSC Code "
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="bank_branch">Bank Branch </Label>
-            <Input
-              id="bank_branch"
-              name="bank_branch"
-              value={formData.bank_branch}
-              onChange={handleInputChange}
-              placeholder="Enter Bank Branch Details "
             />
           </div>
         </div>

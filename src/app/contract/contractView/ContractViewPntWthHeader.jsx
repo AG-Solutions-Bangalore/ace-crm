@@ -200,56 +200,43 @@ const ContractViewPntWthHeader = ({ contractData, SIGN_IN_PURCHASE }) => {
       </div>
 
       {/* add extra start  */}
-      {contractData?.contract?.contract_shipment && (
+      {contractData?.contract?.contract_shipment != null && (
         <>
-          
-         
+          <div className=" w-fit text-[12px] ml-[2%]     pt-4 mb-4">
+            <p className="font-semibold">Bank Details:</p>
+            <hr className="mt-2 border-0 h-[0.5px] bg-black" />
+          </div>
           <div className="text-[12px]  ml-[2%] w-[98%] flex flex-col items-start ">
-         {/* Name  */}
+            {/* Name  */}
             <div className="flex items-center gap-4 w-full">
               <span className="w-1/4 text-left">Name</span>
               <span className="w-1 text-center">:</span>
-              <p className="w-3/4">
-                {localStorage.getItem("companyName")}
-              </p>
+              <p className="w-3/4">{localStorage.getItem("companyName")}</p>
             </div>
-        {/* bank  */}
+            {/* bank  */}
             <div className="flex items-center gap-4 w-full">
               <span className="w-1/4 text-left">Bank</span>
               <span className="w-1 text-center">:</span>
-              <p className="w-3/4">
-                {contractData?.bank?.bank_name}
-              </p>
+              <p className="w-3/4">{contractData?.bank?.bank_name}</p>
             </div>
 
-        {/* Branch  */}
+            {/* Branch  */}
             <div className="flex items-center gap-4 w-full">
               <span className="w-1/4 text-left">Branch</span>
               <span className="w-1 text-center">:</span>
-              <p className="w-3/4">
-                {contractData?.bank?.bank_branch}
-              </p>
+              <p className="w-3/4">{contractData?.bank?.bank_branch}</p>
             </div>
             {/* Account No  */}
             <div className="flex items-center gap-4 w-full">
               <span className="w-1/4 text-left">Account No</span>
               <span className="w-1 text-center">:</span>
-              <p className="w-3/4">
-               
-                {contractData?.bank?.bank_acc_no }
-
-              
-              </p>
+              <p className="w-3/4">{contractData?.bank?.bank_acc_no}</p>
             </div>
             {/* Shift Code  */}
             <div className="flex items-center gap-4 w-full">
               <span className="w-1/4 text-left">Shift Code</span>
               <span className="w-1 text-center">:</span>
-              <p className="w-3/4">
-              
-                {contractData?.bank?.bank_ifsc_code}
-
-              </p>
+              <p className="w-3/4">{contractData?.bank?.bank_ifsc_code}</p>
             </div>
           </div>
         </>
@@ -280,7 +267,11 @@ const ContractViewPntWthHeader = ({ contractData, SIGN_IN_PURCHASE }) => {
           </div>
           <div className=" mr-[7%] flex flex-col border-t-2 w-[18rem]  border-black items-center">
             <p>Accepted with Co Seal </p>
-            <p>{moment(getTodayDate()).format("DD-MM-YYYY")}</p>
+            {contractData?.contract?.contract_date
+              ? moment(contractData?.contract?.contract_date).format(
+                  "DD-MM-YYYY"
+                )
+              : ""}{" "}
           </div>
         </div>
       </div>
