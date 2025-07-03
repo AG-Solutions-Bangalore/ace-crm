@@ -78,6 +78,19 @@ const GrCodeList = () => {
       cell: ({ row }) => <div>{row.index + 1}</div>,
     },
     {
+      accessorKey: "product_name",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Product
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <div>{row.getValue("product_name")}</div>,
+    },
+    {
       accessorKey: "gr_code_des",
       header: ({ column }) => (
         <Button
