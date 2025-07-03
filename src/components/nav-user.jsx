@@ -30,6 +30,7 @@ export function NavUser({ user }) {
   const { isMobile } = useSidebar();
   const navigate = useNavigate();
   const user_position = localStorage.getItem("user_position")
+  const token = localStorage.getItem("token")
   // const handleLogout = () => {
   //   localStorage.clear();
   //   navigate("/");
@@ -39,7 +40,7 @@ export function NavUser({ user }) {
       const response = await fetch(`${BASE_URL}/api/panel-logout`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
