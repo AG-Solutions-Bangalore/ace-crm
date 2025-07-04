@@ -1036,7 +1036,8 @@ const ViewContract = () => {
     pageStyle: `
       @page {
       size: auto;
-     margin: 0mm 0mm 5mm 0mm;
+ margin: 3mm 3mm 3mm 3mm;
+        border: 0px solid black;
       
     }
     @media print {
@@ -1059,7 +1060,9 @@ const ViewContract = () => {
     pageStyle: `
       @page {
       size: auto;
-       margin: 0mm 0mm 5mm 0mm;
+     margin: 3mm 3mm 3mm 3mm;
+        border: 0px solid black;
+       
       
     }
     @media print {
@@ -1083,7 +1086,8 @@ const ViewContract = () => {
     pageStyle: `
       @page {
       size: auto;
-    margin: 0mm 0mm 5mm 0mm;
+    margin: 3mm 3mm 3mm 3mm;
+        border: 0px solid black;
       
     }
     @media print {
@@ -1107,7 +1111,8 @@ const ViewContract = () => {
     pageStyle: `
       @page {
       size: auto;
-      margin: 0mm 0mm 5mm 0mm;
+      margin: 3mm 3mm 3mm 3mm;
+        border: 0px solid black;
       
     }
     @media print {
@@ -1157,6 +1162,7 @@ const ViewContract = () => {
         alt="logo"
         className="w-full max-h-[120px] object-contain"
       />
+      <div className="print:border-t print:border-l print:border-r print:border-black">
       <h1 className="text-center text-[15px] underline font-bold mt-4">
         SALES CONTRACT
       </h1>
@@ -1170,15 +1176,17 @@ const ViewContract = () => {
           {moment(contractData?.contract?.contract_date).format("DD-MMM-YYYY")}
         </p>
       </div>
+      </div>
     </div>
   );
   const PrintWithoutHeader = () => (
     <div className="without-print-header hidden print:block">
       <div
         style={{
-          marginTop: "130px",
+          marginTop: "120px",
         }}
       >
+              <div className="print:border-t print:border-l print:border-r print:border-black ">
         <h1 className="text-center text-[15px] underline font-bold mt-4">
           SALES CONTRACT
         </h1>
@@ -1193,6 +1201,7 @@ const ViewContract = () => {
               "DD-MMM-YYYY"
             )}
           </p>
+        </div>
         </div>
       </div>
     </div>
@@ -1222,6 +1231,7 @@ const ViewContract = () => {
                 alt="logo"
                 className="w-full"
               />
+              {/* <div className="border border-blue-500"> */}
               <h1 className="text-center text-[15px] underline font-bold ">
                 SALES CONTRACT
               </h1>
@@ -1237,7 +1247,8 @@ const ViewContract = () => {
                   )}
                 </p>
               </div>
-            </div>
+              </div>
+            // </div>
           )}
 
           <div
