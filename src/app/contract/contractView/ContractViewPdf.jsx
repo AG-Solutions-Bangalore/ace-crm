@@ -4,8 +4,8 @@ import React from "react";
 
 const ContractViewPdf = ({ contractData, showSignature, signPdf }) => {
   return (
-    <div className="max-w-4xl mx-auto    p-4">
-      <div className=" mb-6 flex items-center   justify-between   w-full gap-5">
+    <div className="max-w-4xl mx-auto  print:border-l print:border-r print:border-b print:border-black   p-4">
+      <div className=" mb-2 flex items-center   justify-between   w-full gap-5">
         <div className="  w-1/2 ">
           <h2 className=" font-semibold  text-[12px]">
             Buyer: {contractData?.contract?.contract_buyer}
@@ -37,7 +37,7 @@ const ContractViewPdf = ({ contractData, showSignature, signPdf }) => {
           </div>
         </div>
       </div>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto ">
         <table className="w-full bg-white border border-gray-300 text-[12px] table-fixed">
           <tbody className="divide-y divide-gray-200">
             {contractData.contractSub.map((sub) => (
@@ -67,7 +67,7 @@ const ContractViewPdf = ({ contractData, showSignature, signPdf }) => {
           </tbody>
         </table>
       </div>
-      <div className="text-[12px] mt-4 ml-[2%] w-[98%] flex flex-col items-start ">
+      <div className="text-[12px] mt-2  ml-[2%] w-[98%] flex flex-col items-start ">
         {/* Container */}
         <div className="flex items-center gap-4 w-full">
           <span className="w-1/4 text-left">Container</span>
@@ -119,7 +119,7 @@ const ContractViewPdf = ({ contractData, showSignature, signPdf }) => {
               
                   </div>
                 </div> */}
-      <div className="text-[12px] mt-4 ml-[2%] w-[98%] flex flex-col items-start ">
+      <div className="text-[12px]  mt-2 ml-[2%] w-[98%] flex flex-col items-start ">
         {/* Shipment */}
         <div className="flex items-center gap-4 w-full">
           <span className="w-1/4 text-left">Shipment</span>
@@ -152,14 +152,14 @@ const ContractViewPdf = ({ contractData, showSignature, signPdf }) => {
         </div>
       </div>
 
-      <div className=" w-fit text-[12px] ml-[2%]     pt-4 mb-4">
+      <div className=" w-fit text-[12px] ml-[2%]   border-b border-black  pt-2 mb-2">
         <p className="font-semibold">
           In Case of Shipment via Direct Vessel by Hyundai Liners:
         </p>
         <hr className="mt-2 border-0 h-[0.5px] bg-black" />
       </div>
 
-      <div className="text-[12px] mt-4 ml-[2%] w-[98%] flex flex-col items-start ">
+      <div className="text-[12px]  ml-[2%] w-[98%] flex flex-col items-start ">
         {/* Port Of loading */}
         <div className="flex items-center gap-4 w-full">
           <span className="w-1/4 text-left">Port of Loading</span>
@@ -203,10 +203,14 @@ const ContractViewPdf = ({ contractData, showSignature, signPdf }) => {
 
       {contractData?.contract?.contract_shipment != null && (
         <>
-          <div className=" w-fit text-[12px] ml-[2%]     pt-4 mb-4">
-            <p className="font-semibold">Bank Details:</p>
-            <hr className="mt-2 border-0 h-[0.5px] bg-black" />
-          </div>
+         
+         
+      <div className=" w-fit border-b border-black  text-[12px] ml-[2%]    pt-2 mb-1">
+        <p className="font-semibold">
+     Bank Details:
+        </p>
+        <hr className="mt-2 border-0 h-[0.5px] bg-black" />
+      </div>
           <div className="text-[12px]  ml-[2%] w-[98%] flex flex-col items-start ">
             {/* Name  */}
             <div className="flex items-center gap-4 w-full">
@@ -245,21 +249,21 @@ const ContractViewPdf = ({ contractData, showSignature, signPdf }) => {
       )}
 
       {/* add extra end  */}
-      <div className=" w-fit mt-5 text-[12px] ml-[2%]    pt-4 mb-1">
+      <div className=" w-fit border-b border-black  text-[12px] ml-[2%]    pt-2 mb-1">
         <p className="font-semibold">
           Kindly Mail your Purchase Order at the earliest.
         </p>
         <hr className="mt-2 border-0 h-[0.5px] bg-black" />
       </div>
 
-      <div className="  text-[12px] ml-[2%]  w-[98%] pt-4">
+      <div className="  text-[12px] ml-[2%]  w-[98%] pt-2">
         <p>Thanks & regards,</p>
         <div className="  flex items-center justify-between">
           <p>For {contractData?.contract?.branch_name} (Seller)</p>
           <p className=" mr-[22%]">(Buyer)</p>
         </div>
       </div>
-      <div className=" relative text-[12px] ml-[2%]   w-[98%] pt-4">
+      <div className=" relative text-[12px] ml-[2%]   w-[98%] pt-2">
         <div className="  flex justify-between mt-10">
           <div className="  flex flex-col border-t-2 w-[18rem]  border-black items-center">
             <p>{contractData?.branch?.branch_sign_name}</p>
