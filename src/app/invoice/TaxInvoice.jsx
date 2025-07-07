@@ -3,9 +3,10 @@ import { decryptId } from "@/utils/encyrption/Encyrption";
 import axios from "axios";
 import { Printer } from "lucide-react";
 import moment from "moment";
+import { toWords } from "number-to-words";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import ReactToPrint, { useReactToPrint } from "react-to-print";
+import { useReactToPrint } from "react-to-print";
 const TaxInvoice = () => {
   const containerRef = useRef();
   const { id } = useParams();
@@ -31,7 +32,6 @@ const TaxInvoice = () => {
       );
 
       const data = await response.data;
-      console.log(data, "data");
       setInvoice(data?.invoice);
       setBranch(data?.branch);
       setInvoiceSubData(data?.invoiceSub);
@@ -75,6 +75,16 @@ const TaxInvoice = () => {
               }
               `,
   });
+
+  const totalAmount = invoiceSubData.reduce((total, item) => {
+    return total + (item.invoiceSub_qntyInMt * item.invoiceSub_rateMT || 0);
+  }, 0);
+
+  const dollars = Math.floor(totalAmount);
+  const cents = Math.round((totalAmount - dollars) * 100);
+  const totalInWords = `${toWords(dollars).toUpperCase()} DOLLARS AND ${
+    cents > 0 ? toWords(cents).toUpperCase() + " CENTS" : "NO CENTS"
+  }`;
   return (
     <>
       <div className="relative">
@@ -88,7 +98,7 @@ const TaxInvoice = () => {
         <div ref={containerRef} className="font-normal text-sm mt-2">
           <>
             <div className="p-4 m-[1rem] font-normal text-[11px]">
-              <div className="max-w-4xl mx-auto border-2 border-black">
+              <div className="max-w-4xl mx-auto border border-black">
                 <h3 className=" border-b border-black text-xl font-bold flex justify-center p-1">
                   TAX INVOICE
                 </h3>
@@ -111,31 +121,31 @@ const TaxInvoice = () => {
                     <div className=" text-[11px]   px-2 border-b border-black">
                       <p className="leading-relaxed mb-2">
                         <p>Consignee (Ship to)</p>
-                        <strong>{invoice?.invoice_buyer}</strong> <br />
-                        {invoice?.invoice_buyer_add}
+                        <strong>{invoice?.invoice_consignee}</strong> <br />
+                        {invoice?.invoice_consignee_add}
                         <br />
                         {/* TIRUVOTTIYUR, CHENNAI
-                        <br />
-                        <p>State Name : Tamil Nadu, Code : 33 </p> */}
+                        <br /> */}
+                        <p>State Name : Tamil Nadu, Code : 33 </p>
                       </p>
                     </div>
                     <div className=" text-[11px]  px-2">
                       <p className="leading-relaxed mb-1">
                         <p> Buyer (Bill to)</p>
-                        <strong>JL AGRI EXPORTS</strong> <br />
-                        189/9 & 189/10
+                        <strong>{invoice?.invoice_buyer}</strong> <br />
+                        {invoice?.invoice_buyer_add}
                         <br />
-                        C/O RAVI AGRI COLD STORAGE, OV ROAD VELLATUR,PONNALUR,
-                        PRAKASAM
-                        <br />
-                        <p>GSTIN/UIN : 37AASFJ5400H1Z8</p>
-                        <p> State Name : Andhra Pradesh, Code : 37</p>
+                        <span className="mr-1">GSTIN/UIN :</span>{" "}
+                        {branch?.branch_gst}
+                        <br /> <span className="mr-1">State Name :</span>{" "}
+                        {branch?.branch_state} , Code: {branch?.branch_state_no}
+                        <br />{" "}
                       </p>
                     </div>
                   </div>
-                  <div>
-                    <div className="grid  text-[11px]">
-                      <div className="grid grid-cols-2 border-b border-l border-black w-full px-1">
+                  <div className="border-l border-black">
+                    <div className="grid  text-[11px] ">
+                      <div className="grid grid-cols-2 border-b border-black w-full px-1">
                         <div className="w-full border-r border-black grid grid-cols-2 gap-2">
                           <div>
                             <h3>Invoice No.</h3>
@@ -158,83 +168,81 @@ const TaxInvoice = () => {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 border-b border-l border-black w-full px-1">
+                      <div className="grid grid-cols-2 border-b  border-black w-full px-1">
                         <div className="w-full border-r border-black">
                           <h3>Delivery Note</h3>
-                          <p>Dummy</p>
+                          <p></p>
                         </div>
                         <div className="w-full px-1">
                           <h3>Mode/Terms of Payment</h3>
-                          <p>Dummy</p>
+                          <p className="mb-4"></p>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 w-full px-1 border-l border-b border-black">
+                      <div className="grid grid-cols-2 w-full px-1  border-b border-black">
                         <div className="w-full border-r border-black">
                           <h3>Reference No. & Date.</h3>
-                          <p>Dummy</p>
+                          <p></p>
                         </div>
                         <div className="w-full px-1">
                           <h3>Other References</h3>
-                          <p>Dummy</p>
+                          <p className="mb-4"></p>
                         </div>
                       </div>
                     </div>
 
                     <div className="grid  text-[11px]">
-                      <div className="grid grid-cols-2 border-b border-l border-black w-full px-1">
+                      <div className="grid grid-cols-2 border-b  border-black w-full px-1">
                         <div className="w-full border-r border-black">
                           <h3>Buyer’s Order No. .</h3>
-                          <p className="font-semibold text-black">
-                            V3C/G155/24-25
-                          </p>
+                          <p className="mb-4 font-semibold text-black"></p>
                         </div>
                         <div className="w-full px-1">
                           <h3>Dated</h3>
-                          <p className="font-semibold text-black">5-Aug-24</p>
+                          <p className="mb-4 font-semibold text-black"></p>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 border-b border-l border-black w-full px-1">
+                      <div className="grid grid-cols-2 border-b  border-black w-full px-1">
                         <div className="w-full border-r border-black">
                           <h3>Dispatch Doc No.</h3>
-                          <p>Dummy</p>
+                          <p className="mb-4"></p>
                         </div>
                         <div className="w-full px-1">
                           <h3>Delivery Note Date</h3>
-                          <p>Dummy</p>
+                          <p className="mb-4"></p>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 w-full px-1 border-l border-b  border-black">
+                      <div className="grid grid-cols-2 w-full px-1  border-b  border-black">
                         <div className="w-full border-r border-black">
                           <h3>Dispatched through .</h3>
-                          <p>dummy</p>
+                          <p>BY SEA</p>
                         </div>
                         <div className="w-full px-1">
                           <h3>Destination</h3>
-                          <p>Dummy</p>
+                          <p>CHENNAI</p>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 w-full px-1 border-l border-b  border-black">
+                      <div className="grid grid-cols-2 w-full px-1  border-b  border-black">
                         <div className="w-full border-r border-black">
                           <h3>Bill of Lading/LR-RR No. .</h3>
-                          <p>dummy</p>
+                          <p className="mb-4"></p>
                         </div>
                         <div className="w-full px-1">
                           <h3>Motor Vehicle No.</h3>
-                          <p>Dummy</p>
+                          <p className="mb-4"></p>
                         </div>
                       </div>
 
-                      <div className="text-[11px] border-l border-black">
+                      <div className="text-[11px]  border-black">
                         <div className="w-full px-1">
                           <div className="w-full">
                             <h3>Terms of Delivery</h3>
 
                             <h3>
-                              Lorem ipsum dolor sit amet consectetur adipisicing
-                              elit. Aliquid dolorem esse possimus
+                              CIF USD {invoice?.invoice_cif} PORT{" "}
+                              {invoice?.invoice_destination_country}
                             </h3>
                           </div>
                         </div>{" "}
@@ -242,12 +250,8 @@ const TaxInvoice = () => {
                     </div>
                   </div>
                 </div>
-                {/* //second */}
-
-                {/* //third */}
 
                 <div className="grid grid-cols-2"></div>
-                {/* //fourth */}
                 <div>
                   <table className="w-full border-t border-black text-[11px]">
                     <thead>
@@ -255,13 +259,13 @@ const TaxInvoice = () => {
                         <th className="w-[5%] border-r border-black p-1 text-center">
                           S. No
                         </th>
-                        <th className="w-[10%] border-r border-black p-1 text-center">
+                        <th className="w-[15%] border-r border-black p-1 text-center">
                           Marks & Nos./Container No.
                         </th>
                         <th className="w-[10%] border-r border-black p-1 text-center">
                           No. & Kind of Pkgs
                         </th>
-                        <th className="w-[25%] border-r border-black p-1 text-center">
+                        <th className="w-[20%] border-r border-black p-1 text-center">
                           Description of Goods
                         </th>
                         <th className="w-[8%] border-r border-black p-1 text-center">
@@ -276,61 +280,47 @@ const TaxInvoice = () => {
                         <th className="w-[7%] border-r border-black p-1 text-center">
                           per
                         </th>
-                        <th className="w-[10%] p-1 text-center">Amount</th>
+                        <th className="w-[14%] p-1 text-center">Amount</th>
                       </tr>
                     </thead>
 
                     <tbody className="text-[12px]">
-                      <tr>
-                        <td className="border-r border-black p-1 text-center">
-                          1
-                        </td>
-                        <td className="border-r border-black p-1">JEAB RED</td>
-                        <td className="border-r border-black p-1 text-center">
-                          1350 BAGS
-                        </td>
-                        <td className="border-r border-black p-1 text-end font-semibold">
-                          DRY CHILLIES (TEJA WITH STEM RED
-                        </td>
-                        <td className="p-1 text-end border-r border-black">
-                          09042110
-                        </td>
-                        <td className="p-1 text-center border-r border-black">
-                          12,825.000 Kgs
-                        </td>
-                        <td className="p-1 text-center border-r border-black">
-                          120.00{" "}
-                        </td>
-                        <td className="p-1 text-center border-r border-black">
-                          Kgs
-                        </td>
-                        <td className="p-1 text-end">16,200.00</td>
-                      </tr>
-                      <tr>
-                        <td className="border-r border-black p-1 text-center">
-                          2
-                        </td>
-                        <td className="border-r border-black p-1">JEAB RED1</td>
-                        <td className="border-r border-black p-1 text-center">
-                          1250 BAGS
-                        </td>
-                        <td className="border-r border-black p-1 text-end font-semibold">
-                          DRY CHILLIES (TEJA WITH STEM REDS
-                        </td>
-                        <td className="p-1 text-end border-r border-black">
-                          09042110
-                        </td>
-                        <td className="p-1 text-center border-r border-black">
-                          12,825.000 Kgs
-                        </td>
-                        <td className="p-1 text-center border-r border-black">
-                          110.00{" "}
-                        </td>
-                        <td className="p-1 text-center border-r border-black">
-                          Kgs
-                        </td>
-                        <td className="p-1 text-end">10,240.00</td>
-                      </tr>
+                      {invoiceSubData.map((item, index) => (
+                        <tr>
+                          <td className="border-r border-black p-1 text-center">
+                            {index + 1}
+                          </td>
+                          <td className="border-r border-black p-1">
+                            {item?.invoiceSub_marking}
+                          </td>
+                          <td className="border-r border-black p-1 text-center">
+                            {item?.invoiceSub_item_bag}
+                            BAGS
+                          </td>
+                          <td className="border-r border-black p-1 text-end font-semibold">
+                            {item?.invoiceSub_descriptionofGoods}
+                          </td>
+                          <td className="p-1 text-end border-r border-black">
+                            {item?.InvoiceSubs?.item_hsn}
+                          </td>
+                          <td className="p-1 text-center border-r border-black">
+                            {item?.invoiceSub_qntyInMt} Kgs
+                          </td>
+                          <td className="p-1 text-center border-r border-black">
+                            {item?.invoiceSub_rateMT}{" "}
+                          </td>
+                          <td className="p-1 text-center border-r border-black">
+                            Kgs
+                          </td>
+                          <td className="p-1 text-end">
+                            {" "}
+                            $
+                            {(
+                              item.invoiceSub_qntyInMt * item.invoiceSub_rateMT
+                            ).toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
 
                       <tr className="border-b border-black">
                         <td className="border-r border-black p-1 text-left"></td>
@@ -344,7 +334,7 @@ const TaxInvoice = () => {
                         </td>
                         <td className="border-r text-end border-black p-1 font-bold">
                           <p></p>
-                          <p> </p>
+                          <p></p>
                         </td>
                         <td className="border-r text-left border-black p-1 font-bold">
                           <p></p>
@@ -353,12 +343,22 @@ const TaxInvoice = () => {
                         <td className="p-1 text-center border-r border-black"></td>
                         <td className="p-1 text-center border-r border-black"></td>
                         <td className=" text-end  p-1 font-bold">
-                          <p>1,458.00</p>
+                          <p>
+                            {" "}
+                            $
+                            {invoiceSubData
+                              .reduce((total, item) => {
+                                return (
+                                  total +
+                                  (item.invoiceSub_qntyInMt *
+                                    item.invoiceSub_rateMT || 0)
+                                );
+                              }, 0)
+                              .toFixed(2)}
+                          </p>
                           <p>1,258.00</p>
                         </td>{" "}
                       </tr>
-                    </tbody>
-                    <tfoot>
                       <tr className="border-b border-black">
                         <td className="border-r border-black p-2 text-left"></td>
                         <td className="border-r text-end border-black p-2 font-bold"></td>
@@ -369,7 +369,12 @@ const TaxInvoice = () => {
                         <td className="border-r text-end border-black p-2 font-bold"></td>
                         <td className="p-1 text-center border-r border-black font-bold">
                           {" "}
-                          12,825.000 Kgs
+                          $
+                          {invoiceSubData
+                            .reduce((total, item) => {
+                              return total + item.invoiceSub_qntyInMt;
+                            }, 0)
+                            .toFixed(2)}
                         </td>
                         <td className="p-1 text-center border-r border-black"></td>
                         <td className="border-r text-left border-black p-2 font-bold"></td>{" "}
@@ -377,7 +382,32 @@ const TaxInvoice = () => {
                           ₹ 19,116.00
                         </td>{" "}
                       </tr>
-                    </tfoot>
+                    </tbody>
+                    {/* <tfoot>
+                      <tr className="border-b border-black">
+                        <td className="border-r border-black p-2 text-left"></td>
+                        <td className="border-r text-end border-black p-2 font-bold"></td>
+                        <td className="border-r border-black p-2 text-center"></td>
+                        <td className="border-r border-black p-2 text-end font-semibold">
+                          Total
+                        </td>
+                        <td className="border-r text-end border-black p-2 font-bold"></td>
+                        <td className="p-1 text-center border-r border-black font-bold">
+                          {" "}
+                          $
+                          {invoiceSubData
+                            .reduce((total, item) => {
+                              return total + item.invoiceSub_qntyInMt;
+                            }, 0)
+                            .toFixed(2)}
+                        </td>
+                        <td className="p-1 text-center border-r border-black"></td>
+                        <td className="border-r text-left border-black p-2 font-bold"></td>{" "}
+                        <td className=" text-end  p-2 font-bold ">
+                          ₹ 19,116.00
+                        </td>{" "}
+                      </tr>
+                    </tfoot> */}
                   </table>
                 </div>
 
@@ -387,11 +417,9 @@ const TaxInvoice = () => {
                     <h2 className="items-start px-1">
                       Amount Chargeable (in words)
                     </h2>
+                    <p className="space-x-2">E. & O.E</p>
                   </div>
-                  <h2 className="font-bold px-1 text-sm">
-                    {" "}
-                    INR Fourteen Lakh Twelve Thousand One Hundred Sixty One Only
-                  </h2>
+                  <h2 className="font-bold px-1 text-sm"> {totalInWords}</h2>
                 </div>
                 {/* sixth */}
 

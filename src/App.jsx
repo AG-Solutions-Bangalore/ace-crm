@@ -123,7 +123,7 @@ function App() {
   return (
     <>
       <Toaster />
-      {/* <DisableRightClick /> */}
+      <DisableRightClick />
       <SessionTimeoutTracker expiryTime={time} onLogout={handleLogout} />
       <Routes>
         {/* Login Page        */}
