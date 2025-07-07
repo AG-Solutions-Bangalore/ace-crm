@@ -7,6 +7,7 @@ import InvoiceSpiceBoard from "./InvoiceSpiceBoard";
 import InvoiceApta from "./InvoiceApta";
 import InvoiceCertificateOrigin from "./InvoiceCertificateOrigin";
 import InvoiceGst from "./InvoiceGst";
+import TaxInvoice from "./TaxInvoice";
 import BuyerInvoice from "./BuyerInvoice";
 import PerfomaInvoice from "./PerfomaInvoice";
 import BlDraft from "./BlDraft";
@@ -14,10 +15,9 @@ import InvoicePytho from "./InvoicePytho";
 import InvoiceTripartite from "./InvoiceTripartite";
 import { StepBack, StepForward } from "lucide-react";
 
-
 const TABS = [
   { value: "pending", label: "Pre_Shipment", component: PreshipmentDetails },
-  { 
+  {
     value: "invoice_packing",
     label: "Invoice Packing ECGC",
     component: InvoiceView,
@@ -29,6 +29,7 @@ const TABS = [
     label: "Cer. Origin",
     component: InvoiceCertificateOrigin,
   },
+  // { value: "tax_invoice", label: "Tax Invoice", component: TaxInvoice },
   { value: "invoice_gst", label: "Invoice Gsts", component: InvoiceGst },
   { value: "tripartite", label: "Tripartite", component: InvoiceTripartite },
   { value: "bldraft", label: "Bl Draft", component: BlDraft },
@@ -39,19 +40,18 @@ const TABS = [
     component: PerfomaInvoice,
   },
   { value: "pytho", label: "Pytho", component: InvoicePytho },
- 
 ];
 
 const InvoiceTabs = () => {
   const [activeTab, setActiveTab] = useState("pending");
-  const [sidebarOpen, setSidebarOpen] = useState(true); 
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const handleTabChange = (value) => {
     setActiveTab(value);
   };
 
   const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen); 
+    setSidebarOpen(!sidebarOpen);
   };
 
   return (
@@ -85,7 +85,6 @@ const InvoiceTabs = () => {
             sidebarOpen ? "w-[15%] p-2 border border-gray-200" : "w-0 p-0"
           }`}
         >
-          
           <div className="flex flex-col h-full overflow-hidden">
             <Tabs
               value={activeTab}
@@ -93,7 +92,6 @@ const InvoiceTabs = () => {
               orientation="vertical"
               className="w-full h-full"
             >
-              
               <TabsList className="flex flex-col w-full h-full space-y-2 overflow-y-auto justify-start">
                 {TABS.map(({ value, label }) => (
                   <TabsTrigger

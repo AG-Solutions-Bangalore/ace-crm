@@ -47,6 +47,7 @@ import CreatePaymentTermC from "../master/paymentTermC/CreatePaymentTermC";
 import CreateItem from "../master/item/CreateItem";
 import CreateDescriptionGoods from "../master/descriptionGoods/CreateDescriptionGoods";
 import CreateMarking from "../master/marking/CreateMarking";
+import { encryptId } from "@/utils/encyrption/Encyrption";
 
 // Validation Schemas
 const productRowSchema = z.object({
@@ -290,9 +291,9 @@ const MemoizedProductSelect = React.memo(
 const ContractAdd = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
- const [submitLoading, setSubmitLoading] = useState(false);
-    const [saveAndViewLoading, setSaveAndViewLoading] = useState(false);
-    const [filteredBanks, setFilteredBanks] = useState([]);
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [saveAndViewLoading, setSaveAndViewLoading] = useState(false);
+  const [filteredBanks, setFilteredBanks] = useState([]);
   const [contractData, setContractData] = useState([
     {
       contractSub_marking: "",
@@ -455,11 +456,10 @@ const ContractAdd = () => {
             contract_loading: selectedCompanySort.branch_port_of_loading,
           }));
 
-          // for shipment 
-          const banksForSelectedCompany = bankData?.bank?.filter(
-            (bank) => bank.branch_short === value
-          ) || [];
-          setFilteredBanks(banksForSelectedCompany); 
+          // for shipment
+          const banksForSelectedCompany =
+            bankData?.bank?.filter((bank) => bank.branch_short === value) || [];
+          setFilteredBanks(banksForSelectedCompany);
 
           const selectedBuyer = buyerData?.buyer?.find(
             (buyer) => buyer.buyer_name === formData.contract_buyer
@@ -629,7 +629,7 @@ const ContractAdd = () => {
         ...formData,
         contract_data: processedContractData,
       });
-      const res = await  createContractMutation.mutateAsync(validatedData);
+      const res = await createContractMutation.mutateAsync(validatedData);
     } catch (error) {
       if (error instanceof z.ZodError) {
         const groupedErrors = error.errors.reduce((acc, err) => {
@@ -668,39 +668,35 @@ const ContractAdd = () => {
         description: "An unexpected error occurred",
         variant: "destructive",
       });
-    }finally{
-      setSubmitLoading(false)
+    } finally {
+      setSubmitLoading(false);
     }
   };
   const handleSaveAndView = async (e) => {
     e.preventDefault();
     setSaveAndViewLoading(true);
     try {
-    
-        const processedContractData = contractData.map((row) => ({
-            ...row,
-            contractSub_item_bag: parseFloat(row.contractSub_item_bag),
-            contractSub_qntyInMt: parseFloat(row.contractSub_qntyInMt),
-            contractSub_rateMT: parseFloat(row.contractSub_rateMT),
-            contractSub_packing: parseFloat(row.contractSub_packing),
-            contractSub_bagsize: parseFloat(row.contractSub_bagsize),
-          }));
-     
-      
-          const validatedData = contractFormSchema.parse({
-            ...formData,
-            contract_data: processedContractData,
-          });
+      const processedContractData = contractData.map((row) => ({
+        ...row,
+        contractSub_item_bag: parseFloat(row.contractSub_item_bag),
+        contractSub_qntyInMt: parseFloat(row.contractSub_qntyInMt),
+        contractSub_rateMT: parseFloat(row.contractSub_rateMT),
+        contractSub_packing: parseFloat(row.contractSub_packing),
+        contractSub_bagsize: parseFloat(row.contractSub_bagsize),
+      }));
 
-    
+      const validatedData = contractFormSchema.parse({
+        ...formData,
+        contract_data: processedContractData,
+      });
+
       const response = await createContractMutation.mutateAsync(validatedData);
 
-  
       if (response.code == 200) {
-      
-        navigate(`/view-contract/${response.latestid}`);
+        const encryptedId = encryptId(response?.latestid);
+        navigate(`/view-contract/${encodeURIComponent(encryptedId)}`);
+        // navigate(`/view-contract/${response?.latestid}`);
       } else {
-        
         toast({
           title: "Error",
           description: response.msg,
@@ -763,8 +759,12 @@ const ContractAdd = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between`}
                   >
-                    <span>Buyer <span className="text-red-500">*</span></span>
-                    <span><CreateBuyer/></span>
+                    <span>
+                      Buyer <span className="text-red-500">*</span>
+                    </span>
+                    <span>
+                      <CreateBuyer />
+                    </span>
                   </label>
                   <MemoizedSelect
                     value={formData.contract_buyer}
@@ -784,8 +784,13 @@ const ContractAdd = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between `}
                   >
-                  <span>  Consignee <span className="text-red-500">*</span></span>
-                  <span><CreateBuyer/></span>
+                    <span>
+                      {" "}
+                      Consignee <span className="text-red-500">*</span>
+                    </span>
+                    <span>
+                      <CreateBuyer />
+                    </span>
                   </label>
                   <MemoizedSelect
                     value={formData.contract_consignee}
@@ -940,8 +945,12 @@ const ContractAdd = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between `}
                   >
-                    <span>Product <span className="text-red-500">*</span></span>
-                    <span><CreateProduct/></span>
+                    <span>
+                      Product <span className="text-red-500">*</span>
+                    </span>
+                    <span>
+                      <CreateProduct />
+                    </span>
                   </label>
                   <MemoizedSelect
                     value={formData.contract_product}
@@ -961,8 +970,13 @@ const ContractAdd = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between`}
                   >
-                  <span>  Port of Loading <span className="text-red-500">*</span></span>
-                    <span><CreatePortofLoading/></span>
+                    <span>
+                      {" "}
+                      Port of Loading <span className="text-red-500">*</span>
+                    </span>
+                    <span>
+                      <CreatePortofLoading />
+                    </span>
                   </label>
                   <MemoizedSelect
                     value={formData.contract_loading}
@@ -984,8 +998,13 @@ const ContractAdd = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between`}
                   >
-                  <span>  Destination Port <span className="text-red-500">*</span></span>
-                    <span><CreateCountry/></span>
+                    <span>
+                      {" "}
+                      Destination Port <span className="text-red-500">*</span>
+                    </span>
+                    <span>
+                      <CreateCountry />
+                    </span>
                   </label>
                   <MemoizedSelect
                     value={formData.contract_destination_port}
@@ -1049,8 +1068,13 @@ const ContractAdd = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium flex items-center justify-between `}
                   >
-                   <span> Dest. Country <span className="text-red-500">*</span></span>
-                    <span><CreateCountry/></span>
+                    <span>
+                      {" "}
+                      Dest. Country <span className="text-red-500">*</span>
+                    </span>
+                    <span>
+                      <CreateCountry />
+                    </span>
                   </label>
                   <MemoizedSelect
                     value={formData.contract_destination_country}
@@ -1125,12 +1149,10 @@ const ContractAdd = () => {
                       handleSelectChange("contract_shipment", value)
                     }
                     options={
-                      filteredBanks.map(
-                        (item) => ({
-                          value: item.bank_name,
-                          label: item.bank_name,
-                        })
-                      ) || []
+                      filteredBanks.map((item) => ({
+                        value: item.bank_name,
+                        label: item.bank_name,
+                      })) || []
                     }
                     placeholder="Select Bank"
                   />
@@ -1187,7 +1209,9 @@ const ContractAdd = () => {
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium  flex items-center justify-between`}
                   >
                     <span>Payment Terms</span>
-                    <span><CreatePaymentTermC/></span>
+                    <span>
+                      <CreatePaymentTermC />
+                    </span>
                   </label>
                   <MemoizedSelect
                     className="bg-white"
@@ -1227,9 +1251,15 @@ const ContractAdd = () => {
               <div className="flex justify-between items-center mb-4">
                 <div className="flex flex-row items-center gap-8">
                   <h2 className="text-xl font-semibold">Products</h2>
-                  <span ><CreateItem/></span>
-                  <span><CreateDescriptionGoods/></span>
-                  <span><CreateMarking/></span>
+                  <span>
+                    <CreateItem />
+                  </span>
+                  <span>
+                    <CreateDescriptionGoods />
+                  </span>
+                  <span>
+                    <CreateMarking />
+                  </span>
                 </div>
               </div>
 
@@ -1475,19 +1505,15 @@ const ContractAdd = () => {
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
             disabled={submitLoading}
           >
-            {submitLoading
-              ? "Creating..."
-              : "Create & Exit"}
+            {submitLoading ? "Creating..." : "Create & Exit"}
           </Button>
           <Button
-            type="button" 
-            onClick={handleSaveAndView} 
+            type="button"
+            onClick={handleSaveAndView}
             className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center mt-2`}
             disabled={saveAndViewLoading}
           >
-            {saveAndViewLoading
-              ? "Creating..."
-              : "Create & Print"}
+            {saveAndViewLoading ? "Viewing..." : "Preview"}
           </Button>
         </div>
       </form>
