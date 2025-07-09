@@ -1,40 +1,27 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { z } from "zod";
-import { Card, CardContent } from "@/components/ui/card";
+import { ProgressBar } from "@/components/spinner/ProgressBar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import {
   Table,
-  TableHeader,
-  TableRow,
-  TableHead,
   TableBody,
   TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
-import Select from "react-select";
-import {
-  PlusCircle,
-  MinusCircle,
-  Settings2,
-  Trash2,
-  ChevronDown,
-} from "lucide-react";
-import Page from "../dashboard/page";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
-import { ProgressBar } from "@/components/spinner/ProgressBar";
-import BASE_URL from "@/config/BaseUrl";
 import { Textarea } from "@/components/ui/textarea";
-import { useCurrentYear } from "@/hooks/useCurrentYear";
+import BASE_URL from "@/config/BaseUrl";
+import { ButtonConfig } from "@/config/ButtonConfig";
+import { useToast } from "@/hooks/use-toast";
 import {
   useFetchBagsTypes,
   useFetchBuyers,
@@ -49,16 +36,22 @@ import {
   useFetchPorts,
   useFetchProduct,
 } from "@/hooks/useApi";
-import axios from "axios";
-import { ButtonConfig } from "@/config/ButtonConfig";
+import { useCurrentYear } from "@/hooks/useCurrentYear";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { ChevronDown, MinusCircle, PlusCircle, Trash2 } from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Select from "react-select";
+import { z } from "zod";
+import Page from "../dashboard/page";
 import CreateBuyer from "../master/buyer/CreateBuyer";
-import CreateProduct from "../master/product/CreateProduct";
-import CreatePortofLoading from "../master/portofLoading/CreatePortofLoading";
 import CreateCountry from "../master/country/CreateCountry";
-import CreatePaymentTermC from "../master/paymentTermC/CreatePaymentTermC";
-import CreateItem from "../master/item/CreateItem";
 import CreateDescriptionGoods from "../master/descriptionGoods/CreateDescriptionGoods";
+import CreateItem from "../master/item/CreateItem";
 import CreateMarking from "../master/marking/CreateMarking";
+import CreatePaymentTermC from "../master/paymentTermC/CreatePaymentTermC";
+import CreatePortofLoading from "../master/portofLoading/CreatePortofLoading";
+import CreateProduct from "../master/product/CreateProduct";
 
 // Validation Schemas
 const productRowSchema = z.object({
@@ -185,6 +178,21 @@ const fetchGRCode = async (value) => {
   });
 
   if (!response.ok) throw new Error("Failed to fetch GR Code data");
+
+  return response.json();
+};
+const fetchCYear = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No authentication token found");
+
+  const response = await fetch(`${BASE_URL}/api/panel-fetch-cyear`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) throw new Error("Failed to fetch Cyear data");
 
   return response.json();
 };
@@ -564,6 +572,11 @@ const InvoiceAdd = () => {
     enabled: !!formData.branch_short, // Only run the query when branch_short is selected
   });
 
+  const { data: fetchCYearData } = useQuery({
+    queryKey: ["grCode"],
+    queryFn: () => fetchCYear(),
+  });
+  console.log(fetchCYearData, "fetchCYearData");
   const { data: grcodeData } = useQuery({
     queryKey: ["grCode", formData.invoice_product],
     queryFn: () => fetchGRCode(formData.invoice_product),
@@ -653,7 +666,9 @@ const InvoiceAdd = () => {
           updatedFormData.invoice_no &&
           updatedFormData.invoice_year
         ) {
-          const invoiceRef = `${selectedCompanySort.branch_name_short}${updatedFormData.invoice_no}${updatedFormData.invoice_year}`;
+          // const invoiceRef = `${selectedCompanySort.branch_name_short}${updatedFormData.invoice_no}${updatedFormData.invoice_year}`;
+          // updatedFormData.invoice_ref = invoiceRef;
+          const invoiceRef = `${selectedCompanySort.branch_name_short}${fetchCYearData?.year?.cyear}${updatedFormData.invoice_no}`;
           updatedFormData.invoice_ref = invoiceRef;
         }
       }
@@ -739,7 +754,7 @@ const InvoiceAdd = () => {
                 (branch) => branch.branch_short === contract.branch_short
               );
               if (selectedCompanySort) {
-                const invoiceRef = `${selectedCompanySort.branch_name_short}${updatedFormDataWithContract.invoice_no}${updatedFormDataWithContract.invoice_year}`;
+                const invoiceRef = `${selectedCompanySort.branch_name_short}${fetchCYearData?.year?.cyear}${updatedFormDataWithContract.invoice_no}`;
                 updatedFormDataWithContract.invoice_ref = invoiceRef;
               }
             }
@@ -770,13 +785,19 @@ const InvoiceAdd = () => {
           if (selectedCompanySort) {
             updatedFormData.branch_name = selectedCompanySort.branch_name;
             updatedFormData.branch_address = selectedCompanySort.branch_address;
-            updatedFormData.invoice_prereceipts = selectedCompanySort.branch_prereceipts;
+            updatedFormData.invoice_prereceipts =
+              selectedCompanySort.branch_prereceipts;
 
             const selectedBuyer = buyerData?.buyer?.find(
               (buyer) => buyer.buyer_name == prev.invoice_buyer
             );
+            console.log(
+              selectedBuyer,
+              "selectedBuyer",
+              fetchCYearData?.year?.cyear
+            );
             if (selectedBuyer) {
-              const invoiceRef = `${selectedCompanySort.branch_name_short}${prev.invoice_no}${prev.invoice_year}`;
+              const invoiceRef = `${selectedCompanySort.branch_name_short}${fetchCYearData?.year?.cyear}${prev.invoice_no}`;
               updatedFormData.invoice_ref = invoiceRef;
             }
           }
@@ -822,7 +843,7 @@ const InvoiceAdd = () => {
         const newData = [...prev];
         newData[rowIndex] = {
           ...newData[rowIndex],
-          [field]:  value === null ? "" : value,
+          [field]: value === null ? "" : value,
         };
         return newData;
       });
@@ -913,8 +934,7 @@ const InvoiceAdd = () => {
         ...formData,
         invoice_data: processedContractData,
         invoice_payment_terms: formData.invoice_payment_terms || "",
-        invoice_remarks: formData.invoice_remarks || "", 
-    
+        invoice_remarks: formData.invoice_remarks || "",
       });
       const res = await createInvoiceMutation.mutateAsync(validatedData);
     } catch (error) {
@@ -935,7 +955,7 @@ const InvoiceAdd = () => {
             return `${label}: ${messages.join(", ")}`;
           }
         );
-console.log("toast",errorMessages)
+        console.log("toast", errorMessages);
         toast({
           title: "Validation Error",
           description: (
@@ -1642,7 +1662,9 @@ console.log("toast",errorMessages)
                   <span>
                     <CreateDescriptionGoods />
                   </span>
-                  <span><CreateMarking/></span>
+                  <span>
+                    <CreateMarking />
+                  </span>
                 </div>
               </div>
 
