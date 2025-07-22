@@ -14,6 +14,8 @@ import {
   File as FileDoc,
   File as FilePdf,
   Trash2,
+  Download,
+  Loader,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FaRegFilePdf, FaRegFileWord } from "react-icons/fa";
@@ -34,8 +36,10 @@ const FileList = () => {
   const { id } = useParams();
   const location = useLocation();
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [excelloading, setExcelLoading] = useState(null);
   const [deleteItemdata, setDeleteItemdata] = useState(null);
   const { toast } = useToast();
+  const token = localStorage.getItem("token");
 
   const {
     data: fetchfile,
@@ -45,7 +49,6 @@ const FileList = () => {
   } = useQuery({
     queryKey: ["file", id],
     queryFn: async () => {
-      const token = localStorage.getItem("token");
       const response = await axios.post(
         `${BASE_URL}/api/panel-fetch-file-folder`,
         { file_folder_unique: id },
@@ -62,6 +65,51 @@ const FileList = () => {
       refetch();
     }
   }, [location.state]);
+
+  const handleDownloadExcel = async (fileName, e) => {
+    e.stopPropagation();
+    try {
+      setExcelLoading(true);
+      const payload = {
+        file_folder_unique: id,
+        file_name: fileName,
+      };
+
+      const response = await axios.post(
+        `${BASE_URL}/api/panel-download-file`,
+        payload,
+        {
+          responseType: "blob",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const blob = new Blob([response.data], {
+        type: response.headers["content-type"],
+      });
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.log(error, "error");
+      toast({
+        title: "Download Failed",
+        description: "Unable to download the file.",
+        variant: "destructive",
+      });
+      setExcelLoading(false);
+    } finally {
+      setExcelLoading(false);
+    }
+  };
 
   const handleDeleteFile = (name, e) => {
     e.stopPropagation();
@@ -191,11 +239,30 @@ const FileList = () => {
                         {file.name.split(".")[0]}
                       </span>
                     </div>
-                    <Trash2
-                      className="text-gray-400 hover:text-red-500 cursor-pointer"
-                      size={18}
-                      onClick={(e) => handleDeleteFile(file.name, e)}
-                    />
+                    <div className="flex items-center gap-2">
+                      {excelloading ? (
+                        <Loader
+                          size={18}
+                          className="text-blue-500 animate-spin"
+                        />
+                      ) : (
+                        <Download
+                          size={18}
+                          className="text-gray-400 hover:text-blue-500 cursor-pointer"
+                          onClick={(e) => handleDownloadExcel(file.name, e)}
+                        />
+                      )}
+                      {/* <Download
+                        size={18}
+                        className="text-gray-400 hover:text-blue-500 cursor-pointer"
+                        onClick={(e) => handleDownloadExcel(file.name, e)}
+                      /> */}
+                      <Trash2
+                        className="text-gray-400 hover:text-red-500 cursor-pointer"
+                        size={18}
+                        onClick={(e) => handleDeleteFile(file.name, e)}
+                      />
+                    </div>
                   </div>
                 ) : (
                   <div
