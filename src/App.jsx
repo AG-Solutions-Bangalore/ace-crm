@@ -97,6 +97,7 @@ import EditUserType from "./app/UserType/EditUserType";
 import SessionTimeoutTracker from "./components/SessionTimeoutTracker/SessionTimeoutTracker";
 import BASE_URL from "./config/BaseUrl";
 import DisableRightClick from "./components/DisableRightClick/DisableRightClick";
+import FloatingMessageActions from "./components/FloatingMessageActions/FloatingMessageActions";
 
 function App() {
   const navigate = useNavigate();
@@ -123,7 +124,8 @@ function App() {
   return (
     <>
       <Toaster />
-      <DisableRightClick />
+      <FloatingMessageActions />
+      {/* <DisableRightClick /> */}
       <SessionTimeoutTracker expiryTime={time} onLogout={handleLogout} />
       <Routes>
         {/* Login Page        */}
