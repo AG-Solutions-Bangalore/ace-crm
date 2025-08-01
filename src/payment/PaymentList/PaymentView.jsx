@@ -1,14 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
-import Page from "../../app/dashboard/page";
 import { Button } from "@/components/ui/button";
+import BASE_URL, { LetterHead, LetterHeadPdf } from "@/config/BaseUrl";
+import { decryptId } from "@/utils/encyrption/Encyrption";
 import html2pdf from "html2pdf.js";
-import ReactToPrint from "react-to-print";
 import { Printer } from "lucide-react";
-import { useParams } from "react-router-dom";
 import moment from "moment";
-import BASE_URL from "@/config/BaseUrl";
+import { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
+import ReactToPrint from "react-to-print";
+import Page from "../../app/dashboard/page";
 const PaymentView = () => {
-  const [viewData, setViewData] = useState([]);
   const [paymentSub, setPaymentSub] = useState([]);
   const [invoice, setInvoice] = useState({});
   const [branch, setBranch] = useState({});
@@ -16,14 +16,13 @@ const PaymentView = () => {
 
   const containerRef = useRef();
   const { id } = useParams();
-
-  console.log(id);
+  const decryptedId = decryptId(id);
   useEffect(() => {
     const fetchContractData = async () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${BASE_URL}/api/panel-fetch-invoice-payment-by-invoiceno/${id}`,
+          `${BASE_URL}/api/panel-fetch-invoice-payment-by-invoiceno/${decryptedId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -36,7 +35,6 @@ const PaymentView = () => {
         }
 
         const data = await response.json();
-        setViewData(data.paymentSubView);
         setPaymentSub(data.paymentSub);
         setPaymentData(data.payment);
         setBranch(data.branch);
@@ -48,7 +46,7 @@ const PaymentView = () => {
     };
 
     fetchContractData();
-  }, [id]);
+  }, [decryptedId]);
   const handleSaveAsPdf = () => {
     const element = containerRef.current;
     generatePdf(element);
@@ -103,7 +101,7 @@ const PaymentView = () => {
     <Page>
       <button
         onClick={handleSaveAsPdf}
-        className="fixed bottom-10 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
+        className="fixed bottom-24 right-8 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
       >
         Save as PDF
       </button>
@@ -112,7 +110,7 @@ const PaymentView = () => {
           <Button
             variant="outline"
             size="icon"
-            className="fixed bottom-20 right-10 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
+            className="fixed bottom-36 right-8 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600"
           >
             <Printer className="h-4 w-4" />
           </Button>
@@ -139,7 +137,10 @@ const PaymentView = () => {
 
       <div ref={containerRef} className="min-h-screen font-normal ">
         <div className="max-w-4xl mx-auto p-4  text-[12px]">
-          <img  src={`/api/public/assets/images/letterHead/${branch?.branch_letter_head}`} alt="Letter Head" />
+          <img
+            src={`${LetterHeadPdf}/${branch?.branch_letter_head}`}
+            alt="Letter Head"
+          />
 
           {/* //first */}
           <div className="max-w-4xl mx-auto px-4 pt-4 grid grid-cols-12 gap-4">
