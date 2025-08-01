@@ -67,7 +67,7 @@ const contractFormSchema = z.object({
     .refine((val) => Number(val) >= 1, {
       message: "USD amount is required and must be at least 1",
     }),
-  invoiceP_irtt_no: z.string().min(1, "IRTT No is required"),
+  invoiceP_irtt_no: z.any().optional(),
   invoiceP_status: z.string().min(1, "Status is required"),
   payment_data: z.array(productRowSchema),
 });
@@ -658,7 +658,7 @@ const EditPaymentList = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                   >
-                    Irtt Number<span className="text-red-500"></span>
+                    Irtt Number
                   </label>
                   <Input
                     className="bg-white"

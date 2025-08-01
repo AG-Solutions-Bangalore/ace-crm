@@ -51,7 +51,7 @@ const contractFormSchema = z.object({
   invoiceP_dollar_rate: z.string().min(1, "Dollar Rate is required"),
   invoiceP_v_date: z.string().min(1, "Invoice Date is required"),
   invoiceP_usd_amount: z.string().min(1, "USD amount is required"),
-  invoiceP_irtt_no: z.string().min(1, "IRTT No is required"),
+  invoiceP_irtt_no: z.any().optional(),
   invoiceP_status: z.string().min(1, "Status is required"),
   payment_data: z.array(productRowSchema),
 });
@@ -506,7 +506,7 @@ const CreatePayment = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
                   >
-                    Irtt Number<span className="text-red-500"></span>
+                    Irtt Number
                   </label>
                   <Input
                     className="bg-white"
