@@ -448,12 +448,16 @@ const EditPaymentList = () => {
           sum +
           (Number(item.invoicePSub_amt_adv) || 0) +
           (Number(item.invoicePSub_amt_dp) || 0) +
-          (Number(item.invoicePSub_amt_da) || 0)
+          (Number(item.invoicePSub_amt_da) || 0) +
+          (Number(item.invoicePSub_bank_c) || 0) +
+          (Number(item.invoicePSub_discount) || 0) +
+          (Number(item.invoicePSub_shortage) || 0)
         );
       }
       return sum;
     }, 0);
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
