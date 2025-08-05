@@ -22,7 +22,8 @@ const PaymentView = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${BASE_URL}/api/panel-fetch-invoice-payment-by-invoiceno/${decryptedId}`,
+          `${BASE_URL}/api/panel-fetch-invoice-payment-by-invoiceref/${decryptedId}`,
+          // `${BASE_URL}/api/panel-fetch-invoice-payment-by-invoiceno/${decryptedId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
