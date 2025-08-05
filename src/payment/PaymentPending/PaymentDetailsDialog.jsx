@@ -30,7 +30,8 @@ const PaymentDetailsDialog = ({ isOpen, onClose, invoiceNo }) => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `${BASE_URL}/api/panel-fetch-invoice-payment-by-invoiceno/${invoiceNo}`,
+          `${BASE_URL}/api/panel-fetch-invoice-payment-by-invoiceref/${invoiceNo}`,
+          // `${BASE_URL}/api/panel-fetch-invoice-payment-by-invoiceno/${invoiceNo}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

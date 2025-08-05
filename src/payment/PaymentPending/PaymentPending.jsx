@@ -160,7 +160,7 @@ const PaymentPending = () => {
                     <Eye
                       className="h-4 w-4 cursor-pointer"
                       onClick={() => {
-                        const id = row.original.invoice_no;
+                        const id = row.original.invoice_ref;
                         handleViewClick(id);
                       }}
                     />

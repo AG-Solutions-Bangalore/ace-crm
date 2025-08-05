@@ -136,7 +136,7 @@ const PaymentClose = () => {
                     //   navigate(`/payment-view/${row.original.invoice_no}`);
                     // }}
                     onClick={() => {
-                      const encryptedId = encryptId(row.original.invoice_no);
+                      const encryptedId = encryptId(row.original.invoice_ref);
 
                       navigate(
                         `/payment-view/${encodeURIComponent(encryptedId)}`
