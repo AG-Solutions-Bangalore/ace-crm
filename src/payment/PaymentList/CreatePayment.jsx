@@ -217,7 +217,7 @@ const CreatePayment = () => {
       updatedData[rowIndex][fieldName] = value;
       setInvoiceData(updatedData);
     } else {
-      if (/^\d*$/.test(value)) {
+      if (/^\d*\.?\d*$/.test(value)) {
         const updatedData = [...invoiceData];
         updatedData[rowIndex][fieldName] = value;
         setInvoiceData(updatedData);
@@ -575,18 +575,18 @@ const CreatePayment = () => {
                     <TableHead className="text-sm font-semibold text-gray-600 py-2 px-4">
                       Remarks
                     </TableHead>
-                    <TableHead className="text-sm font-semibold text-gray-600 py-2 px-4">
+                    {/* <TableHead className="text-sm font-semibold text-gray-600 py-2 px-4">
                       Actions
-                    </TableHead>
+                    </TableHead> */}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {invoiceData.map((row, rowIndex) => (
                     <TableRow
                       key={rowIndex}
-                      className="border-t border-gray-200 hover:bg-gray-50"
+                      className="border-t border-gray-200 hover:bg-gray-50 "
                     >
-                      <TableCell className="px-4 py-2">
+                      <TableCell className="px-4 py-2 relative">
                         <Select
                           value={row.invoicePSub_inv_ref}
                           onValueChange={(value) => {
@@ -623,6 +623,18 @@ const CreatePayment = () => {
                             ))}
                           </SelectContent>
                         </Select>
+
+                        <div className="absolute top-2 left-0">
+                          <Button
+                            variant="ghost"
+                            onClick={() => removeRow(rowIndex)}
+                            disabled={invoiceData.length === 1}
+                            className="text-red-500"
+                            type="button"
+                          >
+                            <MinusCircle className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                       <TableCell className="px-4 py-2">
                         <Input
@@ -722,16 +734,8 @@ const CreatePayment = () => {
                           placeholder="Enter Remarks"
                         />
                       </TableCell>
-                      <TableCell className="px-4 py-2 text-right">
+                      {/* <TableCell className="px-4 py-2 text-right">
                         <div className="flex justify-end space-x-2">
-                          <Button
-                            type="button"
-                            onClick={addRow}
-                            className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-                          >
-                            <PlusCircle className="h-4 w-4 mr-2" />
-                            Add
-                          </Button>
                           <Button
                             variant="ghost"
                             onClick={() => removeRow(rowIndex)}
@@ -742,11 +746,21 @@ const CreatePayment = () => {
                             <MinusCircle className="h-4 w-4" />
                           </Button>
                         </div>
-                      </TableCell>
+                      </TableCell> */}
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
+              <div className="flex justify-start m-2">
+                <Button
+                  type="button"
+                  onClick={addRow}
+                  className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
+                >
+                  <PlusCircle className="h-4 w-4 mr-2" />
+                  Add
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
