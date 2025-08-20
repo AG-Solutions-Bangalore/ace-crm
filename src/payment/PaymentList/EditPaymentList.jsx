@@ -404,7 +404,7 @@ const EditPaymentList = () => {
       updatedData[rowIndex][fieldName] = e.target.value;
       setInvoiceData(updatedData);
     } else {
-      if (/^\d*$/.test(e.target.value)) {
+      if (/^\d*\.?\d*$/.test(e.target.value)) {
         const updatedData = [...invoiceData];
         updatedData[rowIndex][fieldName] = e.target.value;
         setInvoiceData(updatedData);
@@ -731,9 +731,6 @@ const EditPaymentList = () => {
                     <TableHead className="text-sm font-semibold text-gray-600 py-2 px-4">
                       Remarks
                     </TableHead>
-                    <TableHead className="text-sm font-semibold text-gray-600 py-2 px-4">
-                      <Trash2 className="w-5 h-5 text-red-500" />
-                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -744,7 +741,7 @@ const EditPaymentList = () => {
                         crossedRows.has(row.id) ? "bg-red-200   opacity-70" : ""
                       }`}
                     >
-                      <TableCell className="px-4 py-2">
+                      <TableCell className="px-4 py-2 relative">
                         {row.id ? (
                           <Input
                             className="bg-white"
@@ -795,6 +792,32 @@ const EditPaymentList = () => {
                             placeholder="Select Payment"
                           />
                         )}
+                        <div className="absolute top-2 left-0">
+                          {row.id ? (
+                            <Button
+                              variant="ghost"
+                              onClick={() => handleDeleteRow(row.id)}
+                              className={`${
+                                crossedRows.has(row.id)
+                                  ? "text-green-500"
+                                  : "text-red-500"
+                              }`}
+                              type="button"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              onClick={() => removeRow(rowIndex)}
+                              disabled={invoiceData.length === 1}
+                              className="text-red-500"
+                              type="button"
+                            >
+                              <MinusCircle className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="px-4 py-2">
                         <Input
@@ -894,46 +917,21 @@ const EditPaymentList = () => {
                           placeholder="Enter Remarks"
                         />
                       </TableCell>
-                      <TableCell className="p-2 border">
-                        {row.id ? (
-                          <Button
-                            variant="ghost"
-                            onClick={() => handleDeleteRow(row.id)}
-                            className={`${
-                              crossedRows.has(row.id)
-                                ? "text-green-500"
-                                : "text-red-500"
-                            }`}
-                            type="button"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="ghost"
-                            onClick={() => removeRow(rowIndex)}
-                            disabled={invoiceData.length === 1}
-                            className="text-red-500"
-                            type="button"
-                          >
-                            <MinusCircle className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-              <p>Total : {calculateTotalInvoiceSubAmount()}</p>
-              <div className="mt-4 flex justify-end">
+
+              <div className="mt-4 flex justify-between m-2">
                 <Button
                   type="button"
                   onClick={addRow}
                   className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
                 >
                   <PlusCircle className="h-4 w-4 mr-2" />
-                  Add Invoice
+                  Add
                 </Button>
+                <p>Total : {calculateTotalInvoiceSubAmount()}</p>
               </div>
             </div>
           </CardContent>
