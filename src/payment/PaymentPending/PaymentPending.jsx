@@ -201,7 +201,7 @@ const PaymentPending = () => {
 
   // Render loading state
   if (isLoading) {
-    return <LoaderComponent name="Payment Pending  Data" />; // ✅ Correct prop usage
+    return <LoaderComponent name="Payment Pending  Data" />; 
   }
 
   // Render error state
@@ -312,30 +312,54 @@ const PaymentPending = () => {
         </div>
 
         {/* Row selection and pagination button  */}
-        <div className="flex items-center justify-end space-x-2 py-4">
-          <div className="flex-1 text-sm text-muted-foreground">
-            Total Payment Pending : &nbsp;
-            {table.getFilteredRowModel().rows.length}
-          </div>
-          <div className="space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
+    <div className="flex items-center justify-between space-x-6 py-4">
+  <div className="flex items-center space-x-6 text-sm text-muted-foreground">
+    <div>
+      <span className="font-medium text-gray-800">Total Payment Pending:</span>{" "}
+      {table.getFilteredRowModel().rows.length}
+    </div>
+    <div>
+      <span className="font-medium text-gray-800">Total Inv USD:</span>{" "}
+      {table
+        .getFilteredRowModel()
+        .rows.reduce(
+          (sum, row) => sum + Number(row.original.invoice_i_value_usd || 0),
+          0
+        )
+        .toFixed(2)}
+    </div>
+    <div>
+      <span className="font-medium text-gray-800">Total Balance:</span>{" "}
+      {table
+        .getFilteredRowModel()
+        .rows.reduce(
+          (sum, row) => sum + Number(row.original.balance || 0),
+          0
+        )
+        .toFixed(2)}
+    </div>
+  </div>
+
+  <div className="space-x-2">
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={() => table.previousPage()}
+      disabled={!table.getCanPreviousPage()}
+    >
+      Previous
+    </Button>
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={() => table.nextPage()}
+      disabled={!table.getCanNextPage()}
+    >
+      Next
+    </Button>
+  </div>
+</div>
+
       </div>
 
       <PaymentDetailsDialog
