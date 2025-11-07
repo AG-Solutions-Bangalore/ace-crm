@@ -87,12 +87,12 @@ const PaymentView = () => {
       })
       .save();
   };
-  const totalPerEntry = paymentSub.map(
-    (item) =>
-      item.invoicePSub_amt_adv +
-      item.invoicePSub_amt_dp +
-      item.invoicePSub_amt_da
-  );
+ const totalPerEntry = paymentSub.map((item) =>
+  Number(item.invoicePSub_amt_adv || 0) +
+  Number(item.invoicePSub_amt_dp || 0) +
+  Number(item.invoicePSub_amt_da || 0)
+);
+
 
   const grandTotal = totalPerEntry.reduce((acc, val) => acc + val, 0);
   const totalPerBalance = paymentSub.map((item) => item.invoicePSub_discount);
@@ -204,6 +204,9 @@ const PaymentView = () => {
                     Adjusted Value (USD)
                   </th>
                   <th className="border border-black p-2 w-[12%]">
+                    Bank Charge
+                  </th>
+                  <th className="border border-black p-2 w-[12%]">
                     Discount / Balance
                   </th>
                   <th className="border border-black p-2 w-[26%]">Remarks</th>
@@ -226,9 +229,13 @@ const PaymentView = () => {
                       </td>
 
                       <td className="border border-black p-2">
-                        {pending.invoicePSub_amt_adv +
-                          pending.invoicePSub_amt_dp +
-                          pending.invoicePSub_amt_da}{" "}
+                    {Number(pending.invoicePSub_amt_adv || 0) +
+  Number(pending.invoicePSub_amt_dp || 0) +
+  Number(pending.invoicePSub_amt_da || 0)}
+
+                      </td>
+                      <td className="border border-black p-2">
+                        {pending.invoicePSub_bank_c}
                       </td>
                       <td className="border border-black p-2">
                         {pending.invoicePSub_discount}
@@ -241,7 +248,7 @@ const PaymentView = () => {
                 ) : (
                   <tr>
                     <td
-                      colSpan="6"
+                      colSpan="7"
                       className="border border-black p-2 text-center"
                     >
                       No data available
@@ -261,10 +268,12 @@ const PaymentView = () => {
                   <td className="border border-black p-2 text-center">
                     {grandTotal}
                   </td>
+                   <td className="border border-black p-2 text-center"></td>
                   <td className="border border-black p-2 text-center">
                     $ {grandTotalBalance}
                   </td>
 
+                 
                   <td className="border border-black p-2 text-center"></td>
                 </tr>
               </tfoot>
