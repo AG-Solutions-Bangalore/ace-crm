@@ -125,7 +125,7 @@ function App() {
     <>
       <Toaster />
       <FloatingMessageActions />
-      <DisableRightClick />
+      {/* <DisableRightClick /> */}
       <SessionTimeoutTracker expiryTime={time} onLogout={handleLogout} />
       <Routes>
         {/* Login Page        */}

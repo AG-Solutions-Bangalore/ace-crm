@@ -23,6 +23,8 @@ import {
   useFetchScheme,
   useFetchState,
 } from "@/hooks/useApi";
+import useNumericInput from "@/hooks/useNumericInput";
+import BASE_URL from "@/config/BaseUrl";
 
 // Validation Schema
 const branchFormSchema = z.object({
@@ -110,6 +112,7 @@ const createBranch = async (data) => {
 const CreateBranch = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const numericKey = useNumericInput()
   const [formData, setFormData] = useState({
     branch_short: "",
     branch_name: "",
@@ -366,6 +369,7 @@ const CreateBranch = () => {
                   value={formData.branch_state_no}
                   onChange={(e) => handleInputChange(e, "branch_state_no")}
                   placeholder="Enter state code"
+                  onKeyDown ={numericKey}
                 />
               </div>
               <div>

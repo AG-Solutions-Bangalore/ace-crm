@@ -1,21 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { motion } from "framer-motion";
 import {
   FileText,
   ClipboardCheck,
   CheckCircle,
   XCircle,
-  Loader2,
 } from "lucide-react";
 import Page from "../dashboard/page";
 import BASE_URL from "@/config/BaseUrl";
@@ -23,6 +13,10 @@ import {
   ErrorComponent,
   LoaderComponent,
 } from "@/components/LoaderComponent/LoaderComponent";
+import axios from "axios";
+
+import DashboardPolarChart from "./DashboardPolarChart"; 
+import DashboardCombinedChart from "./DashboardCombinedChart";
 
 const StatCard = ({ title, value, icon: Icon, className }) => (
   <Card className="relative overflow-hidden">
@@ -38,95 +32,154 @@ const StatCard = ({ title, value, icon: Icon, className }) => (
   </Card>
 );
 
-const EnquiryTable = ({ enquiries }) => (
-  <Card className="mt-6">
-    <CardHeader>
-      <CardTitle className="text-lg">Recent Enquiries</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader className="bg-yellow-500">
-            <TableRow>
-              <TableHead className="font-medium text-black">Customer</TableHead>
-              <TableHead className="font-medium text-black">Branch</TableHead>
-              <TableHead className="font-medium text-black">
-                Reference
-              </TableHead>
-              <TableHead className="font-medium text-black">Date</TableHead>
-              <TableHead className="font-medium text-black">Products</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {enquiries.map((enquiry, index) => (
-              <TableRow key={index} className="hover:bg-gray-50">
-                <TableCell className="font-medium">
-                  {enquiry.customer_name}
-                </TableCell>
-                <TableCell>{enquiry.branch_short}</TableCell>
-                <TableCell>{enquiry.enquiry_ref}</TableCell>
-                <TableCell>{enquiry.enquiry_date}</TableCell>
-                <TableCell>{enquiry.product_names}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    </CardContent>
-  </Card>
-);
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 const Home = () => {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["dashboard"],
-    queryFn: async () => {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${BASE_URL}/api/panel-fetch-dashboard`, {
+  const currentDates = new Date();
+  const currentYear = currentDates.getFullYear();
+  const currentMonthIndex = currentDates.getMonth();
+  const [selectedYear, setSelectedYear] = useState(String(currentYear));
+  const [selectedMonth, setSelectedMonth] = useState(months[currentMonthIndex]);
+  
+  const getYears = () => {
+    const startYear = 2025;
+    const currentYear = new Date().getFullYear();
+    const years = [];
+
+    if (currentYear < startYear) {
+      return [startYear.toString()];
+    }
+
+    for (let year = startYear; year <= currentYear; year++) {
+      years.push(year.toString());
+    }
+
+    return years;
+  };
+  
+  const years = getYears(); 
+
+  const fetchDashboardData = async () => {
+    const token = localStorage.getItem("token");
+    const year_month = `${selectedMonth} ${selectedYear}`;
+
+    const response = await axios.post(
+      `${BASE_URL}/api/panel-get-dashboard`,
+      {
+        year_month,
+      },
+      {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      });
-      if (!response.ok) throw new Error("Failed to fetch dashboard data");
-      return response.json();
-    },
+      }
+    );
+    return response.data;
+  };
+
+  const {
+    data: dashboardData,
+    isLoading: isLoadingdashboord,
+    isError: isErrordashboord,
+    refetch: refetchdashboord,
+  } = useQuery({
+    queryKey: ["dashboardData", selectedYear, selectedMonth],
+    queryFn: fetchDashboardData,
   });
 
-  if (isLoading) {
-    return <LoaderComponent name="dashboard Data" />; // ✅ Correct prop usage
+  const handleMonthYearChange = (year, month) => {
+    setSelectedYear(year);
+    setSelectedMonth(month);
+    refetchdashboord(); 
+  };
+
+  if (isLoadingdashboord) {
+    return <LoaderComponent name="dashboard Data" />; 
   }
 
-  // Render error state
-  if (isError) {
-    return <ErrorComponent message="Error Fetching dashboard  Data" />;
+  if (isErrordashboord) {
+    return <ErrorComponent message="Error Fetching dashboard Data" />;
   }
 
   return (
     <Page>
       <div className="p-6">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {/* Stat Cards */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-6">
           <StatCard
             title="Contract"
-            value={data.contract_count}
+            value={dashboardData.contract_count}
             icon={FileText}
           />
           <StatCard
             title="Invoice"
-            value={data.invoice_count}
+            value={dashboardData.invoice_count}
             icon={ClipboardCheck}
           />
-          {/* <StatCard
-            title="Confirmed"
-            value={data.confirmed_count}
+          <StatCard
+            title="Invoice Order in Hand"
+            value={dashboardData.invoice_order_in_hand}
             icon={CheckCircle}
           />
           <StatCard
-            title="Closed"
-            value={data.closed_count}
+            title="Invoice Pre Shipment"
+            value={dashboardData.invoice_pre_shipment}
             icon={XCircle}
-          /> */}
+          />
+          <StatCard
+            title="Invoice Dispatched"
+            value={dashboardData.invoice_dispatched}
+            icon={XCircle}
+          />
+          <StatCard
+            title="Invoice Stuffed"
+            value={dashboardData.invoice_stuffed}
+            icon={XCircle}
+          />
         </div>
 
-        {/* <EnquiryTable enquiries={data.enquiry} /> */}
+        <div className="mt-8">
+  <DashboardCombinedChart
+    barGraphData={dashboardData?.graph1 || []}
+    pieGraphData={dashboardData?.graph2 || []}
+    selectedYear={selectedYear}
+    selectedMonth={selectedMonth}
+    years={years}
+    handleChange={handleMonthYearChange}
+    currentYear={currentYear}
+    currentMonthIndex={currentMonthIndex}
+    isLoadingdashboord={isLoadingdashboord}
+    isErrordashboord={isErrordashboord}
+    refetchdashboord={refetchdashboord}
+  />
+</div>
+
+       
+        <div className="mt-8">
+          <DashboardPolarChart
+            title="Balance Distribution by Country"
+            graphData={dashboardData?.graph3 || []}
+            usdToInr={dashboardData?.usd_to_inr}
+            isLoadingdashboord={isLoadingdashboord}
+            isErrordashboord={isErrordashboord}
+            refetchdashboord={refetchdashboord}
+          />
+        </div>
+
+       
       </div>
     </Page>
   );
