@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
@@ -48,6 +48,19 @@ const months = [
 ];
 
 const Home = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
   const currentDates = new Date();
   const currentYear = currentDates.getFullYear();
   const currentMonthIndex = currentDates.getMonth();
@@ -116,59 +129,61 @@ const Home = () => {
 
   return (
     <Page>
-      <div className="p-6">
-        {/* Stat Cards */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-6">
+      <div className="p-3 sm:p-4 md:p-6">
+        {/* Stat Cards - Mobile responsive grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
           <StatCard
-            title="Contract"
+            title="Open Contract"
             value={dashboardData.contract_count}
             icon={FileText}
           />
           <StatCard
-            title="Invoice"
+            title="Total Invoice"
             value={dashboardData.invoice_count}
             icon={ClipboardCheck}
           />
           <StatCard
-            title="Invoice Order in Hand"
+            title="Order in Hand"
             value={dashboardData.invoice_order_in_hand}
             icon={CheckCircle}
           />
           <StatCard
-            title="Invoice Pre Shipment"
+            title="Pre Shipment"
             value={dashboardData.invoice_pre_shipment}
             icon={XCircle}
           />
           <StatCard
-            title="Invoice Dispatched"
+            title="Dispatched"
             value={dashboardData.invoice_dispatched}
             icon={XCircle}
           />
           <StatCard
-            title="Invoice Stuffed"
+            title="Stuffed"
             value={dashboardData.invoice_stuffed}
             icon={XCircle}
           />
         </div>
 
-        <div className="mt-8">
-  <DashboardCombinedChart
-    barGraphData={dashboardData?.graph1 || []}
-    pieGraphData={dashboardData?.graph2 || []}
-    selectedYear={selectedYear}
-    selectedMonth={selectedMonth}
-    years={years}
-    handleChange={handleMonthYearChange}
-    currentYear={currentYear}
-    currentMonthIndex={currentMonthIndex}
-    isLoadingdashboord={isLoadingdashboord}
-    isErrordashboord={isErrordashboord}
-    refetchdashboord={refetchdashboord}
-  />
-</div>
-
+        {/* Combined Chart - Added responsive margin */}
+        <div className="mt-4 sm:mt-6 md:mt-8">
+          <DashboardCombinedChart
+            barGraphData={dashboardData?.graph1 || []}
+            pieGraphData={dashboardData?.graph2 || []}
+            selectedYear={selectedYear}
+            selectedMonth={selectedMonth}
+            years={years}
+            handleChange={handleMonthYearChange}
+            currentYear={currentYear}
+            currentMonthIndex={currentMonthIndex}
+            isLoadingdashboord={isLoadingdashboord}
+            isErrordashboord={isErrordashboord}
+            refetchdashboord={refetchdashboord}
+            isMobile={isMobile}
+          />
+        </div>
        
-        <div className="mt-8">
+        {/* Polar Chart - Added responsive margin */}
+        <div className="mt-4 sm:mt-6 md:mt-8">
           <DashboardPolarChart
             title="Balance Distribution by Country"
             graphData={dashboardData?.graph3 || []}
@@ -176,10 +191,9 @@ const Home = () => {
             isLoadingdashboord={isLoadingdashboord}
             isErrordashboord={isErrordashboord}
             refetchdashboord={refetchdashboord}
+            isMobile={isMobile}
           />
         </div>
-
-       
       </div>
     </Page>
   );
