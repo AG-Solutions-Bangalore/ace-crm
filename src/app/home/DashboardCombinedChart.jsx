@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Bar, Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -92,7 +92,24 @@ const DashboardCombinedChart = ({
   isLoadingdashboord,
   isErrordashboord,
   refetchdashboord,
+  isMobile: parentIsMobile,
 }) => {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  // Use parent isMobile if provided, otherwise use local state
+  const mobileView = parentIsMobile !== undefined ? parentIsMobile : isMobile;
+
   // Initialize years if not provided
   const availableYears = years || getYears();
   const currentDates = new Date();
@@ -135,96 +152,111 @@ const DashboardCombinedChart = ({
     ],
   };
 
-  const barChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "top",
-        labels: {
-          usePointStyle: true,
-          padding: 10,
-          font: {
-            size: 11,
+  // Create bar chart options with responsive settings
+  const getBarChartOptions = () => {
+    const isSmallScreen = window.innerWidth < 640;
+    const isMediumScreen = window.innerWidth < 1024;
+    
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: {
+        padding: {
+          left: isSmallScreen ? 5 : 10,
+          right: isSmallScreen ? 5 : 10,
+          top: 10,
+          bottom: isSmallScreen ? 30 : 20,
+        }
+      },
+      plugins: {
+        legend: {
+          position: "top",
+          labels: {
+            usePointStyle: true,
+            padding: 10,
+            font: {
+              size: isSmallScreen ? 10 : 11,
+            },
+            boxWidth: isSmallScreen ? 8 : 10,
+          },
+        },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              return `${context.dataset.label}: $${context.parsed.y.toLocaleString()}`;
+            },
           },
         },
       },
-      tooltip: {
-        callbacks: {
-          label: function (context) {
-            return `${context.dataset.label}: $${context.parsed.y.toLocaleString()}`;
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: !isSmallScreen,
+            text: "Total Value ($)",
+            font: {
+              size: isSmallScreen ? 10 : 12,
+              weight: "bold",
+            },
           },
+          ticks: {
+            callback: function (value) {
+              if (value >= 1000) return "$" + (value / 1000).toFixed(1) + "k";
+              return "$" + value;
+            },
+            font: {
+              size: isSmallScreen ? 9 : 10,
+            },
+            maxTicksLimit: isSmallScreen ? 5 : 8,
+          },
+          grid: {
+            drawBorder: false,
+          },
+        },
+        x: {
+          title: {
+            display: !isSmallScreen,
+            text: "Destination Country",
+            font: {
+              size: isSmallScreen ? 10 : 12,
+              weight: "bold",
+            },
+          },
+          ticks: {
+            font: {
+              size: isSmallScreen ? 9 : 10,
+            },
+            maxRotation: isSmallScreen ? 90 : 45,
+            minRotation: isSmallScreen ? 90 : 45,
+            autoSkip: true,
+            maxTicksLimit: isSmallScreen ? Math.min(5, barLabels.length) : 
+                         isMediumScreen ? Math.min(8, barLabels.length) : 
+                         Math.min(12, barLabels.length),
+            padding: isSmallScreen ? 2 : 5,
+          },
+          grid: {
+            display: false,
+          },
+          barPercentage: isSmallScreen ? 0.5 : isMediumScreen ? 0.7 : 0.8,
+          categoryPercentage: isSmallScreen ? 0.6 : isMediumScreen ? 0.8 : 0.9,
         },
       },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: "Total Value ($)",
-          font: {
-            size: 12,
-            weight: "bold",
-          },
-        },
-        ticks: {
-          callback: function (value) {
-            if (value >= 1000) return "$" + (value / 1000).toFixed(1) + "k";
-            return "$" + value;
-          },
-          font: {
-            size: 10,
-          },
-        },
-        grid: {
-          drawBorder: false,
-        },
+      animation: {
+        duration: 1000,
+        easing: "easeInOutQuart",
       },
-      x: {
-        title: {
-          display: true,
-          text: "Destination Country",
-          font: {
-            size: 12,
-            weight: "bold",
-          },
-        },
-        ticks: {
-          font: {
-            size: 10,
-          },
-          maxRotation: 45,
-        },
-        grid: {
-          display: false,
-        },
-      },
-    },
-    animation: {
-      duration: 1000,
-      easing: "easeInOutQuart",
-    },
+    };
   };
 
   // Prepare Pie Chart data
   const pieTotalValue = pieData.reduce((sum, item) => sum + item.total_value, 0);
   const pieLabels = pieData.map((d) => d.product);
   const pieValues = pieData.map((d) => d.total_value);
-  const piePercentages = pieValues.map(value => ((value / pieTotalValue) * 100).toFixed(1));
 
   // Color palette for pie chart
   const pieBackgroundColors = [
-    '#FF6384', // Red
-    '#36A2EB', // Blue
-    '#FFCE56', // Yellow
-    '#4BC0C0', // Teal
-    '#9966FF', // Purple
-    '#FF9F40', // Orange
-    '#8AC926', // Green
-    '#1982C4', // Dark Blue
-    '#6A4C93', // Dark Purple
-    '#FF595E', // Bright Red
+    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+    '#FF9F40', '#8AC926', '#1982C4', '#6A4C93', '#FF595E',
   ];
 
   const pieChartData = {
@@ -243,17 +275,17 @@ const DashboardCombinedChart = ({
   const pieChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    cutout: '55%',
+    cutout: mobileView ? '60%' : '55%',
     plugins: {
       legend: {
-        display: false, // Hide default legend for compact view
+        display: false,
       },
       tooltip: {
         callbacks: {
           label: function (context) {
             const label = context.label || '';
             const value = context.raw || 0;
-            const percentage = ((value / pieTotalValue) * 100).toFixed(1);
+            const percentage = pieTotalValue > 0 ? ((value / pieTotalValue) * 100).toFixed(1) : '0.0';
             return `${label}: $${value.toLocaleString()} (${percentage}%)`;
           },
         },
@@ -266,46 +298,48 @@ const DashboardCombinedChart = ({
   const hasAnyData = hasBarData || hasPieData;
 
   return (
-    <div className="border ">
-      <CardHeader className="bg-gradient-to-r from-blue-50 to-green-50 p-2">
-        <div className="flex flex-col md:flex-row items-center md:justify-between mb-2 space-y-3 md:space-y-0">
-          <div>
-            <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5 text-blue-600" />
-                  <span className="text-lg">Invoice Analytics</span>
+    <div className="border overflow-hidden rounded-lg w-full max-w-full">
+      <CardHeader className="bg-gradient-to-r from-blue-50 to-green-50" style={{ padding: mobileView ? '0.75rem' : '1.5rem' }}>
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between" style={{ gap: '0.75rem' }}>
+          <div className="flex-1 min-w-0">
+            <CardTitle className="font-bold text-gray-800" style={{ fontSize: mobileView ? '1.125rem' : '1.25rem' }}>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center flex-wrap" style={{ gap: mobileView ? '0.5rem' : '1rem' }}>
+                <div className="flex items-center" style={{ gap: '0.5rem' }}>
+                  <BarChart3 className="text-blue-600" style={{ height: mobileView ? '1rem' : '1.25rem', width: mobileView ? '1rem' : '1.25rem' }} />
+                  <span style={{ fontSize: mobileView ? '0.875rem' : '1rem' }}>Invoice Analytics</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <PieChart className="h-5 w-5 text-green-600" />
-                  <span className="text-lg">Product Distribution</span>
+                <div className="flex items-center" style={{ gap: '0.5rem' }}>
+                  <PieChart className="text-green-600" style={{ height: mobileView ? '1rem' : '1.25rem', width: mobileView ? '1rem' : '1.25rem' }} />
+                  <span style={{ fontSize: mobileView ? '0.875rem' : '1rem' }}>Product Distribution</span>
                 </div>
               </div>
             </CardTitle>
-            <p className="text-sm text-gray-600 mt-2">
+            <p className="text-gray-600" style={{ fontSize: mobileView ? '0.75rem' : '0.875rem', marginTop: '0.25rem' }}>
               Combined view of invoice values by destination country and product distribution
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row w-full lg:w-auto" style={{ gap: '0.5rem' }}>
             {/* Year Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="outline" 
-                  className="w-full sm:w-32 justify-between bg-white hover:bg-gray-50 text-sm"
-                  size="sm"
+                  className="justify-between bg-white hover:bg-gray-50"
+                  size={mobileView ? "sm" : "default"}
+                  style={{ width: mobileView ? '100%' : '8rem', fontSize: mobileView ? '0.75rem' : '0.875rem' }}
                 >
                   <span className="truncate">{defaultYear}</span>
-                  <ChevronDown className="ml-2 h-4 w-4" />
+                  <ChevronDown style={{ marginLeft: '0.5rem', height: mobileView ? '0.75rem' : '1rem', width: mobileView ? '0.75rem' : '1rem' }} />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="max-h-60 overflow-y-auto" align="end">
+              <DropdownMenuContent className="overflow-y-auto w-[--radix-dropdown-menu-trigger-width]" align="end" style={{ maxHeight: '15rem' }}>
                 {availableYears.map((year) => (
                   <DropdownMenuItem
                     key={year}
                     onSelect={() => handleChange?.(year, defaultMonth)}
-                    className="cursor-pointer text-sm"
+                    className="cursor-pointer"
+                    style={{ fontSize: mobileView ? '0.75rem' : '0.875rem' }}
                   >
                     {year}
                   </DropdownMenuItem>
@@ -318,14 +352,15 @@ const DashboardCombinedChart = ({
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="outline" 
-                  className="w-full sm:w-36 justify-between bg-white hover:bg-gray-50 text-sm"
-                  size="sm"
+                  className="justify-between bg-white hover:bg-gray-50"
+                  size={mobileView ? "sm" : "default"}
+                  style={{ width: mobileView ? '100%' : '9rem', fontSize: mobileView ? '0.75rem' : '0.875rem' }}
                 >
                   <span className="truncate">{defaultMonth}</span>
-                  <ChevronDown className="ml-2 h-4 w-4" />
+                  <ChevronDown style={{ marginLeft: '0.5rem', height: mobileView ? '0.75rem' : '1rem', width: mobileView ? '0.75rem' : '1rem' }} />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="max-h-60 overflow-y-auto" align="end">
+              <DropdownMenuContent className="overflow-y-auto w-[--radix-dropdown-menu-trigger-width]" align="end" style={{ maxHeight: '15rem' }}>
                 {months.map((month, index) => {
                   const isDisabled =
                     Number(defaultYear) === currentYearValue &&
@@ -335,7 +370,8 @@ const DashboardCombinedChart = ({
                       key={month}
                       disabled={isDisabled}
                       onSelect={() => handleChange?.(defaultYear, month)}
-                      className={`cursor-pointer text-sm ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                      className={`cursor-pointer ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                      style={{ fontSize: mobileView ? '0.75rem' : '0.875rem' }}
                     >
                       {month}
                     </DropdownMenuItem>
@@ -347,57 +383,65 @@ const DashboardCombinedChart = ({
         </div>
       </CardHeader>
 
-      <CardContent className="p-4">
+      <CardContent style={{ padding: mobileView ? '0.5rem' : '1.5rem' }}>
         {isLoadingdashboord ? (
-          <div className="flex items-center justify-center min-h-[400px]">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+          <div className="flex items-center justify-center" style={{ minHeight: mobileView ? '18.75rem' : '25rem' }}>
+            <Loader2 className="animate-spin text-blue-500" style={{ height: mobileView ? '1.5rem' : '2rem', width: mobileView ? '1.5rem' : '2rem' }} />
           </div>
         ) : isErrordashboord ? (
-          <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4 p-8">
+          <div className="flex flex-col items-center justify-center" style={{ minHeight: mobileView ? '18.75rem' : '25rem', gap: mobileView ? '0.75rem' : '1rem', padding: mobileView ? '1rem' : '2rem' }}>
             <div className="text-red-500 text-center">
-              <p className="text-lg font-semibold mb-2">Failed to load data</p>
-              <p className="text-sm text-gray-600">
+              <p className="font-semibold" style={{ fontSize: mobileView ? '1rem' : '1.125rem', marginBottom: '0.5rem' }}>Failed to load data</p>
+              <p className="text-gray-600" style={{ fontSize: mobileView ? '0.75rem' : '0.875rem' }}>
                 Please check your connection and try again
               </p>
             </div>
             <Button 
               onClick={refetchdashboord} 
               variant="outline"
+              size={mobileView ? "sm" : "default"}
               className="border-blue-500 text-blue-600 hover:bg-blue-50"
+              style={{ fontSize: mobileView ? '0.75rem' : '0.875rem' }}
             >
               Retry Loading Data
             </Button>
           </div>
         ) : hasAnyData ? (
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Bar Chart Section - Left 50% */}
-            <div className="lg:w-1/2">
-              <div className="border rounded-lg p-4 h-full">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5 text-blue-600" />
-                    Invoice Value by Destination Country
+          <div className="flex flex-col lg:flex-row w-full max-w-full" style={{ gap: mobileView ? '0.75rem' : '1.5rem' }}>
+            {/* Bar Chart Section */}
+            <div className="w-full lg:w-1/2 min-w-0">
+              <div className="border rounded-lg h-full overflow-hidden" style={{ padding: mobileView ? '0.5rem' : '1rem' }}>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between" style={{ marginBottom: mobileView ? '0.75rem' : '1rem', gap: '0.5rem' }}>
+                  <h3 className="font-semibold text-gray-800 flex items-center min-w-0" style={{ fontSize: mobileView ? '0.875rem' : '1.125rem', gap: '0.5rem' }}>
+                    <BarChart3 className="text-blue-600 flex-shrink-0" style={{ height: mobileView ? '0.875rem' : '1.25rem', width: mobileView ? '0.875rem' : '1.25rem' }} />
+                    <span className="truncate">Invoice Value by Country</span>
                   </h3>
                   {hasBarData && (
-                    <div className="text-sm text-gray-500">
+                    <div className="text-gray-500 flex-shrink-0" style={{ fontSize: mobileView ? '0.75rem' : '0.875rem' }}>
                       Total: ${barValues.reduce((a, b) => a + b, 0).toLocaleString()}
                     </div>
                   )}
                 </div>
                 
                 {hasBarData ? (
-                  <div className="h-[300px]">
-                    <Bar data={barChartData} options={barChartOptions} />
+                  <div className="w-full overflow-hidden" style={{ height: mobileView ? '15.625rem' : '21.875rem' }}>
+                    <div className="w-full h-full">
+                      <Bar 
+                        data={barChartData} 
+                        options={getBarChartOptions()} 
+                        redraw={true}
+                      />
+                    </div>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-[300px] space-y-3 p-4">
+                  <div className="flex flex-col items-center justify-center" style={{ height: mobileView ? '15.625rem' : '18.75rem', gap: mobileView ? '0.5rem' : '0.75rem', padding: '1rem' }}>
                     <div className="text-gray-400">
-                      <BarChart3 className="h-12 w-12 mx-auto" />
+                      <BarChart3 className="mx-auto" style={{ height: mobileView ? '2.5rem' : '3rem', width: mobileView ? '2.5rem' : '3rem' }} />
                     </div>
-                    <h3 className="text-base font-semibold text-gray-700">
+                    <h3 className="font-semibold text-gray-700" style={{ fontSize: mobileView ? '0.875rem' : '1rem' }}>
                       No Country Data
                     </h3>
-                    <p className="text-sm text-gray-500 text-center">
+                    <p className="text-gray-500 text-center" style={{ fontSize: mobileView ? '0.75rem' : '0.875rem' }}>
                       No invoice data by destination country for selected period
                     </p>
                   </div>
@@ -405,69 +449,38 @@ const DashboardCombinedChart = ({
               </div>
             </div>
 
-            {/* Pie Chart Section - Right 50% */}
-            <div className="lg:w-1/2">
-              <div className="border rounded-lg p-4 h-full">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                    <PieChart className="h-5 w-5 text-green-600" />
-                    Invoice Value by Product
+            {/* Pie Chart Section */}
+            <div className="w-full lg:w-1/2 min-w-0" style={{ marginTop: mobileView ? '1rem' : '0' }}>
+              <div className="border rounded-lg h-full" style={{ padding: mobileView ? '0.5rem' : '1rem' }}>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between" style={{ marginBottom: mobileView ? '0.75rem' : '1rem', gap: '0.5rem' }}>
+                  <h3 className="font-semibold text-gray-800 flex items-center min-w-0" style={{ fontSize: mobileView ? '0.875rem' : '1.125rem', gap: '0.5rem' }}>
+                    <PieChart className="text-green-600 flex-shrink-0" style={{ height: mobileView ? '0.875rem' : '1.25rem', width: mobileView ? '0.875rem' : '1.25rem' }} />
+                    <span className="truncate">Invoice Value by Product</span>
                   </h3>
                   {hasPieData && (
-                    <div className="text-sm text-gray-500">
+                    <div className="text-gray-500 flex-shrink-0" style={{ fontSize: mobileView ? '0.75rem' : '0.875rem' }}>
                       Total: ${pieTotalValue.toLocaleString()}
                     </div>
                   )}
                 </div>
                 
                 {hasPieData ? (
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <div className="md:w-1/2 h-[250px]">
+                  <div className="flex flex-row items-center justify-center " style={{ gap: mobileView ? '0.75rem' : '1rem' }}>
+                    {/* Chart Container */}
+                    <div className="w-full lg:w-[80%]" style={{ height: mobileView ? '12.5rem' : '17.5rem' }}>
                       <Doughnut data={pieChartData} options={pieChartOptions} />
                     </div>
-                    <div className="md:w-1/2">
-                      <div className="bg-gray-50 p-3 rounded-lg h-full max-h-[250px] overflow-y-auto">
-                        <h4 className="text-sm font-semibold text-gray-700 mb-3">
-                          Product Breakdown
-                        </h4>
-                        <div className="space-y-2">
-                          {pieData.map((item, index) => {
-                            const percentage = ((item.total_value / pieTotalValue) * 100).toFixed(1);
-                            return (
-                              <div key={index} className="flex items-center justify-between p-2 hover:bg-white rounded text-sm">
-                                <div className="flex items-center truncate">
-                                  <div 
-                                    className="w-3 h-3 rounded-full mr-2 flex-shrink-0" 
-                                    style={{ backgroundColor: pieBackgroundColors[index % pieBackgroundColors.length] }}
-                                  />
-                                  <span className="truncate font-medium text-gray-700">
-                                    {item.product}
-                                  </span>
-                                </div>
-                                <div className="text-right flex-shrink-0 ml-2">
-                                  <div className="font-bold text-gray-800">
-                                    ${item.total_value.toLocaleString()}
-                                  </div>
-                                  <div className="text-xs text-gray-500">
-                                    {percentage}%
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
+             
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-[300px] space-y-3 p-4">
+                  <div className="flex flex-col items-center justify-center" style={{ height: mobileView ? '15.625rem' : '18.75rem', gap: mobileView ? '0.5rem' : '0.75rem', padding: '1rem' }}>
                     <div className="text-gray-400">
-                      <PieChart className="h-12 w-12 mx-auto" />
+                      <PieChart className="mx-auto" style={{ height: mobileView ? '2.5rem' : '3rem', width: mobileView ? '2.5rem' : '3rem' }} />
                     </div>
-                    <h3 className="text-base font-semibold text-gray-700">
+                    <h3 className="font-semibold text-gray-700" style={{ fontSize: mobileView ? '0.875rem' : '1rem' }}>
                       No Product Data
                     </h3>
-                    <p className="text-sm text-gray-500 text-center">
+                    <p className="text-gray-500 text-center" style={{ fontSize: mobileView ? '0.75rem' : '0.875rem' }}>
                       No invoice data by product for selected period
                     </p>
                   </div>
@@ -476,25 +489,27 @@ const DashboardCombinedChart = ({
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4 p-8">
+          <div className="flex flex-col items-center justify-center" style={{ minHeight: mobileView ? '18.75rem' : '25rem', gap: mobileView ? '0.75rem' : '1rem', padding: mobileView ? '1rem' : '2rem' }}>
             <div className="text-center">
-              <div className="text-gray-400 mb-2">
-                <div className="flex justify-center gap-4">
-                  <BarChart3 className="w-12 h-12" />
-                  <PieChart className="w-12 h-12" />
+              <div className="text-gray-400" style={{ marginBottom: mobileView ? '0.5rem' : '0.75rem' }}>
+                <div className="flex justify-center" style={{ gap: mobileView ? '0.75rem' : '1rem' }}>
+                  <BarChart3 style={{ width: mobileView ? '2.5rem' : '3rem', height: mobileView ? '2.5rem' : '3rem' }} />
+                  <PieChart style={{ width: mobileView ? '2.5rem' : '3rem', height: mobileView ? '2.5rem' : '3rem' }} />
                 </div>
               </div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-1">
+              <h3 className="font-semibold text-gray-700" style={{ fontSize: mobileView ? '1rem' : '1.125rem', marginBottom: '0.25rem' }}>
                 No Data Available
               </h3>
-              <p className="text-sm text-gray-500">
+              <p className="text-gray-500" style={{ fontSize: mobileView ? '0.75rem' : '0.875rem' }}>
                 There's no invoice data to display for the selected period
               </p>
             </div>
             <Button 
               onClick={refetchdashboord} 
               variant="outline"
+              size={mobileView ? "sm" : "default"}
               className="border-blue-500 text-blue-600 hover:bg-blue-50"
+              style={{ fontSize: mobileView ? '0.75rem' : '0.875rem' }}
             >
               Refresh Data
             </Button>
