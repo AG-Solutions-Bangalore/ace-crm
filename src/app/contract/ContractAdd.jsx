@@ -443,7 +443,18 @@ const ContractAdd = () => {
           }));
         }
       }
-
+      if (field === "contract_destination_port") {
+        const selectedCountry = portsData?.country?.find(
+          (country) => country.country_port === value
+        );
+        setFormData((prev) => ({
+          ...prev,
+          contract_discharge: value,
+          contract_cif: value,
+          contract_destination_country: selectedCountry?.country_name || value,
+        }));
+      }
+      
       if (field === "branch_short") {
         const selectedCompanySort = branchData?.branch?.find(
           (branch) => branch.branch_short === value
@@ -595,7 +606,7 @@ const ContractAdd = () => {
     contract_discharge: "Discharge",
     contract_cif: "CIF",
     contract_destination_country: "Dest. Country",
-    contract_shipment: "Shipment",
+    contract_shipment: "Bank",
     contract_ship_date: "Shipment Date",
     contract_specification1: "Specification 1",
     contract_specification2: "Specification 2",
@@ -1133,7 +1144,7 @@ const ContractAdd = () => {
                   <label
                     className={`block  ${ButtonConfig.cardLabel} text-xs mb-[2px] font-medium `}
                   >
-                    Shipment
+                    Bank
                   </label>
                   {/* <Input
                     className="bg-white"

@@ -52,6 +52,7 @@ import CreateMarking from "../master/marking/CreateMarking";
 import CreatePaymentTermC from "../master/paymentTermC/CreatePaymentTermC";
 import CreatePortofLoading from "../master/portofLoading/CreatePortofLoading";
 import CreateProduct from "../master/product/CreateProduct";
+import { encryptId } from "@/utils/encyrption/Encyrption";
 
 // Validation Schemas
 const productRowSchema = z.object({
@@ -94,8 +95,7 @@ const contractFormSchema = z.object({
   invoice_cif: z.string().min(1, "CIF is required"),
   invoice_destination_country: z.string().min(1, "Dest. Country is required"),
 
-  invoice_payment_terms: z.string().optional(),
-  invoice_remarks: z.string().optional(),
+
   invoice_consig_bank: z.string().optional(),
   invoice_consig_bank_address: z.string().optional(),
   invoice_prereceipts: z.string().min(1, "Pre Receipt is required"),
@@ -110,22 +110,7 @@ const contractFormSchema = z.object({
     .min(1, "At least one product is required"),
 });
 
-// API functions
 
-const fetchDefaultSetting = async () => {
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("No authentication token found");
-
-  const response = await fetch(`${BASE_URL}/api/panel-fetch-default-setting`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) throw new Error("Failed to fetch Product no data");
-  return response.json();
-};
 
 const fetchLUT = async (value) => {
   if (!value) {
@@ -559,7 +544,7 @@ const InvoiceAdd = () => {
   // });
 
   const { data: lutData } = useQuery({
-    queryKey: ["lut", formData.branch_short], // Include branch_short as a dependency
+    queryKey: ["lut", formData.branch_short], 
     queryFn: () => {
       const selectedBranch = branchData?.branch?.find(
         (branch) => branch.branch_short === formData.branch_short
@@ -569,14 +554,14 @@ const InvoiceAdd = () => {
       }
       return null;
     },
-    enabled: !!formData.branch_short, // Only run the query when branch_short is selected
+    enabled: !!formData.branch_short, 
   });
 
   const { data: fetchCYearData } = useQuery({
-    queryKey: ["grCode"],
+    queryKey: ["fetchcyear"],
     queryFn: () => fetchCYear(),
   });
-  console.log(fetchCYearData, "fetchCYearData");
+ 
   const { data: grcodeData } = useQuery({
     queryKey: ["grCode", formData.invoice_product],
     queryFn: () => fetchGRCode(formData.invoice_product),
@@ -743,7 +728,7 @@ const InvoiceAdd = () => {
               invoice_gr_code: contract.contract_gr_code,
               invoice_lut_code: contract.contract_lut_code,
               invoice_prereceipts: contract.contract_prereceipts,
-              invoice_no: contract.contract_no.toString(),
+           
             };
             if (
               contract.branch_short &&
@@ -933,8 +918,8 @@ const InvoiceAdd = () => {
       const validatedData = contractFormSchema.parse({
         ...formData,
         invoice_data: processedContractData,
-        invoice_payment_terms: formData.invoice_payment_terms || "",
-        invoice_remarks: formData.invoice_remarks || "",
+        // invoice_payment_terms: formData.invoice_payment_terms || "",
+        // invoice_remarks: formData.invoice_remarks || "",
       });
       const res = await createInvoiceMutation.mutateAsync(validatedData);
     } catch (error) {
@@ -1002,7 +987,8 @@ const InvoiceAdd = () => {
       const response = await createInvoiceMutation.mutateAsync(validatedData);
 
       if (response.code == 200) {
-        navigate(`/view-invoice/${response.latestid}`);
+      
+        navigate(`/view-invoice/${encodeURIComponent(encryptId(response.latestid))}`);
       } else {
         toast({
           title: "Error",
@@ -1064,7 +1050,7 @@ const InvoiceAdd = () => {
 
         <Card className={`mb-6 ${ButtonConfig.cardColor}`}>
           <CardContent className="p-6">
-            {/* Basic Details Section */}
+
             <div className="mb-3">
               <div className="grid grid-cols-5 gap-6">
                 <div>
@@ -1073,7 +1059,7 @@ const InvoiceAdd = () => {
                   >
                     Contract Ref. <span className="text-red-500">*</span>
                   </label>
-                  {/* this is just for show  no field required here  */}
+    
                   <MemoizedSelect
                     value={formData.contract_ref}
                     onChange={(value) =>
