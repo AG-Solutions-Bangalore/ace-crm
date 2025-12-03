@@ -348,7 +348,9 @@ const ContractAdd = () => {
 
   const { data: buyerData } = useFetchBuyers();
   const { data: branchData } = useFetchCompanys();
-  const { data: contractNoData } = useFetchContractNos(formData.branch_short);
+  const { data: contractNoData, refetch } = useFetchContractNos(formData.branch_short, {
+    enabled: !!formData.branch_short, 
+  });
   const { data: portofLoadingData } = useFetchPortofLoadings();
   const { data: containerSizeData } = useFetchContainerSizes();
   const { data: paymentTermsData } = useFetchPaymentTerms();
@@ -443,6 +445,9 @@ const ContractAdd = () => {
           }));
         }
       }
+
+      
+
       if (field === "contract_destination_port") {
         const selectedCountry = portsData?.country?.find(
           (country) => country.country_port === value
@@ -485,7 +490,14 @@ const ContractAdd = () => {
           }
         }
       }
-
+      if (field === "branch_short") {
+        setFormData((prev) => ({ 
+          ...prev, 
+          branch_short: value,
+          contract_no: "" 
+        }));
+       
+      }
       if (field === "contract_consignee") {
         const selectedConsignee = buyerData?.buyer?.find(
           (buyer) => buyer.buyer_name === value
@@ -522,6 +534,7 @@ const ContractAdd = () => {
       formData.contract_buyer,
       formData.contract_no,
       formData.contract_year,
+      
     ]
   );
 
@@ -703,10 +716,10 @@ const ContractAdd = () => {
 
       const response = await createContractMutation.mutateAsync(validatedData);
 
-      if (response.code == 200) {
+      if (response.code === 200) {
         const encryptedId = encryptId(response?.latestid);
         navigate(`/view-contract/${encodeURIComponent(encryptedId)}`);
-        // navigate(`/view-contract/${response?.latestid}`);
+       
       } else {
         toast({
           title: "Error",

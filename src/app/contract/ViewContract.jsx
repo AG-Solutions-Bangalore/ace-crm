@@ -29,9 +29,9 @@ const ViewContract = () => {
   const HeaderWithSignRef = useRef();
   const pdfRef = useRef();
   const { id } = useParams();
-  console.log(id);
+
   const decryptedId = decryptId(id);
-  console.log(decryptedId, "dedecryptedId");
+
   const [contractData, setContractData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isWordLoading, setIsWordLoading] = useState(false);
@@ -1208,14 +1208,14 @@ const ViewContract = () => {
   );
 
   if (loading) {
-    return <LoaderComponent name="contract Data" />; // ✅ Correct prop usage
+    return <LoaderComponent name="contract Data" />; 
   }
 
   // Render error state
   if (error) {
     return (
       <ErrorComponent
-        message="Error Fetching contract Data"
+        message={error}
         refetch={() => fetchContractData()}
       />
     );

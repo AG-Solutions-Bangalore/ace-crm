@@ -50,7 +50,10 @@ export const useFetchContractNos = (company_sort) => {
       `/api/panel-fetch-contract-no/${company_sort}`,
       {
         enabled: Boolean(company_sort),
+        staleTime: 0, 
+        cacheTime: 0, 
       }
+      
     )
   );
 
@@ -59,7 +62,11 @@ export const useFetchContractNos = (company_sort) => {
       await queryClient.prefetchQuery(
         createQueryConfig(
           ["contractnoss", company_sort],
-          `/api/panel-fetch-contract-no/${company_sort}`
+          `/api/panel-fetch-contract-no/${company_sort}`,
+          {
+            staleTime: 0,
+            cacheTime: 0,
+          }
         )
       );
     }
@@ -67,6 +74,8 @@ export const useFetchContractNos = (company_sort) => {
 
   return { ...query, prefetchNextContractNos };
 };
+
+
 export const useFetchProductNos = (company_sort) => {
   const queryClient = useQueryClient();
 
