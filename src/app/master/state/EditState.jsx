@@ -36,6 +36,7 @@ const EditState = ({ stateId }) => {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     state_no: "",
+    state_short_name: "",
     state_status: "Active",
   });
   const [originalData, setOriginalData] = useState(null);
@@ -54,10 +55,12 @@ const EditState = ({ stateId }) => {
       const stateData = response?.data?.state;
       setFormData({
         state_no: stateData.state_no || "",
+        state_short_name: stateData.state_short_name || "",
         state_status: stateData.state_status || "Active",
       });
       setOriginalData({
         state_no: stateData.state_no || "",
+        state_short_name: stateData.state_short_name || "",
         state_status: stateData.state_status || "Active",
       });
     } catch (error) {
@@ -80,7 +83,7 @@ const EditState = ({ stateId }) => {
 
   // Handle form submission
   const handleSubmit = async () => {
-    if (!formData.state_no.trim()) {
+    if (!formData.state_no.trim() || !formData.state_short_name.trim()) {
       toast({
         title: "Error",
         description: "State number is required",
@@ -129,7 +132,7 @@ const EditState = ({ stateId }) => {
   // Check if there are changes
   const hasChanges =
     originalData &&
-    (formData.state_no !== originalData.state_no ||
+    (formData.state_no !== originalData.state_no || formData.state_short_name !== originalData.state_short_name ||
       formData.state_status !== originalData.state_status);
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -208,6 +211,41 @@ const EditState = ({ stateId }) => {
                       </div>
                     )}
                 </div>
+              
+              </div>
+              <div className="grid gap-1">
+                <label htmlFor="state_short_name" className="text-sm font-medium">
+                  State Short Name
+                </label>
+                <div className="relative">
+                  <Input
+                    id="state_short_name"
+                    placeholder="Enter state short name"
+                    value={formData.state_short_name}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        state_short_name: e.target.value,
+                      }))
+                    }
+                    className={hasChanges ? "pr-8 border-blue-200" : ""}
+                  />
+                  {hasChanges &&
+                    formData.state_short_name !== originalData.state_short_name && (
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                        <RefreshCcw
+                          className="h-4 w-4 text-blue-500 cursor-pointer hover:rotate-180 transition-all duration-300"
+                          onClick={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              state_short_name: originalData.state_short_name,
+                            }))
+                          }
+                        />
+                      </div>
+                    )}
+                </div> 
+              
               </div>
               <div className="grid gap-1">
                 <label htmlFor="state_status" className="text-sm font-medium">

@@ -212,7 +212,25 @@ const EditBranch = () => {
       [field]: value,
     }));
   };
+  const handleStateChange = (value) => {
 
+    handleInputChange({ target: { value } }, "branch_state");
+    
+   
+    const selectedState = stateData?.state?.find(
+      (state) => state.state_name === value
+    );
+    
+   
+    if (selectedState) {
+      setFormData((prev) => ({
+        ...prev,
+        branch_state: value,
+        branch_state_no: selectedState.state_no,
+        branch_state_short: selectedState.state_short_name,
+      }));
+    }
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
     updateBranchMutation.mutate({ decryptedId, data: formData });
@@ -301,9 +319,7 @@ const EditBranch = () => {
                 <Select
                 key={formData.branch_state} 
                    value={formData.branch_state} 
-                   onValueChange={(value) =>
-                     handleInputChange({ target: { value } }, "branch_state")
-                   }
+                   onValueChange={handleStateChange} 
                 >
                   <SelectTrigger className="bg-white">
                     <SelectValue placeholder="Enter state" />

@@ -43,6 +43,8 @@ import { ButtonConfig } from "@/config/ButtonConfig";
 import {
   ErrorComponent,
   LoaderComponent,
+  WithoutErrorComponent,
+  WithoutLoaderComponent,
 } from "@/components/LoaderComponent/LoaderComponent";
 const GrCodeList = () => {
   const {
@@ -166,17 +168,17 @@ const GrCodeList = () => {
   // Render loading state
 
   if (isLoading) {
-    return <LoaderComponent name="Gr Code Data" />; // ✅ Correct prop usage
+    return <WithoutLoaderComponent name="Gr Code Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (isError) {
     return (
-      <ErrorComponent message="Error Fetching Gr Code Data" refetch={refetch} />
+      <WithoutErrorComponent message="Error Fetching Gr Code Data" refetch={refetch} />
     );
   }
   return (
-    <Page>
+    <>
       <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
           Gr Code List
@@ -310,7 +312,7 @@ const GrCodeList = () => {
           </div>
         </div>
       </div>
-    </Page>
+    </>
   );
 };
 

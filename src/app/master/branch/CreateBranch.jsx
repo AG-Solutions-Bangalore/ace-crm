@@ -25,6 +25,8 @@ import {
 } from "@/hooks/useApi";
 import useNumericInput from "@/hooks/useNumericInput";
 import BASE_URL from "@/config/BaseUrl";
+import CreateScheme from "../scheme/CreateScheme";
+import CreateState from "../state/CreateState";
 
 // Validation Schema
 const branchFormSchema = z.object({
@@ -179,7 +181,25 @@ const CreateBranch = () => {
       [field]: value,
     }));
   };
+  const handleStateChange = (value) => {
 
+    handleInputChange({ target: { value } }, "branch_state");
+    
+   
+    const selectedState = stateData?.state?.find(
+      (state) => state.state_name === value
+    );
+    
+   
+    if (selectedState) {
+      setFormData((prev) => ({
+        ...prev,
+        branch_state: value,
+        branch_state_no: selectedState.state_no,
+        branch_state_short: selectedState.state_short_name,
+      }));
+    }
+  };
   useEffect(() => {
     const calculateProgress = () => {
       const totalFields = Object.keys(formData).length;
@@ -335,15 +355,16 @@ const CreateBranch = () => {
 
               <div>
                 <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 flex flex-row items-center justify-between font-medium `}
                 >
-                  State <span className="text-red-500">*</span>
+               <span>
+               State <span className="text-red-500">*</span>
+               </span>
+                  <CreateState/>
                 </label>
                 <Select
                   value={formData.branch_state}
-                  onValueChange={(value) =>
-                    handleInputChange({ target: { value } }, "branch_state")
-                  }
+                  onValueChange={handleStateChange} 
                 >
                   <SelectTrigger className="bg-white">
                     <SelectValue placeholder="Enter state" />
@@ -443,9 +464,9 @@ const CreateBranch = () => {
 
               <div>
                 <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium  flex flex-row items-center justify-between`}
                 >
-                  LUT Scheme
+                 <span> LUT Scheme </span>  <CreateScheme/>
                 </label>
                 <Select
                   value={formData.branch_scheme}

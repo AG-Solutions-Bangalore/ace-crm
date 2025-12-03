@@ -124,7 +124,7 @@ const { data: productData } = useFetchProduct();
                    <SquarePlus className="h-4 w-4" /> Customer
                  </Button> */}
 
-        {pathname === "/master/productdescription" ? (
+        {pathname === "/master/product" || pathname === '/master/productdescription' ? (
           //  <Button
           //    variant="default"
           //    className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}

@@ -91,6 +91,11 @@ const StateList = () => {
       header: "State No",
       cell: ({ row }) => <div>{row.getValue("state_no")}</div>,
     },
+    {
+      accessorKey: "state_short_name",
+      header: "Short Name",
+      cell: ({ row }) => <div>{row.getValue("state_short_name")}</div>,
+    },
 
     {
       accessorKey: "state_status",

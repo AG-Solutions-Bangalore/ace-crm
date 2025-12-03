@@ -1,135 +1,204 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { AlertTriangle, Clock, Timer } from 'lucide-react';
+import React from "react";
+import { AlertTriangle } from "lucide-react";
+
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const SessionTimeoutTracker = ({ expiryTime, onLogout }) => {
-  const [showBanner, setShowBanner] = useState(false);
-  const [countdown, setCountdown] = useState(300);
-  const [isExpiring, setIsExpiring] = useState(false);
-  const hasLoggedOut = useRef(false);
+  const queryClient = useQueryClient();
+  const [isInitialized, setIsInitialized] = React.useState(false);
 
-   const isTokenPresent = () => {
-      return !!localStorage.getItem('token');
-    };
-  
-    const checkExpiry = () => {
-      if (hasLoggedOut.current || !isTokenPresent()) {
-        setShowBanner(false);
-        return;
+  React.useEffect(() => {
+    const initTimer = setTimeout(() => {
+      setIsInitialized(true);
+    }, 3000);
+
+    return () => clearTimeout(initTimer);
+  }, []);
+
+  const isTokenPresent = () => {
+    const token = localStorage.getItem("token");
+
+    return !!token;
+  };
+
+  const validateExpiryTime = (expiryTime) => {
+    if (!expiryTime) {
+      return null;
+    }
+
+    try {
+      const expiryDate = new Date(expiryTime);
+      if (isNaN(expiryDate.getTime())) {
+        return null;
       }
-  
-      const now = new Date();
-      const expiry = new Date(expiryTime);
-      const timeUntilExpiry = expiry - now;
-      const fiveMinutes = 5 * 60 * 1000;
-  
-      if (timeUntilExpiry <= fiveMinutes && timeUntilExpiry > 0) {
-        if (!isExpiring) {
-          setIsExpiring(true);
-          setShowBanner(true);
-          setCountdown(Math.floor(timeUntilExpiry / 1000));
+
+      return expiryDate;
+    } catch (error) {
+      console.error("❌ Error parsing expiry time:", error);
+      return null;
+    }
+  };
+
+  const calculateTimeUntilExpiry = (expiryDate) => {
+    const now = new Date();
+    const timeUntil = expiryDate - now;
+
+    return timeUntil;
+  };
+
+  React.useEffect(() => {
+    if (!isInitialized) return;
+
+    const originalFetch = window.fetch;
+
+    window.fetch = async (...args) => {
+      const response = await originalFetch(...args);
+
+      const url = args[0] || "";
+      if (typeof url === "string" && url.includes("/api/")) {
+        try {
+          const clonedResponse = response.clone();
+          const data = await clonedResponse.json();
+
+          if (data?.message === "Unauthenticated." && isTokenPresent()) {
+            onLogout();
+          }
+        } catch (error) {
+          // Ignore JSON parsing errors
         }
-      } else if (timeUntilExpiry <= 0) {
-        performLogout();
       }
+
+      return response;
     };
-  
-    const performLogout = () => {
-      if (!hasLoggedOut.current && isTokenPresent()) {
-        hasLoggedOut.current = true;
-        onLogout();
+
+    return () => {
+      window.fetch = originalFetch;
+    };
+  }, [onLogout, isInitialized]);
+
+  React.useEffect(() => {
+    if (!isInitialized) return;
+
+    const checkCookieChange = () => {
+      queryClient.invalidateQueries({ queryKey: ["session-validation"] });
+    };
+
+    const interval = setInterval(checkCookieChange, 3000);
+
+    return () => clearInterval(interval);
+  }, [queryClient, isInitialized]);
+
+  const { data: sessionStatus } = useQuery({
+    queryKey: ["session-validation", expiryTime],
+    queryFn: () => {
+      if (!isInitialized) {
+        return { status: "initializing", countdown: null };
       }
-    };
-  
-    useEffect(() => {
-     
+
       if (!isTokenPresent()) {
-        return;
+        return { status: "no-token-warning", countdown: null };
       }
-  
-     
-      checkExpiry();
-  
-      let intervalIds = [];
-  
-      const countdownTimer = () => {
-        
-        if (isExpiring && !hasLoggedOut.current && isTokenPresent()) {
-          setCountdown(prev => {
-            if (prev <= 1) {
-              performLogout();
-              return 0;
-            }
-            return prev - 1;
-          });
-        }
-      };
-  
-      // Set up intervals for ongoing checks
-      const checkInterval = setInterval(checkExpiry, 1000);
-      const countdownInterval = setInterval(countdownTimer, 1000);
+
+      const expiryDate = validateExpiryTime(expiryTime);
+      if (!expiryDate) {
       
-      intervalIds.push(checkInterval, countdownInterval);
-  
-      // Also set up a listener for storage events to catch manual logouts
-      const handleStorageChange = (e) => {
-        if (e.key === 'token' && !e.newValue) {
-          // Token was removed
-          setShowBanner(false);
-          hasLoggedOut.current = true;
-          intervalIds.forEach(id => clearInterval(id));
-        }
-      };
-  
-      window.addEventListener('storage', handleStorageChange);
-  
-      return () => {
-        intervalIds.forEach(id => clearInterval(id));
-        intervalIds = [];
-        window.removeEventListener('storage', handleStorageChange);
-      };
-    }, [expiryTime, onLogout, isExpiring]);
-  
-    const formatTime = (seconds) => {
-      const minutes = Math.floor(seconds / 60);
-      const remainingSeconds = seconds % 60;
-      return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-    };
-  
-  
-    if (!showBanner || hasLoggedOut.current || !isTokenPresent()) return null;
+        return { status: "valid", countdown: null };
+      }
+
+      const timeUntilExpiry = calculateTimeUntilExpiry(expiryDate);
+      const fiveMinutes = 5 * 60 * 1000;
+
+      if (timeUntilExpiry <= -6) {
+        return { status: "expired", countdown: 0 };
+      }
+
+      if (timeUntilExpiry <= fiveMinutes && timeUntilExpiry > 0) {
+        return {
+          status: "expiring",
+          countdown: Math.floor(timeUntilExpiry / 1000),
+        };
+      }
+
+      return { status: "valid", countdown: null };
+    },
+    refetchInterval: (query) => {
+      if (!isInitialized) return false;
+
+      const state = query.state.data;
+
+      if (state?.status === "expiring") {
+        return 1000;
+      }
+
+      if (state?.status === "no-token-warning") {
+        return 5000;
+      }
+
+      if (state?.status === "valid") {
+        return 30000;
+      }
+
+      return false;
+    },
+    refetchOnWindowFocus: true,
+    staleTime: 0,
+    enabled: isInitialized,
+  });
+
+  React.useEffect(() => {
+    if (sessionStatus?.status === "expired" && isTokenPresent()) {
+      onLogout();
+    }
+
+    if (sessionStatus?.status === "no-token-warning") {
+    }
+  }, [sessionStatus?.status, onLogout]);
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
+
+  if (
+    !isInitialized ||
+    sessionStatus?.status !== "expiring" ||
+    !isTokenPresent()
+  ) {
+    return null;
+  }
 
   return (
-    <div className="space-y-20">
-  
- <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md animate-slide-down">
-        <div className="mx-4">
-          <div className="bg-white rounded-lg shadow-xl border border-gray-300">
-          <div className="h-1 bg-yellow-500 rounded-tl-lg" style={{ 
-              width: `${(countdown / 300) * 100}%`,
-              transition: 'width 1s linear'
-            }} />
-            <div className="p-2">
-              <div className="flex items-center gap-4">
-                <div className="bg-yellow-100 rounded-full p-2">
-                  <AlertTriangle className="h-5 w-5 text-yellow-600" />
+    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md animate-slide-down">
+      <div className="mx-4">
+        <div className="bg-white rounded-lg shadow-xl border border-gray-300">
+          <div
+            className="h-1 bg-red-600 rounded-tl-lg"
+            style={{
+              width: `${(sessionStatus.countdown / 300) * 100}%`,
+              transition: "width 1s linear",
+            }}
+          />
+          <div className="p-2">
+            <div className="flex items-center gap-4">
+              <div className="bg-red-100 rounded-full p-2">
+                <AlertTriangle className="h-5 w-5 text-red-600" />
+              </div>
+              <div className="flex-1">
+                <div className="text-gray-800 text-sm">
+                  Session timeout in{" "}
+                  <span className="text-red-600 font-bold font-mono">
+                    {formatTime(sessionStatus.countdown)}
+                  </span>
                 </div>
-                <div>
-                  <div className="text-gray-800 text-sm">
-                    Session timeout in <span className="text-yellow-600 font-bold font-mono">{formatTime(countdown)}</span>
-                  </div>
-                  <div className="text-gray-600 text-xs mt-1">Save your work to prevent data loss</div>
+                <div className="text-gray-600 text-xs mt-1">
+                  Save your work to prevent data loss
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div> 
-
-
-    
-
-     
-  
+      </div>
     </div>
   );
 };

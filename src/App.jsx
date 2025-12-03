@@ -98,23 +98,28 @@ import SessionTimeoutTracker from "./components/SessionTimeoutTracker/SessionTim
 import BASE_URL from "./config/BaseUrl";
 import DisableRightClick from "./components/DisableRightClick/DisableRightClick";
 import FloatingMessageActions from "./components/FloatingMessageActions/FloatingMessageActions";
+import ProductIndex from "./app/master/product-index/ProductIndex";
+import { cache } from "./utils/cache";
+import Signup from "./app/auth/Signup";
+
 
 function App() {
   const navigate = useNavigate();
   const time = localStorage.getItem("token-expire-time");
   const handleLogout = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/api/panel-logout`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "application/json",
-        },
-      });
+      // const response = await fetch(`${BASE_URL}/api/panel-logout`, {
+      //   method: "POST",
+      //   headers: {
+      //     Authorization: `Bearer ${localStorage.getItem("token")}`,
+      //     "Content-Type": "application/json",
+      //   },
+      // });
 
-      const result = await response.json();
-      console.log("Logout successful:", result);
+      // const result = await response.json();
+      // console.log("Logout successful:", result);
       localStorage.clear();
+      cache.clear();
       navigate("/");
     } catch (error) {
       console.error("Logout failed:", error.message);
@@ -130,6 +135,7 @@ function App() {
       <Routes>
         {/* Login Page        */}
         <Route path="/" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         {/* Dashboard  */}
         <Route path="/home" element={<Home />} />
@@ -256,14 +262,31 @@ function App() {
         {/* Master -port of  loading   */}
         <Route path="/master/portofloading" element={<PortOfLoadingList />} />
         {/* Master -gr code */}
-        <Route path="/master/grcode" element={<GrCodeList />} />
-        {/* Master - Product */}
+
+
+        <Route path="/master" element={<ProductIndex />}>
+          {/* Product tab */}
+          <Route path="product" element={<ProductList />} />
+          
+          {/* GR Code tab */}
+          <Route path="grcode" element={<GrCodeList />} />
+          
+          {/* Product Description tab */}
+          <Route path="productdescription" element={<ProductionDescriptionList />} />
+          
+          {/* Default route - redirects to product */}
+          <Route index element={<ProductList />} />
+        </Route>
+
+
+        {/* <Route path="/master/grcode" element={<GrCodeList />} />
+
         <Route path="/master/product" element={<ProductList />} />
-        {/* Master - productdescription */}
+     
         <Route
           path="/master/productdescription"
           element={<ProductionDescriptionList />}
-        />
+        /> */}
         {/* Master - shipper */}
         <Route path="/master/shipper" element={<ShipperList />} />
         {/* Master - vessel */}

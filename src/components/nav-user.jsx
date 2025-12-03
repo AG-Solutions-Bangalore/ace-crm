@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Link, useNavigate } from "react-router-dom";
 import BASE_URL from "@/config/BaseUrl";
+import { cache } from "@/utils/cache";
 
 export function NavUser({ user }) {
   const { isMobile } = useSidebar();
@@ -37,16 +38,17 @@ export function NavUser({ user }) {
   // };
   const handleLogout = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/api/panel-logout`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      // const response = await fetch(`${BASE_URL}/api/panel-logout`, {
+      //   method: "POST",
+      //   headers: {
+      //     Authorization: `Bearer ${token}`,
+      //     "Content-Type": "application/json",
+      //   },
+      // });
 
-      const result = await response.json();
-      console.log("Logout successful:", result);
+      // const result = await response.json();
+      // console.log("Logout successful:", result);
+      cache.clear();
       localStorage.clear();
       navigate("/");
     } catch (error) {

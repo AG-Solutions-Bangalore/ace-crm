@@ -21,13 +21,14 @@ const CreateState = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     state_name: "",
+    state_short_name: "",
     state_no: "",
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { pathname } = useLocation();
   const handleSubmit = async () => {
-    if (!formData.state_name.trim() || !formData.state_no.trim()) {
+    if (!formData.state_name.trim() || !formData.state_short_name.trim() ||!formData.state_no.trim()) {
       toast({
         title: "Error",
         description: "State name and state number are required",
@@ -55,6 +56,7 @@ const CreateState = () => {
 
         setFormData({
           state_name: "",
+          state_short_name: "",
           state_no: "",
         });
         await queryClient.invalidateQueries(["customers"]);
@@ -92,7 +94,7 @@ const CreateState = () => {
               className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             ></StateCreate>
           </div>
-        ) : pathname === "/create-contract" ? (
+        ) : pathname === "/create-contract" || pathname === '/create-branch'? (
           <p className="text-xs text-yellow-700 ml-2 mt-1 w-32 hover:text-red-800 cursor-pointer">
             State
           </p>
@@ -113,6 +115,14 @@ const CreateState = () => {
               value={formData.state_name}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, state_name: e.target.value }))
+              }
+            />
+            <Input
+              id="state_short_name"
+              placeholder="Enter state short name"
+              value={formData.state_short_name}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, state_short_name: e.target.value }))
               }
             />
             <Input

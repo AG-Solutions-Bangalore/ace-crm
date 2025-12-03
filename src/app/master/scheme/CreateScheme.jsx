@@ -112,7 +112,7 @@ const CreateScheme = () => {
               className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
             ></SchemeCreate>
           </div>
-        ) : pathname === "/create-contract" ? (
+        ) : pathname === "/create-contract" || pathname === '/create-branch' ? (
           <p className="text-xs text-yellow-700 ml-2 mt-1 w-32 hover:text-red-800 cursor-pointer">
             Create Scheme
           </p>
