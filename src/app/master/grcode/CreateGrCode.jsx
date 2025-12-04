@@ -113,7 +113,7 @@ const CreateGrCode = () => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        {pathname === "/master/grcode" ? (
+        {pathname === "/master/product" || pathname === '/master/grcode' ? (
           // <Button
           //   variant="default"
           //   className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}

@@ -151,21 +151,21 @@ const ProductList = () => {
       // Render loading state
       if (isLoading) {
         return (
-          <Page>
+          <>
             <div className="flex justify-center items-center h-full">
               <Button disabled>
                 <Loader2 className=" h-4 w-4 animate-spin" />
                 Loading Product List
               </Button>
             </div>
-          </Page>
+          </>
         );
       }
     
       // Render error state
       if (isError) {
         return (
-          <Page>
+          <>
             <Card className="w-full max-w-md mx-auto mt-10">
               <CardHeader>
                 <CardTitle className="text-destructive">
@@ -178,11 +178,11 @@ const ProductList = () => {
                 </Button>
               </CardContent>
             </Card>
-          </Page>
+          </>
         );
       }
   return (
-    <Page>
+    <>
          <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
           Product List
@@ -315,7 +315,7 @@ const ProductList = () => {
           </div>
         </div>
       </div>
-    </Page>
+    </>
   )
 }
 

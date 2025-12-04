@@ -164,18 +164,18 @@ export function AppSidebar({ ...props }) {
             title: "Port of Loading",
             url: "/master/portofloading",
           },
-          {
-            title: "GR Code",
-            url: "/master/grcode",
-          },
+          // {
+          //   title: "GR Code",
+          //   url: "/master/grcode",
+          // },
           {
             title: "Product",
             url: "/master/product",
           },
-          {
-            title: "Product Description",
-            url: "/master/productdescription",
-          },
+          // {
+          //   title: "Product Description",
+          //   url: "/master/productdescription",
+          // },
           {
             title: "Shipper",
             url: "/master/shipper",

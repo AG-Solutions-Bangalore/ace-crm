@@ -43,6 +43,8 @@ import { ButtonConfig } from "@/config/ButtonConfig";
 import {
   ErrorComponent,
   LoaderComponent,
+  WithoutErrorComponent,
+  WithoutLoaderComponent,
 } from "@/components/LoaderComponent/LoaderComponent";
 const ProductionDescriptionList = () => {
   const {
@@ -168,20 +170,20 @@ const ProductionDescriptionList = () => {
 
   // Render loading state
   if (isLoading) {
-    return <LoaderComponent name="Product Description Data" />; // ✅ Correct prop usage
+    return <WithoutLoaderComponent name="Product Description Data" />; // ✅ Correct prop usage
   }
 
   // Render error state
   if (isError) {
     return (
-      <ErrorComponent
+      <WithoutErrorComponent
         message="Error Fetching Product Description Data"
         refetch={refetch}
       />
     );
   }
   return (
-    <Page>
+    <>
       <div className="w-full p-4">
         <div className="flex text-left text-2xl text-gray-800 font-[400]">
           Custom Description List
@@ -315,7 +317,7 @@ const ProductionDescriptionList = () => {
           </div>
         </div>
       </div>
-    </Page>
+    </>
   );
 };
 

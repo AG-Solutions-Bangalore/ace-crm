@@ -38,7 +38,11 @@ export const useFetchCompanys = () => {
   return useQuery(createQueryConfig(["branch"], "/api/panel-fetch-branch"));
 };
 export const useFetchProduct = () => {
-  return useQuery(createQueryConfig(["product"], "/api/panel-fetch-product"));
+  return useQuery(createQueryConfig(["product"], "/api/panel-fetch-product",{
+   
+    staleTime: 0, 
+    cacheTime: 0, 
+  }));
 };
 
 export const useFetchContractNos = (company_sort) => {
