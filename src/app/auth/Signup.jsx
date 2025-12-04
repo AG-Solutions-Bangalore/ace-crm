@@ -91,7 +91,7 @@ export default function Signup() {
     },
     company_gst: {
       required: true,
-      pattern: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
+    
       message: "Valid GST number required (15 chars)"
     },
     company_pan_no: {
@@ -194,7 +194,7 @@ export default function Signup() {
         toast({
           variant: "default",
           title: "Success!",
-          description: "Company registered successfully. You can now login.",
+          description: "Company registered successfully. Check your mail for login.",
         });
         
         // Redirect to login after 2 seconds
@@ -394,11 +394,57 @@ export default function Signup() {
               <form onSubmit={handleSubmit} className="space-y-2" noValidate>
                 {/* Row 1: Company Short Codes */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+         
+<div className="space-y-2">
+  <Label htmlFor="company_name" className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200">
+    <Building size={14} className="mr-2" />
+    Full Company Name
+  </Label>
+  <div className="relative">
+    <Input
+      type="text"
+      name="company_name"
+      id="company_name"
+      value={formData.company_name}
+      onChange={(e) => {
+        const newValue = e.target.value;
+        handleChange(e); 
+        
+      
+        const prefix = newValue
+          .split(' ')
+          .filter(word => word.length > 0)
+          .map(word => word.charAt(0).toUpperCase())
+          .join('')
+          .slice(0, 10); 
+        
+        setFormData(prev => ({
+          ...prev,
+          company_short: prefix
+        }));
+        
+   
+        if (errors.company_short) {
+          setErrors(prev => ({
+            ...prev,
+            company_short: ""
+          }));
+        }
+      }}
+      className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_name ? 'border-red-500 dark:border-red-500' : ''}`}
+      placeholder="Export Business Solutions Private Limited"
+      required
+    />
+    {errors.company_name && (
+      <p className="text-red-500 text-xs mt-1">{errors.company_name}</p>
+    )}
+  </div>
+</div>
                   {/* Company Short */}
                   <div className="space-y-2">
                     <Label htmlFor="company_short" className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200">
                       <Hash size={14} className="mr-2" />
-                      Company Short Code*
+                      Company Prefix
                     </Label>
                     <div className="relative">
                       <Input
@@ -408,7 +454,7 @@ export default function Signup() {
                         value={formData.company_short}
                         onChange={handleChange}
                         className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 pr-10 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_short ? 'border-red-500 dark:border-red-500' : ''}`}
-                        placeholder="EB (uppercase only)"
+                        placeholder="EB (uppercase only) automatically generte"
                         required
                         autoFocus
                         maxLength={10}
@@ -419,11 +465,17 @@ export default function Signup() {
                     </div>
                   </div>
                   
-                  {/* Company Name Short */}
-                  <div className="space-y-2">
+                
+                  
+                </div>
+
+                {/* Row 2: Full Company Name & Email */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                   {/* Company Name Short */}
+                <div className="space-y-2">
                     <Label htmlFor="company_name_short" className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200">
                       <Briefcase size={14} className="mr-2" />
-                      Short Company Name*
+                      Company Short Name
                     </Label>
                     <div className="relative">
                       <Input
@@ -442,38 +494,11 @@ export default function Signup() {
                       )}
                     </div>
                   </div>
-                </div>
-
-                {/* Row 2: Full Company Name & Email */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Full Company Name */}
-                  <div className="space-y-2">
-                    <Label htmlFor="company_name" className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200">
-                      <Building size={14} className="mr-2" />
-                      Full Company Name*
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        type="text"
-                        name="company_name"
-                        id="company_name"
-                        value={formData.company_name}
-                        onChange={handleChange}
-                        className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_name ? 'border-red-500 dark:border-red-500' : ''}`}
-                        placeholder="Export Business Solutions Private Limited"
-                        required
-                      />
-                      {errors.company_name && (
-                        <p className="text-red-500 text-xs mt-1">{errors.company_name}</p>
-                      )}
-                    </div>
-                  </div>
-                  
                   {/* Company Email */}
                   <div className="space-y-2">
                     <Label htmlFor="company_email" className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200">
                       <Mail size={14} className="mr-2" />
-                      Company Email*
+                      Company Email
                     </Label>
                     <div className="relative">
                       <Input
@@ -499,7 +524,7 @@ export default function Signup() {
                   <div className="space-y-2">
                     <Label htmlFor="company_mobile" className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200">
                       <Phone size={14} className="mr-2" />
-                      Company Mobile*
+                      Company Mobile
                     </Label>
                     <div className="relative">
                       <Input
@@ -523,7 +548,7 @@ export default function Signup() {
                   <div className="space-y-2">
                     <Label htmlFor="company_contact_name" className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200">
                       <User size={14} className="mr-2" />
-                      Contact Person Name*
+                      Contact Person Name
                     </Label>
                     <div className="relative">
                       <Input
@@ -547,7 +572,7 @@ export default function Signup() {
                 <div className="space-y-2">
                   <Label htmlFor="company_address" className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200">
                     <MapPin size={14} className="mr-2" />
-                    Company Address*
+                    Company Address
                   </Label>
                   <div className="relative">
                     <Textarea
@@ -571,7 +596,7 @@ export default function Signup() {
                   <div className="space-y-2">
                     <Label htmlFor="company_gst" className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200">
                       <FileDigit size={14} className="mr-2" />
-                      GST Number*
+                      GST Number
                     </Label>
                     <div className="relative">
                       <Input
@@ -583,7 +608,7 @@ export default function Signup() {
                         className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_gst ? 'border-red-500 dark:border-red-500' : ''}`}
                         placeholder="22AAAAA0000A1Z5"
                         required
-                        maxLength={15}
+                        
                       />
                       {errors.company_gst && (
                         <p className="text-red-500 text-xs mt-1">{errors.company_gst}</p>
@@ -595,7 +620,7 @@ export default function Signup() {
                   <div className="space-y-2">
                     <Label htmlFor="company_pan_no" className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200">
                       <FileDigit size={14} className="mr-2" />
-                      PAN Number*
+                      PAN Number
                     </Label>
                     <div className="relative">
                       <Input
