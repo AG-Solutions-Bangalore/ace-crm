@@ -91,6 +91,7 @@ const EditBranch = () => {
   const decryptedId = decryptId(id);
   const { toast } = useToast();
   const navigate = useNavigate();
+  
   const [formData, setFormData] = useState({
     branch_short: "",
     branch_name: "",
@@ -119,6 +120,119 @@ const EditBranch = () => {
     branch_status: "Active",
   });
 
+  const [errors, setErrors] = useState({});
+
+  // Validation rules for each field
+  const validationRules = {
+    branch_name: {
+      required: true,
+      minLength: 3,
+      maxLength: 100,
+      pattern: /^[a-zA-Z0-9\s&.,'-]+$/,
+      message: "Valid company name required"
+    },
+    branch_name_short: {
+      required: true,
+      maxLength: 20,
+      pattern: /^[a-zA-Z0-9\s&.-]+$/,
+      message: "Only letters, numbers, spaces, &, ., - allowed"
+    },
+    branch_address: {
+      required: true,
+     
+      message: "Address must required"
+    },
+    branch_iec: {
+      required: true,
+    
+      message: "Valid IEC code required"
+    },
+    branch_gst: {
+      required: true,
+     
+      message: "Valid GST number required (15 characters)"
+    },
+    branch_pan_no: {
+      required: true,
+      pattern: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
+      message: "Valid PAN number required (10 characters)"
+    },
+    branch_state: {
+      required: true,
+      message: "State is required"
+    },
+    branch_state_no: {
+      required: true,
+    
+      message: "Valid state code required"
+    },
+    branch_state_short: {
+      required: true,
+   
+      message: "Valid  state code required"
+    },
+    branch_prereceipts: {
+      required: true,
+      message: "Pre-receipt is required"
+    },
+    branch_status: {
+      required: true,
+      message: "Status is required"
+    },
+    branch_spice_board: {
+      pattern: /^[A-Z0-9\s/-]*$/,
+      message: "Only alphanumeric, spaces, / and - allowed"
+    },
+    branch_apeda: {
+      pattern: /^[A-Z0-9\s/-]*$/,
+      message: "Only alphanumeric, spaces, / and - allowed"
+    },
+    branch_scheme: {
+      pattern: /^[A-Z0-9\s/-]*$/,
+      message: "Only alphanumeric, spaces, / and - allowed"
+    },
+    branch_ecgcncb: {
+      pattern: /^[A-Z0-9\s/-]*$/,
+      message: "Only alphanumeric, spaces, / and - allowed"
+    },
+    branch_ecgc_policy: {
+      pattern: /^[A-Z0-9\s/-]*$/,
+      message: "Only alphanumeric, spaces, / and - allowed"
+    },
+    branch_reg_no: {
+      pattern: /^[A-Z0-9\s/-]*$/,
+      message: "Only alphanumeric, spaces, / and - allowed"
+    },
+    branch_port_of_loading: {
+      pattern: /^[a-zA-Z\s,.-]*$/,
+      message: "Only letters, spaces, commas, . and - allowed"
+    },
+    branch_sign_name: {
+      pattern: /^[a-zA-Z\s.'-]*$/,
+      message: "Only letters, spaces, ., ' and - allowed"
+    },
+    branch_sign_no: {
+      pattern: /^[0-9\s-]*$/,
+      message: "Only numbers, spaces and - allowed"
+    },
+    branch_sign_name1: {
+      pattern: /^[a-zA-Z\s.'-]*$/,
+      message: "Only letters, spaces, ., ' and - allowed"
+    },
+    branch_sign_no1: {
+      pattern: /^[0-9\s-]*$/,
+      message: "Only numbers, spaces and - allowed"
+    },
+    branch_sign_name2: {
+      pattern: /^[a-zA-Z\s.'-]*$/,
+      message: "Only letters, spaces, ., ' and - allowed"
+    },
+    branch_sign_no2: {
+      pattern: /^[0-9\s-]*$/,
+      message: "Only numbers, spaces and - allowed"
+    }
+  };
+
   // Fetch branch data by ID
   const {
     data: branchDetails,
@@ -146,6 +260,7 @@ const EditBranch = () => {
   const { data: stateData } = useFetchState();
   const { data: schemeData } = useFetchScheme();
   const { data: prereceiptsData } = useFetchPreReceipt();
+
   useEffect(() => {
     if (branchDetails) {
       setFormData({
@@ -178,6 +293,66 @@ const EditBranch = () => {
     }
   }, [branchDetails]);
 
+  // Validate a single field
+  const validateField = (name, value) => {
+    const rules = validationRules[name];
+    if (!rules) return "";
+
+    if (rules.required && !value) {
+      return "This field is required";
+    }
+
+    if (rules.minLength && value.length < rules.minLength) {
+      return `Minimum ${rules.minLength} characters required`;
+    }
+
+    if (rules.maxLength && value.length > rules.maxLength) {
+      return `Maximum ${rules.maxLength} characters allowed`;
+    }
+
+    if (rules.pattern && value && !rules.pattern.test(value)) {
+      return rules.message;
+    }
+
+    return "";
+  };
+
+  // Validate entire form
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Required fields validation
+    const requiredFields = [
+      'branch_name', 'branch_address', 'branch_iec', 'branch_gst', 
+      'branch_pan_no', 'branch_state', 'branch_state_no', 
+      'branch_state_short', 'branch_prereceipts', 'branch_status'
+    ];
+    
+    requiredFields.forEach(field => {
+      const error = validateField(field, formData[field]);
+      if (error) newErrors[field] = error;
+    });
+
+    // Optional fields validation (only if they have value)
+    const optionalFields = [
+      'branch_name_short', 'branch_spice_board', 'branch_apeda', 
+      'branch_scheme', 'branch_ecgcncb', 'branch_ecgc_policy', 
+      'branch_reg_no', 'branch_port_of_loading', 'branch_sign_name', 
+      'branch_sign_no', 'branch_sign_name1', 'branch_sign_no1', 
+      'branch_sign_name2', 'branch_sign_no2'
+    ];
+    
+    optionalFields.forEach(field => {
+      if (formData[field] && formData[field].trim()) {
+        const error = validateField(field, formData[field]);
+        if (error) newErrors[field] = error;
+      }
+    });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   // Update branch mutation
   const updateBranchMutation = useMutation({
     mutationFn: updateBranch,
@@ -207,21 +382,34 @@ const EditBranch = () => {
 
   const handleInputChange = (e, field) => {
     const value = e.target.value;
+    
+    // Auto-uppercase for specific fields
+    let processedValue = value;
+    if (['branch_gst', 'branch_pan_no', 'branch_iec', 'branch_state_short'].includes(field)) {
+      processedValue = value.toUpperCase();
+    }
+    
     setFormData((prev) => ({
       ...prev,
-      [field]: value,
+      [field]: processedValue,
     }));
-  };
-  const handleStateChange = (value) => {
 
+    // Clear error for this field when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: ""
+      }));
+    }
+  };
+
+  const handleStateChange = (value) => {
     handleInputChange({ target: { value } }, "branch_state");
     
-   
     const selectedState = stateData?.state?.find(
       (state) => state.state_name === value
     );
     
-   
     if (selectedState) {
       setFormData((prev) => ({
         ...prev,
@@ -229,16 +417,36 @@ const EditBranch = () => {
         branch_state_no: selectedState.state_no,
         branch_state_short: selectedState.state_short_name,
       }));
+      
+      // Clear state-related errors
+      setErrors(prev => ({
+        ...prev,
+        branch_state: "",
+        branch_state_no: "",
+        branch_state_short: ""
+      }));
     }
   };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: "Please correct the errors in the form",
+      });
+      return;
+    }
+    
     updateBranchMutation.mutate({ decryptedId, data: formData });
   };
 
   if (isLoading) {
-    return <LoaderComponent name="Company Data" />; // ✅ Correct prop usage
+    return <LoaderComponent name="Company Data" />;
   }
+  
   if (isError) {
     return (
       <ErrorComponent message="Error Fetching Company Data" refetch={refetch} />
@@ -254,74 +462,93 @@ const EditBranch = () => {
           <CardContent className="p-6">
             {/* Branch Details Section */}
             <div className="grid grid-cols-4 gap-6">
+              {/* Company Address */}
               <div className="col-span-1 row-span-2">
                 <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
                 >
                   Company Address <span className="text-red-500">*</span>
                 </label>
                 <Textarea
-                  className="bg-white"
+                  className={`bg-white ${errors.branch_address ? 'border-red-500' : ''}`}
                   rows={5}
                   value={formData.branch_address}
                   onChange={(e) => handleInputChange(e, "branch_address")}
                   placeholder="Enter company address"
                 />
+                {errors.branch_address && (
+                  <p className="text-red-500 text-xs mt-1">{errors.branch_address}</p>
+                )}
               </div>
 
+              {/* IEC Code */}
               <div>
                 <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
                 >
                   IEC Code <span className="text-red-500">*</span>
                 </label>
                 <Input
-                  className="bg-white"
+                  className={`bg-white ${errors.branch_iec ? 'border-red-500' : ''}`}
                   value={formData.branch_iec}
                   onChange={(e) => handleInputChange(e, "branch_iec")}
                   placeholder="Enter IEC code"
                 />
+                {errors.branch_iec && (
+                  <p className="text-red-500 text-xs mt-1">{errors.branch_iec}</p>
+                )}
               </div>
+
+              {/* GST Number */}
               <div>
                 <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
                 >
                   GST Number <span className="text-red-500">*</span>
                 </label>
                 <Input
-                  className="bg-white"
+                  className={`bg-white ${errors.branch_gst ? 'border-red-500' : ''}`}
                   value={formData.branch_gst}
                   onChange={(e) => handleInputChange(e, "branch_gst")}
                   placeholder="Enter GST number"
+              
                 />
+                {errors.branch_gst && (
+                  <p className="text-red-500 text-xs mt-1">{errors.branch_gst}</p>
+                )}
               </div>
+
+              {/* PAN Number */}
               <div>
                 <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
                 >
                   PAN Number <span className="text-red-500">*</span>
                 </label>
                 <Input
-                  className="bg-white"
+                  className={`bg-white ${errors.branch_pan_no ? 'border-red-500' : ''}`}
                   value={formData.branch_pan_no}
                   onChange={(e) => handleInputChange(e, "branch_pan_no")}
                   placeholder="Enter PAN number"
                 />
+                {errors.branch_pan_no && (
+                  <p className="text-red-500 text-xs mt-1">{errors.branch_pan_no}</p>
+                )}
               </div>
 
+              {/* State */}
               <div>
                 <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
                 >
                   State <span className="text-red-500">*</span>
                 </label>
-            
                 <Select
-                key={formData.branch_state} 
-                   value={formData.branch_state} 
-                   onValueChange={handleStateChange} 
+                  key={formData.branch_state}
+                  value={formData.branch_state}
+                  onValueChange={handleStateChange}
                 >
-                  <SelectTrigger className="bg-white">
+                  <SelectTrigger className={`bg-white ${errors.branch_state ? 'border-red-500' : ''}`}>
                     <SelectValue placeholder="Enter state" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
@@ -332,37 +559,53 @@ const EditBranch = () => {
                     ))}
                   </SelectContent>
                 </Select>
+                {errors.branch_state && (
+                  <p className="text-red-500 text-xs mt-1">{errors.branch_state}</p>
+                )}
               </div>
 
+              {/* State Code */}
               <div>
                 <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
                 >
                   State Code <span className="text-red-500">*</span>
                 </label>
                 <Input
-                  className="bg-white"
+                  className={`bg-white ${errors.branch_state_no ? 'border-red-500' : ''}`}
                   value={formData.branch_state_no}
                   onChange={(e) => handleInputChange(e, "branch_state_no")}
                   placeholder="Enter state code"
+                  readOnly
                 />
+                {errors.branch_state_no && (
+                  <p className="text-red-500 text-xs mt-1">{errors.branch_state_no}</p>
+                )}
               </div>
+
+              {/* State Short */}
               <div>
                 <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
                 >
                   State Short <span className="text-red-500">*</span>
                 </label>
                 <Input
-                  className="bg-white"
+                  className={`bg-white ${errors.branch_state_short ? 'border-red-500' : ''}`}
                   value={formData.branch_state_short}
                   onChange={(e) => handleInputChange(e, "branch_state_short")}
                   placeholder="Enter state short"
+                  readOnly
                 />
+                {errors.branch_state_short && (
+                  <p className="text-red-500 text-xs mt-1">{errors.branch_state_short}</p>
+                )}
               </div>
- <div>
+
+              {/* Pre Receipt */}
+              <div>
                 <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
                 >
                   Pre Receipt <span className="text-red-500">*</span>
                 </label>
@@ -373,7 +616,7 @@ const EditBranch = () => {
                     handleInputChange({ target: { value } }, "branch_prereceipts")
                   }
                 >
-                  <SelectTrigger className="bg-white">
+                  <SelectTrigger className={`bg-white ${errors.branch_prereceipts ? 'border-red-500' : ''}`}>
                     <SelectValue placeholder="Enter pre receipt" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
@@ -384,47 +627,54 @@ const EditBranch = () => {
                     ))}
                   </SelectContent>
                 </Select>
+                {errors.branch_prereceipts && (
+                  <p className="text-red-500 text-xs mt-1">{errors.branch_prereceipts}</p>
+                )}
               </div>
+
+              {/* Spice Board Details */}
               <div>
                 <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
                 >
                   Spice Board Details
                 </label>
                 <Input
-                  className="bg-white"
+                  className={`bg-white ${errors.branch_spice_board ? 'border-red-500' : ''}`}
                   value={formData.branch_spice_board}
                   onChange={(e) => handleInputChange(e, "branch_spice_board")}
                   placeholder="Enter spice board details"
                 />
+                {errors.branch_spice_board && (
+                  <p className="text-red-500 text-xs mt-1">{errors.branch_spice_board}</p>
+                )}
               </div>
 
+              {/* APEDA Details */}
               <div>
                 <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
                 >
                   APEDA Details
                 </label>
                 <Input
-                  className="bg-white"
+                  className={`bg-white ${errors.branch_apeda ? 'border-red-500' : ''}`}
                   value={formData.branch_apeda}
                   onChange={(e) => handleInputChange(e, "branch_apeda")}
                   placeholder="Enter APEDA details"
                 />
+                {errors.branch_apeda && (
+                  <p className="text-red-500 text-xs mt-1">{errors.branch_apeda}</p>
+                )}
               </div>
 
+              {/* LUT Scheme */}
               <div>
                 <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
                 >
                   LUT Scheme
                 </label>
-                {/* <Input
-                  className="bg-white"
-                  value={formData.branch_scheme}
-                  onChange={(e) => handleInputChange(e, "branch_scheme")}
-                  placeholder="Enter scheme details"
-                /> */}
                 <Select
                   key={formData.branch_scheme}
                   value={formData.branch_scheme}
@@ -432,8 +682,8 @@ const EditBranch = () => {
                     handleInputChange({ target: { value } }, "branch_scheme")
                   }
                 >
-                  <SelectTrigger className="bg-white">
-                    <SelectValue placeholder="Enter LUT scheme " />
+                  <SelectTrigger className={`bg-white ${errors.branch_scheme ? 'border-red-500' : ''}`}>
+                    <SelectValue placeholder="Enter LUT scheme" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     {schemeData?.scheme?.map((item) => (
@@ -446,65 +696,18 @@ const EditBranch = () => {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-{/* 
-              <div>
-                <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                >
-                  ECGC/NCB Details
-                </label>
-                <Input
-                  className="bg-white"
-                  value={formData.branch_ecgcncb}
-                  onChange={(e) => handleInputChange(e, "branch_ecgcncb")}
-                  placeholder="Enter ECGC/NCB details"
-                />
+                {errors.branch_scheme && (
+                  <p className="text-red-500 text-xs mt-1">{errors.branch_scheme}</p>
+                )}
               </div>
 
+              {/* Port of Loading */}
               <div>
                 <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                >
-                  ECGC Policy Details
-                </label>
-                <Input
-                  className="bg-white"
-                  value={formData.branch_ecgc_policy}
-                  onChange={(e) => handleInputChange(e, "branch_ecgc_policy")}
-                  placeholder="Enter ECGC policy details"
-                />
-              </div>
-
-              <div>
-                <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
-                >
-                  Registration Number
-                </label>
-                <Input
-                  className="bg-white"
-                  value={formData.branch_reg_no}
-                  onChange={(e) => handleInputChange(e, "branch_reg_no")}
-                  placeholder="Enter registration number"
-                />
-              </div>
- */}
-              <div>
-                <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
                 >
                   Port of Loading
                 </label>
-                {/* <Input
-                  className="bg-white"
-                  value={formData.branch_port_of_loading}
-                  onChange={(e) =>
-                    handleInputChange(e, "branch_port_of_loading")
-                  }
-                  placeholder="Enter port of loading"
-                /> */}
-
                 <Select
                   key={formData.branch_port_of_loading}
                   value={formData.branch_port_of_loading}
@@ -515,7 +718,7 @@ const EditBranch = () => {
                     )
                   }
                 >
-                  <SelectTrigger className="bg-white">
+                  <SelectTrigger className={`bg-white ${errors.branch_port_of_loading ? 'border-red-500' : ''}`}>
                     <SelectValue placeholder="Enter port of loading" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
@@ -529,67 +732,87 @@ const EditBranch = () => {
                     ))}
                   </SelectContent>
                 </Select>
+                {errors.branch_port_of_loading && (
+                  <p className="text-red-500 text-xs mt-1">{errors.branch_port_of_loading}</p>
+                )}
               </div>
 
+              {/* Signatory Name 1 */}
               <div>
                 <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
                 >
                   Signatory Name 1
                 </label>
                 <Input
-                  className="bg-white"
+                  className={`bg-white ${errors.branch_sign_name ? 'border-red-500' : ''}`}
                   value={formData.branch_sign_name}
                   onChange={(e) => handleInputChange(e, "branch_sign_name")}
                   placeholder="Enter signatory name 1"
                 />
+                {errors.branch_sign_name && (
+                  <p className="text-red-500 text-xs mt-1">{errors.branch_sign_name}</p>
+                )}
               </div>
 
+              {/* Signatory Number 1 */}
               <div>
                 <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
                 >
                   Signatory Number 1
                 </label>
                 <Input
-                  className="bg-white"
+                  className={`bg-white ${errors.branch_sign_no ? 'border-red-500' : ''}`}
                   value={formData.branch_sign_no}
                   onChange={(e) => handleInputChange(e, "branch_sign_no")}
                   placeholder="Enter signatory number 1"
                 />
+                {errors.branch_sign_no && (
+                  <p className="text-red-500 text-xs mt-1">{errors.branch_sign_no}</p>
+                )}
               </div>
 
+              {/* Signatory Name 2 */}
               <div>
                 <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
                 >
                   Signatory Name 2
                 </label>
                 <Input
-                  className="bg-white"
+                  className={`bg-white ${errors.branch_sign_name1 ? 'border-red-500' : ''}`}
                   value={formData.branch_sign_name1}
                   onChange={(e) => handleInputChange(e, "branch_sign_name1")}
                   placeholder="Enter signatory Name 2"
                 />
+                {errors.branch_sign_name1 && (
+                  <p className="text-red-500 text-xs mt-1">{errors.branch_sign_name1}</p>
+                )}
               </div>
 
+              {/* Signatory No 2 */}
               <div>
                 <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
                 >
                   Signatory No 2
                 </label>
                 <Input
-                  className="bg-white"
+                  className={`bg-white ${errors.branch_sign_no1 ? 'border-red-500' : ''}`}
                   value={formData.branch_sign_no1}
                   onChange={(e) => handleInputChange(e, "branch_sign_no1")}
                   placeholder="Enter signatory No 2"
                 />
+                {errors.branch_sign_no1 && (
+                  <p className="text-red-500 text-xs mt-1">{errors.branch_sign_no1}</p>
+                )}
               </div>
 
+              {/* Company Status */}
               <div>
                 <label
-                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                  className={`block ${ButtonConfig.cardLabel} text-sm mb-2 font-medium`}
                 >
                   Company Status <span className="text-red-500">*</span>
                 </label>
@@ -599,7 +822,7 @@ const EditBranch = () => {
                     handleInputChange({ target: { value } }, "branch_status")
                   }
                 >
-                  <SelectTrigger className="bg-white">
+                  <SelectTrigger className={`bg-white ${errors.branch_status ? 'border-red-500' : ''}`}>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
@@ -607,6 +830,9 @@ const EditBranch = () => {
                     <SelectItem value="Inactive">Inactive</SelectItem>
                   </SelectContent>
                 </Select>
+                {errors.branch_status && (
+                  <p className="text-red-500 text-xs mt-1">{errors.branch_status}</p>
+                )}
               </div>
             </div>
           </CardContent>

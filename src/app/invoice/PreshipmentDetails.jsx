@@ -222,7 +222,7 @@ const PreshipmentDetails = () => {
               <div className="border border-black max-w-4xl mx-auto text-sm">
                 <div className="grid grid-cols-12 border-b border-black text-[12px]">
                   <div className="col-span-5 border-r border-black p-1 font-bold">
-                    <p>ACE EXPORTS</p>
+                    <p>{invoicePackingData?.branch_name}</p>
                   </div>
                   <div className="col-span-7 grid grid-cols-4">
                     <div className="col-span-1 border-r border-black p-1 flex items-center">

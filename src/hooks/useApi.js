@@ -109,7 +109,11 @@ export const useFetchProductNos = (company_sort) => {
 
 export const useFetchPortofLoadings = () => {
   return useQuery(
-    createQueryConfig(["portofLoadings"], "/api/panel-fetch-portofLoading")
+    createQueryConfig(["portofLoadings"], "/api/panel-fetch-portofLoading",{
+   
+      staleTime: 0, 
+      cacheTime: 0, 
+    })
   );
 };
 
@@ -145,15 +149,27 @@ export const useFetchItemNames = () => {
   );
 };
 export const useFetchState = () => {
-  return useQuery(createQueryConfig(["state"], "/api/panel-fetch-state"));
+  return useQuery(createQueryConfig(["state"], "/api/panel-fetch-state",{
+   
+    staleTime: 0, 
+    cacheTime: 0, 
+  }));
 };
 export const useFetchPreReceipt = () => {
   return useQuery(
-    createQueryConfig(["preReceipt"], "/api/panel-fetch-prereceipts")
+    createQueryConfig(["preReceipt"], "/api/panel-fetch-prereceipts",{
+   
+      staleTime: 0, 
+      cacheTime: 0, 
+    })
   );
 };
 export const useFetchScheme = () => {
-  return useQuery(createQueryConfig(["scheme"], "/api/panel-fetch-scheme"));
+  return useQuery(createQueryConfig(["scheme"], "/api/panel-fetch-scheme",{
+   
+    staleTime: 0, 
+    cacheTime: 0, 
+  }));
 };
 
 export const useFetchDescriptionofGoods = () => {

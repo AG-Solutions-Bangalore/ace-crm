@@ -9,6 +9,7 @@ import BASE_URL from "@/config/BaseUrl";
 import { motion } from "framer-motion";
 import { ContextPanel } from "@/lib/ContextPanel";
 import { Eye, EyeOff, LogIn, Globe, Shield, CreditCard, FileText, Users, BarChart, TrendingUp, Zap, Download, Database, Briefcase } from 'lucide-react';
+import { encryptId } from "@/utils/encyrption/Encyrption";
 
 export default function LoginAuth() {
   const [email, setEmail] = useState("");
@@ -69,7 +70,7 @@ export default function LoginAuth() {
           return;
         }
 
-        const { UserInfo, userN, company_detils } = res.data;
+        const { UserInfo, userN, company_detils ,branch_detils} = res.data;
 
         localStorage.setItem("token", UserInfo.token);
         localStorage.setItem("allUsers", JSON.stringify(userN));
@@ -86,7 +87,25 @@ export default function LoginAuth() {
         await fetchPermissions();
         await fetchPagePermission();
 
-        navigate("/home");
+        const requiredBranchFields = [
+          'branch_name', 'branch_address', 'branch_iec', 'branch_gst', 
+          'branch_pan_no', 'branch_state', 'branch_state_no', 
+          'branch_state_short', 'branch_prereceipts', 'branch_status'
+        ];
+        
+        
+        const incompleteBranchDetails = requiredBranchFields.some(field => {
+          const value = branch_detils[field];
+          return value === null || value === undefined || value === '' || value === 'null';
+        });
+        
+        if (incompleteBranchDetails) {
+         
+          navigate(`/edit-branch/${encodeURIComponent(encryptId(branch_detils.id))}`);
+        } else {
+     
+          navigate("/home");
+        }
       } else {
         toast({
           variant: "destructive",
@@ -118,14 +137,14 @@ export default function LoginAuth() {
         >
           <div className="flex flex-row relative">
 
-          <div className="absolute top-3 -right-6 z-10">
+          <div className="absolute top-3 -right-6 z-10"  onClick={() => navigate("/signup")} aria-label="signup" role="button">
   <div className="bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 text-white rounded-l-full shadow-xl px-10 py-4 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
     <p className="text-sm font-semibold text-center">
       New to Export Biz?{" "}
      
     </p>
     <button 
-        onClick={() => navigate("/signup")}
+       
         className="font-extrabold hover:underline inline-flex items-center"
       >
         Start Free Trial →
@@ -342,6 +361,7 @@ export default function LoginAuth() {
                       </Label>
                       <button
                         type="button"
+                        tabIndex={-1}
                         onClick={() => navigate("/forgot-password")}
                         className="text-sm font-medium text-amber-600 dark:text-amber-400 hover:underline"
                       >
