@@ -200,7 +200,7 @@ export default function LoginAuth() {
                       <div className="text-white mb-3 flex justify-center">
                         <Briefcase size={32} />
                       </div>
-                      <p className="text-white text-lg font-semibold leading-tight">Invoice  &  <br/>Packing List Management</p>
+                      <p className="text-white text-md font-semibold leading-tight">Invoice  &  <br/>Packing List Management</p>
                     </div>
                   </div>
                   
@@ -214,7 +214,7 @@ export default function LoginAuth() {
                     <div className="mb-2">
                       <Briefcase size={24} />
                     </div>
-                    <h2 className="text-lg font-bold mb-1">Sales Contract</h2>
+                    <h2 className="text-md font-bold mb-1">Sales Contract</h2>
                     <p className="text-center text-xs">Management</p>
                   </motion.div>
                   
@@ -224,7 +224,7 @@ export default function LoginAuth() {
                       <div className="text-white mb-2 flex justify-center">
                         <Database size={24} />
                       </div>
-                      <p className="text-white text-lg font-semibold leading-tight">Database Storage</p>
+                      <p className="text-white text-md font-semibold leading-tight">Database Storage</p>
                     </div>
                   </div>
                   
@@ -238,7 +238,7 @@ export default function LoginAuth() {
                     <div className="mb-2">
                       <Download size={24} />
                     </div>
-                    <h2 className="text-xl font-bold mb-1">Excel & PDF</h2>
+                    <h2 className="text-md font-bold mb-1">Excel & PDF</h2>
                     <p className="text-center text-xs">Export Tools</p>
                   </motion.div>
                   
@@ -248,7 +248,7 @@ export default function LoginAuth() {
                       <div className="text-white mb-3 flex justify-center">
                         <Zap size={32} />
                       </div>
-                      <p className="text-white text-lg font-semibold leading-tight">Secure & Fast Processing</p>
+                      <p className="text-white text-md font-semibold leading-tight">Secure & Fast </p>
                     </div>
                   </div>
                 </div>
