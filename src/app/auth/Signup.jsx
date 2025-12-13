@@ -272,7 +272,7 @@ export default function Signup() {
                     <div className="mb-2">
                       <FileText size={24} />
                     </div>
-                    <h2 className="text-lg font-bold mb-1">GST & PAN</h2>
+                    <h2 className="text-md font-bold mb-1">GST & PAN</h2>
                     <p className="text-center text-xs">Verification</p>
                   </motion.div>
                   
@@ -296,7 +296,7 @@ export default function Signup() {
                     <div className="mb-2">
                       <Zap size={24} />
                     </div>
-                    <h2 className="text-xl font-bold mb-1">14-Day</h2>
+                    <h2 className="text-md font-bold mb-1">14-Day</h2>
                     <p className="text-center text-xs">Free Trial</p>
                   </motion.div>
                   
@@ -306,7 +306,7 @@ export default function Signup() {
                       <div className="text-white mb-3 flex justify-center">
                         <Shield size={32} />
                       </div>
-                      <p className="text-white text-sm font-semibold leading-tight">Secure & Compliant Setup</p>
+                      <p className="text-white text-sm font-semibold leading-tight">Secure & Fast </p>
                     </div>
                   </div>
                 </div>

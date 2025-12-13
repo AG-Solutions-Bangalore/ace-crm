@@ -101,6 +101,7 @@ import FloatingMessageActions from "./components/FloatingMessageActions/Floating
 import ProductIndex from "./app/master/product-index/ProductIndex";
 import { cache } from "./utils/cache";
 import Signup from "./app/auth/Signup";
+import BuyerCanvas from "./app/master/buyer/BuyerCanvas";
 
 
 function App() {
@@ -230,6 +231,7 @@ function App() {
         <Route path="/master/bank" element={<BankList />} />
         {/* master -buyer  */}
         <Route path="/master/buyer" element={<BuyerList />} />
+        <Route path="/master/buyer-canvas" element={<BuyerCanvas />} />
         {/* Master Scheme  */}
         <Route path="/master/scheme" element={<SchemeList />} />
 
