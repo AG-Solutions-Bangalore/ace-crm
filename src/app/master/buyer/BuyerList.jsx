@@ -226,14 +226,7 @@ const BuyerList = () => {
           </DropdownMenu>
 
           <CreateBuyer />
-          <Link to={'/master/buyer-canvas'}>
-           <Button
-                      variant="default"
-                      className={`ml-2 ${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor}`}
-                    >
-                      <SquarePlus className="h-4 w-4" /> Buyer Canvas
-                    </Button>
-                    </Link>
+         
         </div>
         {/* table  */}
         <div className="rounded-md border">

@@ -327,6 +327,12 @@ export function AppSidebar({ ...props }) {
         icon: Folder,
         isActive: false,
       },
+      {
+        title: "Product Costing",
+        url: "/product-costing",
+        icon: Folder,
+        isActive: false,
+      },
     ],
 
     userManagement: [
