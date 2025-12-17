@@ -101,7 +101,11 @@ import FloatingMessageActions from "./components/FloatingMessageActions/Floating
 import ProductIndex from "./app/master/product-index/ProductIndex";
 import { cache } from "./utils/cache";
 import Signup from "./app/auth/Signup";
-import CalculateCosting from "./app/master/buyer/BuyerCanvas";
+
+import ProductCostingList from "./app/product-costing/ProductCostingList";
+import CalculateCosting from "./app/product-costing/CalculateCosting";
+import CostingParameterList from "./app/product-costing/CostingParameterList";
+import EditCalculateCosting from "./app/product-costing/EditCalculateCosting";
 
 
 function App() {
@@ -231,7 +235,11 @@ function App() {
         <Route path="/master/bank" element={<BankList />} />
         {/* master -buyer  */}
         <Route path="/master/buyer" element={<BuyerList />} />
-        <Route path="/product-costing" element={<CalculateCosting />} />
+      
+        <Route path="/product-costing" element={<ProductCostingList />} />
+        <Route path="/product-calculation" element={<CostingParameterList />} />
+       <Route path="/product-calculation-create" element={<CalculateCosting />} />
+         <Route path="/product-calculation-edit/:id" element={<EditCalculateCosting />} />
         {/* Master Scheme  */}
         <Route path="/master/scheme" element={<SchemeList />} />
 

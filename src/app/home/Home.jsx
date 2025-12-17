@@ -6,7 +6,11 @@ import {
   ClipboardCheck,
   CheckCircle,
   XCircle,
+  BarChart3,
+  PieChart,
 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { motion, AnimatePresence } from "framer-motion";
 import Page from "../dashboard/page";
 import BASE_URL from "@/config/BaseUrl";
 import {
@@ -31,6 +35,37 @@ const StatCard = ({ title, value, icon: Icon, className }) => (
     </CardContent>
   </Card>
 );
+
+
+const tabContentVariants = {
+ initial: {
+    opacity: 0,
+    scale: 0.98,
+    y: 20,
+  },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 400,   
+      damping: 30,      
+      mass: 0.8,       
+      bounce: 0.25,    
+    },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.98,
+    y: -20,
+    transition: {
+      type: "spring",
+      stiffness: 400,
+      damping: 30,
+    },
+  },
+};
 
 const months = [
   "January",
@@ -130,7 +165,7 @@ const Home = () => {
   return (
     <Page>
       <div className="p-3 sm:p-4 md:p-6">
-        {/* Stat Cards - Mobile responsive grid */}
+      
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
           <StatCard
             title="Open Contract"
@@ -164,35 +199,76 @@ const Home = () => {
           />
         </div>
 
-        {/* Combined Chart - Added responsive margin */}
-        <div className="mt-4 sm:mt-6 md:mt-8">
-          <DashboardCombinedChart
-            barGraphData={dashboardData?.graph1 || []}
-            pieGraphData={dashboardData?.graph2 || []}
-            selectedYear={selectedYear}
-            selectedMonth={selectedMonth}
-            years={years}
-            handleChange={handleMonthYearChange}
-            currentYear={currentYear}
-            currentMonthIndex={currentMonthIndex}
-            isLoadingdashboord={isLoadingdashboord}
-            isErrordashboord={isErrordashboord}
-            refetchdashboord={refetchdashboord}
-            isMobile={isMobile}
-          />
-        </div>
-       
-        {/* Polar Chart - Added responsive margin */}
-        <div className="mt-4 sm:mt-6 md:mt-8">
-          <DashboardPolarChart
-            title="Balance Distribution by Country"
-            graphData={dashboardData?.graph3 || []}
-            usdToInr={dashboardData?.usd_to_inr}
-            isLoadingdashboord={isLoadingdashboord}
-            isErrordashboord={isErrordashboord}
-            refetchdashboord={refetchdashboord}
-            isMobile={isMobile}
-          />
+        
+        <div className="mt-4">
+          <Tabs defaultValue="combined" className="w-full">
+      
+            <TabsList className="grid w-full grid-cols-2 h-10 p-1 bg-gray-100/80 rounded-lg text-black">
+              <TabsTrigger 
+                value="combined" 
+                className="flex items-center justify-center gap-2 h-8 py-0 data-[state=active]:bg-blue-500/20 data-[state=active]:shadow-sm rounded-md transition-all duration-200"
+              >
+                <BarChart3 className="h-4 w-4" />
+                <span className="text-sm font-medium">Sales Analytics</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="polar" 
+                className="flex items-center justify-center gap-2 h-8 py-0 data-[state=active]:bg-rose-500/20 data-[state=active]:shadow-sm rounded-md transition-all duration-200"
+              >
+                <PieChart className="h-4 w-4" />
+                <span className="text-sm font-medium">Balance Distribution</span>
+              </TabsTrigger>
+            </TabsList>
+
+
+         
+            <AnimatePresence mode="wait">
+              <TabsContent value="combined" className="mt-1">
+                <motion.div
+                  key="combined"
+                  variants={tabContentVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                >
+                  <DashboardCombinedChart
+                    barGraphData={dashboardData?.graph1 || []}
+                    pieGraphData={dashboardData?.graph2 || []}
+                    selectedYear={selectedYear}
+                    selectedMonth={selectedMonth}
+                    years={years}
+                    handleChange={handleMonthYearChange}
+                    currentYear={currentYear}
+                    currentMonthIndex={currentMonthIndex}
+                    isLoadingdashboord={isLoadingdashboord}
+                    isErrordashboord={isErrordashboord}
+                    refetchdashboord={refetchdashboord}
+                    isMobile={isMobile}
+                  />
+                </motion.div>
+              </TabsContent>
+
+              <TabsContent value="polar" className="mt-1">
+                <motion.div
+                  key="polar"
+                  variants={tabContentVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                >
+                  <DashboardPolarChart
+                    title="Balance Distribution by Country"
+                    graphData={dashboardData?.graph3 || []}
+                    usdToInr={dashboardData?.usd_to_inr}
+                    isLoadingdashboord={isLoadingdashboord}
+                    isErrordashboord={isErrordashboord}
+                    refetchdashboord={refetchdashboord}
+                    isMobile={isMobile}
+                  />
+                </motion.div>
+              </TabsContent>
+            </AnimatePresence>
+          </Tabs>
         </div>
       </div>
     </Page>
