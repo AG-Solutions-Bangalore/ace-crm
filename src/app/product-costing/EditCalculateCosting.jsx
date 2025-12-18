@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   DndContext,
   closestCenter,
@@ -18,13 +19,17 @@ import {
 } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Save, Plus, X, GripVertical, Eye, Calculator, DollarSign, Receipt, Hand } from 'lucide-react';
+import { Save, Plus, X, GripVertical, Eye, Calculator, DollarSign, Receipt, Hand, ArrowLeft, Loader2, ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import Page from '@/app/dashboard/page';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import BASE_URL from '@/config/BaseUrl';
+
 
 const INDIAN_STATES = [
   'Andhra Pradesh','Assam','Bihar','Chhattisgarh','Goa',
@@ -34,19 +39,6 @@ const INDIAN_STATES = [
   'Uttar Pradesh','Uttarakhand','West Bengal','Andaman and Nicobar Islands',
   'Chandigarh','Dadra and Nagar Haveli and Daman and Diu','Delhi',
   'Jammu and Kashmir','Ladakh','Lakshadweep','Puducherry'
-];
-
-const COST_PARAMETERS = [
-  { id: 'state', key: 'state', label: 'State', unit: '', description: 'Select state for pricing', type: 'dropdown' },
-  { id: 'transport', key: 'state_transport', label: 'State Transport', unit: '₹', description: 'Transportation cost', type: 'number' },
-  { id: 'road_cost', key: 'road_cost', label: 'Road Cost', unit: '₹', description: 'Road charges', type: 'number' },
-  { id: 'loading', key: 'loading', label: 'Loading', unit: '₹', description: 'Loading charges', type: 'number' },
-  { id: 'unloading', key: 'unloading', label: 'Unloading', unit: '₹', description: 'Unloading charges', type: 'number' },
-  { id: 'labour', key: 'labour_cost', label: 'Labour Cost', unit: '₹', description: 'Labour charges', type: 'number' },
-  { id: 'toll', key: 'toll_charges', label: 'Toll Charges', unit: '₹', description: 'Toll charges', type: 'number' },
-  { id: 'packaging', key: 'packaging', label: 'Packaging', unit: '₹', description: 'Packaging cost', type: 'number' },
-  { id: 'tax', key: 'tax', label: 'GST Tax', unit: '%', description: 'Tax percentage', type: 'number' },
-  { id: 'profit', key: 'profit_margin', label: 'Profit Margin', unit: '%', description: 'Profit margin', type: 'number' }
 ];
 
 const DroppableArea = ({ children, isEmpty }) => {
@@ -128,6 +120,51 @@ const DraggableParameterCard = ({ parameter, onAdd, isAdded }) => {
           {isAdded ? <Eye className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
         </Button>
       </div>
+    </div>
+  );
+};
+
+const ParameterGroup = ({ groupName, parameters, onAdd, selectedParameters, isExpanded, onToggle }) => {
+  const addedCount = parameters.filter(param => 
+    selectedParameters.some(p => p.key === param.key && !p.isCustom)
+  ).length;
+
+  return (
+    <div className="mb-3 border border-gray-200 rounded-lg overflow-hidden">
+      <div 
+        className="flex items-center justify-between p-3 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
+        onClick={onToggle}
+      >
+        <div className="flex items-center">
+          {isExpanded ? (
+            <ChevronDown className="h-4 w-4 text-gray-500 mr-2" />
+          ) : (
+            <ChevronRight className="h-4 w-4 text-gray-500 mr-2" />
+          )}
+          <span className="font-medium text-sm text-gray-700">{groupName}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded">
+            {addedCount}/{parameters.length} added
+          </span>
+        </div>
+      </div>
+      
+      {isExpanded && (
+        <div className="p-2 bg-white grid grid-cols-2 gap-2 items-center">
+          {parameters.map((parameter) => {
+            const isAdded = selectedParameters.some(p => p.key === parameter.key && !p.isCustom);
+            return (
+              <DraggableParameterCard
+                key={parameter.id}
+                parameter={parameter}
+                onAdd={onAdd}
+                isAdded={isAdded}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
@@ -242,42 +279,232 @@ const CostParameterItem = ({ id, parameter, value, onUpdate, onRemove, index }) 
   );
 };
 
-const CalculateCosting = () => {
-  const [fileName, setFileName] = useState('Product Costing - New');
+const EditCalculateCosting = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [fileName, setFileName] = useState('');
   const [selectedParameters, setSelectedParameters] = useState([]);
   const [parameterValues, setParameterValues] = useState({});
   const [activeDragId, setActiveDragId] = useState(null);
   const [activeDragItem, setActiveDragItem] = useState(null);
+  const [expandedGroups, setExpandedGroups] = useState({});
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
+ 
+  const { 
+    data: existingCosting,
+    isLoading: isLoadingExisting,
+    isError: isErrorExisting,
+    refetch: refetchExisting
+  } = useQuery({
+    queryKey: ['costing-parameters-by-id', id],
+    queryFn: async () => {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `${BASE_URL}/api/panel-fetch-costing-parameters-by-id/${id}`,
+        {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      return response.data.costing;
+    },
+    enabled: !!id,
+  });
+
+ 
+  const { 
+    data: costParameters = [], 
+    isLoading: isLoadingCostParameters,
+    isError: isErrorCostParameters,
+  } = useQuery({
+    queryKey: ['costing-parameters'],
+    queryFn: async () => {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `${BASE_URL}/api/panel-fetch-costing-field-list`,
+        {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      if (response.data.costing) {
+        const transformedParams = response.data.costing.map((item, index) => {
+          const isState = item.costing_field_name.toLowerCase() === 'state';
+          
+          return {
+            id: `param_${item.id}_${index}`,
+            key: item.costing_field_name.toLowerCase().replace(/\s+/g, '_'),
+            label: item.costing_field_name,
+            unit: item.costing_field_type2 || '',
+            description: `${item.costing_field_name} field`,
+            type: isState ? 'dropdown' : 'number',
+            category: item.costing_field_type3 || 'Other'
+          };
+        });
+        
+        // const hasState = transformedParams.some(p => p.label.toLowerCase() === 'state');
+        // if (!hasState) {
+        //   transformedParams.unshift({
+        //     id: 'state',
+        //     key: 'state',
+        //     label: 'State',
+        //     unit: '',
+        //     description: 'Select state for pricing',
+        //     type: 'dropdown',
+        //     category: 'Location'
+        //   });
+        // }
+        
+        return transformedParams;
+      }
+      return [];
+    },
+  });
+
+  
+  const groupedParameters = React.useMemo(() => {
+    const groups = {};
+    costParameters.forEach(param => {
+      const category = param.category || 'Other';
+      if (!groups[category]) {
+        groups[category] = [];
+      }
+      groups[category].push(param);
+    });
+    return groups;
+  }, [costParameters]);
+
+
+  React.useEffect(() => {
+    if (Object.keys(groupedParameters).length > 0) {
+      const initialExpanded = {};
+      Object.keys(groupedParameters).forEach(category => {
+        initialExpanded[category] = true; 
+      });
+      setExpandedGroups(initialExpanded);
+    }
+  }, [groupedParameters]);
+
+
+  const updateCostingMutation = useMutation({
+    mutationFn: async (data) => {
+      const token = localStorage.getItem('token');
+      const response = await axios.put(
+        `${BASE_URL}/api/panel-update-costing-parameters/${id}`,
+        data,
+        {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      return response.data;
+    },
+    onSuccess: (data) => {
+      if(data?.code === 200) {
+        toast({
+          title: "Success",
+          description: `${data?.msg}` || `Costing parameters updated successfully`,
+        
+          duration: 2000,
+        });
+        
+      
+        queryClient.invalidateQueries({ queryKey: ['costing-parameters-list'] });
+        queryClient.invalidateQueries({ queryKey: ['costing-parameters-by-id', id] });
+        
+        navigate('/costing-parameter')
+      }else {
+        toast({
+          title: "Error",
+          description: `${data?.msg}` || `Error`,
+          duration: 2000,
+          
+        });
+      }
+    },
+    onError: (error) => {
+      console.error('Error updating configuration:', error);
+      toast({
+        title: "Update Failed",
+        description: error.response?.data?.message || error.message || "Failed to update configuration",
+        variant: "destructive",
+      });
+    }
+  });
+
+
   useEffect(() => {
-    const saved = localStorage.getItem('lastCostingConfig');
-    if (saved) {
+    if (existingCosting && costParameters.length > 0) {
+      setFileName(existingCosting.costing_parameters_name || '');
+      
       try {
-        const config = JSON.parse(saved);
-        setFileName(config.fileName);
-        setSelectedParameters(config.parameters.map(p => ({
-          ...COST_PARAMETERS.find(cp => cp.key === p.key),
-          id: `${p.key}-${Date.now()}`
-        })));
+        const parsedParameters = JSON.parse(existingCosting.costing_parameters || '[]');
+        
+        const newSelectedParameters = parsedParameters.map((param, index) => {
+         
+          const matchedParam = costParameters.find(cp => 
+            cp.label === param.name || 
+            cp.key === param.name.toLowerCase().replace(/\s+/g, '_')
+          );
+          
+          if (matchedParam) {
+            return {
+              ...matchedParam,
+              id: `${matchedParam.id}-edit-${index}-${Date.now()}`,
+              type: param.type || matchedParam.type,
+              unit: param.unit || matchedParam.unit,
+              category: matchedParam.category
+            };
+          }
+          
+    
+          return {
+            id: `custom-${index}-${Date.now()}`,
+            key: param.name.toLowerCase().replace(/\s+/g, '_'),
+            label: param.name,
+            unit: param.unit || '',
+            description: `${param.name} field`,
+            type: param.type || 'number',
+            category: 'Custom',
+            isCustom: true
+          };
+        });
+        
+        setSelectedParameters(newSelectedParameters);
+        
         const values = {};
-        config.parameters.forEach(p => {
-          values[`${p.key}-${Date.now()}`] = p.value !== undefined ? p.value.toString() : '';
+        newSelectedParameters.forEach((param, index) => {
+          values[param.id] = parsedParameters[index]?.value?.toString() || '';
         });
         setParameterValues(values);
+        
       } catch (e) {
-        console.error('Failed to load saved config:', e);
+        console.error('Failed to parse existing parameters:', e);
+        toast({
+          title: "Error",
+          description: "Failed to load existing configuration",
+          variant: "destructive",
+        });
       }
     }
-  }, []);
+  }, [existingCosting, costParameters]);
 
   const handleAddParameter = (parameter) => {
-    if (selectedParameters.some(p => p.id.startsWith(parameter.id))) {
+    if (selectedParameters.some(p => p.key === parameter.key && !p.isCustom)) {
       toast({
         title: "Already Added",
         description: `${parameter.label} is already in the calculation`,
@@ -288,7 +515,7 @@ const CalculateCosting = () => {
 
     const newParam = {
       ...parameter,
-      id: `${parameter.id}-${Date.now()}`
+      id: `${parameter.id}-${Date.now()}-${Math.random()}`
     };
     
     setSelectedParameters(prev => [...prev, newParam]);
@@ -321,7 +548,7 @@ const CalculateCosting = () => {
     const { active } = event;
     setActiveDragId(active.id);
     
-    const parameter = COST_PARAMETERS.find(p => p.id === active.id);
+    const parameter = costParameters.find(p => p.id === active.id);
     if (parameter) {
       setActiveDragItem(parameter);
     }
@@ -334,8 +561,8 @@ const CalculateCosting = () => {
     setActiveDragItem(null);
 
     if (over && over.id === 'selected-parameters-area') {
-      const parameter = COST_PARAMETERS.find(p => p.id === active.id);
-      if (parameter && !selectedParameters.some(p => p.id.startsWith(parameter.id))) {
+      const parameter = costParameters.find(p => p.id === active.id);
+      if (parameter && !selectedParameters.some(p => p.key === parameter.key && !p.isCustom)) {
         handleAddParameter(parameter);
         toast({
           title: "Item Added",
@@ -370,7 +597,14 @@ const CalculateCosting = () => {
     setActiveDragItem(null);
   };
 
-  const handleSaveConfiguration = () => {
+  const toggleGroup = (groupName) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [groupName]: !prev[groupName]
+    }));
+  };
+
+  const handleUpdateConfiguration = async () => {
     if (selectedParameters.length === 0) {
       toast({
         title: "No Parameters",
@@ -380,28 +614,26 @@ const CalculateCosting = () => {
       return;
     }
 
-    const configData = {
-      fileName,
-      parameters: selectedParameters.map(param => {
-        const valueStr = parameterValues[param.id] || '';
-        return {
-          key: param.key,
-          label: param.label,
-          value: param.type === 'dropdown' ? valueStr : (valueStr === '' ? 0 : parseFloat(valueStr) || 0),
-          unit: param.unit,
-          type: param.type
-        };
-      }),
-      timestamp: new Date().toISOString()
+ 
+    const costingParameters = selectedParameters.map(param => {
+      const valueStr = parameterValues[param.id] || '';
+      const value = param.type === 'dropdown' ? valueStr : (valueStr === '' ? 0 : parseFloat(valueStr) || 0);
+      
+      return {
+        name: param.label,
+        value: value,
+        type: param.type,
+        unit: param.unit
+      };
+    });
+
+    const postData = {
+      costing_parameters_name: fileName,
+      costing_parameters: JSON.stringify(costingParameters),
+      costing_parameters_status: existingCosting?.costing_parameters_status || 'Active'
     };
 
-    localStorage.setItem('lastCostingConfig', JSON.stringify(configData));
-
-    toast({
-      title: "Configuration Saved",
-      description: `${fileName} has been saved`,
-      duration: 2000,
-    });
+    updateCostingMutation.mutate(postData);
   };
 
   const hasEmptyFields = () => {
@@ -410,6 +642,42 @@ const CalculateCosting = () => {
       return !value || value.trim() === '';
     });
   };
+
+
+  const totalParametersCount = costParameters.length;
+  const selectedParametersCount = selectedParameters.length;
+
+  if (isLoadingExisting || isLoadingCostParameters) {
+    return (
+      <Page>
+        <div className="p-4 bg-gray-50 min-h-screen flex items-center justify-center">
+          <Calculator className="h-8 w-8 animate-spin text-blue-600" />
+        </div>
+      </Page>
+    );
+  }
+
+  if (isErrorExisting) {
+    return (
+      <Page>
+        <div className="p-4 bg-gray-50 min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-red-600 mb-4">Failed to load costing parameter</p>
+            <Button onClick={() => refetchExisting()}>
+              Retry
+            </Button>
+            <Button 
+              variant="outline" 
+              className="ml-2"
+              onClick={() => navigate('/costing-parameter')}
+            >
+              Back to List
+            </Button>
+          </div>
+        </div>
+      </Page>
+    );
+  }
 
   return (
     <Page>
@@ -429,11 +697,19 @@ const CalculateCosting = () => {
                   <div className="p-4 border-b border-gray-200 bg-white rounded-t-lg">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => navigate('/costing-parameter')}
+                          className="h-8 w-8 p-0"
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                        </Button>
                         <div className="p-2 bg-blue-100 rounded">
                           <Receipt className="h-5 w-5 text-blue-600" />
                         </div>
                         <div>
-                          <h2 className="text-lg font-semibold text-gray-800">Product Costing</h2>
+                          <h2 className="text-lg font-semibold text-gray-800">Edit Product Costing</h2>
                           <Input
                             value={fileName}
                             onChange={(e) => setFileName(e.target.value)}
@@ -449,12 +725,16 @@ const CalculateCosting = () => {
                           </span>
                         )}
                         <Button
-                          onClick={handleSaveConfiguration}
-                          disabled={selectedParameters.length === 0}
+                          onClick={handleUpdateConfiguration}
+                          disabled={selectedParameters.length === 0 || updateCostingMutation.isLoading}
                           className="gap-2 bg-blue-600 hover:bg-blue-700"
                         >
-                          <Save className="h-4 w-4" />
-                          Save
+                          {updateCostingMutation.isLoading ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Save className="h-4 w-4" />
+                          )}
+                          {updateCostingMutation.isLoading ? 'Updating...' : 'Update'}
                         </Button>
                       </div>
                     </div>
@@ -486,7 +766,7 @@ const CalculateCosting = () => {
                             </div>
                           </div>
                           
-                          <div className="max-h-[25rem] overflow-y-auto">
+                          <div className="max-h-[38rem] overflow-y-auto">
                             {selectedParameters.map((param, index) => (
                               <CostParameterItem
                                 key={param.id}
@@ -512,39 +792,49 @@ const CalculateCosting = () => {
                 <CardContent className="p-4">
                   <h3 className="font-medium mb-4 flex items-center gap-2">
                     <Plus className="h-4 w-4 text-blue-600" />
-                    <span>Add Cost Items</span>
+                    <span>Available Cost Items</span>
                     <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
-                      {selectedParameters.length}/{COST_PARAMETERS.length}
+                      {selectedParametersCount}/{totalParametersCount}
                     </span>
                   </h3>
                   
-                  <div className="max-h-[calc(100vh-200px)] overflow-y-auto grid grid-cols-2 gap-2 pr-1">
-                    {COST_PARAMETERS.map((parameter) => {
-                      const isAdded = selectedParameters.some(p => p.id.startsWith(parameter.id));
-                      return (
-                        <DraggableParameterCard
-                          key={parameter.id}
-                          parameter={parameter}
+                  <div className="max-h-[calc(100vh-200px)] overflow-y-auto pr-1">
+                    {Object.keys(groupedParameters).length === 0 ? (
+                      <div className="text-center py-8 text-gray-400">
+                        <p className="text-sm">No parameters available</p>
+                      </div>
+                    ) : (
+                      Object.entries(groupedParameters).map(([category, parameters]) => (
+                        <ParameterGroup
+                          key={category}
+                          groupName={category}
+                          parameters={parameters}
                           onAdd={handleAddParameter}
-                          isAdded={isAdded}
+                          selectedParameters={selectedParameters}
+                          isExpanded={expandedGroups[category]}
+                          onToggle={() => toggleGroup(category)}
                         />
-                      );
-                    })}
+                      ))
+                    )}
                   </div>
                   
                   <div className="mt-4 pt-4 border-t">
                     <div className="text-xs text-gray-600">
                       <div className="mb-2">
                         <div className="flex justify-between mb-1">
-                          <span>Items in receipt: {selectedParameters.length}</span>
+                          <span>Items in receipt: {selectedParametersCount}</span>
                           <span className="font-medium">
-                            {((selectedParameters.length / COST_PARAMETERS.length) * 100).toFixed(0)}%
+                            {totalParametersCount > 0 ? 
+                              ((selectedParametersCount / totalParametersCount) * 100).toFixed(0) : 0}%
                           </span>
                         </div>
                         <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
                           <div 
                             className="h-full bg-green-500 transition-all"
-                            style={{ width: `${(selectedParameters.length / COST_PARAMETERS.length) * 100}%` }}
+                            style={{ 
+                              width: totalParametersCount > 0 ? 
+                                `${(selectedParametersCount / totalParametersCount) * 100}%` : '0%' 
+                            }}
                           />
                         </div>
                       </div>
@@ -588,4 +878,4 @@ const CalculateCosting = () => {
   );
 };
 
-export default CalculateCosting;
+export default EditCalculateCosting;
