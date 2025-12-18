@@ -294,7 +294,7 @@ const CalculateCosting = () => {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  // Fetch cost parameters from API using useQuery
+
   const { 
     data: costParameters = [], 
     isLoading: isLoadingCostParameters,
@@ -315,9 +315,9 @@ const CalculateCosting = () => {
       );
       
       if (response.data.costing) {
-        // Transform API data to match our component structure
+      
         const transformedParams = response.data.costing.map((item, index) => {
-          // Determine if this should be the "state" dropdown
+         
           const isState = item.costing_field_name.toLowerCase() === 'state';
           
           return {
@@ -327,23 +327,23 @@ const CalculateCosting = () => {
             unit: item.costing_field_type2 || '',
             description: `${item.costing_field_name} field`,
             type: isState ? 'dropdown' : 'number',
-            category: item.costing_field_type3 || 'Other' // Add category field
+            category: item.costing_field_type3 || 'Other' 
           };
         });
         
         // Add state parameter if not in API response
-        const hasState = transformedParams.some(p => p.label.toLowerCase() === 'state');
-        if (!hasState) {
-          transformedParams.unshift({
-            id: 'state',
-            key: 'state',
-            label: 'State',
-            unit: '',
-            description: 'Select state for pricing',
-            type: 'dropdown',
-            category: 'Location'
-          });
-        }
+        // const hasState = transformedParams.some(p => p.label.toLowerCase() === 'state');
+        // if (!hasState) {
+        //   transformedParams.unshift({
+        //     id: 'state',
+        //     key: 'state',
+        //     label: 'State',
+        //     unit: '',
+        //     description: 'Select state for pricing',
+        //     type: 'dropdown',
+        //     category: 'Location'
+        //   });
+        // }
         
         return transformedParams;
       }
@@ -358,7 +358,7 @@ const CalculateCosting = () => {
     }
   });
 
-  // Group parameters by category
+
   const groupedParameters = React.useMemo(() => {
     const groups = {};
     costParameters.forEach(param => {
@@ -371,18 +371,18 @@ const CalculateCosting = () => {
     return groups;
   }, [costParameters]);
 
-  // Initialize expanded groups
+
   React.useEffect(() => {
     if (Object.keys(groupedParameters).length > 0) {
       const initialExpanded = {};
       Object.keys(groupedParameters).forEach(category => {
-        initialExpanded[category] = true; // Expand all groups by default
+        initialExpanded[category] = true; 
       });
       setExpandedGroups(initialExpanded);
     }
   }, [groupedParameters]);
 
-  // Mutation for saving costing configuration
+
   const saveCostingMutation = useMutation({
     mutationFn: async (data) => {
       const token = localStorage.getItem('token');
@@ -399,7 +399,7 @@ const CalculateCosting = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      // console.log(data.code)
+   
       if(data?.code === 200) {
         toast({
           title: "Configuration Saved",
@@ -540,7 +540,7 @@ const CalculateCosting = () => {
       return;
     }
 
-    // Prepare data for API
+ 
     const costingParameters = selectedParameters.map(param => {
       const valueStr = parameterValues[param.id] || '';
       const value = param.type === 'dropdown' ? valueStr : (valueStr === '' ? 0 : parseFloat(valueStr) || 0);
@@ -568,7 +568,7 @@ const CalculateCosting = () => {
     });
   };
 
-  // Calculate total parameters count
+ 
   const totalParametersCount = costParameters.length;
   const selectedParametersCount = selectedParameters.length;
 
@@ -671,7 +671,6 @@ const CalculateCosting = () => {
                               <div className="w-7"></div>
                             </div>
                           </div>
-                          
                           <div className="max-h-[38rem] overflow-y-auto">
                             {selectedParameters.map((param, index) => (
                               <CostParameterItem

@@ -28,8 +28,8 @@ import { useToast } from '@/hooks/use-toast';
 import Page from '@/app/dashboard/page';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import BASE_URL from '@/config/BaseUrl';
 
-const BASE_URL = 'https://exportbiz.in/public';
 
 const INDIAN_STATES = [
   'Andhra Pradesh','Assam','Bihar','Chhattisgarh','Goa',
@@ -296,7 +296,7 @@ const EditCalculateCosting = () => {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  // Fetch existing costing parameters by ID
+ 
   const { 
     data: existingCosting,
     isLoading: isLoadingExisting,
@@ -320,7 +320,7 @@ const EditCalculateCosting = () => {
     enabled: !!id,
   });
 
-  // Fetch all available cost parameters
+ 
   const { 
     data: costParameters = [], 
     isLoading: isLoadingCostParameters,
@@ -350,22 +350,22 @@ const EditCalculateCosting = () => {
             unit: item.costing_field_type2 || '',
             description: `${item.costing_field_name} field`,
             type: isState ? 'dropdown' : 'number',
-            category: item.costing_field_type3 || 'Other' // Add category field
+            category: item.costing_field_type3 || 'Other'
           };
         });
         
-        const hasState = transformedParams.some(p => p.label.toLowerCase() === 'state');
-        if (!hasState) {
-          transformedParams.unshift({
-            id: 'state',
-            key: 'state',
-            label: 'State',
-            unit: '',
-            description: 'Select state for pricing',
-            type: 'dropdown',
-            category: 'Location'
-          });
-        }
+        // const hasState = transformedParams.some(p => p.label.toLowerCase() === 'state');
+        // if (!hasState) {
+        //   transformedParams.unshift({
+        //     id: 'state',
+        //     key: 'state',
+        //     label: 'State',
+        //     unit: '',
+        //     description: 'Select state for pricing',
+        //     type: 'dropdown',
+        //     category: 'Location'
+        //   });
+        // }
         
         return transformedParams;
       }
@@ -373,7 +373,7 @@ const EditCalculateCosting = () => {
     },
   });
 
-  // Group parameters by category
+  
   const groupedParameters = React.useMemo(() => {
     const groups = {};
     costParameters.forEach(param => {
@@ -386,18 +386,18 @@ const EditCalculateCosting = () => {
     return groups;
   }, [costParameters]);
 
-  // Initialize expanded groups
+
   React.useEffect(() => {
     if (Object.keys(groupedParameters).length > 0) {
       const initialExpanded = {};
       Object.keys(groupedParameters).forEach(category => {
-        initialExpanded[category] = true; // Expand all groups by default
+        initialExpanded[category] = true; 
       });
       setExpandedGroups(initialExpanded);
     }
   }, [groupedParameters]);
 
-  // Update mutation
+
   const updateCostingMutation = useMutation({
     mutationFn: async (data) => {
       const token = localStorage.getItem('token');
@@ -422,7 +422,7 @@ const EditCalculateCosting = () => {
           duration: 2000,
         });
         
-        // Invalidate queries
+      
         queryClient.invalidateQueries({ queryKey: ['costing-parameters-list'] });
         queryClient.invalidateQueries({ queryKey: ['costing-parameters-by-id', id] });
         
@@ -446,7 +446,7 @@ const EditCalculateCosting = () => {
     }
   });
 
-  // Load existing data when fetched
+
   useEffect(() => {
     if (existingCosting && costParameters.length > 0) {
       setFileName(existingCosting.costing_parameters_name || '');
@@ -455,7 +455,7 @@ const EditCalculateCosting = () => {
         const parsedParameters = JSON.parse(existingCosting.costing_parameters || '[]');
         
         const newSelectedParameters = parsedParameters.map((param, index) => {
-          // Find matching parameter from costParameters
+         
           const matchedParam = costParameters.find(cp => 
             cp.label === param.name || 
             cp.key === param.name.toLowerCase().replace(/\s+/g, '_')
@@ -471,7 +471,7 @@ const EditCalculateCosting = () => {
             };
           }
           
-          // If no match found, create a custom parameter
+    
           return {
             id: `custom-${index}-${Date.now()}`,
             key: param.name.toLowerCase().replace(/\s+/g, '_'),
@@ -614,7 +614,7 @@ const EditCalculateCosting = () => {
       return;
     }
 
-    // Prepare data for API
+ 
     const costingParameters = selectedParameters.map(param => {
       const valueStr = parameterValues[param.id] || '';
       const value = param.type === 'dropdown' ? valueStr : (valueStr === '' ? 0 : parseFloat(valueStr) || 0);
@@ -643,7 +643,7 @@ const EditCalculateCosting = () => {
     });
   };
 
-  // Calculate total parameters count
+
   const totalParametersCount = costParameters.length;
   const selectedParametersCount = selectedParameters.length;
 

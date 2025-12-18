@@ -210,7 +210,7 @@ const ProductPriceCalculation = () => {
                         <tr key={index}>
                           <td className="px-4 py-2">{item.name}</td>
                           <td className="px-4 py-2">
-                            {item.originalValue}{item.unit}
+                            {item.originalValue}
                           </td>
                           <td className="px-4 py-2 font-medium">
                             ₹{item.calculatedValue.toFixed(2)}
@@ -240,8 +240,8 @@ const ProductPriceCalculation = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-        <div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        {/* <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Per Metric Ton
           </label>
@@ -251,7 +251,7 @@ const ProductPriceCalculation = () => {
             onChange={(e) => setPerMetricTon(Number(e.target.value))}
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
           />
-        </div>
+        </div> */}
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -314,7 +314,7 @@ const ProductPriceCalculation = () => {
       </div>
 
       <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div>
             <p className="text-sm text-gray-600">Raw Material</p>
             <p className="text-lg font-semibold">
@@ -327,7 +327,7 @@ const ProductPriceCalculation = () => {
             onClick={() => setShowChargesDialog(true)}
           >
             <p className="text-sm text-gray-600 flex items-center gap-1">
-              Processing Charges (without Drawback)
+              Processing Charges 
               <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -336,25 +336,21 @@ const ProductPriceCalculation = () => {
           </div>
           
           <div>
-            <p className="text-sm text-gray-600">Drawback Amount</p>
+            <p className="text-sm text-gray-600">Benefits</p>
             <p className="text-lg font-semibold">₹{drawbackAmount.toFixed(2)}</p>
           </div>
           
           <div className="bg-green-50 p-3 rounded">
-            <p className="text-sm text-gray-600">INR PER MT / USD PER MT</p>
-           <div className='flex items-center'>
-           <p >
-            
-            
-         <span className="text-xl font-bold text-green-700">   ₹{grandTotal.toFixed(2)}</span> /
-         <span className="text-lg font-semibold text-blue-700">   ${usdPerMt.toFixed(2)}</span>
-            
-            
-            
-            </p>
+            <p className="text-sm text-gray-600">INR PER MT </p>
+            <span className="text-xl font-bold text-green-700">   ₹{grandTotal.toFixed(2)}</span>
            
-           </div>
           </div>
+          <div className="bg-yellow-50 p-3 rounded">
+            <p className="text-sm text-gray-600"> USD PER MT</p>
+            <span className="text-lg font-semibold text-blue-700">   ${usdPerMt.toFixed(2)}</span>
+           
+          </div>
+          
         </div>
         <div className="mt-2 text-xs text-gray-500 text-center">
           Grand Total Formula: Product Value + Total Charges (without Drawback) - Drawback Amount
