@@ -300,14 +300,7 @@ const ProductCostingList = () => {
           <div className="text-left text-2xl text-gray-800 font-[400]">
             Product Costing Fields
           </div>
-          <Link to="/product-calculation">
-            <Button
-              className={`${ButtonConfig.backgroundColor} ${ButtonConfig.hoverBackgroundColor} ${ButtonConfig.textColor} flex items-center gap-2`}
-            >
-              <Calculator className="h-4 w-4" />
-              Calculate Costing
-            </Button>
-          </Link>
+         
         </div>
 
         {/* Search and column filter */}

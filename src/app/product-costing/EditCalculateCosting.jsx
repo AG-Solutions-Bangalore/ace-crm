@@ -426,7 +426,7 @@ const EditCalculateCosting = () => {
         queryClient.invalidateQueries({ queryKey: ['costing-parameters-list'] });
         queryClient.invalidateQueries({ queryKey: ['costing-parameters-by-id', id] });
         
-        navigate('/product-calculation')
+        navigate('/costing-parameter')
       }else {
         toast({
           title: "Error",
@@ -669,7 +669,7 @@ const EditCalculateCosting = () => {
             <Button 
               variant="outline" 
               className="ml-2"
-              onClick={() => navigate('/product-calculation')}
+              onClick={() => navigate('/costing-parameter')}
             >
               Back to List
             </Button>
@@ -700,7 +700,7 @@ const EditCalculateCosting = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => navigate('/product-calculation')}
+                          onClick={() => navigate('/costing-parameter')}
                           className="h-8 w-8 p-0"
                         >
                           <ArrowLeft className="h-4 w-4" />
@@ -766,7 +766,7 @@ const EditCalculateCosting = () => {
                             </div>
                           </div>
                           
-                          <div className="max-h-[25rem] overflow-y-auto">
+                          <div className="max-h-[38rem] overflow-y-auto">
                             {selectedParameters.map((param, index) => (
                               <CostParameterItem
                                 key={param.id}

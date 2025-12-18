@@ -408,7 +408,7 @@ const CalculateCosting = () => {
         });
         
         queryClient.invalidateQueries({ queryKey: ['costing-parameters-list'] });
-        navigate('/product-calculation');
+        navigate('/costing-parameter');
       }else {
         toast({
           title: "Error",
@@ -672,7 +672,7 @@ const CalculateCosting = () => {
                             </div>
                           </div>
                           
-                          <div className="max-h-[25rem] overflow-y-auto">
+                          <div className="max-h-[38rem] overflow-y-auto">
                             {selectedParameters.map((param, index) => (
                               <CostParameterItem
                                 key={param.id}

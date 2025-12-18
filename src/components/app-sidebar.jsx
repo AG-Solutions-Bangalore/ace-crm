@@ -328,8 +328,20 @@ export function AppSidebar({ ...props }) {
         isActive: false,
       },
       {
-        title: "Product Costing",
+        title: "Cost Field",
         url: "/product-costing",
+        icon: Folder,
+        isActive: false,
+      },
+      {
+        title: "Cost Parameter",
+        url: "/costing-parameter",
+        icon: Folder,
+        isActive: false,
+      },
+      {
+        title: "Cost Calculator",
+        url: "/cost-calculator",
         icon: Folder,
         isActive: false,
       },

@@ -20,6 +20,7 @@ import {
   Trash2,
   Eye,
   FileText,
+  Calculator,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -227,7 +228,7 @@ const CostingParameterList = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate(`/product-calculation-edit/${costingId}`)}
+              onClick={() => navigate(`/costing-parameter-edit/${costingId}`)}
               className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
             >
               <Eye className="h-4 w-4" />
@@ -319,10 +320,11 @@ const CostingParameterList = () => {
             <p className="text-sm text-gray-600 mt-1">
               Manage your product costing templates
             </p>
+            
           </div>
           
           <Button
-            onClick={() => navigate("/product-calculation-create")}
+            onClick={() => navigate("/costing-parameter-create")}
             className="gap-2 bg-blue-600 hover:bg-blue-700"
           >
             <SquarePlus className="h-4 w-4" />
