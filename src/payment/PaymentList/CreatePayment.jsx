@@ -233,6 +233,7 @@ const CreatePayment = () => {
 
   const handleInputChange = (e, field) => {
     const value = e.target ? e.target.value : e;
+    console.log("CreatePayment - handleInputChange: field =", field, "value =", value);
 
     setFormData((prev) => {
       if (field === "branch_short") {
@@ -294,6 +295,7 @@ const CreatePayment = () => {
     queryFn: fetchPaymentStatus,
   });
   const fetchPaymentAmount = async () => {
+    console.log("CreatePayment - fetchPaymentAmount triggered for buyer:", formData.invoiceP_buyername);
     if (!formData.invoiceP_buyername) return [];
     const token = localStorage.getItem("token");
     if (!token) throw new Error("No authentication token found");
@@ -312,8 +314,10 @@ const CreatePayment = () => {
       }
     );
 
+    console.log("CreatePayment - Response Status:", response.status);
     if (!response.ok) throw new Error("Failed to fetch payment amount");
     const data = await response.json();
+    console.log("CreatePayment - API Response Data:", data);
     return data.invoicePaymentAmount || [];
   };
 

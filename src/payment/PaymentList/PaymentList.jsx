@@ -217,6 +217,11 @@ const PaymentList = () => {
       header: "Company",
       cell: ({ row }) => <div>{row.getValue("branch_name")}</div>,
     },
+    {
+      accessorKey: "invoiceP_buyername",
+      header: "Buyer Name",
+      cell: ({ row }) => <div>{row.getValue("invoiceP_buyername") || ""}</div>,
+    },
 
     {
       accessorKey: "invoiceP_dollar_rate",
