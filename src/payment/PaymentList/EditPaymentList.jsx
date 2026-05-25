@@ -25,7 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import BASE_URL from "@/config/BaseUrl";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import { useToast } from "@/hooks/use-toast";
-import { useFetchPaymentAmount, useFetchBuyers } from "@/hooks/useApi";
+import { useFetchBuyers } from "@/hooks/useApi";
 import { useCurrentYear } from "@/hooks/useCurrentYear";
 import { decryptId } from "@/utils/encyrption/Encyrption";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -265,8 +265,37 @@ const EditPaymentList = () => {
     queryFn: fetchPaymentStatus,
   });
 
-  const { data: invoiceNoData } = useFetchPaymentAmount();
   const { data: buyerData } = useFetchBuyers();
+
+  const fetchPaymentAmount = async () => {
+    if (!formData.invoiceP_buyername) return [];
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("No authentication token found");
+
+    const response = await fetch(
+      `${BASE_URL}/api/panel-fetch-invoice-payment-amount-new`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          invoiceP_buyername: formData.invoiceP_buyername,
+        }),
+      }
+    );
+
+    if (!response.ok) throw new Error("Failed to fetch payment amount");
+    const data = await response.json();
+    return data.invoicePaymentAmount || [];
+  };
+
+  const { data: invoiceNoData } = useQuery({
+    queryKey: ["paymentamount", formData.invoiceP_buyername],
+    queryFn: fetchPaymentAmount,
+    enabled: !!formData.invoiceP_buyername,
+  });
 
   useEffect(() => {
     if (paymentDatas && PaymentData) {
@@ -799,7 +828,7 @@ const EditPaymentList = () => {
                               )
                             }
                             options={
-                              invoiceNoData?.invoicePaymentAmount?.map(
+                              invoiceNoData?.map(
                                 (status) => ({
                                   value: status.invoice_ref,
                                   label: (

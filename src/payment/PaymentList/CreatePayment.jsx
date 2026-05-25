@@ -294,27 +294,33 @@ const CreatePayment = () => {
     queryFn: fetchPaymentStatus,
   });
   const fetchPaymentAmount = async () => {
+    if (!formData.invoiceP_buyername) return [];
     const token = localStorage.getItem("token");
     if (!token) throw new Error("No authentication token found");
 
     const response = await fetch(
-      `${BASE_URL}/api/panel-fetch-invoice-payment-amount`,
+      `${BASE_URL}/api/panel-fetch-invoice-payment-amount-new`,
       {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          invoiceP_buyername: formData.invoiceP_buyername,
+        }),
       }
     );
 
-    if (!response.ok) throw new Error("Failed to fetch company data");
+    if (!response.ok) throw new Error("Failed to fetch payment amount");
     const data = await response.json();
-    return data.invoicePaymentAmount;
+    return data.invoicePaymentAmount || [];
   };
 
   const { data: PaymentAmount } = useQuery({
-    queryKey: ["paymentamount"],
+    queryKey: ["paymentamount", formData.invoiceP_buyername],
     queryFn: fetchPaymentAmount,
+    enabled: !!formData.invoiceP_buyername,
   });
 
   const fieldLabels = {
