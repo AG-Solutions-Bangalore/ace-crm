@@ -1,12 +1,17 @@
 export const checkPermission = (userId, button, permissions) => {
-   
-      const permission = permissions.find(p => p.button === button);
-      if (!permission) return false;
-      return permission.userIds.includes(userId) && permission.status === 'Active';
-    };
+  if (!permissions || !Array.isArray(permissions)) return false;
+  const permission = permissions.find(p => p.button === button);
+  if (!permission) return false;
   
-    
+  let userIds = [];
+  if (Array.isArray(permission.userIds)) {
+    userIds = permission.userIds;
+  } else if (typeof permission.userIds === 'string') {
+    userIds = permission.userIds.split(',').map(id => id.trim());
+  } else if (permission.userIds) {
+    userIds = [permission.userIds];
+  }
   
-    // export const checkPermission = 1,VechilesCreate,
-  
-    
+  const stringUserIds = userIds.map(id => String(id));
+  return stringUserIds.includes(String(userId)) && permission.status === 'Active';
+};

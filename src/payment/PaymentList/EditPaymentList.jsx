@@ -25,7 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import BASE_URL from "@/config/BaseUrl";
 import { ButtonConfig } from "@/config/ButtonConfig";
 import { useToast } from "@/hooks/use-toast";
-import { useFetchPaymentAmount } from "@/hooks/useApi";
+import { useFetchBuyers } from "@/hooks/useApi";
 import { useCurrentYear } from "@/hooks/useCurrentYear";
 import { decryptId } from "@/utils/encyrption/Encyrption";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -60,7 +60,8 @@ const contractFormSchema = z.object({
   invoiceP_dates: z.string().min(1, "P Date is required"),
   branch_short: z.string().min(1, "Branch Short is required"),
   branch_name: z.string().min(1, "Branch Name is required"),
-  invoiceP_dollar_rate: z.number().min(1, "Dollar Rate is required"),
+  invoiceP_buyername: z.string().min(1, "Buyer Name is required"),
+  invoiceP_dollar_rate: z.any().optional(),
   invoiceP_v_date: z.string().min(1, "Invoice Date is required"),
   invoiceP_usd_amount: z
     .union([z.string(), z.number()])
@@ -187,6 +188,7 @@ const EditPaymentList = () => {
     invoiceP_dates: "",
     branch_short: "",
     branch_name: "",
+    invoiceP_buyername: "",
     invoiceP_dollar_rate: "",
     invoiceP_v_date: "",
     invoiceP_usd_amount: "",
@@ -263,7 +265,37 @@ const EditPaymentList = () => {
     queryFn: fetchPaymentStatus,
   });
 
-  const { data: invoiceNoData } = useFetchPaymentAmount();
+  const { data: buyerData } = useFetchBuyers();
+
+  const fetchPaymentAmount = async () => {
+    if (!formData.invoiceP_buyername) return [];
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("No authentication token found");
+
+    const response = await fetch(
+      `${BASE_URL}/api/panel-fetch-invoice-payment-amount-new`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          invoiceP_buyername: formData.invoiceP_buyername,
+        }),
+      }
+    );
+
+    if (!response.ok) throw new Error("Failed to fetch payment amount");
+    const data = await response.json();
+    return data.invoicePaymentAmount || [];
+  };
+
+  const { data: invoiceNoData } = useQuery({
+    queryKey: ["paymentamount", formData.invoiceP_buyername],
+    queryFn: fetchPaymentAmount,
+    enabled: !!formData.invoiceP_buyername,
+  });
 
   useEffect(() => {
     if (paymentDatas && PaymentData) {
@@ -282,6 +314,7 @@ const EditPaymentList = () => {
         invoiceP_dates: paymentDatas.payment.invoiceP_date || "",
         branch_short: paymentDatas.payment.branch_short || "",
         branch_name: paymentDatas.payment.branch_name || "",
+        invoiceP_buyername: paymentDatas.payment.invoiceP_buyername || "",
         invoiceP_dollar_rate: paymentDatas.payment.invoiceP_dollar_rate || "",
         invoiceP_v_date: paymentDatas.payment.invoiceP_v_date || "",
         invoiceP_usd_amount: paymentDatas.payment.invoiceP_usd_amount || "",
@@ -501,6 +534,7 @@ const EditPaymentList = () => {
           invoicePSub_inv_ref: "Invoice Ref",
           invoiceP_dates: "Payment Date",
           branch_name: "Company Name",
+          invoiceP_buyername: "Buyer Name",
           invoiceP_dollar_rate: "Dollar Rate",
           invoiceP_v_date: "Value Date",
           invoiceP_usd_amount: "USD Amount",
@@ -594,6 +628,34 @@ const EditPaymentList = () => {
                   onChange={(e) => handleInputChange(e, "branch_short")}
                   disabled
                 />
+              </div>
+
+              <div>
+                <label
+                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                >
+                  Buyer Name <span className="text-red-500">*</span>
+                </label>
+                <SelectStatus
+                  value={formData.invoiceP_buyername}
+                  onValueChange={(value) =>
+                    handleInputChange({ target: { value } }, "invoiceP_buyername")
+                  }
+                >
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder="Select Buyer" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {buyerData?.buyer?.map((buyer) => (
+                      <SelectItem
+                        key={buyer.id}
+                        value={buyer.buyer_name}
+                      >
+                        {buyer.buyer_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </SelectStatus>
               </div>
 
               <div>
@@ -766,7 +828,7 @@ const EditPaymentList = () => {
                               )
                             }
                             options={
-                              invoiceNoData?.invoicePaymentAmount?.map(
+                              invoiceNoData?.map(
                                 (status) => ({
                                   value: status.invoice_ref,
                                   label: (

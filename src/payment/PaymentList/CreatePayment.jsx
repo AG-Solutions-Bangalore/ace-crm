@@ -28,6 +28,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { useCurrentYear } from "@/hooks/useCurrentYear";
+import { useFetchBuyers } from "@/hooks/useApi";
 // Validation Schema
 
 const productRowSchema = z.object({
@@ -48,6 +49,7 @@ const contractFormSchema = z.object({
   invoiceP_dates: z.string().min(1, "P Date is required"),
   branch_short: z.string().min(1, "Branch Short is required"),
   branch_name: z.string().min(1, "Branch Name is required"),
+  invoiceP_buyername: z.string().min(1, "Buyer Name is required"),
   invoiceP_dollar_rate: z.string().min(1, "Dollar Rate is required"),
   invoiceP_v_date: z.string().min(1, "Invoice Date is required"),
   invoiceP_usd_amount: z.string().min(1, "USD amount is required"),
@@ -107,6 +109,7 @@ const CreatePayment = () => {
     invoiceP_dates: "",
     branch_short: "",
     branch_name: "",
+    invoiceP_buyername: "",
     invoiceP_dollar_rate: "",
     invoiceP_v_date: "",
     invoiceP_usd_amount: "",
@@ -175,6 +178,7 @@ const CreatePayment = () => {
         invoiceP_dates: "",
         branch_short: "",
         branch_name: "",
+        invoiceP_buyername: "",
         invoiceP_dollar_rate: "",
         invoiceP_v_date: "",
         invoiceP_usd_amount: "",
@@ -229,6 +233,7 @@ const CreatePayment = () => {
 
   const handleInputChange = (e, field) => {
     const value = e.target ? e.target.value : e;
+    console.log("CreatePayment - handleInputChange: field =", field, "value =", value);
 
     setFormData((prev) => {
       if (field === "branch_short") {
@@ -264,6 +269,8 @@ const CreatePayment = () => {
     queryKey: ["branch"],
     queryFn: fetchCompanys,
   });
+
+  const { data: buyerData } = useFetchBuyers();
   const fetchPaymentStatus = async () => {
     const token = localStorage.getItem("token");
     if (!token) throw new Error("No authentication token found");
@@ -288,33 +295,43 @@ const CreatePayment = () => {
     queryFn: fetchPaymentStatus,
   });
   const fetchPaymentAmount = async () => {
+    console.log("CreatePayment - fetchPaymentAmount triggered for buyer:", formData.invoiceP_buyername);
+    if (!formData.invoiceP_buyername) return [];
     const token = localStorage.getItem("token");
     if (!token) throw new Error("No authentication token found");
 
     const response = await fetch(
-      `${BASE_URL}/api/panel-fetch-invoice-payment-amount`,
+      `${BASE_URL}/api/panel-fetch-invoice-payment-amount-new`,
       {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          invoiceP_buyername: formData.invoiceP_buyername,
+        }),
       }
     );
 
-    if (!response.ok) throw new Error("Failed to fetch company data");
+    console.log("CreatePayment - Response Status:", response.status);
+    if (!response.ok) throw new Error("Failed to fetch payment amount");
     const data = await response.json();
-    return data.invoicePaymentAmount;
+    console.log("CreatePayment - API Response Data:", data);
+    return data.invoicePaymentAmount || [];
   };
 
   const { data: PaymentAmount } = useQuery({
-    queryKey: ["paymentamount"],
+    queryKey: ["paymentamount", formData.invoiceP_buyername],
     queryFn: fetchPaymentAmount,
+    enabled: !!formData.invoiceP_buyername,
   });
 
   const fieldLabels = {
     invoicePSub_inv_ref: " Invoice Ref",
     invoiceP_dates: "Payment Date",
     branch_name: "Company Name",
+    invoiceP_buyername: "Buyer Name",
     invoiceP_dollar_rate: " Dollor Rate",
     invoiceP_v_date: "Value Date",
     invoiceP_usd_amount: "Usd Amount",
@@ -443,6 +460,34 @@ const CreatePayment = () => {
                         </SelectItem>
                       ))}
                     </SelectContent>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label
+                  className={`block  ${ButtonConfig.cardLabel} text-sm mb-2 font-medium `}
+                >
+                  Buyer Name <span className="text-red-500">*</span>
+                </label>
+                <Select
+                  value={formData.invoiceP_buyername}
+                  onValueChange={(value) =>
+                    handleInputChange({ target: { value } }, "invoiceP_buyername")
+                  }
+                >
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder="Select Buyer" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {buyerData?.buyer?.map((buyer) => (
+                      <SelectItem
+                        key={buyer.id}
+                        value={buyer.buyer_name}
+                      >
+                        {buyer.buyer_name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

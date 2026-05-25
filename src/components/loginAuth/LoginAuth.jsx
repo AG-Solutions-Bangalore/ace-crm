@@ -8,7 +8,22 @@ import { useToast } from "@/hooks/use-toast";
 import BASE_URL from "@/config/BaseUrl";
 import { motion } from "framer-motion";
 import { ContextPanel } from "@/lib/ContextPanel";
-import { Eye, EyeOff, LogIn, Globe, Shield, CreditCard, FileText, Users, BarChart, TrendingUp, Zap, Download, Database, Briefcase } from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  LogIn,
+  Globe,
+  Shield,
+  CreditCard,
+  FileText,
+  Users,
+  BarChart,
+  TrendingUp,
+  Zap,
+  Download,
+  Database,
+  Briefcase,
+} from "lucide-react";
 import { encryptId } from "@/utils/encyrption/Encyrption";
 
 export default function LoginAuth() {
@@ -19,7 +34,7 @@ export default function LoginAuth() {
   const [loadingMessage, setLoadingMessage] = useState("");
   const [mounted, setMounted] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
-  
+
   const navigate = useNavigate();
   const { toast } = useToast();
   const { fetchPagePermission, fetchPermissions } = useContext(ContextPanel);
@@ -35,7 +50,7 @@ export default function LoginAuth() {
   useEffect(() => {
     setMounted(true);
     setTimeout(() => setFormVisible(true), 300);
-    
+
     let index = 0;
     let intervalId;
     if (isLoading) {
@@ -70,7 +85,7 @@ export default function LoginAuth() {
           return;
         }
 
-        const { UserInfo, userN, company_detils ,branch_detils} = res.data;
+        const { UserInfo, userN, company_detils, branch_detils } = res.data;
 
         localStorage.setItem("token", UserInfo.token);
         localStorage.setItem("allUsers", JSON.stringify(userN));
@@ -88,22 +103,33 @@ export default function LoginAuth() {
         await fetchPagePermission();
 
         const requiredBranchFields = [
-          'branch_name', 'branch_address', 'branch_iec', 'branch_gst', 
-          'branch_pan_no', 'branch_state', 'branch_state_no', 
-          'branch_state_short', 'branch_prereceipts', 'branch_status'
+          "branch_name",
+          "branch_address",
+          "branch_iec",
+          "branch_gst",
+          "branch_pan_no",
+          "branch_state",
+          "branch_state_no",
+          "branch_state_short",
+          "branch_prereceipts",
+          "branch_status",
         ];
-        
-        
-        const incompleteBranchDetails = requiredBranchFields.some(field => {
+
+        const incompleteBranchDetails = requiredBranchFields.some((field) => {
           const value = branch_detils[field];
-          return value === null || value === undefined || value === '' || value === 'null';
+          return (
+            value === null ||
+            value === undefined ||
+            value === "" ||
+            value === "null"
+          );
         });
-        
+
         if (incompleteBranchDetails) {
-         
-          navigate(`/edit-branch/${encodeURIComponent(encryptId(branch_detils.id))}`);
+          navigate(
+            `/edit-branch/${encodeURIComponent(encryptId(branch_detils.id))}`,
+          );
         } else {
-     
           navigate("/home");
         }
       } else {
@@ -118,7 +144,9 @@ export default function LoginAuth() {
         variant: "destructive",
         title: "Login Failed",
         description:
-          error.response?.data?.error || error.response?.data?.message || "Please check your credentials.",
+          error.response?.data?.error ||
+          error.response?.data?.message ||
+          "Please check your credentials.",
       });
       setIsLoading(false);
     }
@@ -129,52 +157,29 @@ export default function LoginAuth() {
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-yellow-50 to-amber-100 dark:from-gray-900 dark:to-gray-800">
       <div className="flex min-h-screen items-center justify-center p-4 md:p-0">
-        <motion.div 
+        <motion.div
           className="w-full max-w-6xl overflow-hidden rounded-b-2xl bg-white dark:bg-gray-800 shadow-2xl"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
         >
           <div className="flex flex-row relative">
+            {/* <div
+              className="absolute top-3 -right-6 z-10"
+              onClick={() => navigate("/signup")}
+              aria-label="signup"
+              role="button"
+            >
+              <div className="bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 text-white rounded-l-full shadow-xl px-10 py-4 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                <p className="text-sm font-semibold text-center">
+                  New to Aditya Spice Industry?{" "}
+                </p>
+                <button className="font-extrabold hover:underline inline-flex items-center">
+                  Start Free Trial →
+                </button>
+              </div>
+            </div> */}
 
-          <div className="absolute top-3 -right-6 z-10"  onClick={() => navigate("/signup")} aria-label="signup" role="button">
-  <div className="bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 text-white rounded-l-full shadow-xl px-10 py-4 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-    <p className="text-sm font-semibold text-center">
-      New to Export Biz?{" "}
-     
-    </p>
-    <button 
-       
-        className="font-extrabold hover:underline inline-flex items-center"
-      >
-        Start Free Trial →
-      </button>
-  </div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                
             {/* Left side - Features Grid */}
             <div className="hidden md:block md:w-2/5 p-8 md:p-10 bg-gradient-to-br from-gray-50 to-amber-50 dark:from-gray-800 dark:to-gray-900">
               <div className="h-full flex flex-col">
@@ -200,12 +205,15 @@ export default function LoginAuth() {
                       <div className="text-white mb-3 flex justify-center">
                         <Briefcase size={32} />
                       </div>
-                      <p className="text-white text-md font-semibold leading-tight">Invoice  &  <br/>Packing List Management</p>
+                      <p className="text-white text-md font-semibold leading-tight">
+                        Invoice & <br />
+                        Packing List Management
+                      </p>
                     </div>
                   </div>
-                  
+
                   {/* Top right - Secure Payments */}
-                  <motion.div 
+                  <motion.div
                     className="col-span-3 row-span-1 rounded-xl flex flex-col justify-center items-center p-3 text-white bg-gradient-to-br from-lime-500 to-green-500 shadow-lg"
                     initial={{ y: 20, opacity: 0 }}
                     animate={formVisible ? { y: 0, opacity: 1 } : {}}
@@ -217,19 +225,21 @@ export default function LoginAuth() {
                     <h2 className="text-md font-bold mb-1">Sales Contract</h2>
                     <p className="text-center text-xs">Management</p>
                   </motion.div>
-                  
+
                   {/* Middle right - Multi-currency */}
                   <div className="col-span-3 row-span-1 overflow-hidden rounded-xl shadow-lg bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center p-3">
                     <div className="text-center">
                       <div className="text-white mb-2 flex justify-center">
                         <Database size={24} />
                       </div>
-                      <p className="text-white text-md font-semibold leading-tight">Database Storage</p>
+                      <p className="text-white text-md font-semibold leading-tight">
+                        Database Storage
+                      </p>
                     </div>
                   </div>
-                  
+
                   {/* Bottom left - Client Stats */}
-                  <motion.div 
+                  <motion.div
                     className="col-span-3 row-span-1 rounded-xl flex flex-col justify-center items-center p-3 text-white bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg"
                     initial={{ y: 20, opacity: 0 }}
                     animate={formVisible ? { y: 0, opacity: 1 } : {}}
@@ -241,14 +251,16 @@ export default function LoginAuth() {
                     <h2 className="text-md font-bold mb-1">Excel & PDF</h2>
                     <p className="text-center text-xs">Export Tools</p>
                   </motion.div>
-                  
+
                   {/* Bottom right - Analytics */}
                   <div className="col-span-3 row-span-2 overflow-hidden rounded-xl shadow-lg bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center p-4">
                     <div className="text-center p-4">
                       <div className="text-white mb-3 flex justify-center">
                         <Zap size={32} />
                       </div>
-                      <p className="text-white text-md font-semibold leading-tight">Secure & Fast </p>
+                      <p className="text-white text-md font-semibold leading-tight">
+                        Secure & Fast{" "}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -258,25 +270,37 @@ export default function LoginAuth() {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="flex items-center text-xs text-gray-600 dark:text-gray-300">
                       <div className="w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-900 flex items-center justify-center mr-2">
-                        <FileText size={10} className="text-amber-600 dark:text-amber-400" />
+                        <FileText
+                          size={10}
+                          className="text-amber-600 dark:text-amber-400"
+                        />
                       </div>
                       Invoice Management
                     </div>
                     <div className="flex items-center text-xs text-gray-600 dark:text-gray-300">
                       <div className="w-5 h-5 rounded-full bg-lime-100 dark:bg-lime-900 flex items-center justify-center mr-2">
-                        <Briefcase size={10} className="text-lime-600 dark:text-lime-400" />
+                        <Briefcase
+                          size={10}
+                          className="text-lime-600 dark:text-lime-400"
+                        />
                       </div>
                       Contract Docs
                     </div>
                     <div className="flex items-center text-xs text-gray-600 dark:text-gray-300">
                       <div className="w-5 h-5 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center mr-2">
-                        <Database size={10} className="text-orange-600 dark:text-orange-400" />
+                        <Database
+                          size={10}
+                          className="text-orange-600 dark:text-orange-400"
+                        />
                       </div>
                       Database Storage
                     </div>
                     <div className="flex items-center text-xs text-gray-600 dark:text-gray-300">
                       <div className="w-5 h-5 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center mr-2">
-                        <Download size={10} className="text-yellow-600 dark:text-yellow-400" />
+                        <Download
+                          size={10}
+                          className="text-yellow-600 dark:text-yellow-400"
+                        />
                       </div>
                       PDF Export
                     </div>
@@ -284,9 +308,9 @@ export default function LoginAuth() {
                 </div>
               </div>
             </div>
-          
+
             {/* Right side - Sign in form */}
-            <motion.div 
+            <motion.div
               className="w-full md:w-3/5 p-8 md:p-12 bg-white dark:bg-gray-800"
               initial={{ x: 20, opacity: 0 }}
               animate={formVisible ? { x: 0, opacity: 1 } : {}}
@@ -308,10 +332,9 @@ export default function LoginAuth() {
                     </div>
                   </motion.div>
                   <h1 className="text-2xl font-bold md:ml-3 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent dark:from-amber-400 dark:to-orange-400">
-                    Export Biz
+                    Aditya Spice Industry
                   </h1>
                 </div>
-                
               </div>
 
               {/* Welcome Section */}
@@ -323,14 +346,17 @@ export default function LoginAuth() {
                   Sign in to manage your export contacts, invoices, and payments
                 </p>
               </div>
-              
-              <form onSubmit={handleSubmit} className="space-y-6 w-full md:w-[25rem] mx-auto">
+
+              <form
+                onSubmit={handleSubmit}
+                className="space-y-6 w-full md:w-[25rem] mx-auto"
+              >
                 {/* Username and Password in same row on medium+ screens */}
                 <div className="grid grid-cols-1 gap-6">
                   {/* Email Input */}
                   <div className="space-y-2">
-                    <Label 
-                      htmlFor="email" 
+                    <Label
+                      htmlFor="email"
                       className="text-sm font-medium text-gray-700 dark:text-gray-200"
                     >
                       Username
@@ -349,12 +375,12 @@ export default function LoginAuth() {
                       />
                     </div>
                   </div>
-                  
+
                   {/* Password Input */}
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <Label 
-                        htmlFor="password" 
+                      <Label
+                        htmlFor="password"
                         className="text-sm font-medium text-gray-700 dark:text-gray-200"
                       >
                         Password
@@ -393,7 +419,7 @@ export default function LoginAuth() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Submit Button */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -407,7 +433,10 @@ export default function LoginAuth() {
                   >
                     {isLoading ? (
                       <span className="flex items-center justify-center">
-                        <svg className="mr-2 h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                        <svg
+                          className="mr-2 h-4 w-4 animate-spin"
+                          viewBox="0 0 24 24"
+                        >
                           <circle
                             className="opacity-25"
                             cx="12"

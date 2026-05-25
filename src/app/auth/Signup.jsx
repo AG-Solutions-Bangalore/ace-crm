@@ -7,18 +7,35 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import BASE_URL from "@/config/BaseUrl";
 import { motion } from "framer-motion";
-import { 
-  Eye, EyeOff, LogIn, Globe, Shield, CreditCard, 
-  FileText, Users, BarChart, TrendingUp, Zap, 
-  Download, Database, Briefcase, Building, Mail, 
-  Phone, User, MapPin, FileDigit, Hash
-} from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  LogIn,
+  Globe,
+  Shield,
+  CreditCard,
+  FileText,
+  Users,
+  BarChart,
+  TrendingUp,
+  Zap,
+  Download,
+  Database,
+  Briefcase,
+  Building,
+  Mail,
+  Phone,
+  User,
+  MapPin,
+  FileDigit,
+  Hash,
+} from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 
 export default function Signup() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   // Form states
   const [formData, setFormData] = useState({
     company_short: "",
@@ -29,7 +46,7 @@ export default function Signup() {
     company_contact_name: "",
     company_address: "",
     company_gst: "",
-    company_pan_no: ""
+    company_pan_no: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -44,7 +61,7 @@ export default function Signup() {
     "Setting up business account...",
     "Configuring dashboard...",
     "Almost done...",
-    "Welcome to Export Biz!",
+    "Welcome to Aditya Spice Industry!",
   ];
 
   // Validation rules
@@ -53,58 +70,58 @@ export default function Signup() {
       required: true,
       maxLength: 10,
       pattern: /^[A-Z0-9]+$/,
-      message: "Must be uppercase letters/numbers only, max 10 chars"
+      message: "Must be uppercase letters/numbers only, max 10 chars",
     },
     company_name_short: {
       required: true,
       maxLength: 20,
       pattern: /^[a-zA-Z0-9\s&.-]+$/,
-      message: "Only letters, numbers, spaces, &, ., - allowed"
+      message: "Only letters, numbers, spaces, &, ., - allowed",
     },
     company_name: {
       required: true,
       minLength: 3,
       maxLength: 100,
       pattern: /^[a-zA-Z0-9\s&.,'-]+$/,
-      message: "Valid company name required"
+      message: "Valid company name required",
     },
     company_email: {
       required: true,
       pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      message: "Valid email required"
+      message: "Valid email required",
     },
     company_mobile: {
       required: true,
       pattern: /^[0-9]{10}$/,
-      message: "10 digit mobile number required"
+      message: "10 digit mobile number required",
     },
     company_contact_name: {
       required: true,
       minLength: 2,
       pattern: /^[a-zA-Z\s.'-]+$/,
-      message: "Valid contact name required"
+      message: "Valid contact name required",
     },
     company_address: {
       required: true,
       minLength: 10,
-      message: "Address must be at least 10 characters"
+      message: "Address must be at least 10 characters",
     },
     company_gst: {
       required: true,
-    
-      message: "Valid GST number required (15 chars)"
+
+      message: "Valid GST number required (15 chars)",
     },
     company_pan_no: {
       required: true,
       pattern: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
-      message: "Valid PAN number required (10 chars)"
-    }
+      message: "Valid PAN number required (10 chars)",
+    },
   };
 
   useEffect(() => {
     setMounted(true);
     setTimeout(() => setFormVisible(true), 300);
-    
+
     let index = 0;
     let intervalId;
     if (isLoading) {
@@ -120,22 +137,26 @@ export default function Signup() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     let processedValue = value;
-    
+
     // Auto-uppercase for specific fields
-    if (name === 'company_short' || name === 'company_gst' || name === 'company_pan_no') {
+    if (
+      name === "company_short" ||
+      name === "company_gst" ||
+      name === "company_pan_no"
+    ) {
       processedValue = value.toUpperCase();
     }
-    
-    setFormData(prev => ({
+
+    setFormData((prev) => ({
       ...prev,
-      [name]: processedValue
+      [name]: processedValue,
     }));
 
     // Clear error for this field when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ""
+        [name]: "",
       }));
     }
   };
@@ -165,7 +186,7 @@ export default function Signup() {
 
   const validateForm = () => {
     const newErrors = {};
-    Object.keys(formData).forEach(key => {
+    Object.keys(formData).forEach((key) => {
       const error = validateField(key, formData[key]);
       if (error) newErrors[key] = error;
     });
@@ -175,7 +196,7 @@ export default function Signup() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    
+
     if (!validateForm()) {
       toast({
         variant: "destructive",
@@ -188,15 +209,19 @@ export default function Signup() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${BASE_URL}/api/createsignup`, formData);
+      const response = await axios.post(
+        `${BASE_URL}/api/createsignup`,
+        formData,
+      );
 
       if (response.status === 200 || response.status === 201) {
         toast({
           variant: "default",
           title: "Success!",
-          description: "Company registered successfully. Check your mail for login.",
+          description:
+            "Company registered successfully. Check your mail for login.",
         });
-        
+
         // Redirect to login after 2 seconds
         setTimeout(() => {
           navigate("/");
@@ -212,9 +237,10 @@ export default function Signup() {
       toast({
         variant: "destructive",
         title: "Registration Failed",
-        description: error.response?.data?.error || 
-                    error.response?.data?.message || 
-                    "Network error. Please try again.",
+        description:
+          error.response?.data?.error ||
+          error.response?.data?.message ||
+          "Network error. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -226,7 +252,7 @@ export default function Signup() {
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-yellow-50 to-amber-100 dark:from-gray-900 dark:to-gray-800">
       <div className="flex min-h-screen items-center justify-center p-4 md:p-0">
-        <motion.div 
+        <motion.div
           className="w-full max-w-6xl overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-2xl"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -245,7 +271,7 @@ export default function Signup() {
                       <Globe size={18} className="text-white" />
                     </div>
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent dark:from-amber-400 dark:to-orange-400">
-                      With Export Biz
+                      With Aditya Spice Industry
                     </h1>
                   </div>
                 </div>
@@ -258,12 +284,14 @@ export default function Signup() {
                       <div className="text-white mb-3 flex justify-center">
                         <Building size={32} />
                       </div>
-                      <p className="text-white text-sm font-semibold leading-tight">Company Profile Setup</p>
+                      <p className="text-white text-sm font-semibold leading-tight">
+                        Company Profile Setup
+                      </p>
                     </div>
                   </div>
-                  
+
                   {/* Top right - Document Management */}
-                  <motion.div 
+                  <motion.div
                     className="col-span-3 row-span-1 rounded-xl flex flex-col justify-center items-center p-3 text-white bg-gradient-to-br from-lime-500 to-green-500 shadow-lg"
                     initial={{ y: 20, opacity: 0 }}
                     animate={formVisible ? { y: 0, opacity: 1 } : {}}
@@ -275,19 +303,21 @@ export default function Signup() {
                     <h2 className="text-md font-bold mb-1">GST & PAN</h2>
                     <p className="text-center text-xs">Verification</p>
                   </motion.div>
-                  
+
                   {/* Middle right - Contact Setup */}
                   <div className="col-span-3 row-span-1 overflow-hidden rounded-xl shadow-lg bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center p-3">
                     <div className="text-center">
                       <div className="text-white mb-2 flex justify-center">
                         <Phone size={24} />
                       </div>
-                      <p className="text-white text-sm font-semibold leading-tight">Contact Management</p>
+                      <p className="text-white text-sm font-semibold leading-tight">
+                        Contact Management
+                      </p>
                     </div>
                   </div>
-                  
+
                   {/* Bottom left - Quick Start */}
-                  <motion.div 
+                  <motion.div
                     className="col-span-3 row-span-1 rounded-xl flex flex-col justify-center items-center p-3 text-white bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg"
                     initial={{ y: 20, opacity: 0 }}
                     animate={formVisible ? { y: 0, opacity: 1 } : {}}
@@ -299,14 +329,16 @@ export default function Signup() {
                     <h2 className="text-md font-bold mb-1">14-Day</h2>
                     <p className="text-center text-xs">Free Trial</p>
                   </motion.div>
-                  
+
                   {/* Bottom right - Secure Setup */}
                   <div className="col-span-3 row-span-2 overflow-hidden rounded-xl shadow-lg bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center p-4">
                     <div className="text-center p-4">
                       <div className="text-white mb-3 flex justify-center">
                         <Shield size={32} />
                       </div>
-                      <p className="text-white text-sm font-semibold leading-tight">Secure & Fast </p>
+                      <p className="text-white text-sm font-semibold leading-tight">
+                        Secure & Fast{" "}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -316,25 +348,37 @@ export default function Signup() {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="flex items-center text-xs text-gray-600 dark:text-gray-300">
                       <div className="w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-900 flex items-center justify-center mr-2">
-                        <Building size={10} className="text-amber-600 dark:text-amber-400" />
+                        <Building
+                          size={10}
+                          className="text-amber-600 dark:text-amber-400"
+                        />
                       </div>
                       Company Profile
                     </div>
                     <div className="flex items-center text-xs text-gray-600 dark:text-gray-300">
                       <div className="w-5 h-5 rounded-full bg-lime-100 dark:bg-lime-900 flex items-center justify-center mr-2">
-                        <FileDigit size={10} className="text-lime-600 dark:text-lime-400" />
+                        <FileDigit
+                          size={10}
+                          className="text-lime-600 dark:text-lime-400"
+                        />
                       </div>
                       GST & PAN Verified
                     </div>
                     <div className="flex items-center text-xs text-gray-600 dark:text-gray-300">
                       <div className="w-5 h-5 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center mr-2">
-                        <Mail size={10} className="text-orange-600 dark:text-orange-400" />
+                        <Mail
+                          size={10}
+                          className="text-orange-600 dark:text-orange-400"
+                        />
                       </div>
                       Business Email
                     </div>
                     <div className="flex items-center text-xs text-gray-600 dark:text-gray-300">
                       <div className="w-5 h-5 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center mr-2">
-                        <User size={10} className="text-yellow-600 dark:text-yellow-400" />
+                        <User
+                          size={10}
+                          className="text-yellow-600 dark:text-yellow-400"
+                        />
                       </div>
                       Contact Person
                     </div>
@@ -342,9 +386,9 @@ export default function Signup() {
                 </div>
               </div>
             </div>
-          
+
             {/* Right side - Signup form */}
-            <motion.div 
+            <motion.div
               className="w-full md:w-3/5 p-6 md:p-8 bg-white dark:bg-gray-800 overflow-y-auto max-h-screen"
               initial={{ x: 20, opacity: 0 }}
               animate={formVisible ? { x: 0, opacity: 1 } : {}}
@@ -366,12 +410,12 @@ export default function Signup() {
                     </div>
                   </motion.div>
                   <h1 className="text-2xl font-bold ml-3 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent dark:from-amber-400 dark:to-orange-400">
-                    Export Biz
+                    Aditya Spice Industry
                   </h1>
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-300 bg-amber-50 dark:bg-gray-700 px-4 py-2 rounded-lg border border-amber-200 dark:border-gray-600">
                   Already have an account?{" "}
-                  <button 
+                  <button
                     onClick={() => navigate("/")}
                     className="font-medium text-amber-600 dark:text-amber-400 hover:underline ml-1"
                   >
@@ -394,55 +438,60 @@ export default function Signup() {
               <form onSubmit={handleSubmit} className="space-y-2" noValidate>
                 {/* Row 1: Company Short Codes */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-         
-<div className="space-y-2">
-  <Label htmlFor="company_name" className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200">
-    <Building size={14} className="mr-2" />
-    Full Company Name
-  </Label>
-  <div className="relative">
-    <Input
-      type="text"
-      name="company_name"
-      id="company_name"
-      value={formData.company_name}
-      onChange={(e) => {
-        const newValue = e.target.value;
-        handleChange(e); 
-        
-      
-        const prefix = newValue
-          .split(' ')
-          .filter(word => word.length > 0)
-          .map(word => word.charAt(0).toUpperCase())
-          .join('')
-          .slice(0, 10); 
-        
-        setFormData(prev => ({
-          ...prev,
-          company_short: prefix
-        }));
-        
-   
-        if (errors.company_short) {
-          setErrors(prev => ({
-            ...prev,
-            company_short: ""
-          }));
-        }
-      }}
-      className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_name ? 'border-red-500 dark:border-red-500' : ''}`}
-      placeholder="Export Business Solutions Private Limited"
-      required
-    />
-    {errors.company_name && (
-      <p className="text-red-500 text-xs mt-1">{errors.company_name}</p>
-    )}
-  </div>
-</div>
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="company_name"
+                      className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200"
+                    >
+                      <Building size={14} className="mr-2" />
+                      Full Company Name
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        name="company_name"
+                        id="company_name"
+                        value={formData.company_name}
+                        onChange={(e) => {
+                          const newValue = e.target.value;
+                          handleChange(e);
+
+                          const prefix = newValue
+                            .split(" ")
+                            .filter((word) => word.length > 0)
+                            .map((word) => word.charAt(0).toUpperCase())
+                            .join("")
+                            .slice(0, 10);
+
+                          setFormData((prev) => ({
+                            ...prev,
+                            company_short: prefix,
+                          }));
+
+                          if (errors.company_short) {
+                            setErrors((prev) => ({
+                              ...prev,
+                              company_short: "",
+                            }));
+                          }
+                        }}
+                        className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_name ? "border-red-500 dark:border-red-500" : ""}`}
+                        placeholder="Export Business Solutions Private Limited"
+                        required
+                      />
+                      {errors.company_name && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.company_name}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                   {/* Company Short */}
                   <div className="space-y-2">
-                    <Label htmlFor="company_short" className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200">
+                    <Label
+                      htmlFor="company_short"
+                      className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200"
+                    >
                       <Hash size={14} className="mr-2" />
                       Company Prefix
                     </Label>
@@ -453,27 +502,29 @@ export default function Signup() {
                         id="company_short"
                         value={formData.company_short}
                         onChange={handleChange}
-                        className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 pr-10 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_short ? 'border-red-500 dark:border-red-500' : ''}`}
+                        className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 pr-10 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_short ? "border-red-500 dark:border-red-500" : ""}`}
                         placeholder="EB (uppercase only) automatically generte"
                         required
                         autoFocus
                         maxLength={10}
                       />
                       {errors.company_short && (
-                        <p className="text-red-500 text-xs mt-1">{errors.company_short}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.company_short}
+                        </p>
                       )}
                     </div>
                   </div>
-                  
-                
-                  
                 </div>
 
                 {/* Row 2: Full Company Name & Email */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   {/* Company Name Short */}
-                <div className="space-y-2">
-                    <Label htmlFor="company_name_short" className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200">
+                  {/* Company Name Short */}
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="company_name_short"
+                      className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200"
+                    >
                       <Briefcase size={14} className="mr-2" />
                       Company Short Name
                     </Label>
@@ -484,19 +535,24 @@ export default function Signup() {
                         id="company_name_short"
                         value={formData.company_name_short}
                         onChange={handleChange}
-                        className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_name_short ? 'border-red-500 dark:border-red-500' : ''}`}
-                        placeholder="Export Biz Ltd."
+                        className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_name_short ? "border-red-500 dark:border-red-500" : ""}`}
+                        placeholder="Aditya Spice Industry Ltd."
                         required
                         maxLength={20}
                       />
                       {errors.company_name_short && (
-                        <p className="text-red-500 text-xs mt-1">{errors.company_name_short}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.company_name_short}
+                        </p>
                       )}
                     </div>
                   </div>
                   {/* Company Email */}
                   <div className="space-y-2">
-                    <Label htmlFor="company_email" className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200">
+                    <Label
+                      htmlFor="company_email"
+                      className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200"
+                    >
                       <Mail size={14} className="mr-2" />
                       Company Email
                     </Label>
@@ -507,12 +563,14 @@ export default function Signup() {
                         id="company_email"
                         value={formData.company_email}
                         onChange={handleChange}
-                        className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_email ? 'border-red-500 dark:border-red-500' : ''}`}
+                        className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_email ? "border-red-500 dark:border-red-500" : ""}`}
                         placeholder="contact@exportbiz.com"
                         required
                       />
                       {errors.company_email && (
-                        <p className="text-red-500 text-xs mt-1">{errors.company_email}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.company_email}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -522,7 +580,10 @@ export default function Signup() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Company Mobile */}
                   <div className="space-y-2">
-                    <Label htmlFor="company_mobile" className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200">
+                    <Label
+                      htmlFor="company_mobile"
+                      className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200"
+                    >
                       <Phone size={14} className="mr-2" />
                       Company Mobile
                     </Label>
@@ -533,20 +594,25 @@ export default function Signup() {
                         id="company_mobile"
                         value={formData.company_mobile}
                         onChange={handleChange}
-                        className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_mobile ? 'border-red-500 dark:border-red-500' : ''}`}
+                        className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_mobile ? "border-red-500 dark:border-red-500" : ""}`}
                         placeholder="9876543210"
                         required
                         maxLength={10}
                       />
                       {errors.company_mobile && (
-                        <p className="text-red-500 text-xs mt-1">{errors.company_mobile}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.company_mobile}
+                        </p>
                       )}
                     </div>
                   </div>
-                  
+
                   {/* Contact Person Name */}
                   <div className="space-y-2">
-                    <Label htmlFor="company_contact_name" className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200">
+                    <Label
+                      htmlFor="company_contact_name"
+                      className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200"
+                    >
                       <User size={14} className="mr-2" />
                       Contact Person Name
                     </Label>
@@ -557,12 +623,14 @@ export default function Signup() {
                         id="company_contact_name"
                         value={formData.company_contact_name}
                         onChange={handleChange}
-                        className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_contact_name ? 'border-red-500 dark:border-red-500' : ''}`}
+                        className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_contact_name ? "border-red-500 dark:border-red-500" : ""}`}
                         placeholder="John Doe"
                         required
                       />
                       {errors.company_contact_name && (
-                        <p className="text-red-500 text-xs mt-1">{errors.company_contact_name}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.company_contact_name}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -570,7 +638,10 @@ export default function Signup() {
 
                 {/* Row 4: Address */}
                 <div className="space-y-2">
-                  <Label htmlFor="company_address" className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200">
+                  <Label
+                    htmlFor="company_address"
+                    className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200"
+                  >
                     <MapPin size={14} className="mr-2" />
                     Company Address
                   </Label>
@@ -580,12 +651,14 @@ export default function Signup() {
                       id="company_address"
                       value={formData.company_address}
                       onChange={handleChange}
-                      className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 min-h-[100px] resize-y ${errors.company_address ? 'border-red-500 dark:border-red-500' : ''}`}
+                      className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 min-h-[100px] resize-y ${errors.company_address ? "border-red-500 dark:border-red-500" : ""}`}
                       placeholder="Complete company address with city, state, and pin code"
                       required
                     />
                     {errors.company_address && (
-                      <p className="text-red-500 text-xs mt-1">{errors.company_address}</p>
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.company_address}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -594,7 +667,10 @@ export default function Signup() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* GST Number */}
                   <div className="space-y-2">
-                    <Label htmlFor="company_gst" className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200">
+                    <Label
+                      htmlFor="company_gst"
+                      className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200"
+                    >
                       <FileDigit size={14} className="mr-2" />
                       GST Number
                     </Label>
@@ -605,20 +681,24 @@ export default function Signup() {
                         id="company_gst"
                         value={formData.company_gst}
                         onChange={handleChange}
-                        className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_gst ? 'border-red-500 dark:border-red-500' : ''}`}
+                        className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_gst ? "border-red-500 dark:border-red-500" : ""}`}
                         placeholder="22AAAAA0000A1Z5"
                         required
-                        
                       />
                       {errors.company_gst && (
-                        <p className="text-red-500 text-xs mt-1">{errors.company_gst}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.company_gst}
+                        </p>
                       )}
                     </div>
                   </div>
-                  
+
                   {/* PAN Number */}
                   <div className="space-y-2">
-                    <Label htmlFor="company_pan_no" className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200">
+                    <Label
+                      htmlFor="company_pan_no"
+                      className="flex items-center text-sm font-medium text-amber-700 dark:text-gray-200"
+                    >
                       <FileDigit size={14} className="mr-2" />
                       PAN Number
                     </Label>
@@ -629,13 +709,15 @@ export default function Signup() {
                         id="company_pan_no"
                         value={formData.company_pan_no}
                         onChange={handleChange}
-                        className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_pan_no ? 'border-red-500 dark:border-red-500' : ''}`}
+                        className={`w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:border-transparent transition-all duration-300 ${errors.company_pan_no ? "border-red-500 dark:border-red-500" : ""}`}
                         placeholder="ABCDE1234F"
                         required
                         maxLength={10}
                       />
                       {errors.company_pan_no && (
-                        <p className="text-red-500 text-xs mt-1">{errors.company_pan_no}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.company_pan_no}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -655,7 +737,10 @@ export default function Signup() {
                   >
                     {isLoading ? (
                       <span className="flex items-center justify-center">
-                        <svg className="mr-2 h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                        <svg
+                          className="mr-2 h-4 w-4 animate-spin"
+                          viewBox="0 0 24 24"
+                        >
                           <circle
                             className="opacity-25"
                             cx="12"
