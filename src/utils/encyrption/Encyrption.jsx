@@ -1,9 +1,9 @@
 import CryptoJS from "crypto-js";
 
-const secretKey = import.meta.env.VITE_SECRET_KEY;
+const secretKey = import.meta.env.VITE_SECRET_KEY || "acecrmsecretkey";
 
-if (!secretKey) {
-  console.error("Secret key is not defined in .env");
+if (!import.meta.env.VITE_SECRET_KEY) {
+  console.warn("VITE_SECRET_KEY is not defined in .env, falling back to default key.");
 }
 
 export const encryptId = (id) => {
