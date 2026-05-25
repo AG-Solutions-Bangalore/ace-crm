@@ -77,6 +77,13 @@ import {
   ErrorComponent,
   LoaderComponent,
 } from "@/components/LoaderComponent/LoaderComponent";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 const PaymentList = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteInoice, setDeleteInoiceid] = useState(null);
@@ -98,9 +105,27 @@ const PaymentList = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      return response.data.invoicePayment;
+      return response.data.invoicePayment || [];
     },
   });
+
+  const [selectedStatus, setSelectedStatus] = useState("All");
+
+  const uniqueStatuses = React.useMemo(() => {
+    const statusSet = new Set();
+    const dataList = payment || [];
+    dataList.forEach((item) => {
+      const status = item.invoiceP_status;
+      if (status) statusSet.add(status);
+    });
+    return Array.from(statusSet).sort();
+  }, [payment]);
+
+  const filteredData = React.useMemo(() => {
+    const list = payment || [];
+    if (selectedStatus === "All") return list;
+    return list.filter((item) => item.invoiceP_status === selectedStatus);
+  }, [payment, selectedStatus]);
 
   const fetchSubRowData = async (id) => {
     const token = localStorage.getItem("token");
@@ -151,7 +176,7 @@ const PaymentList = () => {
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
       const token = localStorage.getItem("token");
-      await axios.delete(`${BASE_URL}/api/panel-delete-invoice/${id}`, {
+      await axios.delete(`${BASE_URL}/api/panel-delete-invoice-payment/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
     },
@@ -160,7 +185,7 @@ const PaymentList = () => {
       setDeleteConfirmOpen(false);
       toast({
         title: "Success",
-        description: "Invoice deleted successfully",
+        description: "Payment deleted successfully",
       });
     },
   });
@@ -247,28 +272,43 @@ const PaymentList = () => {
       header: "Action",
       cell: ({ row }) => {
         const invoiceId = row.original.id;
+        const invoicePStatus = row.original.invoiceP_status;
 
         return (
           <div className="flex flex-row">
-            <TooltipProvider></TooltipProvider>
+            {invoicePStatus !== "Closed" && (
+              <>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <InvoiceEdit
+                        onClick={() => {
+                          const encryptedId = encryptId(invoiceId);
+                          navigate(
+                            `/payment-edit/${encodeURIComponent(encryptedId)}`
+                          );
+                        }}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent>Edit payment</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
 
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <InvoiceEdit
-                    // onClick={() => navigate(`/payment-edit/${invoiceId}`)}
-                    onClick={() => {
-                      const encryptedId = encryptId(invoiceId);
-
-                      navigate(
-                        `/payment-edit/${encodeURIComponent(encryptedId)}`
-                      );
-                    }}
-                  ></InvoiceEdit>
-                </TooltipTrigger>
-                <TooltipContent>Edit payment</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <InvoiceDelete
+                        onClick={() => {
+                          setDeleteInoiceid(invoiceId);
+                          setDeleteConfirmOpen(true);
+                        }}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent>Delete payment</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </>
+            )}
           </div>
         );
       },
@@ -277,7 +317,7 @@ const PaymentList = () => {
 
   // Create the table instance
   const table = useReactTable({
-    data: payment || [],
+    data: filteredData,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -378,6 +418,21 @@ const PaymentList = () => {
               onChange={(event) => table.setGlobalFilter(event.target.value)}
               className="pl-8 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-gray-200"
             />
+          </div>
+          <div className="ml-3 w-[150px]">
+            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+              <SelectTrigger className="bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-gray-200">
+                <SelectValue placeholder="Select Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All Statuses</SelectItem>
+                {uniqueStatuses.map((status) => (
+                  <SelectItem key={status} value={status}>
+                    {status}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

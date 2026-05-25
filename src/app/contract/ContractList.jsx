@@ -71,10 +71,35 @@ import {
   ErrorComponent,
   LoaderComponent,
 } from "@/components/LoaderComponent/LoaderComponent";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+const getFiscalYear = (dateStr) => {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return "";
+  const year = d.getFullYear();
+  const month = d.getMonth();
+  if (month >= 3) {
+    const nextYearSuffix = String(year + 1).slice(-2);
+    return `${year}-${nextYearSuffix}`;
+  } else {
+    const prevYear = year - 1;
+    const currentYearSuffix = String(year).slice(-2);
+    return `${prevYear}-${currentYearSuffix}`;
+  }
+};
+
 const ContractList = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteContractId, setDeleteContractId] = useState(null);
   const { toast } = useToast();
+  const [selectedYear, setSelectedYear] = useState("All");
+
   const {
     data: contract,
     isLoading,
@@ -93,6 +118,31 @@ const ContractList = () => {
       return response.data.contract;
     },
   });
+
+  const uniqueYears = React.useMemo(() => {
+    const yearsSet = new Set();
+    const dataList = contract || [];
+    dataList.forEach((item) => {
+      const date = item.contract_date;
+      if (date) {
+        const fiscalYear = getFiscalYear(date);
+        if (fiscalYear) yearsSet.add(fiscalYear);
+      }
+    });
+    if (yearsSet.size === 0) {
+      yearsSet.add("2026-27");
+    }
+    return Array.from(yearsSet).sort((a, b) => b.localeCompare(a));
+  }, [contract]);
+
+  const filteredData = React.useMemo(() => {
+    const list = contract || [];
+    if (selectedYear === "All") return list;
+    return list.filter((item) => {
+      const date = item.contract_date;
+      return date && getFiscalYear(date) === selectedYear;
+    });
+  }, [contract, selectedYear]);
 
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
@@ -263,7 +313,7 @@ const ContractList = () => {
 
   // Create the table instance
   const table = useReactTable({
-    data: contract || [],
+    data: filteredData,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -316,6 +366,21 @@ const ContractList = () => {
               onChange={(event) => table.setGlobalFilter(event.target.value)}
               className="pl-8 bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-gray-200"
             />
+          </div>
+          <div className="ml-3 w-[150px]">
+            <Select value={selectedYear} onValueChange={setSelectedYear}>
+              <SelectTrigger className="bg-gray-50 border-gray-200 focus:border-gray-300 focus:ring-gray-200">
+                <SelectValue placeholder="Select Year" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All Years</SelectItem>
+                {uniqueYears.map((year) => (
+                  <SelectItem key={year} value={year}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
