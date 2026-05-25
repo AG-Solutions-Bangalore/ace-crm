@@ -276,38 +276,36 @@ const PaymentList = () => {
 
         return (
           <div className="flex flex-row">
-            {invoicePStatus !== "Closed" && (
-              <>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <InvoiceEdit
-                        onClick={() => {
-                          const encryptedId = encryptId(invoiceId);
-                          navigate(
-                            `/payment-edit/${encodeURIComponent(encryptedId)}`
-                          );
-                        }}
-                      />
-                    </TooltipTrigger>
-                    <TooltipContent>Edit payment</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <InvoiceEdit
+                    onClick={() => {
+                      const encryptedId = encryptId(invoiceId);
+                      navigate(
+                        `/payment-edit/${encodeURIComponent(encryptedId)}`
+                      );
+                    }}
+                  />
+                </TooltipTrigger>
+                <TooltipContent>Edit payment</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
 
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <InvoiceDelete
-                        onClick={() => {
-                          setDeleteInoiceid(invoiceId);
-                          setDeleteConfirmOpen(true);
-                        }}
-                      />
-                    </TooltipTrigger>
-                    <TooltipContent>Delete payment</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </>
+            {invoicePStatus !== "Closed" && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <InvoiceDelete
+                      onClick={() => {
+                        setDeleteInoiceid(invoiceId);
+                        setDeleteConfirmOpen(true);
+                      }}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>Delete payment</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
           </div>
         );
