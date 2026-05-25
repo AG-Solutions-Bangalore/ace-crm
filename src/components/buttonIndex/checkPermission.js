@@ -3,7 +3,15 @@ export const checkPermission = (userId, button, permissions) => {
   const permission = permissions.find(p => p.button === button);
   if (!permission) return false;
   
-  const userIds = Array.isArray(permission.userIds) ? permission.userIds : [];
+  let userIds = [];
+  if (Array.isArray(permission.userIds)) {
+    userIds = permission.userIds;
+  } else if (typeof permission.userIds === 'string') {
+    userIds = permission.userIds.split(',').map(id => id.trim());
+  } else if (permission.userIds) {
+    userIds = [permission.userIds];
+  }
+  
   const stringUserIds = userIds.map(id => String(id));
   return stringUserIds.includes(String(userId)) && permission.status === 'Active';
 };
