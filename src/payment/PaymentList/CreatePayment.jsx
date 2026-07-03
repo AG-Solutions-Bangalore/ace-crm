@@ -149,7 +149,7 @@ const CreatePayment = () => {
         setInvoiceData((prev) => prev.filter((_, i) => i !== index));
       }
     },
-    [invoiceData.length]
+    [invoiceData.length],
   );
   const createBranchMutation = useMutation({
     mutationFn: createBranch,
@@ -233,12 +233,17 @@ const CreatePayment = () => {
 
   const handleInputChange = (e, field) => {
     const value = e.target ? e.target.value : e;
-    console.log("CreatePayment - handleInputChange: field =", field, "value =", value);
+    console.log(
+      "CreatePayment - handleInputChange: field =",
+      field,
+      "value =",
+      value,
+    );
 
     setFormData((prev) => {
       if (field === "branch_short") {
         const selectedBranch = branchData?.branch.find(
-          (branch) => branch.branch_short === value
+          (branch) => branch.branch_short === value,
         );
         return {
           ...prev,
@@ -282,7 +287,7 @@ const CreatePayment = () => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     if (!response.ok) throw new Error("Failed to fetch company data");
@@ -295,7 +300,10 @@ const CreatePayment = () => {
     queryFn: fetchPaymentStatus,
   });
   const fetchPaymentAmount = async () => {
-    console.log("CreatePayment - fetchPaymentAmount triggered for buyer:", formData.invoiceP_buyername);
+    console.log(
+      "CreatePayment - fetchPaymentAmount triggered for buyer:",
+      formData.invoiceP_buyername,
+    );
     if (!formData.invoiceP_buyername) return [];
     const token = localStorage.getItem("token");
     if (!token) throw new Error("No authentication token found");
@@ -311,7 +319,7 @@ const CreatePayment = () => {
         body: JSON.stringify({
           invoiceP_buyername: formData.invoiceP_buyername,
         }),
-      }
+      },
     );
 
     console.log("CreatePayment - Response Status:", response.status);
@@ -347,11 +355,8 @@ const CreatePayment = () => {
           sum +
           (Number(item.invoicePSub_amt_adv) || 0) +
           (Number(item.invoicePSub_amt_dp) || 0) +
-          (Number(item.invoicePSub_amt_da) || 0) +
-          (Number(item.invoicePSub_bank_c) || 0) +
-          (Number(item.invoicePSub_discount) || 0) +
-          (Number(item.invoicePSub_shortage) || 0),
-        0
+          (Number(item.invoicePSub_amt_da) || 0),
+        0,
       );
 
       const invoiceUsdAmount = Number(formData.invoiceP_usd_amount) || 0;
@@ -384,7 +389,7 @@ const CreatePayment = () => {
             const fieldKey = field.split(".").pop();
             const label = fieldLabels[fieldKey] || field;
             return `${label}: ${messages.join(", ")}`;
-          }
+          },
         );
 
         toast({
@@ -473,7 +478,10 @@ const CreatePayment = () => {
                 <Select
                   value={formData.invoiceP_buyername}
                   onValueChange={(value) =>
-                    handleInputChange({ target: { value } }, "invoiceP_buyername")
+                    handleInputChange(
+                      { target: { value } },
+                      "invoiceP_buyername",
+                    )
                   }
                 >
                   <SelectTrigger className="bg-white">
@@ -481,10 +489,7 @@ const CreatePayment = () => {
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     {buyerData?.buyer?.map((buyer) => (
-                      <SelectItem
-                        key={buyer.id}
-                        value={buyer.buyer_name}
-                      >
+                      <SelectItem key={buyer.id} value={buyer.buyer_name}>
                         {buyer.buyer_name}
                       </SelectItem>
                     ))}
@@ -638,7 +643,7 @@ const CreatePayment = () => {
                             handlePaymentChange(
                               { target: { value } },
                               rowIndex,
-                              "invoicePSub_inv_ref"
+                              "invoicePSub_inv_ref",
                             );
                           }}
                         >
@@ -689,7 +694,7 @@ const CreatePayment = () => {
                             handlePaymentChange(
                               e,
                               rowIndex,
-                              "invoicePSub_amt_adv"
+                              "invoicePSub_amt_adv",
                             )
                           }
                           placeholder="Enter Amount Adv"
@@ -703,7 +708,7 @@ const CreatePayment = () => {
                             handlePaymentChange(
                               e,
                               rowIndex,
-                              "invoicePSub_amt_dp"
+                              "invoicePSub_amt_dp",
                             )
                           }
                           placeholder="Enter Amount DP"
@@ -717,7 +722,7 @@ const CreatePayment = () => {
                             handlePaymentChange(
                               e,
                               rowIndex,
-                              "invoicePSub_amt_da"
+                              "invoicePSub_amt_da",
                             )
                           }
                           placeholder="Enter Amount DA"
@@ -731,7 +736,7 @@ const CreatePayment = () => {
                             handlePaymentChange(
                               e,
                               rowIndex,
-                              "invoicePSub_bank_c"
+                              "invoicePSub_bank_c",
                             )
                           }
                           placeholder="Enter Bank Name"
@@ -745,7 +750,7 @@ const CreatePayment = () => {
                             handlePaymentChange(
                               e,
                               rowIndex,
-                              "invoicePSub_discount"
+                              "invoicePSub_discount",
                             )
                           }
                           placeholder="Enter Discount"
@@ -759,7 +764,7 @@ const CreatePayment = () => {
                             handlePaymentChange(
                               e,
                               rowIndex,
-                              "invoicePSub_shortage"
+                              "invoicePSub_shortage",
                             )
                           }
                           placeholder="Enter Shortage"
@@ -773,7 +778,7 @@ const CreatePayment = () => {
                             handlePaymentChange(
                               e,
                               rowIndex,
-                              "invoicePSub_remarks"
+                              "invoicePSub_remarks",
                             )
                           }
                           placeholder="Enter Remarks"
