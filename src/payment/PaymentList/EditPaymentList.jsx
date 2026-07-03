@@ -92,7 +92,7 @@ const MemoizedProductSelect = React.memo(
     }));
 
     const selectedOption = selectOptions.find(
-      (option) => option.value === value
+      (option) => option.value === value,
     );
 
     const customStyles = {
@@ -113,8 +113,8 @@ const MemoizedProductSelect = React.memo(
         backgroundColor: state.isSelected
           ? "#A5D6A7"
           : state.isFocused
-          ? "#f3f4f6"
-          : "white",
+            ? "#f3f4f6"
+            : "white",
         color: state.isSelected ? "black" : "#1f2937",
         "&:hover": {
           backgroundColor: "#EEEEEE",
@@ -171,7 +171,7 @@ const MemoizedProductSelect = React.memo(
         getOptionValue={(option) => option.value} // Use the value for the option
       />
     );
-  }
+  },
 );
 const EditPaymentList = () => {
   const { id } = useParams();
@@ -234,7 +234,7 @@ const EditPaymentList = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       if (!response.ok) throw new Error("Failed to fetch payment");
       return response.json();
@@ -252,7 +252,7 @@ const EditPaymentList = () => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     if (!response.ok) throw new Error("Failed to fetch company data");
@@ -283,7 +283,7 @@ const EditPaymentList = () => {
         body: JSON.stringify({
           invoiceP_buyername: formData.invoiceP_buyername,
         }),
-      }
+      },
     );
 
     if (!response.ok) throw new Error("Failed to fetch payment amount");
@@ -334,7 +334,7 @@ const EditPaymentList = () => {
             invoicePSub_discount: sub.invoicePSub_discount || 0,
             invoicePSub_shortage: sub.invoicePSub_shortage || 0,
             invoicePSub_remarks: sub.invoicePSub_remarks || "",
-          }))
+          })),
         );
       }
     }
@@ -362,7 +362,7 @@ const EditPaymentList = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       if (!response.ok) throw new Error("Failed to delete invoice Table");
       return response.json();
@@ -382,7 +382,7 @@ const EditPaymentList = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-      }
+      },
     );
 
     const responseData = await response.json();
@@ -472,7 +472,7 @@ const EditPaymentList = () => {
         setInvoiceData((prev) => prev.filter((_, i) => i !== index));
       }
     },
-    [invoiceData.length]
+    [invoiceData.length],
   );
   const calculateTotalInvoiceSubAmount = () => {
     return invoiceData.reduce((sum, item) => {
@@ -481,10 +481,7 @@ const EditPaymentList = () => {
           sum +
           (Number(item.invoicePSub_amt_adv) || 0) +
           (Number(item.invoicePSub_amt_dp) || 0) +
-          (Number(item.invoicePSub_amt_da) || 0) +
-          (Number(item.invoicePSub_bank_c) || 0) +
-          (Number(item.invoicePSub_discount) || 0) +
-          (Number(item.invoicePSub_shortage) || 0)
+          (Number(item.invoicePSub_amt_da) || 0)
         );
       }
       return sum;
@@ -513,7 +510,7 @@ const EditPaymentList = () => {
         });
 
         const deletionPromises = Array.from(crossedRows).map((rowId) =>
-          deleteProductMutation.mutateAsync(rowId)
+          deleteProductMutation.mutateAsync(rowId),
         );
 
         await Promise.all(deletionPromises);
@@ -554,7 +551,7 @@ const EditPaymentList = () => {
             const fieldKey = field.split(".").pop();
             const label = fieldLabels[fieldKey] || field;
             return `${label}: ${messages.join(", ")}`;
-          }
+          },
         );
 
         toast({
@@ -639,7 +636,10 @@ const EditPaymentList = () => {
                 <SelectStatus
                   value={formData.invoiceP_buyername}
                   onValueChange={(value) =>
-                    handleInputChange({ target: { value } }, "invoiceP_buyername")
+                    handleInputChange(
+                      { target: { value } },
+                      "invoiceP_buyername",
+                    )
                   }
                 >
                   <SelectTrigger className="bg-white">
@@ -647,10 +647,7 @@ const EditPaymentList = () => {
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     {buyerData?.buyer?.map((buyer) => (
-                      <SelectItem
-                        key={buyer.id}
-                        value={buyer.buyer_name}
-                      >
+                      <SelectItem key={buyer.id} value={buyer.buyer_name}>
                         {buyer.buyer_name}
                       </SelectItem>
                     ))}
@@ -812,7 +809,7 @@ const EditPaymentList = () => {
                               handlePaymentChange(
                                 e,
                                 rowIndex,
-                                "invoicePSub_inv_ref"
+                                "invoicePSub_inv_ref",
                               )
                             }
                             disabled
@@ -824,32 +821,29 @@ const EditPaymentList = () => {
                               handlePaymentChange(
                                 value,
                                 rowIndex,
-                                "invoicePSub_inv_ref"
+                                "invoicePSub_inv_ref",
                               )
                             }
                             options={
-                              invoiceNoData?.map(
-                                (status) => ({
-                                  value: status.invoice_ref,
-                                  label: (
-                                    <div className="flex flex-col">
-                                      <span className="font-bold text-sm">
-                                        {status.invoice_ref}
-                                      </span>
-                                      <span className="text-gray-600 text-[10px]">
-                                        Amount (USD):{" "}
-                                        {status.invoice_i_value_usd}
-                                      </span>
-                                      <span className="text-gray-600 text-[10px]">
-                                        Balance: {status.balance}
-                                      </span>
-                                      <span className="text-gray-600 text-[10px]">
-                                        Received: {status.received}
-                                      </span>
-                                    </div>
-                                  ),
-                                })
-                              ) || []
+                              invoiceNoData?.map((status) => ({
+                                value: status.invoice_ref,
+                                label: (
+                                  <div className="flex flex-col">
+                                    <span className="font-bold text-sm">
+                                      {status.invoice_ref}
+                                    </span>
+                                    <span className="text-gray-600 text-[10px]">
+                                      Amount (USD): {status.invoice_i_value_usd}
+                                    </span>
+                                    <span className="text-gray-600 text-[10px]">
+                                      Balance: {status.balance}
+                                    </span>
+                                    <span className="text-gray-600 text-[10px]">
+                                      Received: {status.received}
+                                    </span>
+                                  </div>
+                                ),
+                              })) || []
                             }
                             placeholder="Select Payment"
                           />
@@ -889,7 +883,7 @@ const EditPaymentList = () => {
                             handlePaymentChange(
                               e,
                               rowIndex,
-                              "invoicePSub_amt_adv"
+                              "invoicePSub_amt_adv",
                             )
                           }
                           placeholder="Enter Amount Adv"
@@ -903,7 +897,7 @@ const EditPaymentList = () => {
                             handlePaymentChange(
                               e,
                               rowIndex,
-                              "invoicePSub_amt_dp"
+                              "invoicePSub_amt_dp",
                             )
                           }
                           placeholder="Enter Amount DP"
@@ -917,7 +911,7 @@ const EditPaymentList = () => {
                             handlePaymentChange(
                               e,
                               rowIndex,
-                              "invoicePSub_amt_da"
+                              "invoicePSub_amt_da",
                             )
                           }
                           placeholder="Enter Amount DA"
@@ -931,7 +925,7 @@ const EditPaymentList = () => {
                             handlePaymentChange(
                               e,
                               rowIndex,
-                              "invoicePSub_bank_c"
+                              "invoicePSub_bank_c",
                             )
                           }
                           placeholder="Enter Bank Name"
@@ -945,7 +939,7 @@ const EditPaymentList = () => {
                             handlePaymentChange(
                               e,
                               rowIndex,
-                              "invoicePSub_discount"
+                              "invoicePSub_discount",
                             )
                           }
                           placeholder="Enter Discount"
@@ -959,7 +953,7 @@ const EditPaymentList = () => {
                             handlePaymentChange(
                               e,
                               rowIndex,
-                              "invoicePSub_shortage"
+                              "invoicePSub_shortage",
                             )
                           }
                           placeholder="Enter Shortage"
@@ -973,7 +967,7 @@ const EditPaymentList = () => {
                             handlePaymentChange(
                               e,
                               rowIndex,
-                              "invoicePSub_remarks"
+                              "invoicePSub_remarks",
                             )
                           }
                           placeholder="Enter Remarks"
