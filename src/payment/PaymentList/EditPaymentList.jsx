@@ -582,7 +582,7 @@ const EditPaymentList = () => {
   };
 
   if (isLoading) {
-    return <LoaderComponent name="Payment  Data" />; // ✅ Correct prop usage
+    return <LoaderComponent name="Payment  Data" />;
   }
 
   // Render error state
